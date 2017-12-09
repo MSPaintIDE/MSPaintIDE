@@ -95,8 +95,6 @@ public class ImageCompare {
 
             grid.compact();
 
-            grid.rawPrint();
-
             System.out.println(grid.getPrettyString());
 
 
@@ -118,17 +116,6 @@ public class ImageCompare {
 
                 if (ImageUtil.equals(subImage, searching)) {
                     grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY, hangsDown.get(identifier)));
-
-//                    for (int i = currentX; i < searching.getWidth(); i++) {
-//                        System.out.println("Setting placeholder at " + currentX + ", " + currentY);
-//                        grid.addLetter(new Letter("", 7, 21, i + 1, currentY, false));
-//                    }
-
-
-                    if (identifier.equals("g")) {
-                        System.out.println("Found \"g\" at position (" + currentX + ", " + currentY + ")");
-                    }
-//                    System.out.println("Found letter \"" + identifier + "\"! At (" + currentX + ", " + currentY + ")");
                 }
                 currentX++;
             }

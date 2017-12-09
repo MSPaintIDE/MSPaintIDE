@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.main;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class LetterRow implements Serializable {
@@ -20,88 +19,48 @@ public class LetterRow implements Serializable {
     }
 
     public void sort() {
-        System.out.println("row = " + row);
-
         AtomicReferenceArray<Letter> sorted = new AtomicReferenceArray<>(row.length());
 
         int lastIndex = 0;
+        int index = 0;
 
-        final int len = sorted.length();
-        for (int i = 0; i < len; i++) {
+        while (true) {
             int minIndex = min();
-            if (minIndex == -1) continue;
+            if (minIndex == -1) break;
 
             Letter letter = row.get(minIndex);
 
             int currentX = letter.getX();
 
-            int diff = currentX - lastIndex;
-
-            int spaces = diff % 7;
-
-            for (int i2 = 0; i2 < spaces; i2++) {
-//                sorted.set(i + i2, new Letter(" ", 7, 21, lastIndex + (i), letter.getY(), false));
+            if (letter.getLetter().equals("") || letter.getLetter().equals(" ")) {
+                row.set(minIndex, null);
+                continue;
             }
 
-            lastIndex = currentX;
 
-            sorted.set(i, letter);
+
+            int diff = currentX - lastIndex;
+
+            int spaces = diff / 7;
+
+            if (diff >= 7) {
+                for (int i2 = 0; i2 < spaces; i2++) {
+                    sorted.set(index, new Letter(" ", 7, 21, lastIndex + i2, letter.getY(), false));
+                    index++;
+                }
+            }
+
+            lastIndex = currentX + letter.getWidth();
+
+            sorted.set(index, letter);
             row.set(minIndex, null);
+
+            index++;
         }
 
-        System.out.println("sorted = " + sorted);
-
         row = sorted;
+
     }
-
-    /*
-
-
-
-
-
-
-
-
-
-
-    FOR TOMORROW THE 9TH::
-
-    SORT
-
-    INSERT SPACES
-
-    SORT AGAIN
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     */
-
-//    public void insertSpaces() {
-//        int lastIndex = 0;
-//
-//        for (int i = 0; i < row.length(); i++) {
-//            int currentX =
-//        }
-//    }
 
     public Letter get(int x) {
         for (int i = 0; i < row.length(); i++) {
@@ -109,19 +68,6 @@ public class LetterRow implements Serializable {
             if (temp != null && temp.getX() == x) return temp;
         }
         return null;
-    }
-
-    private int compressedLength() {
-        int len = 0;
-        for (int i = 0; i < row.length(); i++) {
-            Letter tempLetter = row.get(i);
-            if (tempLetter == null) continue;
-            if (tempLetter.getLetter().equals("")) continue;
-            len++;
-        }
-
-        System.out.println("len = " + len);
-        return len;
     }
 
     public int length() {

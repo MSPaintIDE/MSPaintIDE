@@ -49,6 +49,7 @@
 "Y_u.png" "Y"
 "Z_u.png" "Z"
 "and.png" "&"
+"quotes.png" """
 "apostraphe.png" "'"
 "at.png" "@" true
 "backslash.png" "/" true
@@ -74,7 +75,6 @@
 "period.png" "."
 "pipe.png" "|" true
 "questionmark.png" "?"
-"quotes.png" """
 "semicolon.png" ";" true
 "star.png" "*"
 "tilde.png" "~"

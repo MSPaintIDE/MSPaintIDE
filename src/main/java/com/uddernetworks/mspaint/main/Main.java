@@ -24,10 +24,6 @@ public class Main {
     Best results:
     - Verdana
 
-    - Times New Roman
-    - Monterresant
-    - Courier
-
      */
 
     public static void main(String[] args) throws IOException {

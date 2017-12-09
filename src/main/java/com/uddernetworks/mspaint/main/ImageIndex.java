@@ -44,7 +44,8 @@ public class ImageIndex {
                 }
 
 //                images.put(identifier, ImageUtil.trimWhitespace(ImageUtil.blackAndWhite(ImageIO.read(new File(directory, filename)))));
-                images.put(identifier, ImageUtil.trimWhitespace((ImageIO.read(new File(directory, filename)))));
+//                images.put(identifier, ImageUtil.trimWhitespace((ImageIO.read(new File(directory, filename)))));
+                images.put(identifier, (ImageIO.read(new File(directory, filename))));
             }
 
             System.out.println("Index keys:\n\t" + images.keySet());
