@@ -1,54 +1,38 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.ocr;
+
+import com.uddernetworks.mspaint.main.ImageUtil;
+import com.uddernetworks.mspaint.main.Letter;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImageCompare {
 
-    private static Map<String, BufferedImage> images;
-    private static Map<String, Boolean> hangsDown;
+    private Map<String, BufferedImage> images;
 
+    public LetterGrid getText(File inputImage, File objectFile, Map<String, BufferedImage>images, boolean readFromFile) {
+        this.images = images;
 
-    private static int maxLetterHeight = 21;
+        if (readFromFile) {
+            System.out.println("Image not changed since file changed, so using file...");
+        } else {
+            System.out.println("Image has changed since last write to data file, reading image...");
+        }
 
-    public static void main(String[] args) {
-
-        ImageIndex imageIndex = new ImageIndex("E:\\MSPaintIDE\\letters");
-        Object[] objs = imageIndex.index();
-        images = (Map<String, BufferedImage>) objs[0];
-        hangsDown = (Map<String, Boolean>) objs[1];
-
-        File inputImage = new File("E:\\MSPaintIDE\\images\\long_input.png");
-        File writeImage = new File("E:\\MSPaintIDE\\images\\long_input_contrast.png");
-
-//        File inputImage = new File("E:\\MSPaintIDE\\images\\letter_input.png");
-//        File writeImage = new File("E:\\MSPaintIDE\\images\\letter_input_contrast.png");
-//
         try {
-            BufferedImage image = ImageIO.read(inputImage);
+            BufferedImage image = ImageUtil.blackAndWhite(ImageIO.read(inputImage));
 
-//            BufferedImage wImage = new BufferedImage(image.getWidth(), image.getHeight(), TYPE_INT_ARGB);
-
-//            BufferedImage wImage = ImageUtil.blackAndWhite(image);
-            BufferedImage wImage = image;
-
-            ImageIO.write(wImage, "png", writeImage);
-
-            File objectFile = new File("E:\\MSPaintIDE\\LetterGridObject.txt");
             objectFile.createNewFile();
-
-            boolean readObjectFromFile = true; // TODO ::::::::: IMPORTANT
-
-            final long start = System.currentTimeMillis();
 
             LetterGrid grid;
 
-            if (!readObjectFromFile) {
-                grid = new LetterGrid(wImage.getWidth(), wImage.getHeight());
+            if (!readFromFile) {
+                grid = new LetterGrid(image.getWidth(), image.getHeight());
 
 
                 AtomicInteger waitingFor = new AtomicInteger(images.keySet().size());
@@ -57,7 +41,7 @@ public class ImageCompare {
                 for (String identifier : images.keySet()) {
                     new Thread(() -> {
                         System.out.println(identifier);
-                        searchFor(grid, identifier, wImage);
+                        searchFor(grid, identifier, image);
                         waitingFor.getAndDecrement();
                     }).start();
                 }
@@ -75,7 +59,6 @@ public class ImageCompare {
                 FileOutputStream fos = new FileOutputStream(objectFile);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-                // Write objects to file
                 oos.writeObject(grid);
 
                 oos.close();
@@ -84,26 +67,21 @@ public class ImageCompare {
                 FileInputStream fi = new FileInputStream(objectFile);
                 ObjectInputStream oi = new ObjectInputStream(fi);
 
-                // Read objects
                 grid = (LetterGrid) oi.readObject();
             }
 
-
-
-
-            System.out.println("Finished scan in " + (System.currentTimeMillis() - start) + "ms");
-
             grid.compact();
 
-            System.out.println(grid.getPrettyString());
-
+            return grid;
 
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
-    private static void searchFor(LetterGrid grid, String identifier, BufferedImage image) {
+    private void searchFor(LetterGrid grid, String identifier, BufferedImage image) {
         BufferedImage searching = images.get(identifier);
 
         int currentX = 0;
@@ -115,7 +93,7 @@ public class ImageCompare {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, searching.getWidth(), searching.getHeight());
 
                 if (ImageUtil.equals(subImage, searching)) {
-                    grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY, hangsDown.get(identifier)));
+                    grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY));
                 }
                 currentX++;
             }

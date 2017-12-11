@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.main;
 
+import java.awt.*;
 import java.io.Serializable;
 
 public class Letter implements Serializable {
@@ -10,26 +11,14 @@ public class Letter implements Serializable {
     private int height;
     private int x;
     private int y;
-    private boolean hangsDown;
-    private boolean placeholder;
+    private Color color = new Color(0, 0, 0);
 
-    public Letter() {
-        this.placeholder = true;
-    }
-
-    public Letter(String letter, int width, int height, int x, int y, boolean hangsDown) {
+    public Letter(String letter, int width, int height, int x, int y) {
         this.letter = letter;
         this.width = width;
         this.height = height;
         this.x = x;
-        this.hangsDown = hangsDown;
-        this.placeholder = false;
-
-//        if (height != 21) {
-//            this.y = y - (21 - height) - (hangsDown ? 4 : 0);
-//        } else {
-            this.y = y;
-//        }
+        this.y = y;
     }
 
     public String getLetter() {
@@ -52,12 +41,12 @@ public class Letter implements Serializable {
         return y;
     }
 
-    public boolean hangsDown() {
-        return hangsDown;
+    public Color getColor() {
+        return color;
     }
 
-    public boolean isPlaceholder() {
-        return placeholder;
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     @Override

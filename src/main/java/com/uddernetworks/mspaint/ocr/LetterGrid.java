@@ -1,6 +1,11 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.ocr;
+
+import com.uddernetworks.mspaint.main.Letter;
+import com.uddernetworks.mspaint.ocr.LetterRow;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class LetterGrid implements Serializable {
@@ -22,7 +27,7 @@ public class LetterGrid implements Serializable {
         for (int i = 0; i < letter.getWidth(); i++) {
             Letter replacing = letterGrid.get(letter.getY()).get(i + x + 1);
             if (replacing == null) {
-                letterGrid.get(letter.getY()).insertIn(new Letter("", 10, 21, i + x + 1, letter.getY(), false));
+                letterGrid.get(letter.getY()).insertIn(new Letter("", 10, 21, i + x + 1, letter.getY()));
             }
         }
     }
@@ -94,6 +99,18 @@ public class LetterGrid implements Serializable {
         return lastNonNull + 1;
     }
 
+    public List<List<Letter>> getLetterGridArray() {
+        List<List<Letter>> ret = new ArrayList<>();
+
+        for (int i = 0; i < letterGrid.length(); i++) {
+            LetterRow row = letterGrid.get(i);
+
+            ret.add(row.toList());
+        }
+
+        return ret;
+    }
+
     public String getPrettyString() {
         StringBuilder ret = new StringBuilder();
 
@@ -106,7 +123,7 @@ public class LetterGrid implements Serializable {
             for (int i = 0; ; i++) {
                 boolean print = !String.valueOf(row.get(i)).equals("null");
 
-                if (print) ret.append(String.valueOf(row.get(i)));
+                if (print) ret.append(row.get(i).getLetter());
 
                 if (i == iMax) break;
             }
@@ -115,30 +132,6 @@ public class LetterGrid implements Serializable {
         }
 
         return ret.toString();
-    }
-
-    public void rawPrint() {
-        for (int i2 = 0; i2 < letterGrid.length(); i2++) {
-            LetterRow row = letterGrid.get(i2);
-
-            int iMax = row.length() - 1;
-            if (iMax == -1) continue;
-
-            StringBuilder b = new StringBuilder();
-            b.append('[');
-            for (int i = 0; ; i++) {
-                boolean print = !String.valueOf(row.get(i)).equals("null");
-
-                if (print) b.append(String.valueOf(row.get(i)));
-
-                if (i == iMax) {
-                    System.out.println(b.append(']').toString());
-                    break;
-                }
-
-                if (print) b.append(", ");
-            }
-        }
     }
 
 }

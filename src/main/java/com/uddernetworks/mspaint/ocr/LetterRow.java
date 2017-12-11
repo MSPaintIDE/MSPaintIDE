@@ -1,6 +1,10 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.ocr;
+
+import com.uddernetworks.mspaint.main.Letter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class LetterRow implements Serializable {
@@ -45,7 +49,7 @@ public class LetterRow implements Serializable {
 
             if (diff >= 7) {
                 for (int i2 = 0; i2 < spaces; i2++) {
-                    sorted.set(index, new Letter(" ", 7, 21, lastIndex + i2, letter.getY(), false));
+                    sorted.set(index, new Letter(" ", 7, 21, lastIndex + i2, letter.getY()));
                     index++;
                 }
             }
@@ -92,6 +96,16 @@ public class LetterRow implements Serializable {
         }
 
         return minIndex;
+    }
+
+    public List<Letter> toList() {
+        List<Letter> ret = new ArrayList<>();
+
+        for (int i = 0; i < row.length(); i++) {
+            ret.add(row.get(i));
+        }
+
+        return ret;
     }
 
     @Override
