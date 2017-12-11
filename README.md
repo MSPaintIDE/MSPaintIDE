@@ -34,6 +34,8 @@ The image file that will contain all of the compiled program's output, like stat
 
 _Note: All options are saved in a file named options.txt in the same directory of your jar, to keep you from re choosing everything every restart_
 
+   Once you have all of the options set, you can be free to program in MS Paint, saving to the file you set earlier. The font must be in font size **16**, with the font family being **Verdana**. If people are super interested in this (Which I doubt, but who knows) I would make it support more fonts, but right now that's not a top priority.
+
 ## Screenshots
 ![](https://rubbaboy.me/images/ihwxt7y)
 
