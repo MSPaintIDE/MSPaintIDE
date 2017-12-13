@@ -2,16 +2,18 @@ package com.uddernetworks.mspaint.main;
 
 import javax.tools.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class CodeCompiler {
 
@@ -48,13 +50,20 @@ public class CodeCompiler {
         return so;
     }
 
-    private void compile(Iterable<? extends JavaFileObject> files) {
+    private void compile(Iterable<? extends JavaFileObject> files, List<File> libs) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         MyDiagnosticListener c = new MyDiagnosticListener();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(c, Locale.ENGLISH, null);
 
-        Iterable options = Arrays.asList("-d", classOutputFolder.getAbsolutePath());
+        List<String> options = new ArrayList<>(Arrays.asList("-d", classOutputFolder.getAbsolutePath()));
+
+        if (!libs.isEmpty()) {
+            options.add("-classpath");
+
+            libs.forEach(lib -> options.add(lib.getAbsolutePath()));
+        }
+
         JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, c, options, null, files);
         task.call();
     }
@@ -71,16 +80,20 @@ public class CodeCompiler {
             Object instance = thisClass.newInstance();
             Method thisMethod = thisClass.getDeclaredMethod("main", String[].class);
 
-            thisMethod.invoke(instance, new Object[] { new String[0] });
+            thisMethod.invoke(instance, new Object[]{new String[0]});
         } catch (MalformedURLException | ClassNotFoundException ignored) {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public List<Diagnostic<? extends JavaFileObject>> compileAndExecute(String text, File classOutputFolder, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
+    public List<Diagnostic<? extends JavaFileObject>> compileAndExecute(String text, File jarFile, File otherFiles, File classOutputFolder, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
         this.classOutputFolder = classOutputFolder;
         classOutputFolder.mkdirs();
+
+        for (File file : getFilesFromDirectory(classOutputFolder, null)) {
+            file.delete();
+        }
 
         PrintStream imageOut = new PrintStream(imageOutputStream);
         PrintStream compilerOut = new PrintStream(compilerStream);
@@ -108,9 +121,32 @@ public class CodeCompiler {
         JavaFileObject file = getJavaFileObject(text, classPackage, className);
         Iterable<? extends JavaFileObject> files = Arrays.asList(file);
 
-        compile(files);
+        compile(files, libs);
 
         compilerOut.println("Compiled in " + String.valueOf((System.currentTimeMillis() - start)) + "ms");
+
+        start = System.currentTimeMillis();
+        compilerOut.println("Packaging jar...");
+
+        if (otherFiles.isDirectory()) {
+
+            copyFolder(otherFiles, classOutputFolder);
+        } else {
+            File newLoc = new File(classOutputFolder, otherFiles.getName());
+            newLoc.createNewFile();
+            Files.copy(Paths.get(otherFiles.getAbsolutePath()), Paths.get(newLoc.getAbsolutePath()), REPLACE_EXISTING);
+        }
+
+        FileJarrer fileJarrer = new FileJarrer(classOutputFolder, jarFile);
+        fileJarrer.jarDirectory();
+
+        System.out.println("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
+
+        if (!execute) {
+            System.setOut(oldPS);
+            return errors;
+        }
+
         compilerOut.println("Executing...");
         start = System.currentTimeMillis();
 
@@ -128,5 +164,50 @@ public class CodeCompiler {
         compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
 
         return errors;
+    }
+
+
+    private static void copyFolder(File src, File dest) throws IOException {
+        if (src.isDirectory()) {
+
+            if (!dest.exists()) dest.mkdir();
+
+            for (String file : src.list()) {
+                //construct the src and dest file structure
+                File srcFile = new File(src, file);
+                File destFile = new File(dest, file);
+                //recursive copy
+                copyFolder(srcFile, destFile);
+            }
+        } else {
+            InputStream in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dest);
+
+            byte[] buffer = new byte[1024];
+
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+
+            in.close();
+            out.close();
+        }
+    }
+
+
+    private List<File> getFilesFromDirectory(File directory, String extension) {
+        List<File> ret = new ArrayList<>();
+        for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+                ret.add(file);
+                ret.addAll(getFilesFromDirectory(file, extension));
+            } else {
+                if (extension == null) ret.add(file);
+                else if (file.getName().endsWith("." + extension)) ret.add(file);
+            }
+        }
+
+        return ret;
     }
 }

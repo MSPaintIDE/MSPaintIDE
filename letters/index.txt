@@ -38,6 +38,7 @@
 "M_u.png" "M"
 "N_u.png" "N"
 "O_u.png" "O"
+"P_u.png" "P"
 "Q_u.png" "Q" true
 "R_u.png" "R"
 "S_u.png" "S"

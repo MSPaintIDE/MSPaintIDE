@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.ocr;
 
 import com.uddernetworks.mspaint.main.ImageUtil;
 import com.uddernetworks.mspaint.main.Letter;
+import com.uddernetworks.mspaint.main.Probe;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -15,7 +16,7 @@ public class ImageCompare {
 
     private Map<String, BufferedImage> images;
 
-    public LetterGrid getText(File inputImage, File objectFile, Map<String, BufferedImage>images, boolean readFromFile) {
+    public LetterGrid getText(File inputImage, File objectFile, Map<String, BufferedImage>images, boolean useProbe, boolean readFromFile) {
         this.images = images;
 
         if (readFromFile) {
@@ -37,11 +38,15 @@ public class ImageCompare {
 
                 AtomicInteger waitingFor = new AtomicInteger(images.keySet().size());
 
+                Probe probe = new Probe(image, images.get("p"));
+
+                int startY = (useProbe) ? probe.sendInProbe() : 0;
+                int iterByY = (useProbe) ? 25 : 1;
 
                 for (String identifier : images.keySet()) {
                     new Thread(() -> {
                         System.out.println(identifier);
-                        searchFor(grid, identifier, image);
+                        searchFor(grid, identifier, image, startY, iterByY);
                         waitingFor.getAndDecrement();
                     }).start();
                 }
@@ -81,11 +86,11 @@ public class ImageCompare {
         return null;
     }
 
-    private void searchFor(LetterGrid grid, String identifier, BufferedImage image) {
+    private void searchFor(LetterGrid grid, String identifier, BufferedImage image, int startY, int iterYBy) {
         BufferedImage searching = images.get(identifier);
 
         int currentX = 0;
-        int currentY = 0;
+        int currentY = startY;
 
         while (currentY + searching.getHeight() <= image.getHeight()) {
             currentX = 0;
@@ -97,7 +102,7 @@ public class ImageCompare {
                 }
                 currentX++;
             }
-            currentY++;
+            currentY += iterYBy;
         }
 
         System.out.println("Checked " + (currentX * currentY));

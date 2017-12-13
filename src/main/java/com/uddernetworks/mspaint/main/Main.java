@@ -16,10 +16,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
 
@@ -29,6 +26,9 @@ public class Main {
     private File highlightedFile = null;
     private File objectFile = null;
     private File classOutput = null;
+    private File jarFile = null;
+    private File libraryFile = null;
+    private File otherFiles = null;
     private File compilerOutput = null;
     private File appOutput = null;
     private File letterDirectory = null;
@@ -88,6 +88,15 @@ public class Main {
                 case "classOutput":
                     classOutput = new File(secondPart);
                     break;
+                case "jarFile":
+                    jarFile = new File(secondPart);
+                    break;
+                case "libraryFile":
+                    libraryFile = new File(secondPart);
+                    break;
+                case "otherFiles":
+                    otherFiles = new File(secondPart);
+                    break;
                 case "compilerOutput":
                     compilerOutput = new File(secondPart);
                     break;
@@ -107,6 +116,9 @@ public class Main {
         stringBuilder.append("highlightedFile ").append(getHighlightedFile()).append("\n");
         stringBuilder.append("objectFile ").append(getObjectFile()).append("\n");
         stringBuilder.append("classOutput ").append(getClassOutput()).append("\n");
+        stringBuilder.append("jarFile ").append(getJarFile()).append("\n");
+        stringBuilder.append("libraryFile ").append(getLibraryFile()).append("\n");
+        stringBuilder.append("otherFiles ").append(getOtherFiles()).append("\n");
         stringBuilder.append("compilerOutput ").append(getCompilerOutput()).append("\n");
         stringBuilder.append("appOutput ").append(getAppOutput()).append("\n");
         stringBuilder.append("letterDirectory ").append(getLetterDirectory());
@@ -128,7 +140,7 @@ public class Main {
         return inputImage == null || highlightedFile == null || objectFile == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
     }
 
-    public long highlight(boolean printOutTime) throws IOException {
+    public long highlightAll(boolean printOutTime, boolean useProbe) throws IOException {
         if (optionsNotFilled()) {
             JOptionPane.showMessageDialog(null, "Please select files for all options", "Error", JOptionPane.ERROR_MESSAGE);
             return -1;
@@ -136,87 +148,127 @@ public class Main {
 
         final long originalStart = System.currentTimeMillis();
 
-        System.out.println("Scanning image...");
+        System.out.println("Scanning all images...");
         long start = System.currentTimeMillis();
 
         ImageIndex imageIndex = new ImageIndex(letterDirectory);
         images = imageIndex.index();
 
+        if (inputImage.isDirectory()) {
+            for (File imageFile : getFilesFromDirectory(inputImage, "png")) {
+                highlight(imageFile, printOutTime, useProbe);
+            }
+        } else {
+            highlight(inputImage, printOutTime, useProbe);
+        }
+
+        System.out.println("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
+
+        return originalStart;
+    }
+
+    public void highlight(File inputImage, boolean printOutTime, boolean useProbe) throws IOException {
+        System.out.println("Scanning image " + inputImage.getName() + "...");
+        final String prefix = "[" + inputImage.getName() + "] ";
+
+        final long originalStart = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+
         ImageCompare imageCompare = new ImageCompare();
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        LetterGrid grid = imageCompare.getText(inputImage, objectFile, images, !modifiedDetector.imageChanged());
+        LetterGrid grid = imageCompare.getText(inputImage, objectFile, images, useProbe, !modifiedDetector.imageChanged());
 
         letterGrid = grid.getLetterGridArray();
         text = grid.getPrettyString();
 
-        System.out.println("\n\ntext =\n" + text);
+        System.out.println("\n\n" + prefix + "text =\n" + text);
 
-        System.out.println("Finished scan in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
 
-        System.out.println("\nHighlighting...");
+        System.out.println("\n" + prefix + "Highlighting...");
         start = System.currentTimeMillis();
 
         CustomJavaRenderer renderer = new CustomJavaRenderer();
         String highlighted = renderer.highlight(text);
 
-        System.out.println("Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 
-        System.out.println("Modifying letters...");
+        System.out.println(prefix + "Modifying letters...");
         start = System.currentTimeMillis();
 
         LetterFormatter letterFormatter = new LetterFormatter(letterGrid);
         letterFormatter.formatLetters(highlighted);
 
-        System.out.println("Finished modifying letters in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println(prefix + "Finished modifying letters in " + (System.currentTimeMillis() - start) + "ms");
 
-        System.out.println("Writing highlighted image to file...");
+        System.out.println(prefix + "Writing highlighted image to file...");
         start = System.currentTimeMillis();
 
 
         letterFileWriter = new LetterFileWriter(letterGrid, inputImage, highlightedFile);
         letterFileWriter.writeToFile(images);
 
-        System.out.println("Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
 
         if (printOutTime) {
-            System.out.println("Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
+            System.out.println(prefix + "Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
         }
-
-        return originalStart;
     }
 
-    public void compile() throws IOException {
-        final long originalStart = highlight(false);
-
-        if (originalStart == -1) return;
+    public void compile(boolean execute) throws IOException {
 
         long start = System.currentTimeMillis();
+        final long originalStart = start;
 
         BufferedImage image = letterFileWriter.getImage();
 
         System.out.println("Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
 
-        System.out.println("Executing...");
+        System.out.println("Compiling...");
         start = System.currentTimeMillis();
 
 
         CodeCompiler codeCompiler = new CodeCompiler();
 
+        List<File> libFiles = new ArrayList<>();
+        if (libraryFile != null) {
+            if (libraryFile.isFile()) {
+                if (libraryFile.getName().endsWith(".jar")) {
+                    libFiles.add(libraryFile);
+                }
+            } else {
+                libFiles.addAll(getFilesFromDirectory(libraryFile, "jar"));
+            }
+        }
+
         ImageOutputStream imageOutputStream = new ImageOutputStream(appOutput, 500);
         ImageOutputStream compilerOutputStream = new ImageOutputStream(compilerOutput, 500);
-        List<Diagnostic<? extends JavaFileObject>> errors = codeCompiler.compileAndExecute(text, classOutput, imageOutputStream, compilerOutputStream);
+        List<Diagnostic<? extends JavaFileObject>> errors = codeCompiler.compileAndExecute(text, jarFile, otherFiles, classOutput, imageOutputStream, compilerOutputStream, libFiles, execute);
 
-        AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(image, 3, new File(letterDirectory.getAbsoluteFile(),"angry_squiggle.png"), highlightedFile, letterGrid, errors);
+        AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(image, 3, new File(letterDirectory.getAbsoluteFile(), "angry_squiggle.png"), highlightedFile, letterGrid, errors);
         highlighter.highlightAngrySquiggles();
 
-        System.out.println("Finished executing in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
 
         imageOutputStream.saveImage();
         compilerOutputStream.saveImage();
 
         System.out.println("Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
+    }
+
+    private List<File> getFilesFromDirectory(File directory, String extension) {
+        List<File> ret = new ArrayList<>();
+        for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+                ret.addAll(getFilesFromDirectory(file, extension));
+            } else {
+                if (file.getName().endsWith("." + extension)) ret.add(file);
+            }
+        }
+
+        return ret;
     }
 
     public void setInputImage(File inputImage) {
@@ -236,6 +288,21 @@ public class Main {
 
     public void setClassOutput(File classOutput) {
         this.classOutput = classOutput;
+        saveOptions();
+    }
+
+    public void setJarFile(File jarFile) {
+        this.jarFile = jarFile;
+        saveOptions();
+    }
+
+    public void setLibraryFile(File libraryFile) {
+        this.libraryFile = libraryFile;
+        saveOptions();
+    }
+
+    public void setOtherFiles(File libraryFile) {
+        this.otherFiles = libraryFile;
         saveOptions();
     }
 
@@ -268,6 +335,18 @@ public class Main {
 
     public String getClassOutput() {
         return (classOutput == null) ? "" : classOutput.getAbsolutePath();
+    }
+
+    public String getJarFile() {
+        return (jarFile == null) ? "" : jarFile.getAbsolutePath();
+    }
+
+    public String getLibraryFile() {
+        return (libraryFile == null) ? "" : libraryFile.getAbsolutePath();
+    }
+
+    public String getOtherFiles() {
+        return (otherFiles == null) ? "" : otherFiles.getAbsolutePath();
     }
 
     public String getCompilerOutput() {

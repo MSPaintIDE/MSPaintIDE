@@ -78,8 +78,6 @@ public class AngrySquiggleHighlighter {
                     ret[0] = letter.getX();
                     ret[1] = letter.getY() + 21;
                     ret[2] = columnNumber;
-
-                    System.out.println("ret = " + Arrays.toString(ret));
                     break;
                 }
             }
