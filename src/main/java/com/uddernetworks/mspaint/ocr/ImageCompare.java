@@ -26,6 +26,7 @@ public class ImageCompare {
         }
 
         try {
+            System.out.println("Image = " + inputImage.getAbsolutePath());
             BufferedImage image = ImageUtil.blackAndWhite(ImageIO.read(inputImage));
 
             objectFile.createNewFile();

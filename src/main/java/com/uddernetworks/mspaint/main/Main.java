@@ -11,12 +11,14 @@ import javafx.scene.control.Alert;
 import javax.swing.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 
 public class Main {
 
@@ -38,6 +40,8 @@ public class Main {
     private List<List<Letter>> letterGrid;
     private File parent;
     private File currentJar;
+
+    private List<ImageClass> imageClasses = new ArrayList<>();
 
     public static void main(String[] args) {
         try {
@@ -61,10 +65,21 @@ public class Main {
         mainWindow.registerThings(this, currentJar);
         JTextPane textArea = mainWindow.getTextAreaOutput();
 
-        TextPrintStream textPrintStream = new TextPrintStream(textArea);
+        TextPrintStream textPrintStream = new TextPrintStream(textArea, System.out);
         PrintStream textOut = new PrintStream(textPrintStream);
         System.setOut(textOut);
         System.setErr(textOut);
+
+        new Thread(() -> {
+            try {
+                while (true) {
+                    textPrintStream.updateText();
+                    Thread.sleep(3000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void parseOptions() throws IOException {
@@ -140,13 +155,11 @@ public class Main {
         return inputImage == null || highlightedFile == null || objectFile == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
     }
 
-    public long highlightAll(boolean printOutTime, boolean useProbe) throws IOException {
+    public void indexAll(boolean useProbe) {
         if (optionsNotFilled()) {
             JOptionPane.showMessageDialog(null, "Please select files for all options", "Error", JOptionPane.ERROR_MESSAGE);
-            return -1;
+            return;
         }
-
-        final long originalStart = System.currentTimeMillis();
 
         System.out.println("Scanning all images...");
         long start = System.currentTimeMillis();
@@ -156,73 +169,38 @@ public class Main {
 
         if (inputImage.isDirectory()) {
             for (File imageFile : getFilesFromDirectory(inputImage, "png")) {
-                highlight(imageFile, printOutTime, useProbe);
+                imageClasses.add(new ImageClass(imageFile, objectFile, images, useProbe));
             }
         } else {
-            highlight(inputImage, printOutTime, useProbe);
+            imageClasses.add(new ImageClass(inputImage, objectFile, images, useProbe));
         }
 
         System.out.println("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
-
-        return originalStart;
     }
 
-    public void highlight(File inputImage, boolean printOutTime, boolean useProbe) throws IOException {
-        System.out.println("Scanning image " + inputImage.getName() + "...");
-        final String prefix = "[" + inputImage.getName() + "] ";
+    public void highlightAll() throws IOException {
+        if (optionsNotFilled()) {
+            JOptionPane.showMessageDialog(null, "Please select files for all options", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        final long originalStart = System.currentTimeMillis();
+        System.out.println("Scanning all images...");
         long start = System.currentTimeMillis();
 
-        ImageCompare imageCompare = new ImageCompare();
-
-        ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
-
-        LetterGrid grid = imageCompare.getText(inputImage, objectFile, images, useProbe, !modifiedDetector.imageChanged());
-
-        letterGrid = grid.getLetterGridArray();
-        text = grid.getPrettyString();
-
-        System.out.println("\n\n" + prefix + "text =\n" + text);
-
-        System.out.println(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
-
-        System.out.println("\n" + prefix + "Highlighting...");
-        start = System.currentTimeMillis();
-
-        CustomJavaRenderer renderer = new CustomJavaRenderer();
-        String highlighted = renderer.highlight(text);
-
-        System.out.println(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
-
-        System.out.println(prefix + "Modifying letters...");
-        start = System.currentTimeMillis();
-
-        LetterFormatter letterFormatter = new LetterFormatter(letterGrid);
-        letterFormatter.formatLetters(highlighted);
-
-        System.out.println(prefix + "Finished modifying letters in " + (System.currentTimeMillis() - start) + "ms");
-
-        System.out.println(prefix + "Writing highlighted image to file...");
-        start = System.currentTimeMillis();
-
-
-        letterFileWriter = new LetterFileWriter(letterGrid, inputImage, highlightedFile);
-        letterFileWriter.writeToFile(images);
-
-        System.out.println(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
-
-        if (printOutTime) {
-            System.out.println(prefix + "Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
+        for (ImageClass imageClass : imageClasses) {
+            imageClass.highlight(highlightedFile);
         }
+
+        System.out.println("Finished highlighting all images in " + (System.currentTimeMillis() - start) + "ms");
     }
+
+
 
     public void compile(boolean execute) throws IOException {
 
         long start = System.currentTimeMillis();
         final long originalStart = start;
 
-        BufferedImage image = letterFileWriter.getImage();
 
         System.out.println("Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -245,10 +223,13 @@ public class Main {
 
         ImageOutputStream imageOutputStream = new ImageOutputStream(appOutput, 500);
         ImageOutputStream compilerOutputStream = new ImageOutputStream(compilerOutput, 500);
-        List<Diagnostic<? extends JavaFileObject>> errors = codeCompiler.compileAndExecute(text, jarFile, otherFiles, classOutput, imageOutputStream, compilerOutputStream, libFiles, execute);
+        Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, imageOutputStream, compilerOutputStream, libFiles, execute);
 
-        AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(image, 3, new File(letterDirectory.getAbsoluteFile(), "angry_squiggle.png"), highlightedFile, letterGrid, errors);
-        highlighter.highlightAngrySquiggles();
+        for (ImageClass imageClass : errors.keySet()) {
+            AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, new File(letterDirectory.getAbsoluteFile(), "angry_squiggle.png"), imageClass.getHighlightedFile(), imageClass.getLetterGrid(), errors.get(imageClass));
+            highlighter.highlightAngrySquiggles();
+        }
+
 
         System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
 

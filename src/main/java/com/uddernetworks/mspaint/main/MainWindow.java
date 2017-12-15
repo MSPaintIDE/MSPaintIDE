@@ -76,7 +76,7 @@ public class MainWindow {
         changeInputImage.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             fc.setFileFilter(imageFilter);
-//            fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fc.setSelectedFile(currentFile);
             int returnVal = fc.showOpenDialog(panel1);
 
@@ -103,7 +103,7 @@ public class MainWindow {
         changeCacheFile.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             fc.setSelectedFile(currentFile);
-            fc.setFileFilter(txtFilter);
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             int returnVal = fc.showOpenDialog(panel1);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -229,14 +229,19 @@ public class MainWindow {
 
         start.addActionListener(e -> new Thread(() -> {
             try {
+                long start = System.currentTimeMillis();
+                main.indexAll(useProbeCheckBox.isSelected());
+
                 if (syntaxHighlightCheckbox.isSelected()) {
-                    main.highlightAll(useProbeCheckBox.isSelected(), true);
+                    main.highlightAll();
 
                 }
 
                 if (compileHighlightCheckbox.isSelected()) {
                     main.compile(executeCheckBox.isSelected());
                 }
+
+                System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
 
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -333,7 +338,7 @@ public class MainWindow {
         label2.setText("Highlighted Out Directory:");
         panel3.add(label2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label3 = new JLabel();
-        label3.setText("Cache File:");
+        label3.setText("Cache File Directory:");
         panel3.add(label3, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label4 = new JLabel();
         label4.setText("Class File Output:");

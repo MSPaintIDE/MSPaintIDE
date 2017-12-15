@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.main;
 import javax.tools.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -18,11 +19,26 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class CodeCompiler {
 
     private File classOutputFolder;
-    private List<Diagnostic<? extends JavaFileObject>> errors = new ArrayList<>();
+    private Map<String, ImageClass> imageClassHashMap = new HashMap<>();
+    private Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = new HashMap<>();
 
     public class MyDiagnosticListener implements DiagnosticListener<JavaFileObject> {
+
         public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-            errors.add(diagnostic);
+            String packageName = diagnostic.getSource().getName().substring(1).replace("/", ".");
+            packageName = packageName.substring(0, packageName.length() - 5);
+
+            System.out.println("packageName = " + packageName);
+
+            ImageClass imageClass = imageClassHashMap.get(packageName);
+
+            if (errors.containsKey(imageClass)) {
+                errors.get(imageClass).add(diagnostic);
+            } else {
+                List<Diagnostic<? extends JavaFileObject>> list = new ArrayList<>();
+                list.add(diagnostic);
+                errors.put(imageClass, list);
+            }
         }
     }
 
@@ -81,13 +97,10 @@ public class CodeCompiler {
             Method thisMethod = thisClass.getDeclaredMethod("main", String[].class);
 
             thisMethod.invoke(instance, new Object[]{new String[0]});
-        } catch (MalformedURLException | ClassNotFoundException ignored) {
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (MalformedURLException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ignored) {}
     }
 
-    public List<Diagnostic<? extends JavaFileObject>> compileAndExecute(String text, File jarFile, File otherFiles, File classOutputFolder, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
+    public Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
         this.classOutputFolder = classOutputFolder;
         classOutputFolder.mkdirs();
 
@@ -105,23 +118,31 @@ public class CodeCompiler {
         long start = System.currentTimeMillis();
         compilerOut.println("Compiling...");
 
-        String classPackage = (text.trim().startsWith("package") ? text.trim().substring(8, text.trim().indexOf(";")) : "");
-        String[] spaces = text.trim().split(" ");
-        String className = "Main";
-        for (int i = 0; i < spaces.length; i++) {
-            if (spaces[i].equals("class")) {
-                className = spaces[i + 1];
-                break;
+        List<JavaFileObject> filesList = new ArrayList<>();
+
+        Map<String, String> namePackages = new HashMap<>();
+
+        for (ImageClass imageClass : imageClasses) {
+            String classPackage = (imageClass.getText().trim().startsWith("package") ? imageClass.getText().trim().substring(8, imageClass.getText().trim().indexOf(";")) : "");
+            String[] spaces = imageClass.getText().trim().split(" ");
+            String className = "Main";
+            for (int i = 0; i < spaces.length; i++) {
+                if (spaces[i].equals("class")) {
+                    className = spaces[i + 1];
+                    break;
+                }
             }
+
+            compilerOut.println("Class name = " + className);
+            compilerOut.println("Class package = " + classPackage);
+
+            namePackages.put(className, classPackage);
+            imageClassHashMap.put(classPackage + "." + className, imageClass);
+
+            filesList.add(getJavaFileObject(imageClass.getText(), classPackage, className));
         }
 
-        compilerOut.println("Class name = " + className);
-        compilerOut.println("Class package = " + classPackage);
-
-        JavaFileObject file = getJavaFileObject(text, classPackage, className);
-        Iterable<? extends JavaFileObject> files = Arrays.asList(file);
-
-        compile(files, libs);
+        compile(filesList, libs);
 
         compilerOut.println("Compiled in " + String.valueOf((System.currentTimeMillis() - start)) + "ms");
 
@@ -142,6 +163,14 @@ public class CodeCompiler {
 
         System.out.println("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
+        if (!errors.isEmpty()) {
+            for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {
+                for (Diagnostic<? extends JavaFileObject> error : errorList) {
+                    compilerOut.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
+                }
+            }
+        }
+
         if (!execute) {
             System.setOut(oldPS);
             return errors;
@@ -150,11 +179,15 @@ public class CodeCompiler {
         compilerOut.println("Executing...");
         start = System.currentTimeMillis();
 
-        runIt(classPackage, className);
+        for (String className : namePackages.keySet()) {
+            runIt(namePackages.get(className), className);
+        }
 
         if (!errors.isEmpty()) {
-            for (Diagnostic<? extends JavaFileObject> error : errors) {
-                compilerOut.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
+            for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {
+                for (Diagnostic<? extends JavaFileObject> error : errorList) {
+                    compilerOut.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
+                }
             }
         }
 

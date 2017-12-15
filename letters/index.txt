@@ -25,6 +25,7 @@
 "y.png" "y" true
 "z.png" "z"
 "A_u.png" "A"
+"B_u.png" "B"
 "C_u.png" "C"
 "D_u.png" "D"
 "E_u.png" "E"
