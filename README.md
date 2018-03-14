@@ -1,6 +1,6 @@
 # MSPaintIDE
 
-_For Spigot thread, check [here](https://www.spigotmc.org/threads/programming-in-ms-paint.289868)_
+_For Spigot thread, check [here](https://www.spigotmc.org/threads/programming-in-ms-paint.289868). For website, click [here](https://ms-paint-i.de/)_
 
 People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
 
@@ -66,7 +66,11 @@ _Note: All options are saved in a file named options.txt in the same directory o
 If anyone would like to support me with donations, I would be extremely grateful, and would help support for future suggested projects :) If you donate and would like your name posted here, please PM me!
 
 Thank you to:
+
 [@Stef](https://www.spigotmc.org/members/18736/)
+
 [@Meepidy](https://www.spigotmc.org/members/191302/)
+
+[@iCodeHaven](https://www.spigotmc.org/members/482937/)
 
 Feel free to donate via PayPal
