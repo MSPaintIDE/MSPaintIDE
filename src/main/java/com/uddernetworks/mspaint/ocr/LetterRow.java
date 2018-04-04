@@ -18,6 +18,7 @@ public class LetterRow implements Serializable {
 
     private int lastIndex = 0;
     public void insertIn(Letter letter) {
+        if (lastIndex > row.length()) return;
         row.set(lastIndex, letter);
         lastIndex++;
     }

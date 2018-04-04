@@ -16,7 +16,7 @@ public class ImageCompare {
 
     private Map<String, BufferedImage> images;
 
-    public LetterGrid getText(File inputImage, File objectFile, Map<String, BufferedImage>images, boolean useProbe, boolean readFromFile) {
+    public LetterGrid getText(File inputImage, File objectFile, Map<String, BufferedImage> images, boolean useProbe, boolean readFromFile) {
         this.images = images;
 
         if (readFromFile) {
@@ -33,7 +33,7 @@ public class ImageCompare {
 
             LetterGrid grid;
 
-            if (!readFromFile) {
+            if (!readFromFile || true) {
                 grid = new LetterGrid(image.getWidth(), image.getHeight());
 
 
@@ -46,7 +46,7 @@ public class ImageCompare {
 
                 for (String identifier : images.keySet()) {
                     new Thread(() -> {
-                        System.out.println(identifier);
+//                        System.out.println(identifier);
                         searchFor(grid, identifier, image, startY, iterByY);
                         waitingFor.getAndDecrement();
                     }).start();
@@ -99,6 +99,7 @@ public class ImageCompare {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, searching.getWidth(), searching.getHeight());
 
                 if (ImageUtil.equals(subImage, searching)) {
+                    System.out.println("Found letter: " + identifier);
                     grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY));
                 }
                 currentX++;
@@ -106,7 +107,7 @@ public class ImageCompare {
             currentY += iterYBy;
         }
 
-        System.out.println("Checked " + (currentX * currentY));
+//        System.out.println("Checked " + (currentX * currentY));
 
     }
 
