@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.main.Letter;
 import com.uddernetworks.mspaint.main.Probe;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class ImageCompare {
 
             LetterGrid grid;
 
-            if (!readFromFile || true) {
+            if (!readFromFile) {
                 grid = new LetterGrid(image.getWidth(), image.getHeight());
 
 
@@ -98,6 +99,73 @@ public class ImageCompare {
             while (currentX + searching.getWidth() <= image.getWidth()) {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, searching.getWidth(), searching.getHeight());
 
+                if (identifier.equals("\'")) {
+                    int topRightX = currentX + searching.getWidth();
+                    int topRightY = currentY;
+
+                    boolean matches = true;
+
+                    for (int i = 0; i < 3; i++) {
+                        if (isInBounds(image, topRightX + i, topRightY)) {
+                            Color color = new Color(image.getRGB(topRightX + i, topRightY));
+                            if (!(color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
+                                matches = false;
+                            }
+                        } else {
+                            matches = false;
+                        }
+                    }
+
+                    for (int i = 0; i < 2; i++) {
+                        if (isInBounds(image, topRightX + i, topRightY + 1)) {
+                            Color color = new Color(image.getRGB(topRightX + i, topRightY + 1));
+                            if (!(color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
+                                matches = false;
+                            }
+                        } else {
+                            matches = false;
+                        }
+                    }
+
+                    if (matches) {
+                        currentX++;
+                        continue;
+                    }
+                } else if (identifier.equals(".")) {
+                    int bottomLeftX = currentX;
+                    int bottomLeftY = currentY + searching.getHeight();
+
+                    boolean matches = true;
+
+                    if (isInBounds(image, bottomLeftX, bottomLeftY + 2)) {
+                        Color color = new Color(image.getRGB(bottomLeftX, bottomLeftY + 2));
+                        if ((color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
+                            matches = false;
+                        }
+                    } else {
+                        matches = false;
+                    }
+
+                    bottomLeftX++;
+
+                    for (int i = 0; i < 3; i++) {
+                        if (isInBounds(image, bottomLeftX + i, bottomLeftY + 2)) {
+                            Color color = new Color(image.getRGB(bottomLeftX + i, bottomLeftY + 2));
+                            if (!(color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
+                                matches = false;
+                            }
+                        } else {
+                            matches = false;
+                        }
+                    }
+
+                    if (matches) {
+                        currentX++;
+                        continue;
+                    }
+
+                }
+
                 if (ImageUtil.equals(subImage, searching)) {
                     System.out.println("Found letter: " + identifier);
                     grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY));
@@ -107,8 +175,10 @@ public class ImageCompare {
             currentY += iterYBy;
         }
 
-//        System.out.println("Checked " + (currentX * currentY));
+    }
 
+    private boolean isInBounds(BufferedImage image, int x, int y) {
+        return x > 0 && y > 0 && image.getWidth() > x && image.getHeight() > y;
     }
 
 }
