@@ -2,8 +2,9 @@ package com.uddernetworks.mspaint.main;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
-import static java.awt.image.BufferedImage.*;
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
 public class ImageUtil {
 
@@ -36,6 +37,20 @@ public class ImageUtil {
         return luminence < 233;
     }
 
+    public static boolean equals(BufferedImage image1, BufferedImage image2, List<Point> ignoring) {
+        if (image1.getWidth() != image2.getWidth() || image1.getHeight() != image2.getHeight()) return false;
+        for (int y = 0; y < image1.getHeight(); y++) {
+            for (int x = 0; x < image1.getWidth(); x++) {
+                if (checkingPoint(ignoring, x, y)) {
+                    if (image1.getRGB(x, y) != image2.getRGB(x, y)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     // Sub image   Searching
     public static boolean equals(BufferedImage image1, BufferedImage image2) {
         if (image1.getWidth() != image2.getWidth() || image1.getHeight() != image2.getHeight()) return false;
@@ -47,14 +62,6 @@ public class ImageUtil {
             }
         }
         return true;
-
-//        double similarity = getDifferenceBetween(image1, image2);
-//
-//        if (similarity < 1) return false;
-//
-//        System.out.println("Probably a match, similarity = " + similarity);
-//
-//        return true;
     }
 
     // Returns 1 for exact match, 0 for none matching
@@ -70,5 +77,10 @@ public class ImageUtil {
         }
 
         return same / totalPixels;
+    }
+
+    private static boolean checkingPoint(List<Point> points, int x, int y) {
+        if (points == null) return true;
+        return points.stream().noneMatch(point -> point.getX() == x && point.getY() == y);
     }
 }

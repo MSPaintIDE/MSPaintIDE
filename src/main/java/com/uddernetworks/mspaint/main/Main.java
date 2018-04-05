@@ -1,24 +1,20 @@
 package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.highlighter.AngrySquiggleHighlighter;
-import com.uddernetworks.mspaint.highlighter.CustomJavaRenderer;
-import com.uddernetworks.mspaint.highlighter.LetterFormatter;
-import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.mspaint.ocr.ImageIndex;
-import com.uddernetworks.mspaint.ocr.LetterGrid;
-import javafx.scene.control.Alert;
 
 import javax.swing.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
