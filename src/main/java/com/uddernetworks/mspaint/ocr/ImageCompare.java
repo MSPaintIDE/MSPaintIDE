@@ -7,8 +7,6 @@ import com.uddernetworks.mspaint.main.Probe;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
@@ -162,39 +160,32 @@ public class ImageCompare {
                         }
                     }
 
+                    bottomLeftX = currentX;
+
                     if (matches) {
                         currentX++;
                         continue;
                     }
 
-                } else if (identifier.equals("f")) {
-//                    int topRightX = currentX + searching.getWidth();
-//                    int topRightY = currentY;
+                    matches = true;
 
-//                    boolean matches = true;
+                    for (int i = 0; i < 4; i++) {
+                        if (isInBounds(image, bottomLeftX + i, bottomLeftY + 2)) {
+                            Color color = new Color(image.getRGB(bottomLeftX + i, bottomLeftY + 2));
+                            if ((color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
+                                matches = false;
+                            }
+                        } else {
+                            matches = false;
+                        }
+                    }
 
-//                    subImage.setRGB(0, 0, Color.WHITE.getRGB());
-//                    subImage.setRGB(0, 1, Color.WHITE.getRGB());
+                    if (!matches) {
+                        currentX++;
+                        continue;
+                    }
 
-//                    for (int i = 0; i < 2; i++) {
-//                        if (isInBounds(image, topRightX, topRightY + 1)) {
-//
-//                            Color color = new Color(image.getRGB(topRightX + i, topRightY));
-//                            if (!(color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
-//                                matches = false;
-//                            }
-//                        } else {
-//                            matches = false;
-//                        }
-//                    }
-//
-//                    if (matches) {
-//                        currentX++;
-//                        continue;
-//                    }
-
-
-
+                } else if (identifier.equals("f") || identifier.equals("t")) {
                     if (ImageUtil.equals(subImage, searching, Arrays.asList(new Point(0, 0), new Point(0, 1)))) {
                         System.out.println("Found letter: " + identifier);
                         grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY));
@@ -213,13 +204,6 @@ public class ImageCompare {
             currentY += iterYBy;
         }
 
-    }
-
-    static BufferedImage deepCopy(BufferedImage bi) {
-        ColorModel cm = bi.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = bi.copyData(null);
-        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 
     private boolean isInBounds(BufferedImage image, int x, int y) {
