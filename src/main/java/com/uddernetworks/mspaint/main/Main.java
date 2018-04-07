@@ -23,7 +23,7 @@ public class Main {
 
     private Map<String, BufferedImage> images;
 
-    private File inputImage = null;
+    public File inputImage = null;
     private File highlightedFile = null;
     private File objectFile = null;
     private File classOutput = null;
@@ -40,6 +40,8 @@ public class Main {
     private File parent;
     private File currentJar;
 
+    public String temp = "DEFAULT";
+
     private List<ImageClass> imageClasses = new ArrayList<>();
 
 //    public static void main(String[] args) {
@@ -53,18 +55,16 @@ public class Main {
 //        }
 //    }
 
-    public static void main(String[] args) {
-
-    }
-
     public void start(Test test) throws IOException, URISyntaxException {
         System.out.println("test = " + test);
+        System.out.println("this = " + this);
+        System.out.println("temp = " + temp);
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
         parseOptions();
 
-        test.registerThings();
+//        System.out.println("2222222222222222");
 
 //        MainWindow mainWindow = new MainWindow();
 //        mainWindow.display();
@@ -89,6 +89,7 @@ public class Main {
     }
 
     private void parseOptions() throws IOException {
+        System.out.println("Options path = " + getOptions().getAbsolutePath());
         List<String> options = Files.readAllLines(Paths.get(getOptions().getAbsolutePath()));
 
         for (String option : options) {
@@ -99,6 +100,7 @@ public class Main {
             switch (firstPart) {
                 case "inputImage":
                     inputImage = new File(secondPart);
+                    System.out.println("inputImage = " + inputImage);
                     break;
                 case "highlightedFile":
                     highlightedFile = new File(secondPart);

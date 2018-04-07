@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -72,28 +73,30 @@ public class Test extends Application implements Initializable {
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
     private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
 
-    public void startStuff() {
+    public Test() throws IOException, URISyntaxException {
+        System.out.println("WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 
+        this.main = new Main();
+        main.start(this);
+        this.main.temp = "SET IN TEMP";
+    }
+
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        System.out.println("1111111111111111");
+
+        System.out.println("222222222222222");
+
+        launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        System.out.println("Test.start");
         this.primaryStage = primaryStage;
 
-        System.out.println("Setting main");
-
-        this.main = new Main();
-
-        System.out.println("this.main = " + this.main + " : " + Thread.currentThread());
-        main.start(this);
+        registerThings();
     }
 
     public void registerThings() throws IOException {
-        System.out.println("Test.registerThings");
-
-//    @Override
-//    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("Test.fxml"));
         Scene scene = new Scene(root);
 
@@ -114,6 +117,8 @@ public class Test extends Application implements Initializable {
         }
 
         node.setText(builder.toString());
+
+        System.out.println("inputName = " + inputName);
 //
 //        changeInputImage.setOnAction(event -> {
 //            FileChooser fc = new FileChooser();
@@ -135,16 +140,12 @@ public class Test extends Application implements Initializable {
     @FXML
     private void changePathButton(ActionEvent event) {
         System.out.println("event = " + event);
-        System.out.println("inputName = " + inputName);
     }
 
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Test.initialize");
-        System.out.println("inputName = " + inputName);
-
-        System.out.println("main = " + main + " : " + Thread.currentThread());
 
         inputName.setText(main.getInputImage());
         highlightedImage.setText(main.getHighlightedFile());
