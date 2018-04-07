@@ -7,7 +7,10 @@ import javax.swing.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,43 +42,50 @@ public class Main {
 
     private List<ImageClass> imageClasses = new ArrayList<>();
 
+//    public static void main(String[] args) {
+//        try {
+//            UIManager.setLookAndFeel(
+//                    UIManager.getSystemLookAndFeelClassName());
+//            Main main = new Main();
+//            main.start();
+//        } catch (IOException | InstantiationException | IllegalAccessException | URISyntaxException | ClassNotFoundException | UnsupportedLookAndFeelException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
-            Main main = new Main();
-            main.start();
-        } catch (IOException | InstantiationException | IllegalAccessException | URISyntaxException | ClassNotFoundException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
+
     }
 
-    public void start() throws IOException, URISyntaxException {
+    public void start(Test test) throws IOException, URISyntaxException {
+        System.out.println("test = " + test);
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
         parseOptions();
 
-        MainWindow mainWindow = new MainWindow();
-        mainWindow.display();
-        mainWindow.registerThings(this, currentJar);
-        JTextPane textArea = mainWindow.getTextAreaOutput();
+        test.registerThings();
 
-        TextPrintStream textPrintStream = new TextPrintStream(textArea, System.out);
-        PrintStream textOut = new PrintStream(textPrintStream);
-        System.setOut(textOut);
-        System.setErr(textOut);
-
-        new Thread(() -> {
-            try {
-                while (true) {
-                    textPrintStream.updateText();
-                    Thread.sleep(3000);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+//        MainWindow mainWindow = new MainWindow();
+//        mainWindow.display();
+//        mainWindow.registerThings(this, currentJar);
+//        JTextPane textArea = mainWindow.getTextAreaOutput();
+//
+//        TextPrintStream textPrintStream = new TextPrintStream(textArea, System.out);
+//        PrintStream textOut = new PrintStream(textPrintStream);
+//        System.setOut(textOut);
+//        System.setErr(textOut);
+//
+//        new Thread(() -> {
+//            try {
+//                while (true) {
+//                    textPrintStream.updateText();
+//                    Thread.sleep(3000);
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
     }
 
     private void parseOptions() throws IOException {

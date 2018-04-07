@@ -25,7 +25,7 @@
                 <RowConstraints maxHeight="150.0" minHeight="10.0" prefHeight="150.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <GridPane prefHeight="589.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
+                  <GridPane prefHeight="589.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;" >
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="162.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="9999999.0" minWidth="10.0" prefWidth="219.0" />
@@ -54,63 +54,63 @@
                         <Label prefHeight="55.0" prefWidth="236.0" text="Letter Directory" GridPane.rowIndex="7" />
                         <Label prefHeight="55.0" prefWidth="236.0" text="Compiler Output" GridPane.rowIndex="8" />
                         <Label prefHeight="55.0" prefWidth="236.0" text="Program Output" GridPane.rowIndex="9" />
-                        <JFXTextField GridPane.columnIndex="1" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                        <JFXTextField GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <JFXTextField fx:id="inputName" GridPane.columnIndex="1" />
+                        <JFXTextField fx:id="highlightedImage" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <JFXTextField fx:id="cacheFile" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <JFXTextField fx:id="classOutput" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <JFXTextField fx:id="compiledJarOutput" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <JFXTextField fx:id="libraryFile" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <JFXTextField fx:id="otherFiles" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <JFXTextField fx:id="letterDirectory" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <JFXTextField fx:id="compilerOutputValue" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <JFXTextField fx:id="programOutputValue" GridPane.columnIndex="1" GridPane.rowIndex="9" />
                          
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeInputImage" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeHighlightImage" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeCacheFile" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeClassOutput" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeCompiledJar" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeLibraries" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeOtherFiles" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="changeLetterDir" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="compilerOutput" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                         <JFXButton buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                         <JFXButton fx:id="programOutput" buttonType="RAISED" onAction="#changePathButton" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#5264AE;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -119,10 +119,10 @@
                   </GridPane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                      <children>
-                        <JFXCheckBox style="-jfx-checked-color: #5264AE;" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Syntax Highlight" />
-                        <JFXCheckBox style="-jfx-checked-color: #5264AE;" layoutX="216.0" layoutY="14.0" mnemonicParsing="false" text="Compile" />
-                        <JFXCheckBox style="-jfx-checked-color: #5264AE;" layoutX="420.0" layoutY="14.0" mnemonicParsing="false" text="Execute" />
-                        <JFXCheckBox style="-jfx-checked-color: #5264AE;" layoutX="14.0" layoutY="47.0" mnemonicParsing="false" text="Use Caches" />
+                        <JFXCheckBox layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Syntax Highlight" />
+                        <JFXCheckBox layoutX="216.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Compile" />
+                        <JFXCheckBox layoutX="420.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Execute" />
+                        <JFXCheckBox layoutX="14.0" layoutY="47.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Use Caches" />
                      </children>
                   </Pane>
                </children>
