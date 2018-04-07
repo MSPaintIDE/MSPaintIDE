@@ -40,6 +40,8 @@ public class Main {
     private File parent;
     private File currentJar;
 
+    private Test test;
+
     private List<ImageClass> imageClasses = new ArrayList<>();
 
 //    public static void main(String[] args) {
@@ -54,6 +56,7 @@ public class Main {
 //    }
 
     public void start(Test test) throws IOException, URISyntaxException {
+        this.test = test;
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
@@ -151,16 +154,22 @@ public class Main {
         System.out.println("Scanning all images...");
         long start = System.currentTimeMillis();
 
+        test.setStatusText("Indexing letters...");
+
         ImageIndex imageIndex = new ImageIndex(letterDirectory);
         images = imageIndex.index();
 
+        test.setStatusText(null);
+
         if (inputImage.isDirectory()) {
             for (File imageFile : getFilesFromDirectory(inputImage, "png")) {
-                imageClasses.add(new ImageClass(imageFile, objectFile, images, useProbe, useCaches));
+                imageClasses.add(new ImageClass(imageFile, objectFile, test, images, useProbe, useCaches));
             }
         } else {
-            imageClasses.add(new ImageClass(inputImage, objectFile, images, useProbe, useCaches));
+            imageClasses.add(new ImageClass(inputImage, objectFile, test, images, useProbe, useCaches));
         }
+
+        test.setStatusText(null);
 
         System.out.println("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -172,11 +181,14 @@ public class Main {
         }
 
         System.out.println("Scanning all images...");
+        test.setStatusText("Highlighting...");
         long start = System.currentTimeMillis();
 
         for (ImageClass imageClass : imageClasses) {
             imageClass.highlight(highlightedFile);
         }
+
+        test.setStatusText(null);
 
         System.out.println("Finished highlighting all images in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -184,7 +196,6 @@ public class Main {
 
 
     public void compile(boolean execute) throws IOException {
-
         long start = System.currentTimeMillis();
         final long originalStart = start;
 
@@ -210,7 +221,9 @@ public class Main {
 
         ImageOutputStream imageOutputStream = new ImageOutputStream(appOutput, 500);
         ImageOutputStream compilerOutputStream = new ImageOutputStream(compilerOutput, 500);
-        Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, imageOutputStream, compilerOutputStream, libFiles, execute);
+        Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, test, imageOutputStream, compilerOutputStream, libFiles, execute);
+
+        test.setStatusText("Highlighting Angry Squiggles...");
 
         for (ImageClass imageClass : errors.keySet()) {
             AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, new File(letterDirectory.getAbsoluteFile(), "angry_squiggle.png"), imageClass.getHighlightedFile(), imageClass.getLetterGrid(), errors.get(imageClass));
@@ -220,8 +233,12 @@ public class Main {
 
         System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
 
+        test.setStatusText("Saving output images...");
+
         imageOutputStream.saveImage();
         compilerOutputStream.saveImage();
+
+        test.setStatusText(null);
 
         System.out.println("Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
     }

@@ -26,15 +26,15 @@ public class Probe {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, probe.getWidth(), probe.getHeight());
 
                 if (ImageUtil.equals(subImage, probe)) {
-                    yVals.add(currentY);
+                    return currentY;
+//                    yVals.add(currentY);
                 }
                 currentX++;
             }
             currentY++;
         }
 
-        return Collections.min(yVals);
+        return yVals.size() > 0 ? Collections.min(yVals) : 0;
     }
-
 
 }

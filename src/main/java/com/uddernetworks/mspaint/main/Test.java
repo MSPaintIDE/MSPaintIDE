@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -123,7 +124,12 @@ public class Test extends Application implements Initializable {
     }
 
     public void setStatusText(String text) {
-        statusText.setText(text);
+        Platform.runLater(() -> statusText.setText(text));
+    }
+
+    public void updateLoading(double current, double total) {
+        System.out.println(current + " / " + total + " = " + (current / total));
+        Platform.runLater(() -> progress.setProgress(current / total));
     }
 
     public void registerThings() throws IOException {
@@ -193,6 +199,8 @@ public class Test extends Application implements Initializable {
         letterDirectory.setText(main.getLetterDirectory());
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
+
+        progress.setProgress(0.75);
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 

@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.ocr;
 import com.uddernetworks.mspaint.main.ImageUtil;
 import com.uddernetworks.mspaint.main.Letter;
 import com.uddernetworks.mspaint.main.Probe;
+import com.uddernetworks.mspaint.main.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,8 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ImageCompare {
 
     private Map<String, BufferedImage> images;
+    private int totalIterations;
+    private AtomicInteger currentIterations;
+    private Test test;
 
-    public LetterGrid getText(File inputImage, File objectFile, Map<String, BufferedImage> images, boolean useProbe, boolean readFromFile) {
+    public LetterGrid getText(File inputImage, File objectFile, Test test, Map<String, BufferedImage> images, boolean useProbe, boolean readFromFile) {
+        this.test = test;
         this.images = images;
 
         if (readFromFile) {
@@ -29,13 +34,20 @@ public class ImageCompare {
             System.out.println("Image = " + inputImage.getAbsolutePath());
             BufferedImage image = ImageUtil.blackAndWhite(ImageIO.read(inputImage));
 
+            System.out.println("66666666666666666666666666666666666666666666");
+
             objectFile.createNewFile();
+
+            System.out.println("777777777777777777777777777777777");
 
             LetterGrid grid;
 
             if (!readFromFile) {
                 grid = new LetterGrid(image.getWidth(), image.getHeight());
 
+                System.out.println("8888888888888888888888888888888888888888");
+
+                test.setStatusText("Probing...");
 
                 AtomicInteger waitingFor = new AtomicInteger(images.keySet().size());
 
@@ -44,14 +56,48 @@ public class ImageCompare {
                 int startY = (useProbe) ? probe.sendInProbe() : 0;
                 int iterByY = (useProbe) ? 25 : 1;
 
+                test.setStatusText("Scanning image " + inputImage.getName() + "...");
+
+                System.out.println("Total images: " + images.keySet().size());
+
+//                int imageWidth = image.getWidth();
+                int imageHeight = image.getHeight();
+
+               totalIterations = 0;
+               currentIterations = new AtomicInteger(0);
+
                 for (String identifier : images.keySet()) {
-                    new Thread(() -> {
-//                        System.out.println(identifier);
-                        searchFor(grid, identifier, image, startY, iterByY);
-                        waitingFor.getAndDecrement();
-                    }).start();
+//                    int diffWidth = imageWidth - images.get(identifier).getWidth();
+                    int diffHeight = imageHeight - images.get(identifier).getHeight();
+
+                    totalIterations += diffHeight;
+
+                    System.out.println("totalIterations = " + totalIterations);
                 }
 
+                System.out.println("totalIterations = " + totalIterations);
+
+                Thread loadingBarThread = new Thread(() -> {
+                    while(true) {
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        test.updateLoading(currentIterations.get(), totalIterations);
+                    }
+                });
+
+                loadingBarThread.start();
+                new Thread(() -> {
+                for (String identifier : images.keySet()) {
+
+                    searchFor(grid, identifier, image, startY, iterByY);
+                    waitingFor.getAndDecrement();
+
+                }
+            }).start();
                 while (true) {
                     if (waitingFor.get() == 0) {
                         break;
@@ -69,6 +115,8 @@ public class ImageCompare {
 
                 oos.close();
                 fos.close();
+
+                loadingBarThread.stop();
             } else {
                 FileInputStream fi = new FileInputStream(objectFile);
                 ObjectInputStream oi = new ObjectInputStream(fi);
@@ -95,6 +143,7 @@ public class ImageCompare {
 
         while (currentY + searching.getHeight() <= image.getHeight()) {
             currentX = 0;
+            currentIterations.incrementAndGet();
             while (currentX + searching.getWidth() <= image.getWidth()) {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, searching.getWidth(), searching.getHeight());
 
