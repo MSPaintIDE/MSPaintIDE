@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -9,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -67,9 +69,14 @@ public class Test extends Application implements Initializable {
     @FXML
     private JFXButton programOutput;
 
+    @FXML
+    private JFXProgressBar progress;
+
+    @FXML
+    private Label statusText;
+
     private Main main;
     private Stage primaryStage;
-    private File currentFile;
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
@@ -82,7 +89,6 @@ public class Test extends Application implements Initializable {
 
         this.main = new Main();
         main.start(this);
-        this.main.temp = "SET IN TEMP";
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -100,9 +106,14 @@ public class Test extends Application implements Initializable {
         registerThings();
     }
 
+    public void setStatusText(String text) {
+        statusText.setText(text);
+    }
+
     public void registerThings() throws IOException {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("Test.fxml"));
         Scene scene = new Scene(root);
+        scene.getStylesheets().add("style.css");
 
         primaryStage.setScene(scene);
 
@@ -121,20 +132,16 @@ public class Test extends Application implements Initializable {
         }
 
         node.setText(builder.toString());
-
-        System.out.println("inputName = " + inputName);
     }
 
     @FXML
     private void changePathButton(ActionEvent event) {
-        System.out.println("event = " + event);
+
     }
 
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Test.initialize");
-
         inputName.setText(main.getInputImage());
         highlightedImage.setText(main.getHighlightedFile());
         cacheFile.setText(main.getObjectFile());
@@ -146,54 +153,84 @@ public class Test extends Application implements Initializable {
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
 
-        changeInputImage.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
-            inputName.setText(file.getAbsolutePath());
-            main.setInputImage(file);
-        }));
+        changeInputImage.setOnAction(event -> {
+            File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
+            FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+                inputName.setText(file.getAbsolutePath());
+                main.setInputImage(file);
+            });
+        });
 
-        changeHighlightImage.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
-            highlightedImage.setText(file.getAbsolutePath());
-            main.setHighlightedFile(file);
-        }));
+        changeHighlightImage.setOnAction(event -> {
+            File selected = main.getHighlightedFile().isEmpty() ? main.getCurrentJar() : new File(main.getHighlightedFile());
+            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+                highlightedImage.setText(file.getAbsolutePath());
+                main.setHighlightedFile(file);
+            });
+        });
 
-        changeCacheFile.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
-            cacheFile.setText(file.getAbsolutePath());
-            main.setObjectFile(file);
-        }));
+        changeCacheFile.setOnAction(event -> {
+            File selected = main.getObjectFile().isEmpty() ? main.getCurrentJar() : new File(main.getObjectFile());
+            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+                cacheFile.setText(file.getAbsolutePath());
+                main.setObjectFile(file);
+            });
+        });
 
-        changeClassOutput.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
-            classOutput.setText(file.getAbsolutePath());
-            main.setClassOutput(file);
-        }));
+        changeClassOutput.setOnAction(event -> {
+            File selected = main.getClassOutput().isEmpty() ? main.getCurrentJar() : new File(main.getClassOutput());
+            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+                classOutput.setText(file.getAbsolutePath());
+                main.setClassOutput(file);
+            });
+        });
 
-        changeCompiledJar.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, jarFilter, JFileChooser.FILES_ONLY, file -> {
-            compiledJarOutput.setText(file.getAbsolutePath());
-            main.setJarFile(file);
-        }));
+        changeCompiledJar.setOnAction(event -> {
+                    File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
+                    FileDirectoryChooser.openFileChoser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
+                        compiledJarOutput.setText(file.getAbsolutePath());
+                        main.setJarFile(file);
+                    });
+                });
 
-        changeLibraries.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
-            libraryFile.setText(file.getAbsolutePath());
-            main.setLibraryFile(file);
-        }));
+        changeLibraries.setOnAction(event -> {
+            File selected = main.getLibraryFile().isEmpty() ? main.getCurrentJar() : new File(main.getLibraryFile());
+            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+                libraryFile.setText(file.getAbsolutePath());
+                main.setLibraryFile(file);
+            });
+        });
 
-        changeOtherFiles.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
-            otherFiles.setText(file.getAbsolutePath());
-            main.setOtherFiles(file);
-        }));
+        changeOtherFiles.setOnAction(event -> {
+            File selected = main.getOtherFiles().isEmpty() ? main.getCurrentJar() : new File(main.getOtherFiles());
+            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+                otherFiles.setText(file.getAbsolutePath());
+                main.setOtherFiles(file);
+            });
+        });
 
-        changeLetterDir.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
-            letterDirectory.setText(file.getAbsolutePath());
-            main.setLetterDirectory(file);
-        }));
+        changeLetterDir.setOnAction(event -> {
+            File selected = main.getLetterDirectory().isEmpty() ? main.getCurrentJar() : new File(main.getLetterDirectory());
+            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+                letterDirectory.setText(file.getAbsolutePath());
+                main.setLetterDirectory(file);
+            });
+        });
 
-        compilerOutput.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, imageFilter, JFileChooser.FILES_ONLY, file -> {
-            compilerOutputValue.setText(file.getAbsolutePath());
-            main.setCompilerOutput(file);
-        }));
+        compilerOutput.setOnAction(event -> {
+            File selected = main.getCompilerOutput().isEmpty() ? main.getCurrentJar() : new File(main.getCompilerOutput());
+            FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
+                compilerOutputValue.setText(file.getAbsolutePath());
+                main.setCompilerOutput(file);
+            });
+        });
 
-        changeInputImage.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, imageFilter, JFileChooser.FILES_ONLY, file -> {
-            programOutputValue.setText(file.getAbsolutePath());
-            main.setAppOutput(file);
-        }));
+        programOutput.setOnAction(event -> {
+            File selected = main.getAppOutput().isEmpty() ? main.getCurrentJar() : new File(main.getAppOutput());
+            FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
+                programOutputValue.setText(file.getAbsolutePath());
+                main.setAppOutput(file);
+            });
+        });
     }
 }

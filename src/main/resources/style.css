@@ -1,0 +1,11 @@
+/*#progress {*/
+    /*-fx-progress-color: #5264AE;*/
+/*}*/
+
+.jfx-progress-bar > .track {
+    -fx-background-color: #E0E0E0;
+}
+
+.jfx-progress-bar > .bar {
+    -fx-background-color: #5472d3;
+}

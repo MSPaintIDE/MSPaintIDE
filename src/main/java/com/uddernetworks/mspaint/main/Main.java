@@ -40,8 +40,6 @@ public class Main {
     private File parent;
     private File currentJar;
 
-    public String temp = "DEFAULT";
-
     private List<ImageClass> imageClasses = new ArrayList<>();
 
 //    public static void main(String[] args) {
@@ -56,9 +54,6 @@ public class Main {
 //    }
 
     public void start(Test test) throws IOException, URISyntaxException {
-        System.out.println("test = " + test);
-        System.out.println("this = " + this);
-        System.out.println("temp = " + temp);
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
@@ -348,5 +343,9 @@ public class Main {
 
     public String getLetterDirectory() {
         return (letterDirectory == null) ? "" : letterDirectory.getAbsolutePath();
+    }
+
+    public File getCurrentJar() {
+        return currentJar;
     }
 }
