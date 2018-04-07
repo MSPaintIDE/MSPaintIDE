@@ -25,7 +25,7 @@
                 <RowConstraints maxHeight="150.0" minHeight="10.0" prefHeight="150.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <GridPane prefHeight="589.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;" >
+                  <GridPane prefHeight="589.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="162.0" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="9999999.0" minWidth="10.0" prefWidth="219.0" />
@@ -119,10 +119,22 @@
                   </GridPane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                      <children>
-                        <JFXCheckBox layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Syntax Highlight" />
-                        <JFXCheckBox layoutX="216.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Compile" />
-                        <JFXCheckBox layoutX="420.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Execute" />
-                        <JFXCheckBox layoutX="14.0" layoutY="47.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Use Caches" />
+                        <JFXCheckBox layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Syntax Highlight">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></JFXCheckBox>
+                        <JFXCheckBox layoutX="216.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Compile">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></JFXCheckBox>
+                        <JFXCheckBox layoutX="420.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Execute">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></JFXCheckBox>
+                        <JFXCheckBox layoutX="14.0" layoutY="47.0" mnemonicParsing="false" style="-jfx-checked-color: #5264AE;" text="Use Caches">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></JFXCheckBox>
                      </children>
                   </Pane>
                </children>

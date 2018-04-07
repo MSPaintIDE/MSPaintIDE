@@ -12,11 +12,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -68,12 +69,15 @@ public class Test extends Application implements Initializable {
 
     private Main main;
     private Stage primaryStage;
+    private File currentFile;
 
-    private FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Image files", "png");
+    private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
     private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
 
-    public Test() throws IOException, URISyntaxException {
+    public Test() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
         System.out.println("WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 
         this.main = new Main();
@@ -119,22 +123,6 @@ public class Test extends Application implements Initializable {
         node.setText(builder.toString());
 
         System.out.println("inputName = " + inputName);
-//
-//        changeInputImage.setOnAction(event -> {
-//            FileChooser fc = new FileChooser();
-//            fc.setSelectedExtensionFilter(imageFilter);
-////            fc.direc(JFileChooser.FILES_AND_DIRECTORIES);
-////            fc.setInitialDirectory(currentFile.getParentFile());
-////            fc.setInitialFileName(currentFile.getName());
-//            File file = fc.showOpenDialog(primaryStage);
-//            System.out.println("file = " + file);
-//
-////            if (returnVal == JFileChooser.APPROVE_OPTION) {
-////                File selected = fc.getSelectedFile();
-////                inputName.setText(selected.getAbsolutePath());
-////                main.setInputImage(fc.getSelectedFile());
-////            }
-//        });
     }
 
     @FXML
@@ -157,5 +145,55 @@ public class Test extends Application implements Initializable {
         letterDirectory.setText(main.getLetterDirectory());
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
+
+        changeInputImage.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            inputName.setText(file.getAbsolutePath());
+            main.setInputImage(file);
+        }));
+
+        changeHighlightImage.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            highlightedImage.setText(file.getAbsolutePath());
+            main.setHighlightedFile(file);
+        }));
+
+        changeCacheFile.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            cacheFile.setText(file.getAbsolutePath());
+            main.setObjectFile(file);
+        }));
+
+        changeClassOutput.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            classOutput.setText(file.getAbsolutePath());
+            main.setClassOutput(file);
+        }));
+
+        changeCompiledJar.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, jarFilter, JFileChooser.FILES_ONLY, file -> {
+            compiledJarOutput.setText(file.getAbsolutePath());
+            main.setJarFile(file);
+        }));
+
+        changeLibraries.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            libraryFile.setText(file.getAbsolutePath());
+            main.setLibraryFile(file);
+        }));
+
+        changeOtherFiles.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            otherFiles.setText(file.getAbsolutePath());
+            main.setOtherFiles(file);
+        }));
+
+        changeLetterDir.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            letterDirectory.setText(file.getAbsolutePath());
+            main.setLetterDirectory(file);
+        }));
+
+        compilerOutput.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, imageFilter, JFileChooser.FILES_ONLY, file -> {
+            compilerOutputValue.setText(file.getAbsolutePath());
+            main.setCompilerOutput(file);
+        }));
+
+        changeInputImage.setOnAction(event -> FileDirectoryChooser.openFileChoser(currentFile, imageFilter, JFileChooser.FILES_ONLY, file -> {
+            programOutputValue.setText(file.getAbsolutePath());
+            main.setAppOutput(file);
+        }));
     }
 }
