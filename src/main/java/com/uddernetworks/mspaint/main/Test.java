@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Application;
@@ -21,6 +22,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -75,6 +77,20 @@ public class Test extends Application implements Initializable {
     @FXML
     private Label statusText;
 
+    @FXML
+    private JFXCheckBox syntaxHighlight;
+    @FXML
+    private JFXCheckBox compile;
+    @FXML
+    private JFXCheckBox execute;
+    @FXML
+    private JFXCheckBox useProbe;
+    @FXML
+    private JFXCheckBox useCaches;
+
+    @FXML
+    private TextArea output;
+
     private Main main;
     private Stage primaryStage;
 
@@ -127,16 +143,41 @@ public class Test extends Application implements Initializable {
 
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 0; i < 100; i++) {
-            builder.append("Line #" + i).append("\n");
-        }
+//        for (int i = 0; i < 100; i++) {
+//            builder.append("Line #" + i).append("\n");
+//        }
 
         node.setText(builder.toString());
     }
 
     @FXML
-    private void changePathButton(ActionEvent event) {
+    private void startScan(ActionEvent event) {
+        System.out.println("1111111111111111111");
+        new Thread(() -> {
+            try {
+                long start = System.currentTimeMillis();
+                System.out.println("2222222222222222");
+                main.indexAll(useProbe.isSelected(), useCaches.isSelected());
 
+                System.out.println("33333333333333333333");
+
+                if (syntaxHighlight.isSelected()) {
+                    main.highlightAll();
+                }
+                System.out.println("4444444444444444444444444444");
+
+                if (compile.isSelected()) {
+                    main.compile(execute.isSelected());
+                }
+
+                System.out.println("555555555555555555555555");
+
+                System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @FXML
@@ -153,6 +194,24 @@ public class Test extends Application implements Initializable {
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
 
+        inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
+
+        TextPrintStream textPrintStream = new TextPrintStream(output, System.out);
+        PrintStream textOut = new PrintStream(textPrintStream);
+        System.setOut(textOut);
+        System.setErr(textOut);
+
+        new Thread(() -> {
+            try {
+                while (true) {
+                    textPrintStream.updateText();
+                    Thread.sleep(250);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
         changeInputImage.setOnAction(event -> {
             File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
             FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
@@ -160,6 +219,8 @@ public class Test extends Application implements Initializable {
                 main.setInputImage(file);
             });
         });
+
+        highlightedImage.textProperty().addListener(event -> main.setHighlightedFile(new File(inputName.getText())));
 
         changeHighlightImage.setOnAction(event -> {
             File selected = main.getHighlightedFile().isEmpty() ? main.getCurrentJar() : new File(main.getHighlightedFile());
@@ -169,6 +230,8 @@ public class Test extends Application implements Initializable {
             });
         });
 
+        cacheFile.textProperty().addListener(event -> main.setObjectFile(new File(cacheFile.getText())));
+
         changeCacheFile.setOnAction(event -> {
             File selected = main.getObjectFile().isEmpty() ? main.getCurrentJar() : new File(main.getObjectFile());
             FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
@@ -176,6 +239,8 @@ public class Test extends Application implements Initializable {
                 main.setObjectFile(file);
             });
         });
+
+        classOutput.textProperty().addListener(event -> main.setClassOutput(new File(classOutput.getText())));
 
         changeClassOutput.setOnAction(event -> {
             File selected = main.getClassOutput().isEmpty() ? main.getCurrentJar() : new File(main.getClassOutput());
@@ -185,6 +250,8 @@ public class Test extends Application implements Initializable {
             });
         });
 
+        compiledJarOutput.textProperty().addListener(event -> main.setJarFile(new File(compiledJarOutput.getText())));
+
         changeCompiledJar.setOnAction(event -> {
                     File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
                     FileDirectoryChooser.openFileChoser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
@@ -192,6 +259,8 @@ public class Test extends Application implements Initializable {
                         main.setJarFile(file);
                     });
                 });
+
+        libraryFile.textProperty().addListener(event -> main.setLibraryFile(new File(libraryFile.getText())));
 
         changeLibraries.setOnAction(event -> {
             File selected = main.getLibraryFile().isEmpty() ? main.getCurrentJar() : new File(main.getLibraryFile());
@@ -201,6 +270,8 @@ public class Test extends Application implements Initializable {
             });
         });
 
+        otherFiles.textProperty().addListener(event -> main.setOtherFiles(new File(otherFiles.getText())));
+
         changeOtherFiles.setOnAction(event -> {
             File selected = main.getOtherFiles().isEmpty() ? main.getCurrentJar() : new File(main.getOtherFiles());
             FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
@@ -208,6 +279,8 @@ public class Test extends Application implements Initializable {
                 main.setOtherFiles(file);
             });
         });
+
+        letterDirectory.textProperty().addListener(event -> main.setLetterDirectory(new File(letterDirectory.getText())));
 
         changeLetterDir.setOnAction(event -> {
             File selected = main.getLetterDirectory().isEmpty() ? main.getCurrentJar() : new File(main.getLetterDirectory());
@@ -217,6 +290,8 @@ public class Test extends Application implements Initializable {
             });
         });
 
+        compilerOutputValue.textProperty().addListener(event -> main.setCompilerOutput(new File(compilerOutputValue.getText())));
+
         compilerOutput.setOnAction(event -> {
             File selected = main.getCompilerOutput().isEmpty() ? main.getCurrentJar() : new File(main.getCompilerOutput());
             FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
@@ -225,6 +300,8 @@ public class Test extends Application implements Initializable {
             });
         });
 
+        programOutputValue.textProperty().addListener(event -> main.setAppOutput(new File(programOutputValue.getText())));
+
         programOutput.setOnAction(event -> {
             File selected = main.getAppOutput().isEmpty() ? main.getCurrentJar() : new File(main.getAppOutput());
             FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
@@ -232,5 +309,9 @@ public class Test extends Application implements Initializable {
                 main.setAppOutput(file);
             });
         });
+    }
+
+    public TextArea getOutputTextArea() {
+        return output;
     }
 }

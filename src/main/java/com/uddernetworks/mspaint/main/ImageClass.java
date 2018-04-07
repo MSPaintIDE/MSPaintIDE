@@ -20,16 +20,16 @@ public class ImageClass {
     private Map<String, BufferedImage> images;
     private File highlightedFile;
 
-    public ImageClass(File inputImage, File objectFileDir, Map<String, BufferedImage> images, boolean useProbe) {
+    public ImageClass(File inputImage, File objectFileDir, Map<String, BufferedImage> images, boolean useProbe, boolean useCaches) {
         this.inputImage = inputImage;
         this.images = images;
 
         File objectFile = new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.txt");
 
-        scan(images, objectFile, useProbe);
+        scan(images, objectFile, useProbe, useCaches);
     }
 
-    public void scan(Map<String, BufferedImage> images, File objectFile, boolean useProbe) {
+    public void scan(Map<String, BufferedImage> images, File objectFile, boolean useProbe, boolean useCaches) {
         System.out.println("Scanning image " + inputImage.getName() + "...");
         final String prefix = "[" + inputImage.getName() + "] ";
 
@@ -39,7 +39,7 @@ public class ImageClass {
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        LetterGrid grid = imageCompare.getText(inputImage, objectFile, images, useProbe, !modifiedDetector.imageChanged());
+        LetterGrid grid = imageCompare.getText(inputImage, objectFile, images, useProbe, !modifiedDetector.imageChanged() && useCaches);
 
         letterGrid = grid.getLetterGridArray();
         text = grid.getPrettyString();

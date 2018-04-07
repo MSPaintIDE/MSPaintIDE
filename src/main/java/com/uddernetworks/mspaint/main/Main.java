@@ -65,22 +65,6 @@ public class Main {
 //        mainWindow.display();
 //        mainWindow.registerThings(this, currentJar);
 //        JTextPane textArea = mainWindow.getTextAreaOutput();
-//
-//        TextPrintStream textPrintStream = new TextPrintStream(textArea, System.out);
-//        PrintStream textOut = new PrintStream(textPrintStream);
-//        System.setOut(textOut);
-//        System.setErr(textOut);
-//
-//        new Thread(() -> {
-//            try {
-//                while (true) {
-//                    textPrintStream.updateText();
-//                    Thread.sleep(3000);
-//                }
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
     }
 
     private void parseOptions() throws IOException {
@@ -158,7 +142,7 @@ public class Main {
         return inputImage == null || highlightedFile == null || objectFile == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
     }
 
-    public void indexAll(boolean useProbe) {
+    public void indexAll(boolean useProbe, boolean useCaches) {
         if (optionsNotFilled()) {
             JOptionPane.showMessageDialog(null, "Please select files for all options", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -172,10 +156,10 @@ public class Main {
 
         if (inputImage.isDirectory()) {
             for (File imageFile : getFilesFromDirectory(inputImage, "png")) {
-                imageClasses.add(new ImageClass(imageFile, objectFile, images, useProbe));
+                imageClasses.add(new ImageClass(imageFile, objectFile, images, useProbe, useCaches));
             }
         } else {
-            imageClasses.add(new ImageClass(inputImage, objectFile, images, useProbe));
+            imageClasses.add(new ImageClass(inputImage, objectFile, images, useProbe, useCaches));
         }
 
         System.out.println("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");

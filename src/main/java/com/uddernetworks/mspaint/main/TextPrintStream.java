@@ -1,18 +1,18 @@
 package com.uddernetworks.mspaint.main;
 
-import javax.swing.*;
-import java.awt.*;
+import javafx.scene.control.TextArea;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class TextPrintStream extends OutputStream {
 
-    private JTextPane textArea;
+    private TextArea textArea;
     private PrintStream original;
     private String last = "";
     private StringBuilder builder = new StringBuilder();
 
-    public TextPrintStream(JTextPane textArea, PrintStream original) {
+    public TextPrintStream(TextArea textArea, PrintStream original) {
         this.textArea = textArea;
         this.original = original;
     }
@@ -28,6 +28,7 @@ public class TextPrintStream extends OutputStream {
         if (!last.equals(builder.toString())) {
             last = builder.toString();
             textArea.setText(last);
+            textArea.setScrollTop(Double.MAX_VALUE);
         }
     }
 }

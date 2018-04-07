@@ -14,11 +14,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -230,7 +227,7 @@ public class MainWindow {
         start.addActionListener(e -> new Thread(() -> {
             try {
                 long start = System.currentTimeMillis();
-                main.indexAll(useProbeCheckBox.isSelected());
+//                main.indexAll(useProbeCheckBox.isSelected());
 
                 if (syntaxHighlightCheckbox.isSelected()) {
                     main.highlightAll();
