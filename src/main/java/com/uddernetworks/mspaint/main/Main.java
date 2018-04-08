@@ -182,12 +182,14 @@ public class Main {
 
         System.out.println("Scanning all images...");
         test.setStatusText("Highlighting...");
+        test.setIndeterminate(true);
         long start = System.currentTimeMillis();
 
         for (ImageClass imageClass : imageClasses) {
             imageClass.highlight(highlightedFile);
         }
 
+        test.setIndeterminate(false);
         test.setStatusText(null);
 
         System.out.println("Finished highlighting all images in " + (System.currentTimeMillis() - start) + "ms");
@@ -198,7 +200,6 @@ public class Main {
     public void compile(boolean execute) throws IOException {
         long start = System.currentTimeMillis();
         final long originalStart = start;
-
 
         System.out.println("Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
 

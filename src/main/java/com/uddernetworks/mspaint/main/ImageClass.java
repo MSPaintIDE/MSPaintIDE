@@ -43,11 +43,7 @@ public class ImageClass {
 
         LetterGrid grid = imageCompare.getText(inputImage, objectFile, test, images, useProbe, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
-        System.out.println("Got");
-
         letterGrid = grid.getLetterGridArray();
-
-        System.out.println("Got griod array");
 
         text = grid.getPrettyString();
 

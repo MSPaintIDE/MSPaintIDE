@@ -2,6 +2,11 @@
     /*-fx-progress-color: #5264AE;*/
 /*}*/
 
+.root {
+    -fx-font-family: "Montserrat";
+    -fx-font-smoothing-type: gray;
+}
+
 .jfx-progress-bar > .track {
     -fx-background-color: #E0E0E0;
 }
@@ -12,4 +17,30 @@
 
 .progressError > .bar {
     -fx-background-color: #c62828 !important;
+}
+
+/** {*/
+    /*-fx-font-size: 20.0;*/
+    /*-fx-font-weight: BOLD;*/
+    /*-fx-background-color: #5472d3;*/
+    /*-fx-pref-width: 100.0%;*/
+    /*-fx-pref-height: 64.0px;*/
+/*}*/
+
+.jfx-decorator {
+    -fx-decorator-color: #5472d3;
+    /*-fx-font-weight: BOLD;*/
+}
+
+.jfx-decorator .jfx-decorator-buttons-container {
+    -fx-background-color: #5472d3;
+}
+
+.jfx-decorator .resize-border {
+    -fx-border-color: #5472d3;
+    -fx-border-width: 0 4 4 4;
+}
+
+.unrounded {
+    border-radius: 10px !important;
 }

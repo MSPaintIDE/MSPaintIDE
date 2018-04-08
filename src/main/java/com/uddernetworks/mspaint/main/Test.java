@@ -1,9 +1,6 @@
 package com.uddernetworks.mspaint.main;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXProgressBar;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,8 +12,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -94,6 +93,9 @@ public class Test extends Application implements Initializable {
     @FXML
     private TextArea output;
 
+    @FXML
+    private AnchorPane rootAnchor;
+
     private Main main;
     private Stage primaryStage;
 
@@ -115,8 +117,9 @@ public class Test extends Application implements Initializable {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
+        primaryStage.initStyle(StageStyle.UNDECORATED);
 
-        registerThings();
+        registerThings(primaryStage);
     }
 
     public void setStatusText(String text) {
@@ -131,28 +134,26 @@ public class Test extends Application implements Initializable {
         Platform.runLater(() -> progress.setProgress(indeterminate ? -1 : 1));
     }
 
-    public void registerThings() throws IOException {
+    public void registerThings(Stage primaryStage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("Test.fxml"));
-        Scene scene = new Scene(root);
+
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo.png").toString());
+        icon.setFitHeight(25);
+        icon.setFitWidth(25);
+
+        JFXDecorator jfxDecorator = new JFXDecorator(primaryStage, root, false, true, true);
+        jfxDecorator.setGraphic(icon);
+        jfxDecorator.setTitle("MS Paint IDE");
+
+        Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
 
         primaryStage.setScene(scene);
 
         primaryStage.setTitle("MS Paint IDE");
-        primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo.png")));
+        primaryStage.getIcons().add(icon.getImage());
 
         primaryStage.show();
-
-        TextArea node = (TextArea) scene.lookup("#output");
-        node.setText("Text here");
-
-        StringBuilder builder = new StringBuilder();
-
-//        for (int i = 0; i < 100; i++) {
-//            builder.append("Line #" + i).append("\n");
-//        }
-
-        node.setText(builder.toString());
     }
 
     @FXML
