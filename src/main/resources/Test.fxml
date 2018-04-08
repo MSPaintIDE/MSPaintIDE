@@ -127,7 +127,7 @@
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></JFXCheckBox>
-                        <JFXCheckBox fx:id="execute" layoutX="420.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Execute">
+                        <JFXCheckBox fx:id="execute" layoutX="399.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Execute">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></JFXCheckBox>
@@ -140,9 +140,14 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                        <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="140.0" prefHeight="18.0" prefWidth="480.0" progress="0.82" styleClass="jfx-progress-bar" />
-                        <Label fx:id="statusText" layoutX="170.0" layoutY="101.0" maxWidth="330.0" prefHeight="17.0" prefWidth="320.0" text="Scanning image..." />
+                        <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="140.0" prefHeight="18.0" prefWidth="480.0" progress="0.0" styleClass="jfx-progress-bar" />
+                        <Label fx:id="statusText" layoutX="170.0" layoutY="101.0" maxWidth="330.0" prefHeight="17.0" prefWidth="320.0" />
                         <JFXCheckBox fx:id="useCaches" layoutX="207.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Use Caches">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXCheckBox>
+                        <JFXCheckBox fx:id="saveCaches" layoutX="399.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Save Caches">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>

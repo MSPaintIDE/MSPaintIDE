@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.ocr;
 
 import com.uddernetworks.mspaint.main.Letter;
-import com.uddernetworks.mspaint.ocr.LetterRow;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ public class LetterGrid implements Serializable {
         for (int i2 = 0; i2 < letterGrid.length(); i2++) {
             LetterRow row = letterGrid.get(i2);
             if (!isEmpty(row)) {
-
                 int tempWidth = getWidth(row);
                 LetterRow newRow = new LetterRow(row.length() - 1);
 
@@ -71,6 +69,7 @@ public class LetterGrid implements Serializable {
                         newRow.insertIn(letter);
                         added++;
                     }
+
                     i++;
                 }
 
@@ -85,8 +84,7 @@ public class LetterGrid implements Serializable {
     private boolean isEmpty(LetterRow row) {
         if (row.length() == 0) return true;
         for (int i = 0; i < row.length(); i++) {
-            Letter letter = row.get(i);
-            if (letter != null) return false;
+            if (row.get(i) != null) return false;
         }
         return true;
     }

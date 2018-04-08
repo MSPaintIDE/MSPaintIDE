@@ -145,7 +145,7 @@ public class Main {
         return inputImage == null || highlightedFile == null || objectFile == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
     }
 
-    public void indexAll(boolean useProbe, boolean useCaches) {
+    public void indexAll(boolean useProbe, boolean useCaches, boolean saveCaches) {
         if (optionsNotFilled()) {
             JOptionPane.showMessageDialog(null, "Please select files for all options", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -163,10 +163,10 @@ public class Main {
 
         if (inputImage.isDirectory()) {
             for (File imageFile : getFilesFromDirectory(inputImage, "png")) {
-                imageClasses.add(new ImageClass(imageFile, objectFile, test, images, useProbe, useCaches));
+                imageClasses.add(new ImageClass(imageFile, objectFile, test, images, useProbe, useCaches, saveCaches));
             }
         } else {
-            imageClasses.add(new ImageClass(inputImage, objectFile, test, images, useProbe, useCaches));
+            imageClasses.add(new ImageClass(inputImage, objectFile, test, images, useProbe, useCaches, saveCaches));
         }
 
         test.setStatusText(null);

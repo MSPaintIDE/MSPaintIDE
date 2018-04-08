@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.highlighter;
 
 import com.uddernetworks.mspaint.main.Letter;
-import com.uddernetworks.mspaint.ocr.LetterRow;
 
 import java.awt.*;
 import java.util.List;
@@ -18,6 +17,7 @@ public class LetterFormatter {
         String[] lines = text.split("\n");
 
         for (int i = 0; i < lines.length; i++) {
+            if (letters.size() <= i) continue;
             List<Letter> letterRow = letters.get(i);
 
             String line = lines[i].substring(0, lines[i].length() - 1).trim();

@@ -9,3 +9,7 @@
 .jfx-progress-bar > .bar {
     -fx-background-color: #5472d3;
 }
+
+.progressError > .bar {
+    -fx-background-color: #c62828 !important;
+}

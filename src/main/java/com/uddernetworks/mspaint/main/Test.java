@@ -88,6 +88,8 @@ public class Test extends Application implements Initializable {
     private JFXCheckBox useProbe;
     @FXML
     private JFXCheckBox useCaches;
+    @FXML
+    private JFXCheckBox saveCaches;
 
     @FXML
     private TextArea output;
@@ -102,17 +104,11 @@ public class Test extends Application implements Initializable {
     public Test() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-        System.out.println("WTFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-
         this.main = new Main();
         main.start(this);
     }
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        System.out.println("1111111111111111");
-
-        System.out.println("222222222222222");
-
+    public static void main(String[] args) {
         launch(args);
     }
 
@@ -128,8 +124,11 @@ public class Test extends Application implements Initializable {
     }
 
     public void updateLoading(double current, double total) {
-        System.out.println(current + " / " + total + " = " + (current / total));
         Platform.runLater(() -> progress.setProgress(current / total));
+    }
+
+    public void setIndeterminate(boolean indeterminate) {
+        Platform.runLater(() -> progress.setProgress(indeterminate ? -1 : 1));
     }
 
     public void registerThings() throws IOException {
@@ -158,25 +157,21 @@ public class Test extends Application implements Initializable {
 
     @FXML
     private void startScan(ActionEvent event) {
-        System.out.println("1111111111111111111");
         new Thread(() -> {
             try {
-                long start = System.currentTimeMillis();
-                System.out.println("2222222222222222");
-                main.indexAll(useProbe.isSelected(), useCaches.isSelected());
+                progress.setProgress(0);
+                progress.getStyleClass().remove("progressError");
 
-                System.out.println("33333333333333333333");
+                long start = System.currentTimeMillis();
+                main.indexAll(useProbe.isSelected(), useCaches.isSelected(), saveCaches.isSelected());
 
                 if (syntaxHighlight.isSelected()) {
                     main.highlightAll();
                 }
-                System.out.println("4444444444444444444444444444");
 
                 if (compile.isSelected()) {
                     main.compile(execute.isSelected());
                 }
-
-                System.out.println("555555555555555555555555");
 
                 System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -200,9 +195,17 @@ public class Test extends Application implements Initializable {
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
 
-        progress.setProgress(0.75);
-
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
+
+        Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
+            System.err.println("Error happened! Thread " + thread + " exception: " + exception.getLocalizedMessage());
+            exception.printStackTrace();
+            System.out.println(progress.getStyleClass());
+            progress.setProgress(1);
+            progress.getStyleClass().remove("progressError");
+            progress.getStyleClass().add("progressError");
+            setStatusText("An error has occurred!");
+        });
 
         TextPrintStream textPrintStream = new TextPrintStream(output, System.out);
         PrintStream textOut = new PrintStream(textPrintStream);

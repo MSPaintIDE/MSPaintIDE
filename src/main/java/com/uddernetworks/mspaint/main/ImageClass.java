@@ -21,17 +21,17 @@ public class ImageClass {
     private File highlightedFile;
     private Test test;
 
-    public ImageClass(File inputImage, File objectFileDir, Test test, Map<String, BufferedImage> images, boolean useProbe, boolean useCaches) {
+    public ImageClass(File inputImage, File objectFileDir, Test test, Map<String, BufferedImage> images, boolean useProbe, boolean useCaches, boolean saveCaches) {
         this.inputImage = inputImage;
         this.test = test;
         this.images = images;
 
         File objectFile = new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.txt");
 
-        scan(images, objectFile, useProbe, useCaches);
+        scan(images, objectFile, useProbe, useCaches, saveCaches);
     }
 
-    public void scan(Map<String, BufferedImage> images, File objectFile, boolean useProbe, boolean useCaches) {
+    public void scan(Map<String, BufferedImage> images, File objectFile, boolean useProbe, boolean useCaches, boolean saveCaches) {
         System.out.println("Scanning image " + inputImage.getName() + "...");
         final String prefix = "[" + inputImage.getName() + "] ";
 
@@ -41,9 +41,14 @@ public class ImageClass {
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        LetterGrid grid = imageCompare.getText(inputImage, objectFile, test, images, useProbe, !modifiedDetector.imageChanged() && useCaches);
+        LetterGrid grid = imageCompare.getText(inputImage, objectFile, test, images, useProbe, !modifiedDetector.imageChanged() && useCaches, saveCaches);
+
+        System.out.println("Got");
 
         letterGrid = grid.getLetterGridArray();
+
+        System.out.println("Got griod array");
+
         text = grid.getPrettyString();
 
         System.out.println("\n\n" + prefix + "text =\n" + text);
