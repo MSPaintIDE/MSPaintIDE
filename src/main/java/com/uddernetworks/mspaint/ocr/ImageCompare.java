@@ -2,8 +2,8 @@ package com.uddernetworks.mspaint.ocr;
 
 import com.uddernetworks.mspaint.main.ImageUtil;
 import com.uddernetworks.mspaint.main.Letter;
+import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.Probe;
-import com.uddernetworks.mspaint.main.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,11 +21,11 @@ public class ImageCompare {
     private Map<String, BufferedImage> images;
     private int totalIterations;
     private AtomicInteger currentIterations;
-    private Test test;
+    private MainGUI mainGUI;
     private final AtomicBoolean loading = new AtomicBoolean(true);
 
-    public LetterGrid getText(File inputImage, File objectFile, Test test, Map<String, BufferedImage> images, boolean useProbe, boolean readFromFile, boolean saveCaches) {
-        this.test = test;
+    public LetterGrid getText(File inputImage, File objectFile, MainGUI mainGUI, Map<String, BufferedImage> images, boolean useProbe, boolean readFromFile, boolean saveCaches) {
+        this.mainGUI = mainGUI;
         this.images = images;
 
         if (readFromFile) {
@@ -45,7 +45,7 @@ public class ImageCompare {
             if (!readFromFile) {
                 grid = new LetterGrid(image.getWidth(), image.getHeight());
 
-                test.setStatusText("Probing...");
+                mainGUI.setStatusText("Probing...");
 
                 AtomicInteger waitingFor = new AtomicInteger(images.keySet().size());
 
@@ -54,7 +54,7 @@ public class ImageCompare {
                 int startY = (useProbe) ? probe.sendInProbe() : 0;
                 int iterByY = (useProbe) ? 25 : 1;
 
-                test.setStatusText("Scanning image " + inputImage.getName() + "...");
+                mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
 
                 System.out.println("Total images: " + images.keySet().size());
 
@@ -77,7 +77,7 @@ public class ImageCompare {
                             e.printStackTrace();
                         }
 
-                        test.updateLoading(currentIterations.get(), totalIterations);
+                        mainGUI.updateLoading(currentIterations.get(), totalIterations);
                     }
                 });
 
@@ -110,7 +110,7 @@ public class ImageCompare {
                 }
 
                 if (saveCaches) {
-                    test.setStatusText("Saving to cache file...");
+                    mainGUI.setStatusText("Saving to cache file...");
 
                     FileOutputStream fos = new FileOutputStream(objectFile);
                     ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -130,13 +130,13 @@ public class ImageCompare {
                 grid = (LetterGrid) oi.readObject();
             }
 
-            test.setStatusText("Compacting and processing collected data...");
+            mainGUI.setStatusText("Compacting and processing collected data...");
 
-            test.setIndeterminate(true);
+            mainGUI.setIndeterminate(true);
 
             grid.compact();
 
-            test.setIndeterminate(false);
+            mainGUI.setIndeterminate(false);
 
             return grid;
 

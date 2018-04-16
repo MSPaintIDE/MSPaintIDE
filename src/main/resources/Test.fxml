@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane maxHeight="999999.0" maxWidth="999999.0" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.Test">
+<BorderPane maxHeight="999999.0" maxWidth="999999.0" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.MainGUI">
    <center>
       <GridPane prefHeight="675.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
         <columnConstraints>

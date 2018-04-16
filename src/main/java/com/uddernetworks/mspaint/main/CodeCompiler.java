@@ -100,7 +100,7 @@ public class CodeCompiler {
         } catch (MalformedURLException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ignored) {}
     }
 
-    public Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, Test test, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
+    public Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
         this.classOutputFolder = classOutputFolder;
         classOutputFolder.mkdirs();
 
@@ -118,7 +118,7 @@ public class CodeCompiler {
         long start = System.currentTimeMillis();
         compilerOut.println("Compiling...");
 
-        test.setStatusText("Compiling...");
+        mainGUI.setStatusText("Compiling...");
 
         List<JavaFileObject> filesList = new ArrayList<>();
 
@@ -150,7 +150,7 @@ public class CodeCompiler {
 
         start = System.currentTimeMillis();
         compilerOut.println("Packaging jar...");
-        test.setStatusText("Packaging jar...");
+        mainGUI.setStatusText("Packaging jar...");
 
         if (otherFiles.isDirectory()) {
             copyFolder(otherFiles, classOutputFolder);
@@ -179,7 +179,7 @@ public class CodeCompiler {
         }
 
         compilerOut.println("Executing...");
-        test.setStatusText("Executing...");
+        mainGUI.setStatusText("Executing...");
         start = System.currentTimeMillis();
 
         for (String className : namePackages.keySet()) {
@@ -199,7 +199,7 @@ public class CodeCompiler {
 
         compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
 
-        test.setStatusText("");
+        mainGUI.setStatusText("");
 
         return errors;
     }

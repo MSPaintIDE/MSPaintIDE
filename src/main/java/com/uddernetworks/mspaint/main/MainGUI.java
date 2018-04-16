@@ -27,7 +27,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class Test extends Application implements Initializable {
+public class MainGUI extends Application implements Initializable {
 
     @FXML
     private TextField inputName;
@@ -103,7 +103,7 @@ public class Test extends Application implements Initializable {
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
     private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
 
-    public Test() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+    public MainGUI() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         this.main = new Main();
@@ -174,12 +174,22 @@ public class Test extends Application implements Initializable {
                     main.compile(execute.isSelected());
                 }
 
+                setStatusText("");
+                updateLoading(0, 1);
+
                 System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public void setHaveError() {
+        progress.setProgress(1);
+        progress.getStyleClass().remove("progressError");
+        progress.getStyleClass().add("progressError");
+        setStatusText("An error has occurred!");
     }
 
     @FXML
@@ -202,10 +212,7 @@ public class Test extends Application implements Initializable {
             System.err.println("Error happened! Thread " + thread + " exception: " + exception.getLocalizedMessage());
             exception.printStackTrace();
             System.out.println(progress.getStyleClass());
-            progress.setProgress(1);
-            progress.getStyleClass().remove("progressError");
-            progress.getStyleClass().add("progressError");
-            setStatusText("An error has occurred!");
+            setHaveError();
         });
 
         TextPrintStream textPrintStream = new TextPrintStream(output, System.out);
@@ -224,6 +231,8 @@ public class Test extends Application implements Initializable {
             }
         }).start();
 
+        inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
+
         changeInputImage.setOnAction(event -> {
             File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
             FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
@@ -232,7 +241,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        highlightedImage.textProperty().addListener(event -> main.setHighlightedFile(new File(inputName.getText())));
+        highlightedImage.textProperty().addListener(event -> main.setHighlightedFile(highlightedImage.getText().trim().equals("") ? null : new File(highlightedImage.getText())));
 
         changeHighlightImage.setOnAction(event -> {
             File selected = main.getHighlightedFile().isEmpty() ? main.getCurrentJar() : new File(main.getHighlightedFile());
@@ -242,7 +251,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        cacheFile.textProperty().addListener(event -> main.setObjectFile(new File(cacheFile.getText())));
+        cacheFile.textProperty().addListener(event -> main.setObjectFile(cacheFile.getText().trim().equals("") ? null : new File(cacheFile.getText())));
 
         changeCacheFile.setOnAction(event -> {
             File selected = main.getObjectFile().isEmpty() ? main.getCurrentJar() : new File(main.getObjectFile());
@@ -252,7 +261,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        classOutput.textProperty().addListener(event -> main.setClassOutput(new File(classOutput.getText())));
+        classOutput.textProperty().addListener(event -> main.setClassOutput(classOutput.getText().trim().equals("") ? null : new File(classOutput.getText())));
 
         changeClassOutput.setOnAction(event -> {
             File selected = main.getClassOutput().isEmpty() ? main.getCurrentJar() : new File(main.getClassOutput());
@@ -262,7 +271,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        compiledJarOutput.textProperty().addListener(event -> main.setJarFile(new File(compiledJarOutput.getText())));
+        compiledJarOutput.textProperty().addListener(event -> main.setJarFile(compiledJarOutput.getText().trim().equals("") ? null : new File(compiledJarOutput.getText())));
 
         changeCompiledJar.setOnAction(event -> {
                     File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
@@ -272,7 +281,7 @@ public class Test extends Application implements Initializable {
                     });
                 });
 
-        libraryFile.textProperty().addListener(event -> main.setLibraryFile(new File(libraryFile.getText())));
+        libraryFile.textProperty().addListener(event -> main.setLibraryFile(libraryFile.getText().trim().equals("") ? null : new File(libraryFile.getText())));
 
         changeLibraries.setOnAction(event -> {
             File selected = main.getLibraryFile().isEmpty() ? main.getCurrentJar() : new File(main.getLibraryFile());
@@ -282,7 +291,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        otherFiles.textProperty().addListener(event -> main.setOtherFiles(new File(otherFiles.getText())));
+        otherFiles.textProperty().addListener(event -> main.setOtherFiles(otherFiles.getText().trim().equals("") ? null : new File(otherFiles.getText())));
 
         changeOtherFiles.setOnAction(event -> {
             File selected = main.getOtherFiles().isEmpty() ? main.getCurrentJar() : new File(main.getOtherFiles());
@@ -292,7 +301,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        letterDirectory.textProperty().addListener(event -> main.setLetterDirectory(new File(letterDirectory.getText())));
+        letterDirectory.textProperty().addListener(event -> main.setLetterDirectory(letterDirectory.getText().trim().equals("") ? null : new File(letterDirectory.getText())));
 
         changeLetterDir.setOnAction(event -> {
             File selected = main.getLetterDirectory().isEmpty() ? main.getCurrentJar() : new File(main.getLetterDirectory());
@@ -302,7 +311,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        compilerOutputValue.textProperty().addListener(event -> main.setCompilerOutput(new File(compilerOutputValue.getText())));
+        compilerOutputValue.textProperty().addListener(event -> main.setCompilerOutput(compilerOutputValue.getText().trim().equals("") ? null : new File(compilerOutputValue.getText())));
 
         compilerOutput.setOnAction(event -> {
             File selected = main.getCompilerOutput().isEmpty() ? main.getCurrentJar() : new File(main.getCompilerOutput());
@@ -312,7 +321,7 @@ public class Test extends Application implements Initializable {
             });
         });
 
-        programOutputValue.textProperty().addListener(event -> main.setAppOutput(new File(programOutputValue.getText())));
+        programOutputValue.textProperty().addListener(event -> main.setAppOutput(programOutputValue.getText().trim().equals("") ? null : new File(programOutputValue.getText())));
 
         programOutput.setOnAction(event -> {
             File selected = main.getAppOutput().isEmpty() ? main.getCurrentJar() : new File(main.getAppOutput());

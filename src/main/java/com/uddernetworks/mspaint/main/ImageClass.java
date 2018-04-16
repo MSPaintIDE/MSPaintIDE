@@ -19,11 +19,11 @@ public class ImageClass {
     private LetterFileWriter letterFileWriter;
     private Map<String, BufferedImage> images;
     private File highlightedFile;
-    private Test test;
+    private MainGUI mainGUI;
 
-    public ImageClass(File inputImage, File objectFileDir, Test test, Map<String, BufferedImage> images, boolean useProbe, boolean useCaches, boolean saveCaches) {
+    public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, Map<String, BufferedImage> images, boolean useProbe, boolean useCaches, boolean saveCaches) {
         this.inputImage = inputImage;
-        this.test = test;
+        this.mainGUI = mainGUI;
         this.images = images;
 
         File objectFile = new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.txt");
@@ -41,7 +41,7 @@ public class ImageClass {
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        LetterGrid grid = imageCompare.getText(inputImage, objectFile, test, images, useProbe, !modifiedDetector.imageChanged() && useCaches, saveCaches);
+        LetterGrid grid = imageCompare.getText(inputImage, objectFile, mainGUI, images, useProbe, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
         letterGrid = grid.getLetterGridArray();
 

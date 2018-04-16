@@ -203,25 +203,30 @@ public class MainWindow {
         });
 
 
-        addChangeListener(inputName, e -> main.setInputImage(new File(inputName.getText())));
+        addChangeListener(inputName, e -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
 
-        addChangeListener(highlightedImage, e -> main.setHighlightedFile(new File(highlightedImage.getText())));
+        addChangeListener(highlightedImage, e -> main.setHighlightedFile(highlightedImage.getText().trim().equals("") ? null : new File(highlightedImage.getText())));
 
-        addChangeListener(cacheFile, e -> main.setObjectFile(new File(cacheFile.getText())));
+        addChangeListener(cacheFile, e -> main.setObjectFile(cacheFile.getText().trim().equals("") ? null : new File(cacheFile.getText())));
 
-        addChangeListener(classOutput, e -> main.setClassOutput(new File(classOutput.getText())));
+        addChangeListener(classOutput, e -> main.setClassOutput(classOutput.getText().trim().equals("") ? null : new File(classOutput.getText())));
 
-        addChangeListener(compiledJarOutput, e -> main.setJarFile(new File(compiledJarOutput.getText())));
+        addChangeListener(compiledJarOutput, e -> main.setJarFile(compiledJarOutput.getText().trim().equals("") ? null : new File(compiledJarOutput.getText())));
 
-        addChangeListener(libraryFile, e -> main.setLibraryFile(new File(libraryFile.getText())));
+        addChangeListener(libraryFile, e -> main.setLibraryFile(libraryFile.getText().trim().equals("") ? null : new File(libraryFile.getText())));
 
-        addChangeListener(otherFiles, e -> main.setOtherFiles(new File(otherFiles.getText())));
+        addChangeListener(otherFiles, e -> main.setOtherFiles(otherFiles.getText().trim().equals("") ? null : new File(otherFiles.getText())));
 
-        addChangeListener(letterDirectory, e -> main.setLetterDirectory(new File(letterDirectory.getText())));
+        addChangeListener(letterDirectory, e -> {
+            System.out.println("333333333333333333333333333333333333333");
+            System.out.println(letterDirectory.getText().trim());
+            System.out.println(letterDirectory.getText().trim().equals(""));
+            main.setLetterDirectory(letterDirectory.getText().trim().equals("") ? null : new File(letterDirectory.getText()));
+        });
 
-        addChangeListener(compilerOutputValue, e -> main.setCompilerOutput(new File(compilerOutputValue.getText())));
+        addChangeListener(compilerOutputValue, e -> main.setCompilerOutput(compilerOutputValue.getText().trim().equals("") ? null : new File(compilerOutputValue.getText())));
 
-        addChangeListener(programOutputValue, e -> main.setAppOutput(new File(programOutputValue.getText())));
+        addChangeListener(programOutputValue, e -> main.setAppOutput(programOutputValue.getText().trim().equals("") ? null : new File(programOutputValue.getText())));
 
 
         start.addActionListener(e -> new Thread(() -> {
