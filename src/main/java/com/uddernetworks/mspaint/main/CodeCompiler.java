@@ -91,7 +91,7 @@ public class CodeCompiler {
 
             ClassLoader loader = new URLClassLoader(urls);
 
-            Class thisClass = loader.loadClass(classPackage + "." + className);
+            Class thisClass = loader.loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
 
             Object instance = thisClass.newInstance();
             Method thisMethod = thisClass.getDeclaredMethod("main", String[].class);
@@ -134,6 +134,8 @@ public class CodeCompiler {
                     break;
                 }
             }
+
+            if (className.trim().endsWith("{")) className = className.trim().substring(0, className.trim().length() - 1);
 
             compilerOut.println("Class name = " + className);
             compilerOut.println("Class package = " + classPackage);

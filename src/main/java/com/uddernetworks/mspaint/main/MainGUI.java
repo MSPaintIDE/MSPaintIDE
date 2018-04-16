@@ -164,7 +164,7 @@ public class MainGUI extends Application implements Initializable {
                 progress.getStyleClass().remove("progressError");
 
                 long start = System.currentTimeMillis();
-                main.indexAll(useProbe.isSelected(), useCaches.isSelected(), saveCaches.isSelected());
+                if (main.indexAll(useProbe.isSelected(), useCaches.isSelected(), saveCaches.isSelected()) == -1) return;
 
                 if (syntaxHighlight.isSelected()) {
                     main.highlightAll();
@@ -186,10 +186,12 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void setHaveError() {
-        progress.setProgress(1);
-        progress.getStyleClass().remove("progressError");
-        progress.getStyleClass().add("progressError");
-        setStatusText("An error has occurred!");
+        Platform.runLater(() -> {
+            progress.setProgress(1);
+            progress.getStyleClass().remove("progressError");
+            progress.getStyleClass().add("progressError");
+            setStatusText("An error has occurred!");
+        });
     }
 
     @FXML

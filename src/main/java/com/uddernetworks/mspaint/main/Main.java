@@ -3,7 +3,6 @@ package com.uddernetworks.mspaint.main;
 import com.uddernetworks.mspaint.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.ocr.ImageIndex;
 
-import javax.swing.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.awt.image.BufferedImage;
@@ -44,34 +43,15 @@ public class Main {
 
     private List<ImageClass> imageClasses = new ArrayList<>();
 
-//    public static void main(String[] args) {
-//        try {
-//            UIManager.setLookAndFeel(
-//                    UIManager.getSystemLookAndFeelClassName());
-//            Main main = new Main();
-//            main.start();
-//        } catch (IOException | InstantiationException | IllegalAccessException | URISyntaxException | ClassNotFoundException | UnsupportedLookAndFeelException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         this.mainGUI = mainGUI;
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
         parseOptions();
-
-//        System.out.println("2222222222222222");
-
-//        MainWindow mainWindow = new MainWindow();
-//        mainWindow.display();
-//        mainWindow.registerThings(this, currentJar);
-//        JTextPane textArea = mainWindow.getTextAreaOutput();
     }
 
     private void parseOptions() throws IOException {
-        System.out.println("Options path = " + getOptions().getAbsolutePath());
         List<String> options = Files.readAllLines(Paths.get(getOptions().getAbsolutePath()));
 
         for (String option : options) {
@@ -82,7 +62,6 @@ public class Main {
             switch (firstPart) {
                 case "inputImage":
                     inputImage = new File(secondPart);
-                    System.out.println("inputImage = " + inputImage);
                     break;
                 case "highlightedFile":
                     highlightedFile = new File(secondPart);
@@ -145,11 +124,11 @@ public class Main {
         return inputImage == null || highlightedFile == null || objectFile == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
     }
 
-    public void indexAll(boolean useProbe, boolean useCaches, boolean saveCaches) {
+    public int indexAll(boolean useProbe, boolean useCaches, boolean saveCaches) {
         if (optionsNotFilled()) {
             System.err.println("Please select files for all options");
             mainGUI.setHaveError();
-            return;
+            return -1;
         }
 
         System.out.println("Scanning all images...");
@@ -173,11 +152,13 @@ public class Main {
         mainGUI.setStatusText(null);
 
         System.out.println("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
+        return 1;
     }
 
     public void highlightAll() throws IOException {
         if (optionsNotFilled()) {
-            JOptionPane.showMessageDialog(null, "Please select files for all options", "Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Please select files for all options");
+            mainGUI.setHaveError();
             return;
         }
 
@@ -205,6 +186,8 @@ public class Main {
         System.out.println("Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
 
         System.out.println("Compiling...");
+        mainGUI.setStatusText("Compiling...");
+        mainGUI.setIndeterminate(true);
         start = System.currentTimeMillis();
 
 
@@ -225,6 +208,7 @@ public class Main {
         ImageOutputStream compilerOutputStream = new ImageOutputStream(compilerOutput, 500);
         Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
 
+        System.out.println("Highlighting Angry Squiggles...");
         mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
         for (ImageClass imageClass : errors.keySet()) {
@@ -235,6 +219,7 @@ public class Main {
 
         System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
 
+        System.out.println("Saving output images...");
         mainGUI.setStatusText("Saving output images...");
 
         imageOutputStream.saveImage();
