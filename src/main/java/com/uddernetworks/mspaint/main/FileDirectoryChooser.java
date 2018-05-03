@@ -27,15 +27,18 @@ public class FileDirectoryChooser {
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
             new Thread(() -> {
-                try {
-                    Thread.sleep(100);
-                    Field dialogField = JFileChooser.class.getDeclaredField("dialog");
-                    dialogField.setAccessible(true);
-                    jDialog = (JDialog) dialogField.get(fileChooser);
-                    jDialog.toFront();
-                } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
-                    e.printStackTrace();
+                while (jDialog == null) {
+                    try {
+                        Thread.sleep(500);
+                        Field dialogField = JFileChooser.class.getDeclaredField("dialog");
+                        dialogField.setAccessible(true);
+                        jDialog = (JDialog) dialogField.get(fileChooser);
+                    } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                jDialog.toFront();
             }).start();
 
             int returnVal = fileChooser.showOpenDialog(null);
