@@ -27,6 +27,7 @@ public class FileDirectoryChooser {
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
             new Thread(() -> {
+                // Sketchy while loop fixes Issue #1
                 while (jDialog == null) {
                     try {
                         Thread.sleep(500);
