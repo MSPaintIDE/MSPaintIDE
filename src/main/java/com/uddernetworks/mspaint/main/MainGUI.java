@@ -89,6 +89,8 @@ public class MainGUI extends Application implements Initializable {
     private JFXCheckBox useCaches;
     @FXML
     private JFXCheckBox saveCaches;
+    @FXML
+    private JFXButton invertColors;
 
     @FXML
     private TextArea output;
@@ -98,6 +100,7 @@ public class MainGUI extends Application implements Initializable {
 
     private Main main;
     private Stage primaryStage;
+    private boolean darkTheme = false;
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
@@ -119,6 +122,8 @@ public class MainGUI extends Application implements Initializable {
         this.primaryStage = primaryStage;
         primaryStage.initStyle(StageStyle.UNDECORATED);
 
+        primaryStage.setMinWidth(1000);
+        primaryStage.setMinHeight(700);
         registerThings(primaryStage);
     }
 
@@ -233,6 +238,24 @@ public class MainGUI extends Application implements Initializable {
             }
         }).start();
 
+        invertColors.setOnAction(event -> {
+            this.darkTheme = !this.darkTheme;
+            Parent parent = invertColors.getParent().getParent().getParent().getParent();
+            parent.lookupAll(".theme-text").forEach(node -> {
+                if (this.darkTheme) {
+                    node.getStyleClass().add("dark-text");
+                    parent.lookup(".gridpane-theme").getStyleClass().add("gridpane-theme-dark");
+                    parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
+                    parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
+                } else {
+                    node.getStyleClass().remove("dark-text");
+                    parent.lookup(".gridpane-theme").getStyleClass().remove("gridpane-theme-dark");
+                    parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
+                    parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
+                }
+            });
+        });
+
         inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
 
         changeInputImage.setOnAction(event -> {
@@ -276,12 +299,12 @@ public class MainGUI extends Application implements Initializable {
         compiledJarOutput.textProperty().addListener(event -> main.setJarFile(compiledJarOutput.getText().trim().equals("") ? null : new File(compiledJarOutput.getText())));
 
         changeCompiledJar.setOnAction(event -> {
-                    File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
-                    FileDirectoryChooser.openFileChoser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
-                        compiledJarOutput.setText(file.getAbsolutePath());
-                        main.setJarFile(file);
-                    });
-                });
+            File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
+            FileDirectoryChooser.openFileChoser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
+                compiledJarOutput.setText(file.getAbsolutePath());
+                main.setJarFile(file);
+            });
+        });
 
         libraryFile.textProperty().addListener(event -> main.setLibraryFile(libraryFile.getText().trim().equals("") ? null : new File(libraryFile.getText())));
 

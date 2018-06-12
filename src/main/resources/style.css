@@ -44,3 +44,33 @@
 .unrounded {
     border-radius: 10px !important;
 }
+
+.invert-colors {
+    -fx-background-image: url(baseline_invert_colors_black_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.invert-colors-white {
+    -fx-background-image: url(baseline_invert_colors_white_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.gridpane-theme-dark {
+    -fx-background-color: #424242;
+    -fx-text-fill: white;
+}
+
+.output-theme-dark {
+    -fx-background-color: #616161;
+    -fx-border-color: #616161 !important;
+    -fx-text-fill: white;
+}
+
+.output-theme-dark .content {
+    -fx-background-color: #616161;
+    -fx-border-color: #616161 !important;
+}
+
+.dark-text {
+    -fx-text-fill: white;
+}

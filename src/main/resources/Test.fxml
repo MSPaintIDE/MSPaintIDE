@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import com.jfoenix.controls.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane maxHeight="999999.0" maxWidth="999999.0" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.MainGUI">
+<?import java.lang.String?>
+<BorderPane maxHeight="999999.0" maxWidth="1000.0" minWidth="1000.0" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.MainGUI">
    <center>
-      <GridPane prefHeight="675.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
+      <GridPane maxWidth="9.999999999E9" minWidth="500.0" prefHeight="675.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="500.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="500.0" minWidth="10.0" prefWidth="500.0" />
@@ -17,12 +17,16 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <TextArea fx:id="output" prefHeight="290.0" prefWidth="500.0" style="-fx-border-style: solid; -fx-border-radius: 0; -fx-border-color: #F4F4F4;" styleClass="unrounded" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+            <TextArea fx:id="output" maxWidth="9.9999999E7" prefHeight="290.0" prefWidth="500.0" style="-fx-border-style: solid; -fx-border-radius: 0;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
+               <styleClass>
+                  <String fx:value="unrounded" />
+                  <String fx:value="output-theme" />
+               </styleClass>
             </TextArea>
-            <GridPane>
+            <GridPane maxWidth="9.9999999E7" minWidth="500.0" styleClass="gridpane-theme">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -50,26 +54,26 @@
                         <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Input Image/Image Folder" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Highlighted Out Directory" GridPane.rowIndex="1" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Cache File Directory" GridPane.rowIndex="2" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Class File Output" GridPane.rowIndex="3" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Compiled Jar Output" GridPane.rowIndex="4" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Library jar(s) path" GridPane.rowIndex="5" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Compile other file(s) path" GridPane.rowIndex="6" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Letter Directory" GridPane.rowIndex="7" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Compiler Output" GridPane.rowIndex="8" />
-                        <Label prefHeight="55.0" prefWidth="236.0" text="Program Output" GridPane.rowIndex="9" />
-                        <JFXTextField fx:id="inputName" GridPane.columnIndex="1" />
-                        <JFXTextField fx:id="highlightedImage" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <JFXTextField fx:id="cacheFile" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <JFXTextField fx:id="classOutput" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <JFXTextField fx:id="compiledJarOutput" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                        <JFXTextField fx:id="libraryFile" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <JFXTextField fx:id="otherFiles" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <JFXTextField fx:id="letterDirectory" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                        <JFXTextField fx:id="compilerOutputValue" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                        <JFXTextField fx:id="programOutputValue" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Input Image/Image Folder" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Highlighted Out Directory" GridPane.rowIndex="1" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Cache File Directory" GridPane.rowIndex="2" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Class File Output" GridPane.rowIndex="3" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiled Jar Output" GridPane.rowIndex="4" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Library jar(s) path" GridPane.rowIndex="5" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compile other file(s) path" GridPane.rowIndex="6" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Letter Directory" GridPane.rowIndex="7" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiler Output" GridPane.rowIndex="8" />
+                        <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Program Output" GridPane.rowIndex="9" />
+                        <JFXTextField fx:id="inputName" styleClass="theme-text" GridPane.columnIndex="1" />
+                        <JFXTextField fx:id="highlightedImage" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <JFXTextField fx:id="cacheFile" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <JFXTextField fx:id="classOutput" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <JFXTextField fx:id="compiledJarOutput" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <JFXTextField fx:id="libraryFile" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <JFXTextField fx:id="otherFiles" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <JFXTextField fx:id="letterDirectory" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <JFXTextField fx:id="compilerOutputValue" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <JFXTextField fx:id="programOutputValue" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="9" />
 
                          <JFXButton fx:id="changeInputImage" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
                            <cursor>
@@ -125,43 +129,53 @@
                   </GridPane>
                   <Pane prefHeight="183.0" prefWidth="500.0" GridPane.rowIndex="1">
                      <children>
-                        <JFXCheckBox fx:id="syntaxHighlight" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Syntax Highlight">
+                        <JFXCheckBox fx:id="syntaxHighlight" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Syntax Highlight">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXCheckBox>
-                        <JFXCheckBox fx:id="compile" layoutX="207.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Compile">
+                        <JFXCheckBox fx:id="compile" layoutX="207.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Compile">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXCheckBox>
-                        <JFXCheckBox fx:id="execute" layoutX="399.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Execute">
+                        <JFXCheckBox fx:id="execute" layoutX="399.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Execute">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXCheckBox>
-                        <JFXCheckBox fx:id="useProbe" layoutX="14.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Use Probe">
+                        <JFXCheckBox fx:id="useProbe" layoutX="14.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Use Probe">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXCheckBox>
-                        <JFXButton buttonType="RAISED" layoutX="10.0" layoutY="94.0" onAction="#startScan" prefHeight="30" prefWidth="150.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Start">
+                        <JFXButton buttonType="RAISED" layoutX="10.0" layoutY="94.0" onAction="#startScan" prefHeight="30" prefWidth="150.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" styleClass="theme-text" text="Start">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
                         <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="140.0" prefHeight="18.0" prefWidth="480.0" progress="0.0" styleClass="jfx-progress-bar" />
-                        <Label fx:id="statusText" layoutX="170.0" layoutY="101.0" maxWidth="330.0" prefHeight="17.0" prefWidth="320.0" />
-                        <JFXCheckBox fx:id="useCaches" layoutX="207.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Use Caches">
+                        <Label fx:id="statusText" layoutX="170.0" layoutY="101.0" maxWidth="330.0" prefHeight="17.0" prefWidth="275.0" />
+                        <JFXCheckBox fx:id="useCaches" layoutX="207.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Use Caches">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXCheckBox>
-                        <JFXCheckBox fx:id="saveCaches" layoutX="399.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" text="Save Caches">
+                        <JFXCheckBox fx:id="saveCaches" layoutX="399.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Save Caches">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXCheckBox>
+                        <JFXButton fx:id="invertColors" layoutX="450.0" layoutY="95.0" prefHeight="30" prefWidth="30.0" style="-fx-text-fill: WHITE;" styleClass="invert-colors">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXButton>
+                        <!--<JFXButton fx:id="invertColors" buttonType="RAISED" layoutX="429.0" layoutY="94.0" prefHeight="30" prefWidth="30.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="I">-->
+                           <!--<cursor>-->
+                              <!--<Cursor fx:constant="HAND" />-->
+                           <!--</cursor>-->
+                        <!--</JFXButton>-->
 
                          <!--<JFXSpinner styleClass="blue-spinner" startingAngle="0" radius="13"/>-->
 
