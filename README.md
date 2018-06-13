@@ -8,7 +8,7 @@ People joke about what IDE they use often, things like Word, MS Notepad, sometim
 The way the MS Paint IDE works, is it is an application running separate from MS Paint. You input some locations for things like input image, output image location, compile to folder, etc. Once you save your code to MS Paint, you click **Compile/Execute** and the program uses a custom [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) implementation designed specially for MS Paint and code, then syntax highlights it, and then uses Java's JDK to compile the code and execute it. All output from the compiler and application compiled are outputed via images.
 
 ## Usage Tutorial
-First to open the program, if you intend to compile your application, you **must** run the jar from your JDK. This can be done by doing something like `"C:\Program Files\Java\jdk1.8.0_112\bin\java.exe" -jar MSPaintIDE-1.2-SNAPSHOT.jar` in your commandline. This should be modified for your location of `java.exe` in your JDK's directory.
+First to open the program, if you intend to compile your application, you **must** run the jar from your JDK. This can be done by doing something like `"C:\Program Files\Java\jdk1.8.0_144\bin\java.exe" -jar MSPaintIDE-2.0.2-SNAPSHOT.jar` in your commandline. This should be modified for your location of `java.exe` in your JDK's directory.
 
 Before you do anything with highlighting, compiling and executing, you must set some paths first. You can manually input them in the text boxes, or click _Change_ and select files, or type in names in the selector. Here is what the following options do and should be set at:
 
@@ -77,4 +77,4 @@ Thank you to:
 
 [@iCodeHaven](https://www.spigotmc.org/members/482937/)
 
-Feel free to donate via PayPal
+Feel free to donate via [PayPal](https://paypal.me/RubbaBoy)
