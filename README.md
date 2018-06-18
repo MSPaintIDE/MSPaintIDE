@@ -80,3 +80,11 @@ Thank you to:
 [@iCodeHaven](https://www.spigotmc.org/members/482937/)
 
 Feel free to donate via [PayPal](https://paypal.me/RubbaBoy)
+
+## Special Thanks To:
+![](https://www.yourkit.com/images/yklogo.png)
+
+YourKit supports open source projects with its full-featured Java Profiler.
+YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
+and <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
+innovative and intelligent tools for profiling Java and .NET applications.
