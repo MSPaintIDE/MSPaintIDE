@@ -56,19 +56,19 @@
 }
 
 .gridpane-theme-dark {
-    -fx-background-color: #424242;
+    -fx-background-color: #202225;
     -fx-text-fill: white;
 }
 
 .output-theme-dark {
-    -fx-background-color: #616161;
-    -fx-border-color: #616161 !important;
+    -fx-background-color: #242529;
+    -fx-border-color: #242529 !important;
     -fx-text-fill: white;
 }
 
 .output-theme-dark .content {
-    -fx-background-color: #616161;
-    -fx-border-color: #616161 !important;
+    -fx-background-color: #242529;
+    -fx-border-color: #242529 !important;
 }
 
 .dark-text {
