@@ -28,18 +28,19 @@
 /*}*/
 
 .jfx-decorator {
-    -fx-decorator-color: #5472d3;
+    -fx-decorator-color: #202225;
     /*-fx-font-weight: BOLD;*/
 }
 
 .jfx-decorator .jfx-decorator-buttons-container {
-    -fx-background-color: #5472d3;
+    -fx-background-color: #202225;
 }
 
 .jfx-decorator .resize-border {
-    -fx-border-color: #5472d3;
-    -fx-border-width: 0 4 4 4;
-}
+     /*-fx-border-color: #5472d3;*/
+    -fx-border-color: #202225;
+     -fx-border-width: 0 4 4 4;
+ }
 
 .unrounded {
     border-radius: 10px !important;
