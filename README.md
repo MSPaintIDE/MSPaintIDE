@@ -73,13 +73,15 @@ If anyone would like to support me with donations, I would be extremely grateful
 
 Thank you to:
 
+[@Mr. Midnight](https://www.spigotmc.org/members/11614/)
+
 [@Stef](https://www.spigotmc.org/members/18736/)
 
 [@Meepidy](https://www.spigotmc.org/members/191302/)
 
 [@iCodeHaven](https://www.spigotmc.org/members/482937/)
 
-Feel free to donate via [PayPal](https://paypal.me/RubbaBoy)
+Feel free to donate via [PayPal](https://rubbaboy.fund/)
 
 ## Special Thanks To:
 ![](https://www.yourkit.com/images/yklogo.png)
