@@ -73,4 +73,6 @@
 
 .dark-text {
     -fx-text-fill: white;
+    -fx-prompt-text-fill: WHITE;
+    -jfx-unfocus-color: WHITE;
 }

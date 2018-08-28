@@ -70,6 +70,14 @@ public class MainGUI extends Application implements Initializable {
     private JFXButton compilerOutput;
     @FXML
     private JFXButton programOutput;
+    @FXML
+    private JFXButton createRepo;
+    @FXML
+    private JFXButton addRemote;
+    @FXML
+    private JFXButton addFiles;
+    @FXML
+    private JFXButton commitAndPush;
 
     @FXML
     private JFXProgressBar progress;
@@ -101,6 +109,7 @@ public class MainGUI extends Application implements Initializable {
     private Main main;
     private Stage primaryStage;
     private boolean darkTheme = false;
+    private GitController gitController;
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
@@ -111,6 +120,8 @@ public class MainGUI extends Application implements Initializable {
 
         this.main = new Main();
         main.start(this);
+
+        this.gitController = new GitController(this);
     }
 
     public static void main(String[] args) {
@@ -147,6 +158,7 @@ public class MainGUI extends Application implements Initializable {
         icon.setFitWidth(25);
 
         JFXDecorator jfxDecorator = new JFXDecorator(primaryStage, root, false, true, true);
+        jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
         jfxDecorator.setGraphic(icon);
         jfxDecorator.setTitle("MS Paint IDE");
 
@@ -199,6 +211,13 @@ public class MainGUI extends Application implements Initializable {
         });
     }
 
+    private void setGitFeaturesDisabled(boolean disabled) {
+        createRepo.setDisable(disabled);
+        addRemote.setDisable(disabled);
+        addFiles.setDisable(disabled);
+        commitAndPush.setDisable(disabled);
+    }
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -212,6 +231,7 @@ public class MainGUI extends Application implements Initializable {
         letterDirectory.setText(main.getLetterDirectory());
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
+        setGitFeaturesDisabled(true);
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 
@@ -254,6 +274,21 @@ public class MainGUI extends Application implements Initializable {
                     parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
                 }
             });
+        });
+
+        this.gitController.getVersion(gitVersion -> {
+            if (gitVersion == null) {
+                System.out.println("Git not found! Git features will not be available.");
+            } else {
+                System.out.println("Git found! Version: " + gitVersion);
+                setGitFeaturesDisabled(false);
+            }
+        });
+
+        createRepo.setOnAction(event -> {
+//            File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
+//            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> this.gitController.gitInit(file));
+            this.gitController.gitInit(new File(main.getInputImage()));
         });
 
         inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
