@@ -154,12 +154,14 @@ public class CodeCompiler {
         compilerOut.println("Packaging jar...");
         mainGUI.setStatusText("Packaging jar...");
 
-        if (otherFiles.isDirectory()) {
-            copyFolder(otherFiles, classOutputFolder);
-        } else {
-            File newLoc = new File(classOutputFolder, otherFiles.getName());
-            newLoc.createNewFile();
-            Files.copy(Paths.get(otherFiles.getAbsolutePath()), Paths.get(newLoc.getAbsolutePath()), REPLACE_EXISTING);
+        if (otherFiles != null) {
+            if (otherFiles.isDirectory()) {
+                copyFolder(otherFiles, classOutputFolder);
+            } else {
+                File newLoc = new File(classOutputFolder, otherFiles.getName());
+                newLoc.createNewFile();
+                Files.copy(Paths.get(otherFiles.getAbsolutePath()), Paths.get(newLoc.getAbsolutePath()), REPLACE_EXISTING);
+            }
         }
 
         FileJarrer fileJarrer = new FileJarrer(classOutputFolder, jarFile);

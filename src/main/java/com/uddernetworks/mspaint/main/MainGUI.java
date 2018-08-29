@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.git.GitController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -20,6 +21,7 @@ import javafx.stage.StageStyle;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -138,6 +140,10 @@ public class MainGUI extends Application implements Initializable {
         registerThings(primaryStage);
     }
 
+    public Main getMain() {
+        return this.main;
+    }
+
     public void setStatusText(String text) {
         Platform.runLater(() -> statusText.setText(text));
     }
@@ -177,6 +183,14 @@ public class MainGUI extends Application implements Initializable {
     private void startScan(ActionEvent event) {
         new Thread(() -> {
             try {
+                if (ToolProvider.getSystemJavaCompiler() == null) {
+                    setHaveError();
+                    System.out.println("Error: No Java compiler found!" +
+                            "You must make sure you ran the IDE with with JDK and not the JRE." +
+                            "Please see usage instructions: https://github.com/RubbaBoy/MSPaintIDE/#usage-tutorial");
+                    return;
+                }
+
                 progress.setProgress(0);
                 progress.getStyleClass().remove("progressError");
 
@@ -200,6 +214,18 @@ public class MainGUI extends Application implements Initializable {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public boolean shouldUseProbe() {
+        return this.useProbe.isSelected();
+    }
+
+    public boolean shouldUseCaches() {
+        return this.useCaches.isSelected();
+    }
+
+    public boolean shouldSaveCaches() {
+        return this.saveCaches.isSelected();
     }
 
     public void setHaveError() {
@@ -287,15 +313,23 @@ public class MainGUI extends Application implements Initializable {
 
         createRepo.setOnAction(event -> {
 //            File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
-//            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> this.gitController.gitInit(file));
+//            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> this.gitController.gitInit(file));
             this.gitController.gitInit(new File(main.getInputImage()));
         });
+
+        addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileChoser(new File(main.getInputImage()), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
+            try {
+                this.gitController.addFiles(files);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
 
         inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
 
         changeInputImage.setOnAction(event -> {
             File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
-            FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 inputName.setText(file.getAbsolutePath());
                 main.setInputImage(file);
             });
@@ -305,7 +339,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeHighlightImage.setOnAction(event -> {
             File selected = main.getHighlightedFile().isEmpty() ? main.getCurrentJar() : new File(main.getHighlightedFile());
-            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 highlightedImage.setText(file.getAbsolutePath());
                 main.setHighlightedFile(file);
             });
@@ -315,7 +349,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeCacheFile.setOnAction(event -> {
             File selected = main.getObjectFile().isEmpty() ? main.getCurrentJar() : new File(main.getObjectFile());
-            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 cacheFile.setText(file.getAbsolutePath());
                 main.setObjectFile(file);
             });
@@ -325,7 +359,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeClassOutput.setOnAction(event -> {
             File selected = main.getClassOutput().isEmpty() ? main.getCurrentJar() : new File(main.getClassOutput());
-            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 classOutput.setText(file.getAbsolutePath());
                 main.setClassOutput(file);
             });
@@ -335,7 +369,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeCompiledJar.setOnAction(event -> {
             File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
-            FileDirectoryChooser.openFileChoser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
                 compiledJarOutput.setText(file.getAbsolutePath());
                 main.setJarFile(file);
             });
@@ -345,7 +379,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeLibraries.setOnAction(event -> {
             File selected = main.getLibraryFile().isEmpty() ? main.getCurrentJar() : new File(main.getLibraryFile());
-            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 libraryFile.setText(file.getAbsolutePath());
                 main.setLibraryFile(file);
             });
@@ -355,7 +389,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeOtherFiles.setOnAction(event -> {
             File selected = main.getOtherFiles().isEmpty() ? main.getCurrentJar() : new File(main.getOtherFiles());
-            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 otherFiles.setText(file.getAbsolutePath());
                 main.setOtherFiles(file);
             });
@@ -365,7 +399,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeLetterDir.setOnAction(event -> {
             File selected = main.getLetterDirectory().isEmpty() ? main.getCurrentJar() : new File(main.getLetterDirectory());
-            FileDirectoryChooser.openFileChoser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 letterDirectory.setText(file.getAbsolutePath());
                 main.setLetterDirectory(file);
             });
@@ -375,7 +409,7 @@ public class MainGUI extends Application implements Initializable {
 
         compilerOutput.setOnAction(event -> {
             File selected = main.getCompilerOutput().isEmpty() ? main.getCurrentJar() : new File(main.getCompilerOutput());
-            FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
                 compilerOutputValue.setText(file.getAbsolutePath());
                 main.setCompilerOutput(file);
             });
@@ -385,7 +419,7 @@ public class MainGUI extends Application implements Initializable {
 
         programOutput.setOnAction(event -> {
             File selected = main.getAppOutput().isEmpty() ? main.getCurrentJar() : new File(main.getAppOutput());
-            FileDirectoryChooser.openFileChoser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
                 programOutputValue.setText(file.getAbsolutePath());
                 main.setAppOutput(file);
             });

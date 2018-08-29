@@ -76,10 +76,10 @@ public class Main {
                     jarFile = new File(secondPart);
                     break;
                 case "libraryFile":
-                    libraryFile = new File(secondPart);
+                    libraryFile = "".equals(secondPart) ? null : new File(secondPart);
                     break;
                 case "otherFiles":
-                    otherFiles = new File(secondPart);
+                    otherFiles = "".equals(secondPart) ? null : new File(secondPart);
                     break;
                 case "compilerOutput":
                     compilerOutput = new File(secondPart);
@@ -230,7 +230,7 @@ public class Main {
         System.out.println("Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
     }
 
-    private List<File> getFilesFromDirectory(File directory, String extension) {
+    public List<File> getFilesFromDirectory(File directory, String extension) {
         List<File> ret = new ArrayList<>();
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
