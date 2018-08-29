@@ -32,19 +32,19 @@ public class GitController {
         this.mainGUI = mainGUI;
     }
 
-    private void runCommand(String command, Consumer<String> result) {
-        runCommand(command, true, result);
+    private void runCommand(String command, File directory, Consumer<String> result) {
+        runCommand(command, true, directory, result);
     }
 
-    private void runCommand(String command, boolean showStatus, Consumer<String> result) {
+    private void runCommand(String command, boolean showStatus, File directory, Consumer<String> result) {
         this.mainGUI.setIndeterminate(true);
         if (showStatus) this.mainGUI.setStatusText("Running command '" + command + "'");
-        System.out.println(command);
+        System.out.println((directory != null ? directory.getAbsolutePath() : "") + "> " + command);
         executorService.execute(() -> {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 Runtime runtime = Runtime.getRuntime();
-                Process process = runtime.exec(command);
+                Process process = runtime.exec(command, null, directory);
 
                 String line;
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -80,12 +80,14 @@ public class GitController {
             return new GitIndex(new HashMap<>());
         }
 
-        return this.gson.fromJson(new String(Files.readAllBytes(gitIndexFile.toPath())), GitIndex.class);
+        String str = new String(Files.readAllBytes(gitIndexFile.toPath()));
+
+        return this.gson.fromJson(str, GitIndex.class);
     }
 
     public void getVersion(Consumer<String> result) {
         this.mainGUI.setStatusText("Checking git version");
-        runCommand("git --version", false, versionResult -> result.accept(versionResult.toLowerCase().contains("git version") ? versionResult.substring(12) : null));
+        runCommand("git --version", false, null, versionResult -> result.accept(versionResult.toLowerCase().contains("git version") ? versionResult.substring(12) : null));
     }
 
     public void gitInit(File directory) {
@@ -94,10 +96,7 @@ public class GitController {
         if (directory.isFile()) directory = directory.getParentFile();
         File gitFolder = new File(directory, "git");
         gitFolder.mkdirs();
-        System.out.println(gitFolder.getAbsolutePath());
-        runCommand("git init \"" + gitFolder.getAbsolutePath() + "\"", false, result -> { //  & git init
-            System.out.println("result = " + result);
-
+        runCommand("git init", false, gitFolder, result -> { //  & git init
             this.mainGUI.updateLoading(0, 1);
             this.mainGUI.setStatusText(null);
 
@@ -126,20 +125,20 @@ public class GitController {
         imageFiles.forEach(file -> {
             try {
                 ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
-                String rel = getRelativeClass(file);
-                File scannedText = new File(getGitFolder() + File.separator + rel.replace(".png", ".java"));
+                String rel = getRelativeClass(file).replace(".png", ".java");
+                File scannedText = new File(getGitFolder() + File.separator + rel);
                 scannedText.getParentFile().mkdirs();
                 scannedText.createNewFile();
                 Files.write(scannedText.toPath(), imageClass.getText().getBytes());
                 gitIndex.addFile(file, scannedText);
+
+                runCommand("git add \"" + scannedText.getAbsolutePath().replace("\\", "\\\\") + "\"", getGitFolder(), result -> System.out.println("Finished adding " + rel));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         Files.write(getGitIndexFile().toPath(), this.gson.toJson(gitIndex).getBytes());
-
-        // TODO: Add git command to add files
     }
 
     private String getRelativeClass(File file) {
