@@ -4,14 +4,10 @@ import java.io.File;
 import java.util.Map;
 
 public class GitIndex {
-    private Map<File, File> added;
+    private Map<String, String> added;
 
-    public GitIndex(Map<File, File> added) {
+    public GitIndex(Map<String, String> added) {
         this.added = added;
-    }
-
-    public Map<File, File> getAdded() {
-        return added;
     }
 
     /**
@@ -20,6 +16,6 @@ public class GitIndex {
      * @param source The scanned code .java file
      */
     public void addFile(File image, File source) {
-        this.added.put(image, source);
+        this.added.put(image.getAbsolutePath(), source.getAbsolutePath());
     }
 }

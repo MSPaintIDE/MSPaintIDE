@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ public class GitController {
     private void runCommand(String command, boolean showStatus, File directory, Consumer<String> result) {
         this.mainGUI.setIndeterminate(true);
         if (showStatus) this.mainGUI.setStatusText("Running command '" + command + "'");
-        System.out.println((directory != null ? directory.getAbsolutePath() : "") + "> " + command);
+        System.out.println((directory != null ? directory.getAbsolutePath() : "") + " > " + command);
         executorService.execute(() -> {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -118,27 +119,39 @@ public class GitController {
         Map<String, BufferedImage> images = imageIndex.index();
 
         List<File> imageFiles = Arrays.stream(files).flatMap(file -> {
-            if (file.isDirectory()) return main.getFilesFromDirectory(file, "png").stream();
+            if (file.isDirectory()) return main.getFilesFromDirectory(file, null).stream();
             return Stream.of(file);
         }).collect(Collectors.toList());
 
         imageFiles.forEach(file -> {
             try {
-                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
-                String rel = getRelativeClass(file).replace(".png", ".java");
-                File scannedText = new File(getGitFolder() + File.separator + rel);
-                scannedText.getParentFile().mkdirs();
-                scannedText.createNewFile();
-                Files.write(scannedText.toPath(), imageClass.getText().getBytes());
-                gitIndex.addFile(file, scannedText);
+                File addingFile;
+                String relative = getRelativeClass(file);
+                if (file.getName().endsWith(".png")) {
+                    ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
+                    relative = relative.replace(".png", ".java");
+                    addingFile = new File(getGitFolder() + File.separator + relative);
+                    addingFile.getParentFile().mkdirs();
+                    addingFile.createNewFile();
+                    Files.write(addingFile.toPath(), imageClass.getText().getBytes());
+                    gitIndex.addFile(file, addingFile);
+                } else {
+                    addingFile = new File(getGitFolder() + File.separator + relative);
+                    addingFile.getParentFile().mkdirs();
 
-                runCommand("git add \"" + scannedText.getAbsolutePath().replace("\\", "\\\\") + "\"", getGitFolder(), result -> System.out.println("Finished adding " + rel));
+                    Files.copy(file.toPath(), addingFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                String finalRelative = relative;
+                runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", getGitFolder(), result -> System.out.println("Finished adding " + finalRelative));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         Files.write(getGitIndexFile().toPath(), this.gson.toJson(gitIndex).getBytes());
+
+        System.out.println("Finished adding " + imageFiles.size() + " files");
     }
 
     private String getRelativeClass(File file) {

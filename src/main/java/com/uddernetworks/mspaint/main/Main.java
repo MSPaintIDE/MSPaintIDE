@@ -236,7 +236,7 @@ public class Main {
             if (file.isDirectory()) {
                 ret.addAll(getFilesFromDirectory(file, extension));
             } else {
-                if (file.getName().endsWith("." + extension)) ret.add(file);
+                if (extension == null || file.getName().endsWith("." + extension)) ret.add(file);
             }
         }
 
