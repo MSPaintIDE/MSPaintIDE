@@ -83,7 +83,9 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXButton addFiles;
     @FXML
-    private JFXButton commitAndPush;
+    private JFXButton commit;
+    @FXML
+    private JFXButton push;
 
     @FXML
     private JFXProgressBar progress;
@@ -153,10 +155,12 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void updateLoading(double current, double total) {
+        resetError();
         Platform.runLater(() -> progress.setProgress(current / total));
     }
 
     public void setIndeterminate(boolean indeterminate) {
+        resetError();
         Platform.runLater(() -> progress.setProgress(indeterminate ? -1 : 1));
     }
 
@@ -241,11 +245,19 @@ public class MainGUI extends Application implements Initializable {
         });
     }
 
+    public void resetError() {
+        Platform.runLater(() -> {
+            progress.setProgress(0);
+            progress.getStyleClass().remove("progressError");
+        });
+    }
+
     private void setGitFeaturesDisabled(boolean disabled) {
         createRepo.setDisable(disabled);
         addRemote.setDisable(disabled);
         addFiles.setDisable(disabled);
-        commitAndPush.setDisable(disabled);
+        commit.setDisable(disabled);
+        push.setDisable(disabled);
     }
 
     @FXML
@@ -331,6 +343,14 @@ public class MainGUI extends Application implements Initializable {
 
         addRemote.setOnAction(event -> {
             this.gitController.setRemoteOrigin(originURL.getText());
+        });
+
+        commit.setOnAction(event -> {
+            this.gitController.commit(commitMessage.getText());
+        });
+
+        push.setOnAction(event -> {
+            this.gitController.push();
         });
 
         inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));

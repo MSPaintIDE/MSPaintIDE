@@ -70,10 +70,13 @@ public class GitController {
         }
     }
 
+    private File gitFolder = null;
+
     private File getGitFolder() {
+        if (gitFolder != null) return gitFolder;
         File directory = new File(this.mainGUI.getMain().getInputImage());
         if (directory.isFile()) directory = directory.getParentFile();
-        return new File(directory, "git");
+        return gitFolder = new File(directory, "git");
     }
 
     private File getGitIndexFile() {
@@ -178,7 +181,13 @@ public class GitController {
     }
 
     public void setRemoteOrigin(String url) {
-        runCommand("git remote -v", false, getGitFolder(), result -> {
+        if (url == null || "".equals(url)) {
+            System.out.println("Error: No URL for remote origin found");
+            this.mainGUI.setHaveError();
+            return;
+        }
+
+        runCommand("git remote -v", true, getGitFolder(), result -> {
             Runnable addOrigin = () -> runCommand("git remote add origin " + url, true, getGitFolder(), lastResult -> {
                 if (result.contains("remote origin already exists")) {
                     System.out.println("Couldn't add as a remote origin.");
@@ -193,5 +202,53 @@ public class GitController {
                 addOrigin.run();
             }
         });
+    }
+
+    public void commit(String message) {
+        if (message == null || "".equals(message)) {
+            System.out.println("Error: No commit message found");
+            this.mainGUI.setHaveError();
+            return;
+        }
+
+        runCommand("git commit -a -m \"" + message + "\"", true, getGitFolder(), result -> {
+            if (result.contains("changed")) {
+                System.out.println("Successfully committed");
+            } else if (result.contains("nothing added")) {
+                System.out.println("Nothing changed; couldn't commit");
+            } else {
+                System.out.println("Unexpected git command result: \n" + result + "\nIf this looks correct, please make an issue on the MS Paint IDE GitHub: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
+            }
+        });
+    }
+
+    public void hasUnpushedCommits(Consumer<Boolean> result) {
+        runCommand("git log origin/master..HEAD", true, getGitFolder(), logResult -> result.accept(logResult.contains("commit")));
+    }
+
+    public void push() {
+        hasUnpushedCommits(hasUnpushed -> {
+            if (!hasUnpushed) {
+                System.out.println("Error: There are no unpushed commits to push");
+                return;
+            }
+
+            runCommand("git push origin master", true, getGitFolder(), pushResult -> {
+                if (pushResult.contains("does not appear to be a git repository")) {
+                    System.out.println("Error: No origin set up, couldn't push");
+                    return;
+                }
+
+                hasUnpushedCommits(stillHasUnpushed -> {
+                    if (stillHasUnpushed) {
+                        this.mainGUI.setHaveError();
+                        System.out.println("Error: The push did not succeed, did your remote origin contain credentials? If not, please add them");
+                    } else {
+                        System.out.println("Pushed commits successfully");
+                    }
+                });
+            });
+        });
+
     }
 }
