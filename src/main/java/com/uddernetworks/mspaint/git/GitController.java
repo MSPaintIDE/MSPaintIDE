@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.uddernetworks.mspaint.main.ImageClass;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ModifiedDetector;
 import com.uddernetworks.mspaint.ocr.ImageIndex;
 
 import java.awt.image.BufferedImage;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +29,7 @@ public class GitController {
 
     private MainGUI mainGUI;
     private Gson gson = new Gson();
+    private Map<String, BufferedImage> images;
     private ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     public GitController(MainGUI mainGUI) {
@@ -124,43 +127,66 @@ public class GitController {
         GitIndex gitIndex = getGitIndex();
         Main main = this.mainGUI.getMain();
 
-        ImageIndex imageIndex = new ImageIndex(new File(main.getLetterDirectory()));
-        Map<String, BufferedImage> images = imageIndex.index();
-
         List<File> imageFiles = Arrays.stream(files).flatMap(file -> {
             if (file.isDirectory()) return main.getFilesFromDirectory(file, null).stream();
             return Stream.of(file);
         }).collect(Collectors.toList());
 
-        imageFiles.forEach(file -> {
-            try {
-                File addingFile;
-                String relative = getRelativeClass(file);
-                if (file.getName().endsWith(".png")) {
-                    ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
-                    relative = relative.replace(".png", ".java");
-                    addingFile = new File(getGitFolder() + File.separator + relative);
-                    addingFile.getParentFile().mkdirs();
-                    addingFile.createNewFile();
-                    Files.write(addingFile.toPath(), imageClass.getText().getBytes());
-                    gitIndex.addFile(file, addingFile);
-                } else {
-                    addingFile = new File(getGitFolder() + File.separator + relative);
-                    addingFile.getParentFile().mkdirs();
+        imageFiles.forEach(file ->
+                moveOrScan(file, null, true, gitIndex, getImageIndex(), (addingFile, relative) ->
+                        runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", false, getGitFolder(), result ->
+                                System.out.println("Finished adding " + relative))));
 
-                    Files.copy(file.toPath(), addingFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
-
-                String finalRelative = relative;
-                runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", false, getGitFolder(), result -> System.out.println("Finished adding " + finalRelative));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        System.out.println(gitIndex.getAdded());
 
         Files.write(getGitIndexFile().toPath(), this.gson.toJson(gitIndex).getBytes());
 
         System.out.println("Finished adding " + imageFiles.size() + " file" + (imageFiles.size() > 1 ? "s" : ""));
+    }
+
+    private void moveOrScan(File file, File source, boolean addToIndex, GitIndex gitIndex, Map<String, BufferedImage> images, BiConsumer<File, String> result) {
+        Main main = this.mainGUI.getMain();
+        try {
+            File addingFile;
+            String relative = getRelativeClass(file);
+            if (file.getName().endsWith(".png")) {
+                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
+                relative = relative.replace(".png", ".java");
+
+                if (source == null) {
+                    addingFile = new File(getGitFolder() + File.separator + relative);
+                    addingFile.getParentFile().mkdirs();
+                    addingFile.createNewFile();
+                } else {
+                    addingFile = source;
+                }
+                Files.write(addingFile.toPath(), imageClass.getText().getBytes());
+                if (addToIndex) gitIndex.addFile(file, addingFile);
+            } else {
+                if (source == null) {
+                    addingFile = new File(getGitFolder() + File.separator + relative);
+                    addingFile.getParentFile().mkdirs();
+                } else {
+                    addingFile = source;
+                }
+
+                if (addToIndex) gitIndex.addFile(file, addingFile);
+                Files.copy(file.toPath(), addingFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            result.accept(addingFile, relative);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Map<String, BufferedImage> getImageIndex() {
+        if (this.images == null) {
+            ImageIndex imageIndex = new ImageIndex(new File(this.mainGUI.getMain().getLetterDirectory()));
+            this.images = imageIndex.index();
+        }
+
+        return this.images;
     }
 
     private String getRelativeClass(File file) {
@@ -204,12 +230,25 @@ public class GitController {
         });
     }
 
-    public void commit(String message) {
+    public void commit(String message) throws IOException {
         if (message == null || "".equals(message)) {
             System.out.println("Error: No commit message found");
             this.mainGUI.setHaveError();
             return;
         }
+
+        GitIndex gitIndex = getGitIndex();
+        gitIndex.getAdded().forEach((image, source) -> {
+            File imageFile = new File(image);
+            File sourceFile = new File(source);
+
+            ModifiedDetector modifiedDetector = new ModifiedDetector(imageFile, sourceFile);
+
+            if (modifiedDetector.imageChanged()) {
+                moveOrScan(imageFile, sourceFile, false, null, getImageIndex(), (addingFile, relative) ->
+                        System.out.println("Moved/scanned file " + relative));
+            }
+        });
 
         runCommand("git commit -a -m \"" + message + "\"", true, getGitFolder(), result -> {
             if (result.contains("changed")) {
@@ -227,15 +266,21 @@ public class GitController {
     }
 
     public void push() {
-        hasUnpushedCommits(hasUnpushed -> {
-            if (!hasUnpushed) {
-                System.out.println("Error: There are no unpushed commits to push");
+        runCommand("git remote -v", true, getGitFolder(), result -> {
+            if (!result.contains("origin")) {
+                System.out.println("Error: No origin set up, couldn't push");
                 return;
             }
 
-            runCommand("git push origin master", true, getGitFolder(), pushResult -> {
+            runCommand("git push -u origin master", true, getGitFolder(), pushResult -> {
                 if (pushResult.contains("does not appear to be a git repository")) {
                     System.out.println("Error: No origin set up, couldn't push");
+                    return;
+                }
+
+                if (pushResult.contains("unknown revision or path not in the working tree")) {
+                    System.out.println("The branch isn't set up properly, try re-adding your remote origin, making new commits, pushing again, or making an issue here: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
+                    System.out.println("Full command response:\n" + pushResult);
                     return;
                 }
 
@@ -249,6 +294,5 @@ public class GitController {
                 });
             });
         });
-
     }
 }

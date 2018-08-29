@@ -155,7 +155,6 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void updateLoading(double current, double total) {
-        resetError();
         Platform.runLater(() -> progress.setProgress(current / total));
     }
 
@@ -346,7 +345,11 @@ public class MainGUI extends Application implements Initializable {
         });
 
         commit.setOnAction(event -> {
-            this.gitController.commit(commitMessage.getText());
+            try {
+                this.gitController.commit(commitMessage.getText());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         push.setOnAction(event -> {

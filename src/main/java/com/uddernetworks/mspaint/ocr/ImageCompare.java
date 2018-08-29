@@ -247,7 +247,6 @@ public class ImageCompare {
 
                 } else if (identifier.equals("f") || identifier.equals("t")) {
                     if (ImageUtil.equals(subImage, searching, Arrays.asList(new Point(0, 0), new Point(0, 1)))) {
-                        System.out.println("Found letter: " + identifier);
                         grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY));
                     }
                     currentX++;
@@ -256,7 +255,6 @@ public class ImageCompare {
                 }
 
                 if (ImageUtil.equals(subImage, searching)) {
-                    System.out.println("Found letter: " + identifier);
                     grid.addLetter(new Letter(identifier, searching.getWidth(), searching.getHeight(), currentX, currentY));
                 }
                 currentX++;

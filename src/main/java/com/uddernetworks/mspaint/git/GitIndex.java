@@ -10,6 +10,10 @@ public class GitIndex {
         this.added = added;
     }
 
+    public Map<String, String> getAdded() {
+        return added;
+    }
+
     /**
      * Adds a file to git
      * @param image The image of the code saved by MS Paint
