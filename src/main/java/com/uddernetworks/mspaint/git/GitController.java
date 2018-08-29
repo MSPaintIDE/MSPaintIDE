@@ -33,15 +33,15 @@ public class GitController {
         this.mainGUI = mainGUI;
     }
 
-    private void runCommand(String command, File directory, Consumer<String> result) {
-        runCommand(command, true, directory, result);
+    private void runCommand(String command, boolean async, File directory, Consumer<String> result) {
+        runCommand(command, async, true, directory, result);
     }
 
-    private void runCommand(String command, boolean showStatus, File directory, Consumer<String> result) {
+    private void runCommand(String command, boolean async, boolean showStatus, File directory, Consumer<String> result) {
         this.mainGUI.setIndeterminate(true);
         if (showStatus) this.mainGUI.setStatusText("Running command '" + command + "'");
         System.out.println((directory != null ? directory.getAbsolutePath() : "") + " > " + command);
-        executorService.execute(() -> {
+        Runnable commandRunnable = () -> {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 Runtime runtime = Runtime.getRuntime();
@@ -61,7 +61,13 @@ public class GitController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        };
+
+        if (async) {
+            executorService.execute(commandRunnable);
+        } else {
+            commandRunnable.run();
+        }
     }
 
     private File getGitFolder() {
@@ -88,7 +94,7 @@ public class GitController {
 
     public void getVersion(Consumer<String> result) {
         this.mainGUI.setStatusText("Checking git version");
-        runCommand("git --version", false, null, versionResult -> result.accept(versionResult.toLowerCase().contains("git version") ? versionResult.substring(12) : null));
+        runCommand("git --version", true, false, null, versionResult -> result.accept(versionResult.toLowerCase().contains("git version") ? versionResult.substring(12) : null));
     }
 
     public void gitInit(File directory) {
@@ -97,7 +103,7 @@ public class GitController {
         if (directory.isFile()) directory = directory.getParentFile();
         File gitFolder = new File(directory, "git");
         gitFolder.mkdirs();
-        runCommand("git init", false, gitFolder, result -> { //  & git init
+        runCommand("git init", true, false, gitFolder, result -> { //  & git init
             this.mainGUI.updateLoading(0, 1);
             this.mainGUI.setStatusText(null);
 
@@ -143,7 +149,7 @@ public class GitController {
                 }
 
                 String finalRelative = relative;
-                runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", getGitFolder(), result -> System.out.println("Finished adding " + finalRelative));
+                runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", false, getGitFolder(), result -> System.out.println("Finished adding " + finalRelative));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -151,7 +157,7 @@ public class GitController {
 
         Files.write(getGitIndexFile().toPath(), this.gson.toJson(gitIndex).getBytes());
 
-        System.out.println("Finished adding " + imageFiles.size() + " files");
+        System.out.println("Finished adding " + imageFiles.size() + " file" + (imageFiles.size() > 1 ? "s" : ""));
     }
 
     private String getRelativeClass(File file) {
@@ -169,5 +175,23 @@ public class GitController {
 
 
         return inputImage.toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
+    }
+
+    public void setRemoteOrigin(String url) {
+        runCommand("git remote -v", false, getGitFolder(), result -> {
+            Runnable addOrigin = () -> runCommand("git remote add origin " + url, true, getGitFolder(), lastResult -> {
+                if (result.contains("remote origin already exists")) {
+                    System.out.println("Couldn't add as a remote origin.");
+                } else {
+                    System.out.println("Added " + url + " as a remote origin");
+                }
+            });
+
+            if (result.contains("origin")) {
+                runCommand("git remote remove origin", true, getGitFolder(), ignored -> addOrigin.run());
+            } else {
+                addOrigin.run();
+            }
+        });
     }
 }

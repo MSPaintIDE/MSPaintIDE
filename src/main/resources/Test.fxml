@@ -6,9 +6,9 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
-<BorderPane maxHeight="999999.0" maxWidth="999999.0" minWidth="1000.0" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.MainGUI">
+<BorderPane maxHeight="999999.0" maxWidth="999999.0" minWidth="1000.0" prefHeight="825.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.MainGUI">
    <center>
-      <GridPane maxWidth="99999.0" minWidth="500.0" prefHeight="675.0" BorderPane.alignment="CENTER">
+      <GridPane maxWidth="99999.0" minWidth="500.0" prefHeight="625.0" BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="ALWAYS" maxWidth="500.0" minWidth="10.0" prefWidth="500.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="99999.0" minWidth="10.0" prefWidth="500.0" />
@@ -32,7 +32,7 @@
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints maxHeight="527.0" minHeight="10.0" prefHeight="527.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="100.0" minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="150.0" minHeight="10.0" prefHeight="150.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="200.0" minHeight="10.0" prefHeight="200.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
@@ -135,22 +135,23 @@
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                        <JFXButton fx:id="addRemote" buttonType="RAISED" layoutX="129.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Add Remote">
+                        <JFXButton fx:id="addRemote" buttonType="RAISED" layoutX="10.0" layoutY="40.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Add Remote">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                        <JFXButton fx:id="addFiles" buttonType="RAISED" layoutX="250.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Add Files">
+                        <JFXButton fx:id="addFiles" buttonType="RAISED" layoutX="120.0" layoutY="-1.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Add Files">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                        <JFXButton fx:id="commitAndPush" buttonType="RAISED" layoutX="10.0" layoutY="46.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Commit &amp; Push">
+                        <JFXButton fx:id="commitAndPush" buttonType="RAISED" layoutX="10.0" layoutY="80.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Commit &amp; Push">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
                         </JFXButton>
-                        <JFXTextField labelFloat="true" layoutX="150.0" layoutY="49.0" prefHeight="25.0" prefWidth="328.0" promptText="Commit message" styleClass="theme-text" />
+                        <JFXTextField fx:id="commitMessage" labelFloat="true" layoutX="156.0" layoutY="83.0" prefHeight="25.0" prefWidth="328.0" promptText="Commit message" styleClass="theme-text" />
+                        <JFXTextField fx:id="originURL" labelFloat="true" layoutX="156.0" layoutY="43.0" prefHeight="25.0" prefWidth="328.0" promptText="Remote origin URL" styleClass="theme-text" />
                      </children></Pane>
                   <Pane prefHeight="283.0" prefWidth="500.0" GridPane.rowIndex="2">
                      <children>

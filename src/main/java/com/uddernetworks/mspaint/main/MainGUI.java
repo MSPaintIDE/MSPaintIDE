@@ -51,6 +51,10 @@ public class MainGUI extends Application implements Initializable {
     private JFXTextField compilerOutputValue;
     @FXML
     private JFXTextField programOutputValue;
+    @FXML
+    private JFXTextField originURL;
+    @FXML
+    private JFXTextField commitMessage;
 
     @FXML
     private JFXButton changeInputImage;
@@ -324,6 +328,10 @@ public class MainGUI extends Application implements Initializable {
                 e.printStackTrace();
             }
         }));
+
+        addRemote.setOnAction(event -> {
+            this.gitController.setRemoteOrigin(originURL.getText());
+        });
 
         inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
 
