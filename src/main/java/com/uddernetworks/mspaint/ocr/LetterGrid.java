@@ -5,12 +5,17 @@ import com.uddernetworks.mspaint.main.Letter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class LetterGrid implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private AtomicReferenceArray<LetterRow> letterGrid;
+    private ExecutorService executor = Executors.newFixedThreadPool(25);
 
     public LetterGrid(int width, int height) {
         letterGrid = new AtomicReferenceArray<>(height);
@@ -32,24 +37,32 @@ public class LetterGrid implements Serializable {
     }
 
     public void compact() {
-        int width = 0;
-        int height = 0;
+        AtomicInteger width = new AtomicInteger();
+        AtomicInteger height = new AtomicInteger();
 
         for (int i = 0; i < letterGrid.length(); i++) {
             LetterRow row = letterGrid.get(i);
-            if (!isEmpty(row)) {
-                row.sort();
-                height++;
-                int tempWidth = getWidth(row) + 20;
-                if (tempWidth > width) width = tempWidth;
-            }
+            executor.execute(() -> {
+                if (!isEmpty(row)) {
+                    row.sort();
+                    height.getAndIncrement();
+                    int tempWidth = getWidth(row) + 20;
+                    if (tempWidth > width.get()) width.set(tempWidth);
+                }
+            });
         }
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException ignored) {}
 
         AtomicReferenceArray<LetterRow> newGrid;
 
-        newGrid = new AtomicReferenceArray<>(height);
-        for (int i = 0; i < height; i++) {
-            newGrid.set(i, new LetterRow(width));
+        newGrid = new AtomicReferenceArray<>(height.get());
+        for (int i = 0; i < height.get(); i++) {
+            newGrid.set(i, new LetterRow(width.get()));
         }
 
         int addedRow = 0;
@@ -110,9 +123,12 @@ public class LetterGrid implements Serializable {
     }
 
     public String getPrettyString() {
+        List<StringBuilder> lines = new ArrayList<>();
         StringBuilder ret = new StringBuilder();
+        int minSpace = Integer.MAX_VALUE;
 
         for (int i2 = 0; i2 < letterGrid.length(); i2++) {
+            StringBuilder line = new StringBuilder();
             LetterRow row = letterGrid.get(i2);
 
             int iMax = row.length() - 1;
@@ -121,15 +137,25 @@ public class LetterGrid implements Serializable {
             for (int i = 0; ; i++) {
                 boolean print = !String.valueOf(row.get(i)).equals("null");
 
-                if (print) ret.append(row.get(i).getLetter());
+                if (print) {
+                    line.append(row.get(i).getLetter());
+                }
 
                 if (i == iMax) break;
             }
 
-            ret.append('\n');
+            minSpace = Math.min(minSpace, getLeadingSpaces(line.toString()));
+            lines.add(line);
         }
 
+        int finalMinSpace = minSpace;
+        lines.forEach(line -> ret.append(line.substring(finalMinSpace)).append("\n"));
+
         return ret.toString();
+    }
+
+    private int getLeadingSpaces(String string) {
+        return string.indexOf(string.trim());
     }
 
 }

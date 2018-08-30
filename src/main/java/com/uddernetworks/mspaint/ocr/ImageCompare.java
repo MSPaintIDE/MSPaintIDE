@@ -157,9 +157,6 @@ public class ImageCompare {
             currentX = 0;
             while (currentX + searching.getWidth() <= image.getWidth()) {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, searching.getWidth(), searching.getHeight());
-
-//                subImage = new BufferedImage(subImage.getColorModel(), subImage.copyData(null), subImage.getColorModel().isAlphaPremultiplied(), null);
-
                 if (identifier.equals("\'")) {
                     int topRightX = currentX + searching.getWidth();
                     int topRightY = currentY;
