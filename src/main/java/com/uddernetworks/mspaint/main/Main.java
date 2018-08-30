@@ -228,6 +228,8 @@ public class Main {
         mainGUI.setStatusText(null);
 
         System.out.println("Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
+
+        imageClasses.clear();
     }
 
     public List<File> getFilesFromDirectory(File directory, String extension) {

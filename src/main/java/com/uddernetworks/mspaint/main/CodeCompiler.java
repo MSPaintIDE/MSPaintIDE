@@ -21,6 +21,7 @@ public class CodeCompiler {
     private File classOutputFolder;
     private Map<String, ImageClass> imageClassHashMap = new HashMap<>();
     private Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = new HashMap<>();
+    private List<URLClassLoader> classLoaders = new ArrayList<>();
 
     public class MyDiagnosticListener implements DiagnosticListener<JavaFileObject> {
 
@@ -89,9 +90,9 @@ public class CodeCompiler {
             URL url = classOutputFolder.toURL();
             URL[] urls = new URL[]{url};
 
-            ClassLoader loader = new URLClassLoader(urls);
+            classLoaders.add(new URLClassLoader(urls));
 
-            Class thisClass = loader.loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
+            Class thisClass = classLoaders.get(classLoaders.size() - 1).loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
 
             Object instance = thisClass.newInstance();
             Method thisMethod = thisClass.getDeclaredMethod("main", String[].class);
@@ -204,6 +205,12 @@ public class CodeCompiler {
         compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
 
         mainGUI.setStatusText("");
+
+        for (URLClassLoader classLoader : this.classLoaders) {
+            classLoader.close();
+        }
+
+        this.classLoaders.clear();
 
         return errors;
     }
