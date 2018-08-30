@@ -49,23 +49,26 @@ _Note: All options are saved in a file named options.txt in the same directory o
    Once you have all of the options set, you can be free to program in MS Paint, saving to the file you set earlier. The font must be in font size **16**, with the font family being **Verdana**. If people are super interested in this (Which I doubt, but who knows) I would make it support more fonts, but right now that's not a top priority.
 
 ## Screenshots
-![](https://rubbaboy.me/images/byqmep9)
 
-![](https://rubbaboy.me/images/y55jisj)
+Light theme variants of the screenshots available on [the website](https://ms-paint-i.de/), change the website theme from light to dark to see both variants.
 
-![](https://rubbaboy.me/images/h8bg7ys)
+![](https://ms-paint-i.de/images/screenshot-1-dark.png)
 
-![](https://rubbaboy.me/images/7y6b3l2)
+![](https://ms-paint-i.de/images/screenshot-2-dark.png)
 
-![](https://rubbaboy.me/images/ow09uyl)
+![](https://ms-paint-i.de/images/screenshot-3-dark.png)
 
-![](https://rubbaboy.me/images/7vdphau)
+![](https://ms-paint-i.de/images/screenshot-4-dark.png)
+
+![](https://ms-paint-i.de/images/screenshot-5.png)
+
+![](https://ms-paint-i.de/images/screenshot-6.png)
 
 ## Examples of program with errors:
 
-![](https://rubbaboy.me/images/3tff4jz)
+![](https://ms-paint-i.de/images/screenshot-7.png)
 
-![](https://rubbaboy.me/images/wuds2rd)
+![](https://ms-paint-i.de/images/screenshot-8.png)
 
 
 ### Donations
