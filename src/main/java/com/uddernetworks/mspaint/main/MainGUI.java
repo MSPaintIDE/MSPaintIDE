@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
 import com.uddernetworks.mspaint.git.GitController;
+import com.uddernetworks.mspaint.install.Installer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -133,6 +134,26 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) {
+        if (ToolProvider.getSystemJavaCompiler() != null) {
+            System.out.println("Using JDK");
+        } else {
+            System.out.println("Not using JDK, compiling/executing WILL NOT work");
+        }
+
+        Installer installer = new Installer();
+
+        if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("install")) {
+                installer.install();
+                System.exit(0);
+            } else if (args[0].equalsIgnoreCase("uninstall")) {
+                installer.uninstall();
+                System.exit(0);
+            } else {
+                // TODO: Add opening of files via context menu, args[0] is file being opened
+            }
+        }
+
         launch(args);
     }
 
