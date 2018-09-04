@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.imagestreams;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

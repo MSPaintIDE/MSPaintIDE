@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.imagestreams;
 
 import java.io.OutputStream;
 import java.io.PrintStream;

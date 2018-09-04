@@ -1,5 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
+import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+
 import javax.tools.*;
 import java.awt.*;
 import java.io.*;

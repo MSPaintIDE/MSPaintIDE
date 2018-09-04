@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.highlighter.AngrySquiggleHighlighter;
+import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.ImageIndex;
 
 import javax.tools.Diagnostic;

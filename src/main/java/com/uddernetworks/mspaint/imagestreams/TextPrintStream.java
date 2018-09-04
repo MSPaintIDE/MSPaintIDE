@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.imagestreams;
 
 import javafx.scene.control.TextArea;
 

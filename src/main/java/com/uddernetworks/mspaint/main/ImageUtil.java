@@ -83,4 +83,20 @@ public class ImageUtil {
         if (points == null) return true;
         return points.stream().noneMatch(point -> point.getX() == x && point.getY() == y);
     }
+
+    public static int getWidth(BufferedImage image) {
+        int width = 0;
+        int black = new Color(255, 255, 255, 255).getRGB();
+
+        for (int x = 0; x < image.getWidth(); x++) {
+            boolean hasBlack = false;
+            for (int y = 0; y < image.getHeight(); y++) {
+                if (image.getRGB(x, y) == black) hasBlack = true;
+            }
+
+            if (hasBlack) width++;
+        }
+
+        return width;
+    }
 }
