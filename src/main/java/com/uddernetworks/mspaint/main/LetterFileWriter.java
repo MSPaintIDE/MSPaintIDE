@@ -11,21 +11,24 @@ import java.util.Map;
 public class LetterFileWriter {
 
     private List<List<Letter>> letterGrid;
-    private File readFile;
     private File writeFile;
     private BufferedImage image;
 
-    public LetterFileWriter(List<List<Letter>> letterGrid, File readFile, File writeFile) {
+    public LetterFileWriter(List<List<Letter>> letterGrid, BufferedImage image, File writeFile) {
         this.letterGrid = letterGrid;
-        this.readFile = readFile;
+        this.image = image;
         this.writeFile = writeFile;
     }
 
+    public LetterFileWriter(List<List<Letter>> letterGrid, File readFile, File writeFile) throws IOException {
+        this.letterGrid = letterGrid;
+        this.writeFile = writeFile;
+        this.image = ImageIO.read(readFile);
+    }
+
     public void writeToFile(Map<String, BufferedImage> images) throws IOException {
-        image = ImageIO.read(readFile);
         image = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         background(Color.WHITE);
-
 
         for (List<Letter> row : letterGrid) {
             for (Letter letter : row) {
@@ -34,7 +37,7 @@ public class LetterFileWriter {
             }
         }
 
-        ImageIO.write(image, "png", writeFile);
+        if (writeFile != null) ImageIO.write(image, "png", writeFile);
     }
 
     public BufferedImage getImage() {
@@ -46,6 +49,7 @@ public class LetterFileWriter {
         letterImage = colorImage(letterImage, color.getRed(), color.getGreen(), color.getBlue());
         for (int y = 0; y < letterImage.getHeight(); y++) {
             for (int x = 0; x < letterImage.getWidth(); x++) {
+//                System.out.println("(" + (letter.getX() + x) + ", " + (letter.getY() + y) + ")");
                 image.setRGB(letter.getX() + x, letter.getY() + y, letterImage.getRGB(x, y));
             }
         }

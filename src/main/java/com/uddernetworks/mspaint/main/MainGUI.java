@@ -3,7 +3,9 @@ package com.uddernetworks.mspaint.main;
 import com.jfoenix.controls.*;
 import com.sun.javafx.PlatformUtil;
 import com.uddernetworks.mspaint.git.GitController;
+import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
+import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -134,7 +136,7 @@ public class MainGUI extends Application implements Initializable {
         this.gitController = new GitController(this);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);
@@ -148,6 +150,7 @@ public class MainGUI extends Application implements Initializable {
             frame.setVisible(true);
             return;
         }
+
         if (ToolProvider.getSystemJavaCompiler() != null) {
             System.out.println("Using JDK");
         } else {
@@ -164,7 +167,11 @@ public class MainGUI extends Application implements Initializable {
                 installer.uninstall();
                 System.exit(0);
             } else {
+                System.out.println("Opening: " + args[0]);
                 // TODO: Add opening of files via context menu, args[0] is file being opened
+
+                new TextEditorManager(args[0]);
+                return;
             }
         }
 
