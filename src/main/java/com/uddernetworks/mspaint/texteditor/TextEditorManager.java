@@ -45,7 +45,6 @@ public class TextEditorManager {
                     while (true) {
                         WatchKey wk = watchService.take();
                         for (WatchEvent<?> event : wk.pollEvents()) {
-                            //we only register "ENTRY_MODIFY" so the context is always a Path.
                             Path changed = ((Path) event.context()).toAbsolutePath();
 
                             if (changed.toFile().getName().equals(this.imageFile.getName())) {

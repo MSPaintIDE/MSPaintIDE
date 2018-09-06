@@ -14,7 +14,7 @@ public class Installer {
 
     private List<String> regCommands = Arrays.asList(
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /d \"Edit with MS Paint IDE\"",
-            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\\command\" /d \"java -jar %APPDATA_JAR% %1\"",
+            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\\command\" /d \"%APPDATA_BAT% \\\"%1\\\"\"",
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Icon /d \"%APPDATA_LOGO%\"",
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Position /d \"Top\""
     );
@@ -40,8 +40,15 @@ public class Installer {
             Path uninstallIcon = Paths.get(imagesFolder.getAbsolutePath(), "uninstall.ico");
             Files.copy(getClass().getClassLoader().getResourceAsStream("uninstall.ico"), uninstallIcon, StandardCopyOption.REPLACE_EXISTING);
 
+            Path openBat = Paths.get(msPaintAppData.getAbsolutePath(), "open.bat");
+
+            String open = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("open.bat"));
+            open = open.replace("%APPDATA_JAR%", appDataJar.toString());
+
+            Files.write(openBat, open.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+
             for (String regCommand : regCommands) {
-                regCommand = regCommand.replace("%APPDATA_JAR%", appDataJar.toAbsolutePath().toString());
+                regCommand = regCommand.replace("%APPDATA_BAT%", openBat.toAbsolutePath().toString());
                 regCommand = regCommand.replace("%APPDATA_LOGO%", newIcon.toAbsolutePath().toString());
                 if ("TIMEOUT".equals(runCommand(regCommand, false))) {
                     break;

@@ -1,0 +1,1 @@
+START java -jar "%APPDATA_JAR%" %1

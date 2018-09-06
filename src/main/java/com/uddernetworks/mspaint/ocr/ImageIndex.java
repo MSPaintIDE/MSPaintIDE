@@ -27,9 +27,16 @@ public class ImageIndex {
                 System.out.println("Creating directory: " + this.directory);
                 this.directory.mkdirs();
 
-                for (String line : IOUtils.toString(getClass().getClassLoader().getResourceAsStream("letters")).split("\n")) {
-                    Files.copy(getClass().getClassLoader().getResourceAsStream("letters\\" + line), Paths.get(this.directory.getAbsolutePath(), line), StandardCopyOption.REPLACE_EXISTING);
+                for (String line : IOUtils.toString(ImageIndex.class.getResourceAsStream("/letters/index.txt")).split("\n")) {
+                    if ("".equals(line)) continue;
+                    String[] spaceSplit = line.split("\\s+");
+                    String filename = spaceSplit[0];
+                    filename = filename.substring(1, filename.length() - 1);
+
+                    Files.copy(ImageIndex.class.getResourceAsStream("/letters/" + filename), Paths.get(this.directory.getAbsolutePath(), filename), StandardCopyOption.REPLACE_EXISTING);
                 }
+
+                Files.copy(ImageIndex.class.getResourceAsStream("/letters/index.txt"), Paths.get(this.directory.getAbsolutePath(), "index.txt"), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             e.printStackTrace();
