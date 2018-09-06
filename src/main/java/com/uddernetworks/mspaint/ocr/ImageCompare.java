@@ -38,14 +38,14 @@ public class ImageCompare {
             System.out.println("Image = " + inputImage.getAbsolutePath());
             BufferedImage image = ImageUtil.blackAndWhite(ImageIO.read(inputImage));
 
-            objectFile.createNewFile();
+            if (objectFile != null) objectFile.createNewFile();
 
             LetterGrid grid;
 
             if (!readFromFile) {
                 grid = new LetterGrid(image.getWidth(), image.getHeight());
 
-                mainGUI.setStatusText("Probing...");
+                if (mainGUI != null) mainGUI.setStatusText("Probing...");
 
                 AtomicInteger waitingFor = new AtomicInteger(images.keySet().size());
 
@@ -54,7 +54,7 @@ public class ImageCompare {
                 int startY = (useProbe) ? probe.sendInProbe() : 0;
                 int iterByY = (useProbe) ? 25 : 1;
 
-                mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
+                if (mainGUI != null) mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
 
                 System.out.println("Total images: " + images.keySet().size());
 
@@ -77,7 +77,7 @@ public class ImageCompare {
                             e.printStackTrace();
                         }
 
-                        mainGUI.updateLoading(currentIterations.get(), totalIterations);
+                        if (mainGUI != null) mainGUI.updateLoading(currentIterations.get(), totalIterations);
                     }
                 });
 
@@ -110,7 +110,7 @@ public class ImageCompare {
                 }
 
                 if (saveCaches) {
-                    mainGUI.setStatusText("Saving to cache file...");
+                    if (mainGUI != null) mainGUI.setStatusText("Saving to cache file...");
 
                     FileOutputStream fos = new FileOutputStream(objectFile);
                     ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -130,13 +130,15 @@ public class ImageCompare {
                 grid = (LetterGrid) oi.readObject();
             }
 
-            mainGUI.setStatusText("Compacting and processing collected data...");
+            if (mainGUI != null) {
+                mainGUI.setStatusText("Compacting and processing collected data...");
 
-            mainGUI.setIndeterminate(true);
+                mainGUI.setIndeterminate(true);
+            }
 
             grid.compact();
 
-            mainGUI.setIndeterminate(false);
+            if (mainGUI != null) mainGUI.setIndeterminate(false);
 
             return grid;
 

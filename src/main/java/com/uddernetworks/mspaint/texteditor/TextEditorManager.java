@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.texteditor;
 
+import com.uddernetworks.mspaint.main.ImageClass;
 import com.uddernetworks.mspaint.main.ImageUtil;
 import com.uddernetworks.mspaint.main.Letter;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
@@ -18,6 +19,7 @@ public class TextEditorManager {
 
     private File originalFile;
     private File imageFile;
+    private ImageClass imageClass;
 
     private Map<String, BufferedImage> images;
     private Map<String, Integer> widths = new HashMap<>();
@@ -32,6 +34,8 @@ public class TextEditorManager {
 
         this.imageFile = createImageFile();
 
+        this.imageClass = new ImageClass(this.imageFile, null, null, this.images, true, false, false);
+
         new Thread(() -> {
             try {
                 Path path = FileSystems.getDefault().getPath(this.imageFile.getParent());
@@ -45,12 +49,13 @@ public class TextEditorManager {
                             Path changed = ((Path) event.context()).toAbsolutePath();
 
                             if (changed.toFile().getName().equals(this.imageFile.getName())) {
-                                System.out.println("Saved!");
+                                Thread.sleep(500);
+                                this.imageClass.scan(this.images, null, false, false, false);
+                                System.out.println(this.imageClass.getText());
+                                Files.write(this.originalFile.toPath(), this.imageClass.getText().getBytes());
                                 break;
                             }
                         }
-
-                        Thread.sleep(500);
 
                         if (!wk.reset()) {
                             System.out.println("Key has been unregistered");
@@ -110,7 +115,16 @@ public class TextEditorManager {
             }
         }
 
-        return new int[] {x, y};
+        return new int[] {x + 8, y + 26};
+    }
+
+    private void applyPadding(List<List<Letter>> letterGrid, int xAmount, int yAmount) {
+        for (List<Letter> letters : letterGrid) {
+            for (Letter letter : letters) {
+                letter.setX(letter.getX() + xAmount);
+                letter.setY(letter.getY() + yAmount);
+            }
+        }
     }
 
     private File createImageFile() throws IOException {
@@ -119,10 +133,13 @@ public class TextEditorManager {
 
         String text = new String(Files.readAllBytes(this.originalFile.toPath()));
 
+        int padding = 12;
+
         List<List<Letter>> letterGrid = generateLetterGrid(text);
         int[] coords = getBiggestCoordinates(letterGrid);
+        applyPadding(letterGrid, padding, padding);
 
-        BufferedImage bufferedImage = new BufferedImage(coords[0] + 25, coords[1] + 25, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bufferedImage = new BufferedImage(coords[0] + padding * 2, coords[1] + padding * 2, BufferedImage.TYPE_INT_ARGB);
 
         LetterFileWriter letterFileWriter = new LetterFileWriter(letterGrid, bufferedImage, tempImage);
         letterFileWriter.writeToFile(images);
@@ -137,7 +154,7 @@ public class TextEditorManager {
         Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");
 
         System.out.println("Opened MS Paint");
-        System.out.println(process.waitFor());
+        process.waitFor();
 
         System.out.println("Closed MS Paint!");
 

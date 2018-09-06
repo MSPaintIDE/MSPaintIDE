@@ -26,7 +26,7 @@ public class ImageClass {
         this.mainGUI = mainGUI;
         this.images = images;
 
-        File objectFile = new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.txt");
+        File objectFile = objectFileDir != null ? new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.txt") : null;
 
         scan(images, objectFile, useProbe, useCaches, saveCaches);
     }

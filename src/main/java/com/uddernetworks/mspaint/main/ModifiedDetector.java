@@ -17,7 +17,7 @@ public class ModifiedDetector {
      * @return True if the first file is newer than the second one
      */
     public boolean imageChanged() {
-        return !image.exists() || !fileObject.exists() || fileObject.lastModified() < image.lastModified();
+        return fileObject == null || !image.exists() || !fileObject.exists() || fileObject.lastModified() < image.lastModified();
 
     }
 
