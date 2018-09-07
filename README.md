@@ -8,8 +8,15 @@ People joke about what IDE they use often, things like Word, MS Notepad, sometim
 The way the MS Paint IDE works, is it is an application running separate from MS Paint. You input some locations for things like input image, output image location, compile to folder, etc. Once you save your code to MS Paint, you click **Compile/Execute** and the program uses a custom [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) implementation designed specially for MS Paint and code, then syntax highlights it, and then uses Java's JDK to compile the code and execute it. All output from the compiler and application compiled are outputed via images.
 
 ## Usage Tutorial
+MS Paint IDE can be used in two different ways. You can either just run the jar (Following the instructions below), or you can run the installer as administrator, which provides a much cleaner way of using the program, and also allows you to right click any text file and edit it with MS Paint.
+
+### With the Installer
+The easiest way of using MS Paint IDE is via the installer. All is required for you to do is run the commandprompt as administrator, and run `java -jar MSPaintIDE.jar install` with `MSPaintIDE.jar` pointing to your downloaded MS Paint IDE jar. It will then remove the downloaded file and replace it with a shortcut with an icon. The shortcut is bound to ran with your latest installed JDK on your machine, so running the IDE doesn't require anything but running the shortcut. To uninstall the program, all is needed is to run the uninstaller in `%LocalAppData%\MSPaintIDE`.
+
+### Without the Installer
 First to open the program, if you intend to compile your application, you **must** run the jar from your JDK. This can be done by doing something like `"C:\Program Files\Java\jdk1.8.0_144\bin\java.exe" -jar MSPaintIDE-2.0.2-SNAPSHOT.jar` in your commandline. This should be modified for your location of `java.exe` in your JDK's directory.
 
+### After Initial Installation
 Before you do anything with highlighting, compiling and executing, you must set some paths first. You can manually input them in the text boxes, or click _Change_ and select files, or type in names in the selector. Here is what the following options do and should be set at:
 
 #### Input Image/Image Folder
@@ -42,6 +49,17 @@ The image file that will contain all compiler output, like status, times, and er
 #### Program Output
 The image file that will contain all of the compiled program's output, like status, times, and errors. If no image is found by this name and location, one will be created.
 
+### File Editing
+**Note: This only works if you used the installer**
+
+MS Paint IDE allows you to edit any text file on your system in MS Paint, allowing you to make whole projects just with MS Paint; no need to make your README's in MS Notepad any more!
+
+To use this feature, right click any file (Preferably a text file) and click `Edit With MS Paint IDE`
+
+![](https://ms-paint-i.de/images/context-menu.png)
+
+
+After you click the context menu button, a MS Paint window will pop up with an image version of your file. You may edit this, and upon saving, the program's OCR will convert the image to text, saving it again.
 
 
 _Note: All options are saved in a file named options.txt in the same directory of your jar, to keep you from re choosing everything every restart_
