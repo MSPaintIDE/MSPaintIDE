@@ -1,1 +1,1 @@
-START java -jar "%APPDATA_JAR%" %1
+START javaw -jar "%APPDATA_JAR%" %1
