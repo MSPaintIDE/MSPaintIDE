@@ -1,9 +1,6 @@
 package com.uddernetworks.mspaint.main;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class Probe {
 
@@ -16,7 +13,6 @@ public class Probe {
     }
 
     public int sendInProbe() {
-        List<Integer> yVals = new ArrayList<>();
         int currentX;
         int currentY = 0;
 
@@ -34,7 +30,7 @@ public class Probe {
             currentY++;
         }
 
-        return yVals.size() > 0 ? Collections.min(yVals) : 0;
+        return 0;
     }
 
 }

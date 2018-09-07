@@ -27,7 +27,14 @@ public class TextEditorManager {
     public TextEditorManager(String file) throws IOException, InterruptedException {
         this.originalFile = new File(file).getAbsoluteFile();
 
-        ImageIndex imageIndex = new ImageIndex(new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE\\letters"));
+        File localMSPaintIDE = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+        File backup = new File(localMSPaintIDE, "opened\\backup");
+        backup.mkdirs();
+
+        File backupFile = new File(backup, "original_" + this.originalFile.getName());
+        Files.copy(backupFile.toPath(), this.originalFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        ImageIndex imageIndex = new ImageIndex(new File(localMSPaintIDE, "letters"));
         this.images = imageIndex.index();
 
         this.images.forEach((letter, image) -> this.widths.put(letter, ImageUtil.getWidth(image)));
