@@ -61,6 +61,8 @@ To use this feature, right click any file (Preferably a text file) and click `Ed
 
 After you click the context menu button, a MS Paint window will pop up with an image version of your file. You may edit this, and upon saving, the program's OCR will convert the image to text, saving it again.
 
+[Here's a video example](https://youtu.be/FZnvNTZr7DQ) of this feature being used from beginning to end.
+
 
 _Note: All options are saved in a file named options.txt in the same directory of your jar, to keep you from re choosing everything every restart_
 
