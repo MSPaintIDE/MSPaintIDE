@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.sun.javafx.PlatformUtil;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
@@ -136,6 +137,20 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
+            JFrame frame = new JFrame("MS Paint IDE");
+            frame.setSize(700, 200);
+            JPanel jPanel = new JPanel();
+            jPanel.add(new JLabel("<html><br><br><div style='text-align: center;'>Sorry, MS Paint IDE only supports Windows<br> However, the developer of MS Paint IDE is going to be adding support soon. <br> Stay tuned</div><br></html>"));
+            frame.add(jPanel);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.setResizable(false);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+            return;
+        }
+
         if (ToolProvider.getSystemJavaCompiler() != null) {
             System.out.println("Using JDK");
         } else {
