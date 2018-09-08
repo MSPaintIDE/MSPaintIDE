@@ -32,6 +32,7 @@ public class TextEditorManager {
         backup.mkdirs();
 
         File backupFile = new File(backup, "original_" + this.originalFile.getName());
+        backupFile.createNewFile();
         Files.copy(backupFile.toPath(), this.originalFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         ImageIndex imageIndex = new ImageIndex(new File(localMSPaintIDE, "letters"));
