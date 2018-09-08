@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
-import com.sun.javafx.PlatformUtil;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
@@ -26,6 +25,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.tools.ToolProvider;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -184,7 +184,8 @@ public class MainGUI extends Application implements Initializable {
         primaryStage.initStyle(StageStyle.UNDECORATED);
 
         primaryStage.setMinWidth(1000);
-        primaryStage.setMinHeight(700);
+        primaryStage.setMinHeight(100);
+        primaryStage.setHeight(GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100);
         registerThings(primaryStage);
     }
 
