@@ -45,7 +45,7 @@ public class Installer {
             String open = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("open.bat"));
             open = open.replace("%APPDATA_JAR%", appDataJar.toString());
 
-            Files.write(openBat, open.getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(openBat, open.getBytes(), StandardOpenOption.CREATE_NEW);
 
             for (String regCommand : regCommands) {
                 regCommand = regCommand.replace("%APPDATA_BAT%", openBat.toAbsolutePath().toString());
@@ -99,7 +99,7 @@ public class Installer {
     }
 
     public File getJDKLocation() throws FileNotFoundException {
-        List<String> jdkLines = Arrays.stream(runCommand("where java", true).split("\n")).filter(line -> line.contains("\\Program Files") && line.contains("Java\\jdk") && line.contains("bin")).sorted().collect(Collectors.toList());
+        List<String> jdkLines = Arrays.stream(runCommand("where javaw", true).split("\n")).filter(line -> line.contains("\\Program Files") && line.contains("Java\\jdk") && line.contains("bin")).sorted().collect(Collectors.toList());
         Collections.reverse(jdkLines);
 
         if (jdkLines.size() == 0) {

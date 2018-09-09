@@ -122,9 +122,7 @@ public class LetterGrid implements Serializable {
         return ret;
     }
 
-    public String getPrettyString() {
-        List<StringBuilder> lines = new ArrayList<>();
-        StringBuilder ret = new StringBuilder();
+    public void trimLeft() {
         int minSpace = Integer.MAX_VALUE;
 
         for (int i2 = 0; i2 < letterGrid.length(); i2++) {
@@ -145,11 +143,34 @@ public class LetterGrid implements Serializable {
             }
 
             minSpace = Math.min(minSpace, getLeadingSpaces(line.toString()));
-            lines.add(line);
         }
 
-        int finalMinSpace = minSpace;
-        lines.forEach(line -> ret.append(line.substring(finalMinSpace)).append("\n"));
+        for (int i2 = 0; i2 < letterGrid.length(); i2++) {
+            LetterRow row = letterGrid.get(i2);
+            row.trimLeft(minSpace);
+        }
+    }
+
+    public String getPrettyString() {
+        trimLeft();
+        StringBuilder ret = new StringBuilder();
+
+        for (int i2 = 0; i2 < letterGrid.length(); i2++) {
+            LetterRow row = letterGrid.get(i2);
+
+            int iMax = row.length() - 1;
+            if (iMax == -1) continue;
+
+            for (int i = 0; ; i++) {
+                boolean print = !String.valueOf(row.get(i)).equals("null");
+
+                if (print) ret.append(row.get(i).getLetter());
+
+                if (i == iMax) break;
+            }
+
+            ret.append('\n');
+        }
 
         return ret.toString();
     }

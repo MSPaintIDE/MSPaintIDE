@@ -46,13 +46,37 @@
 }
 
 .invert-colors {
-    -fx-background-image: url(baseline_invert_colors_black_18dp.png);
+    -fx-background-image: url(icons/invert_colors/baseline_invert_colors_black_18dp.png);
     -fx-background-size: 30px 30px;
 }
 
 .invert-colors-white {
-    -fx-background-image: url(baseline_invert_colors_white_18dp.png);
+    -fx-background-image: url(icons/invert_colors/baseline_invert_colors_white_18dp.png);
     -fx-background-size: 30px 30px;
+}
+
+.remote-origin-visibility {
+    -fx-background-image: url(icons/visibility/baseline_visibility_black_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.remote-origin-visibility.dark {
+    -fx-background-image: url(icons/visibility/baseline_visibility_white_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.remote-origin-visibility.off {
+    -fx-background-image: url(icons/visibility/baseline_visibility_off_black_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.remote-origin-visibility.dark.off {
+    -fx-background-image: url(icons/visibility/baseline_visibility_off_white_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
 }
 
 .gridpane-theme-dark {

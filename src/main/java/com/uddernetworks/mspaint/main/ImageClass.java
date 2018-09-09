@@ -43,9 +43,9 @@ public class ImageClass {
 
         LetterGrid grid = imageCompare.getText(inputImage, objectFile, mainGUI, images, useProbe, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
-        letterGrid = grid.getLetterGridArray();
-
         text = grid.getPrettyString();
+
+        letterGrid = grid.getLetterGridArray();
 
         System.out.println("\n\n" + prefix + "text =\n" + text);
 

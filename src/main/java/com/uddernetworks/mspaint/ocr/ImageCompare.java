@@ -37,7 +37,13 @@ public class ImageCompare {
         try {
             BufferedImage image = ImageUtil.blackAndWhite(ImageIO.read(inputImage));
 
-            if (objectFile != null) objectFile.createNewFile();
+            if (objectFile != null && !objectFile.exists() && !objectFile.isFile()) {
+                try {
+                    readFromFile = objectFile.createNewFile();
+                } catch (IOException e) {
+                    readFromFile = false;
+                }
+            }
 
             LetterGrid grid;
 

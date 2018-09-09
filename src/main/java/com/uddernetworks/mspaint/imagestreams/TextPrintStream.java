@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.imagestreams;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 import java.io.OutputStream;
@@ -22,13 +23,6 @@ public class TextPrintStream extends OutputStream {
     public void write(int b) {
         builder.append((char) b);
         original.write(b);
-    }
-
-    public void updateText() {
-        if (!last.equals(builder.toString())) {
-            last = builder.toString();
-            textArea.setText(last);
-            textArea.setScrollTop(Double.MAX_VALUE);
-        }
+        Platform.runLater(() -> textArea.appendText(String.valueOf((char) b)));
     }
 }

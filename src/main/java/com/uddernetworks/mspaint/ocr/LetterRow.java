@@ -99,6 +99,12 @@ public class LetterRow implements Serializable {
         return minIndex;
     }
 
+    public void trimLeft(int amount) {
+        for (int i = amount; i < this.row.length(); i++) {
+            this.row.set(i - amount, this.row.get(i));
+        }
+    }
+
     public List<Letter> toList() {
         List<Letter> ret = new ArrayList<>();
 

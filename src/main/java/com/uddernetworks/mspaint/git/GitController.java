@@ -20,8 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +35,8 @@ public class GitController {
     private Gson gson = new Gson();
     private Map<String, BufferedImage> images;
     private ExecutorService executorService = Executors.newFixedThreadPool(5);
+    private Map<String, Function<String, String>> commandOutputModifiers = new HashMap<>();
+    private boolean hideOrigin;
 
     public GitController(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
@@ -42,8 +48,11 @@ public class GitController {
 
     private void runCommand(String command, boolean async, boolean showStatus, File directory, Consumer<String> result) {
         this.mainGUI.setIndeterminate(true);
-        if (showStatus) this.mainGUI.setStatusText("Running command '" + command + "'");
-        System.out.println((directory != null ? directory.getAbsolutePath() : "") + " > " + command);
+        AtomicReference<String> safeCommand = new AtomicReference<>(command);
+        commandOutputModifiers.forEach((functionName, stringStringFunction) -> safeCommand.set(stringStringFunction.apply(safeCommand.get())));
+
+        if (showStatus) this.mainGUI.setStatusText("Running command '" + safeCommand.get() + "'");
+        System.out.println((directory != null ? directory.getAbsolutePath() : "") + " > " + safeCommand.get());
         Runnable commandRunnable = () -> {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -206,6 +215,21 @@ public class GitController {
         return inputImage.toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
     }
 
+    private Pattern hideOriginPattern = Pattern.compile("add origin(.*)");
+
+    public void setHideOrigin(boolean hideOrigin) {
+        this.hideOrigin = hideOrigin;
+        if (hideOrigin) {
+            this.commandOutputModifiers.putIfAbsent("hideOrigin", string -> {
+                Matcher matcher = hideOriginPattern.matcher(string);
+
+                return matcher.find() ? matcher.replaceFirst("<hidden>") : string;
+            });
+        } else {
+            this.commandOutputModifiers.remove("hideOrigin");
+        }
+    }
+
     public void setRemoteOrigin(String url) {
         if (url == null || "".equals(url)) {
             System.out.println("Error: No URL for remote origin found");
@@ -214,11 +238,11 @@ public class GitController {
         }
 
         runCommand("git remote -v", true, getGitFolder(), result -> {
-            Runnable addOrigin = () -> runCommand("git remote add origin " + url, true, getGitFolder(), lastResult -> {
+            Runnable addOrigin = () -> runCommand("git remote add origin " + url, true, false, getGitFolder(), lastResult -> {
                 if (result.contains("remote origin already exists")) {
                     System.out.println("Couldn't add as a remote origin.");
                 } else {
-                    System.out.println("Added " + url + " as a remote origin");
+                    System.out.println("Added " + (this.hideOrigin ? "<hidden>" : url) + " as a remote origin");
                 }
             });
 

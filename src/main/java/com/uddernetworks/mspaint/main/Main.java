@@ -68,7 +68,7 @@ public class Main {
                     highlightedFile = new File(secondPart);
                     break;
                 case "objectFile":
-                    objectFile = new File(secondPart);
+                    objectFile = "".equals(secondPart) ? null : new File(secondPart);
                     break;
                 case "classOutput":
                     classOutput = new File(secondPart);
@@ -89,7 +89,7 @@ public class Main {
                     appOutput = new File(secondPart);
                     break;
                 case "letterDirectory":
-                    letterDirectory = new File(secondPart);
+                    letterDirectory = "".equals(secondPart) ? null : new File(secondPart);
                     break;
             }
         }
@@ -122,10 +122,17 @@ public class Main {
     }
 
     private boolean optionsNotFilled() {
-        return inputImage == null || highlightedFile == null || objectFile == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
+        return inputImage == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
     }
 
     public int indexAll(boolean useProbe, boolean useCaches, boolean saveCaches) {
+        if (this.letterDirectory == null) {
+            File localMSPaintIDE = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+            if (localMSPaintIDE.exists()) {
+                this.letterDirectory = new File(localMSPaintIDE, "letters");
+            }
+        }
+
         if (optionsNotFilled()) {
             System.err.println("Please select files for all options");
             mainGUI.setHaveError();
@@ -163,6 +170,16 @@ public class Main {
             return;
         }
 
+        if (highlightedFile == null) {
+            highlightedFile.mkdirs();
+
+            if (!highlightedFile.isDirectory()) {
+                System.err.println("No highlighted file directory found!");
+                mainGUI.setHaveError();
+                return;
+            }
+        }
+
         System.out.println("Scanning all images...");
         mainGUI.setStatusText("Highlighting...");
         mainGUI.setIndeterminate(true);
@@ -179,18 +196,12 @@ public class Main {
     }
 
 
-
     public void compile(boolean execute) throws IOException {
         long start = System.currentTimeMillis();
-        final long originalStart = start;
-
-        System.out.println("Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
 
         System.out.println("Compiling...");
         mainGUI.setStatusText("Compiling...");
         mainGUI.setIndeterminate(true);
-        start = System.currentTimeMillis();
-
 
         CodeCompiler codeCompiler = new CodeCompiler();
 
@@ -217,9 +228,6 @@ public class Main {
             highlighter.highlightAngrySquiggles();
         }
 
-
-        System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
-
         System.out.println("Saving output images...");
         mainGUI.setStatusText("Saving output images...");
 
@@ -228,7 +236,7 @@ public class Main {
 
         mainGUI.setStatusText(null);
 
-        System.out.println("Finished everything in " + (System.currentTimeMillis() - originalStart) + "ms");
+        System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
 
         imageClasses.clear();
     }
@@ -247,8 +255,29 @@ public class Main {
     }
 
     public void setInputImage(File inputImage) {
+        if (inputImage.equals(this.inputImage)) return;
         this.inputImage = inputImage;
         saveOptions();
+
+        File outputParent = inputImage.getParentFile();
+
+        if (compilerOutput == null) {
+            setCompilerOutput(new File(outputParent, "compiler.png"));
+        }
+
+        if (appOutput == null) {
+            setAppOutput(new File(outputParent, "program.png"));
+        }
+
+        if (jarFile == null) {
+            setJarFile(new File(outputParent, "Output.jar"));
+        }
+
+        if (classOutput == null) {
+            setClassOutput(new File(outputParent, "classes"));
+        }
+
+        this.mainGUI.initializeInputTextFields();
     }
 
     public void setHighlightedFile(File highlightedFile) {
@@ -333,7 +362,16 @@ public class Main {
     }
 
     public String getLetterDirectory() {
-        return (letterDirectory == null) ? "" : letterDirectory.getAbsolutePath();
+        if (letterDirectory == null) {
+            File localMSPaintIDE = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+            if (!localMSPaintIDE.exists()) return "";
+
+            File directory = new File(localMSPaintIDE, "letters");
+            File[] files = directory.listFiles();
+            return (directory.exists() && directory.isDirectory() && files != null && files.length > 0) ? directory.getAbsolutePath() : "";
+        }
+
+        return letterDirectory.getAbsolutePath();
     }
 
     public File getCurrentJar() {

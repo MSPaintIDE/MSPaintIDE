@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -57,6 +58,8 @@ public class MainGUI extends Application implements Initializable {
     private JFXTextField programOutputValue;
     @FXML
     private JFXTextField originURL;
+    @FXML
+    private JFXPasswordField hiddenOriginURL;
     @FXML
     private JFXTextField commitMessage;
 
@@ -111,6 +114,8 @@ public class MainGUI extends Application implements Initializable {
     private JFXCheckBox saveCaches;
     @FXML
     private JFXButton invertColors;
+    @FXML
+    private JFXButton remoteOriginVisibility;
 
     @FXML
     private TextArea output;
@@ -121,6 +126,7 @@ public class MainGUI extends Application implements Initializable {
     private Main main;
     private Stage primaryStage;
     private boolean darkTheme = false;
+    private boolean remoteURLVisible = true;
     private GitController gitController;
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
@@ -167,9 +173,6 @@ public class MainGUI extends Application implements Initializable {
                 installer.uninstall();
                 System.exit(0);
             } else {
-                System.out.println("Opening: " + args[0]);
-                // TODO: Add opening of files via context menu, args[0] is file being opened
-
                 new TextEditorManager(args[0]);
                 return;
             }
@@ -185,8 +188,9 @@ public class MainGUI extends Application implements Initializable {
 
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(100);
-        primaryStage.setHeight(GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100);
+
         registerThings(primaryStage);
+        primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
     }
 
     public Main getMain() {
@@ -207,7 +211,7 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void registerThings(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("Test.fxml"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("Main.fxml"));
 
         ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo.png").toString());
         icon.setFitHeight(25);
@@ -302,9 +306,7 @@ public class MainGUI extends Application implements Initializable {
         push.setDisable(disabled);
     }
 
-    @FXML
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initializeInputTextFields() {
         inputName.setText(main.getInputImage());
         highlightedImage.setText(main.getHighlightedFile());
         cacheFile.setText(main.getObjectFile());
@@ -315,6 +317,12 @@ public class MainGUI extends Application implements Initializable {
         letterDirectory.setText(main.getLetterDirectory());
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
+    }
+
+    @FXML
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        initializeInputTextFields();
         setGitFeaturesDisabled(true);
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
@@ -331,33 +339,54 @@ public class MainGUI extends Application implements Initializable {
         System.setOut(textOut);
         System.setErr(textOut);
 
-        new Thread(() -> {
-            try {
-                while (true) {
-                    textPrintStream.updateText();
-                    Thread.sleep(250);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
         invertColors.setOnAction(event -> {
             this.darkTheme = !this.darkTheme;
-            Parent parent = invertColors.getParent().getParent().getParent().getParent();
+            Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
             parent.lookupAll(".theme-text").forEach(node -> {
                 if (this.darkTheme) {
                     node.getStyleClass().add("dark-text");
-                    parent.lookup(".gridpane-theme").getStyleClass().add("gridpane-theme-dark");
-                    parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
-                    parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
                 } else {
                     node.getStyleClass().remove("dark-text");
-                    parent.lookup(".gridpane-theme").getStyleClass().remove("gridpane-theme-dark");
-                    parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
-                    parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
                 }
             });
+
+            if (this.darkTheme) {
+                parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.add("gridpane-theme-dark"));
+                parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
+                parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
+                parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
+            } else {
+                parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
+                parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
+                parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
+                parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
+            }
+        });
+
+        hiddenOriginURL.setManaged(false);
+        hiddenOriginURL.setVisible(false);
+
+        originURL.textProperty().bindBidirectional(hiddenOriginURL.textProperty());
+
+        remoteOriginVisibility.setOnAction(event -> {
+            Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
+            this.gitController.setHideOrigin(!(remoteURLVisible ^= true));
+
+            originURL.setManaged(remoteURLVisible);
+            originURL.setVisible(remoteURLVisible);
+
+            hiddenOriginURL.setManaged(!remoteURLVisible);
+            hiddenOriginURL.setVisible(!remoteURLVisible);
+
+            if (remoteURLVisible) {
+                originURL.requestFocus();
+                originURL.selectEnd();
+                parent.lookup(".remote-origin-visibility").getStyleClass().remove("off");
+            } else {
+                hiddenOriginURL.requestFocus();
+                hiddenOriginURL.selectEnd();
+                parent.lookup(".remote-origin-visibility").getStyleClass().add("off");
+            }
         });
 
         this.gitController.getVersion(gitVersion -> {
@@ -370,8 +399,6 @@ public class MainGUI extends Application implements Initializable {
         });
 
         createRepo.setOnAction(event -> {
-//            File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
-//            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> this.gitController.gitInit(file));
             this.gitController.gitInit(new File(main.getInputImage()));
         });
 
