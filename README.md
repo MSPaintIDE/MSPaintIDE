@@ -14,7 +14,7 @@ MS Paint IDE can be used in two different ways. You can either just run the jar 
 The easiest way of using MS Paint IDE is via the installer. All is required for you to do is run the commandprompt as administrator, and run `java -jar MSPaintIDE.jar install` with `MSPaintIDE.jar` pointing to your downloaded MS Paint IDE jar. It will then remove the downloaded file and replace it with a shortcut with an icon. The shortcut is bound to ran with your latest installed JDK on your machine, so running the IDE doesn't require anything but running the shortcut. To uninstall the program, all is needed is to run the uninstaller in `%LocalAppData%\MSPaintIDE`.
 
 ### Without the Installer
-First to open the program, if you intend to compile your application, you **must** run the jar from your JDK. This can be done by doing something like `"C:\Program Files\Java\jdk1.8.0_144\bin\java.exe" -jar MSPaintIDE-2.0.2-SNAPSHOT.jar` in your commandline. This should be modified for your location of `java.exe` in your JDK's directory.
+First to open the program, if you intend to compile your application, you **must** run the jar from your JDK. This can be done by doing something like `"C:\Program Files\Java\jdk1.8.0_144\bin\java.exe" -jar MSPaintIDE-2.1.1-SNAPSHOT.jar` in your commandline. This should be modified for your location of `java.exe` in your JDK's directory.
 
 ### After Initial Installation
 Before you do anything with highlighting, compiling and executing, you must set some paths first. You can manually input them in the text boxes, or click _Change_ and select files, or type in names in the selector. Here is what the following options do and should be set at:
