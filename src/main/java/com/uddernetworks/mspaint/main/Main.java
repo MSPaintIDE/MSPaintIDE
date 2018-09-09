@@ -367,8 +367,7 @@ public class Main {
             if (!localMSPaintIDE.exists()) return "";
 
             File directory = new File(localMSPaintIDE, "letters");
-            File[] files = directory.listFiles();
-            return (directory.exists() && directory.isDirectory() && files != null && files.length > 0) ? directory.getAbsolutePath() : "";
+            return (directory.exists() && directory.isDirectory()) ? directory.getAbsolutePath() : "";
         }
 
         return letterDirectory.getAbsolutePath();

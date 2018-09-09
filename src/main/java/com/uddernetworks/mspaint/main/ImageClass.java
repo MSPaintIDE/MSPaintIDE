@@ -47,7 +47,7 @@ public class ImageClass {
 
         letterGrid = grid.getLetterGridArray();
 
-        System.out.println("\n\n" + prefix + "text =\n" + text);
+        System.out.println("\n" + prefix + "text =\n" + text);
 
         System.out.println(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
     }

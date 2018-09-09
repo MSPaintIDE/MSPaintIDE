@@ -37,6 +37,7 @@ public class GitController {
     private ExecutorService executorService = Executors.newFixedThreadPool(5);
     private Map<String, Function<String, String>> commandOutputModifiers = new HashMap<>();
     private boolean hideOrigin;
+    private File gitIndexFile = null;
 
     public GitController(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
@@ -86,25 +87,21 @@ public class GitController {
 
     private File getGitFolder() {
         if (gitFolder != null) return gitFolder;
-        File directory = new File(this.mainGUI.getMain().getInputImage());
-        if (directory.isFile()) directory = directory.getParentFile();
+        File directory = new File(this.mainGUI.getMain().getInputImage()).getParentFile();
         return gitFolder = new File(directory, "git");
     }
 
     private File getGitIndexFile() {
-        return new File(getGitFolder(), "gitindex");
+        return this.gitIndexFile == null ? (this.gitIndexFile = new File(getGitFolder(), "gitindex")) : this.gitIndexFile;
     }
 
     private GitIndex getGitIndex() throws IOException {
         File gitIndexFile = getGitIndexFile();
-        if (!gitIndexFile.exists()) {
-            gitIndexFile.createNewFile();
-            return new GitIndex(new HashMap<>());
-        }
+        if (!gitIndexFile.exists()) return new GitIndex(new HashMap<>());
 
         String str = new String(Files.readAllBytes(gitIndexFile.toPath()));
 
-        return this.gson.fromJson(str, GitIndex.class);
+        return "".equals(str) ? new GitIndex(new HashMap<>()) : this.gson.fromJson(str, GitIndex.class);
     }
 
     public void getVersion(Consumer<String> result) {
@@ -115,7 +112,7 @@ public class GitController {
     public void gitInit(File directory) {
         this.mainGUI.setIndeterminate(true);
         this.mainGUI.setStatusText("Creating local git repository");
-        if (directory.isFile()) directory = directory.getParentFile();
+        directory = directory.getParentFile();
         File gitFolder = new File(directory, "git");
         gitFolder.mkdirs();
         runCommand("git init", true, false, gitFolder, result -> { //  & git init
@@ -146,8 +143,7 @@ public class GitController {
                         runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", false, getGitFolder(), result ->
                                 System.out.println("Finished adding " + relative))));
 
-        System.out.println(gitIndex.getAdded());
-
+        if (!getGitIndexFile().exists()) getGitIndexFile().createNewFile();
         Files.write(getGitIndexFile().toPath(), this.gson.toJson(gitIndex).getBytes());
 
         System.out.println("Finished adding " + imageFiles.size() + " file" + (imageFiles.size() > 1 ? "s" : ""));
@@ -169,6 +165,7 @@ public class GitController {
                 } else {
                     addingFile = source;
                 }
+
                 Files.write(addingFile.toPath(), imageClass.getText().getBytes());
                 if (addToIndex) gitIndex.addFile(file, addingFile);
             } else {
@@ -179,8 +176,8 @@ public class GitController {
                     addingFile = source;
                 }
 
-                if (addToIndex) gitIndex.addFile(file, addingFile);
                 Files.copy(file.toPath(), addingFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                if (addToIndex) gitIndex.addFile(file, addingFile);
             }
 
             result.accept(addingFile, relative);
@@ -212,7 +209,7 @@ public class GitController {
         }
 
 
-        return inputImage.toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
+        return inputImage.getParentFile().toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
     }
 
     private Pattern hideOriginPattern = Pattern.compile("add origin(.*)");
