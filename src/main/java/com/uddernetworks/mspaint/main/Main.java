@@ -170,14 +170,12 @@ public class Main {
             return;
         }
 
-        if (highlightedFile == null) {
-            highlightedFile.mkdirs();
+        if (highlightedFile != null && !highlightedFile.isDirectory()) highlightedFile.mkdirs();
 
-            if (!highlightedFile.isDirectory()) {
-                System.err.println("No highlighted file directory found!");
-                mainGUI.setHaveError();
-                return;
-            }
+        if (highlightedFile == null || !highlightedFile.isDirectory()) {
+            System.err.println("No highlighted file directory found!");
+            mainGUI.setHaveError();
+            return;
         }
 
         System.out.println("Scanning all images...");
@@ -260,6 +258,10 @@ public class Main {
         saveOptions();
 
         File outputParent = inputImage.getParentFile();
+
+        if (highlightedFile == null) {
+            setHighlightedFile(new File(outputParent, "highlighted"));
+        }
 
         if (compilerOutput == null) {
             setCompilerOutput(new File(outputParent, "compiler.png"));

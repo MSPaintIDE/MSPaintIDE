@@ -36,6 +36,7 @@ public class ImageIndex {
                     Files.copy(ImageIndex.class.getResourceAsStream("/letters/" + filename), Paths.get(this.directory.getAbsolutePath(), filename), StandardCopyOption.REPLACE_EXISTING);
                 }
 
+                Files.copy(ImageIndex.class.getResourceAsStream("/letters/angry_squiggle.png"), Paths.get(this.directory.getAbsolutePath(), "angry_squiggle.png"), StandardCopyOption.REPLACE_EXISTING);
                 Files.copy(ImageIndex.class.getResourceAsStream("/letters/index.txt"), Paths.get(this.directory.getAbsolutePath(), "index.txt"), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
