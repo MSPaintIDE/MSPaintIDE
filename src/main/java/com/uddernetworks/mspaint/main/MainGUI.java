@@ -142,7 +142,7 @@ public class MainGUI extends Application implements Initializable {
         this.gitController = new GitController(this);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException {
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);

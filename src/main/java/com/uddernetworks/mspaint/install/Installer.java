@@ -2,8 +2,13 @@ package com.uddernetworks.mspaint.install;
 
 import com.uddernetworks.mspaint.main.Main;
 import org.apache.tika.io.IOUtils;
+import sun.management.VMManagement;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,8 +96,25 @@ public class Installer {
         }
     }
 
-    public void uninstall() {
+    public void uninstall() throws ReflectiveOperationException {
         File msPaintAppData = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+
+        int currentPID = getProcessID();
+
+        List<Integer> runningProcesses = Arrays.stream(runCommand("tasklist.exe /fo csv /nh /v /fi \"IMAGENAME eq javaw.exe\"", true)
+                .split("\n"))
+                .filter(line -> line.contains("MS Paint IDE"))
+                .map(line -> Integer.valueOf(line.split(",")[1].replace("\"", "")))
+                .filter(pid -> pid != currentPID)
+                .collect(Collectors.toList());
+
+        if (runningProcesses.size() > 0) {
+            System.out.println("Found " + runningProcesses.size() + " process" + (runningProcesses.size() > 1 ? "es" : "") + " of MS Paint IDE running. Killing them...");
+
+            runningProcesses.forEach(pid -> runCommand("taskkill /PID " + pid + " /F", false));
+
+            System.out.println("Killed all processes. Continuing...");
+        }
 
         runCommand(removeRegistry, false);
         runCommand("cmd /c ping localhost -n 3 > nul && rmdir \"" + msPaintAppData.getAbsolutePath() + "\" /q /s", false, false, new File("C:\\Windows\\system32"));
@@ -107,6 +129,20 @@ public class Installer {
         }
 
         return new File(jdkLines.get(0));
+    }
+
+    private int getProcessID() throws ReflectiveOperationException{
+        RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+        Field jvm = runtime.getClass().getDeclaredField("jvm");
+        jvm.setAccessible(true);
+        VMManagement mgmt = (VMManagement) jvm.get(runtime);
+
+        System.out.println("VM id: " + mgmt.getClass());
+
+        Method pidMethod = mgmt.getClass().getDeclaredMethod("getProcessId");
+        pidMethod.setAccessible(true);
+
+        return (Integer) pidMethod.invoke(mgmt);
     }
 
     private String runCommand(String command, boolean output) {
