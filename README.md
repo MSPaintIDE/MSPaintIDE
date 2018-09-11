@@ -8,6 +8,8 @@ People joke about what IDE they use often, things like Word, MS Notepad, sometim
 The way the MS Paint IDE works, is it is an application running separate from MS Paint. You input some locations for things like input image, output image location, compile to folder, etc. Once you save your code to MS Paint, you click **Compile/Execute** and the program uses a custom [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) implementation designed specially for MS Paint and code, then syntax highlights it, and then uses Java's JDK to compile the code and execute it. All output from the compiler and application compiled are outputed via images.
 
 ## Usage Tutorial
+There is now an installation and demo video, for anything not explained fully here, or just for those who want to see the IDE in action: [https://www.youtube.com/watch?v=eyH4aXlB1Js](https://www.youtube.com/watch?v=eyH4aXlB1Js)
+
 MS Paint IDE can be used in two different ways. You can either just run the jar (Following the instructions below), or you can run the installer as administrator, which provides a much cleaner way of using the program, and also allows you to right click any text file and edit it with MS Paint.
 
 ### With the Installer
@@ -48,6 +50,30 @@ The image file that will contain all compiler output, like status, times, and er
 
 #### Program Output
 The image file that will contain all of the compiled program's output, like status, times, and errors. If no image is found by this name and location, one will be created.
+
+### Git Features
+MS Paint IDE has only the important Git features, allowing you to do anything you would normally do on an IDE.
+
+#### Create Repo
+The `Create Repo` button simply does `git init` for your project, relative to the input image directory/file.
+
+#### Add Files
+Clicking the `Add Files` button will open a dialog for you to select as many files/directories as you want that will be added to the Git repo. If an image file is found, it will be scanned with the OCR, and that scanned version will be added to Git.
+
+#### Add Remote
+The `Add Remote` button will add whatever is in the text field to the right of the button as a remote origin.
+
+The text box must contain an SSH origin containing authentication. A template for what is required is:
+`https://Username:token@github.com/Username/Repo.git`
+Please note the `token` in the template can be an authentication token to your account (Accessed/managed by going to GitHub's `Settings > Developer Settings > Personal access tokens` and generating a token) **or** the password for your account.
+
+If you don't want the remote origin to be visible in the text box and in the console output to the right (for use in tutorials or demonstrations) you can click the visibility button to the right in the text field, and it will toggle the visibility for the origin.
+
+#### Commit
+Clicking the `Commit` button will simply make a commit with the message in the text box to the right.
+
+#### Push
+The `Push` button will push all unpushed commits to the remote origin.
 
 ### File Editing
 **Note: This only works if you used the installer**
