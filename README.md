@@ -1,6 +1,6 @@
 # MSPaintIDE
 
-_For Spigot thread, check [here](https://www.spigotmc.org/threads/programming-in-ms-paint.289868). For website, click [here](https://ms-paint-i.de/)_
+_For Spigot thread, check [here](https://www.spigotmc.org/threads/programming-in-ms-paint.289868). For website, click [here](https://ms-paint-i.de/). For a demo/installation tutorial video, check [here](https://www.youtube.com/watch?v=eyH4aXlB1Js)_
 
 People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
 
