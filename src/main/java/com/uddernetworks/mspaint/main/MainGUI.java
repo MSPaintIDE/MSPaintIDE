@@ -304,6 +304,11 @@ public class MainGUI extends Application implements Initializable {
         addFiles.setDisable(disabled);
         commit.setDisable(disabled);
         push.setDisable(disabled);
+
+        originURL.setDisable(disabled);
+        hiddenOriginURL.setDisable(disabled);
+        commitMessage.setDisable(disabled);
+        remoteOriginVisibility.setDisable(disabled);
     }
 
     public void initializeInputTextFields() {

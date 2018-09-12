@@ -72,6 +72,14 @@ public class GitController {
                 this.mainGUI.setStatusText(null);
                 result.accept(stringBuilder.toString());
             } catch (IOException e) {
+                if (e.getMessage().contains("cannot find")) {
+                    this.mainGUI.updateLoading(0, 1);
+                    this.mainGUI.setStatusText(null);
+
+                    result.accept("");
+                    return;
+                }
+
                 e.printStackTrace();
             }
         };
