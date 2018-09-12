@@ -9,6 +9,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Collections;
@@ -93,6 +94,36 @@ public class Installer {
             Runtime.getRuntime().exec("cmd /c ping localhost -n 2 > nul && del \"" + currentJar.getAbsolutePath() + "\"");
         } catch (Exception e) {
             e.printStackTrace();
+
+            System.out.println("An error has occurred during installation! Reverting anything changed during the process...");
+
+            try {
+                Path msPaintAppData = Paths.get(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE").toAbsolutePath();
+
+                File imagesFolder = new File(msPaintAppData.toString(), "images");
+                if (imagesFolder.exists()) {
+                    Arrays.stream(imagesFolder.listFiles()).forEach(File::delete);
+                    imagesFolder.delete();
+                }
+
+                File currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+
+                Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "MSPaintIDE.jar"));
+                Files.deleteIfExists(Paths.get(imagesFolder.getAbsolutePath(), "logo.ico"));
+                Files.deleteIfExists(Paths.get(imagesFolder.getAbsolutePath(), "uninstall.ico"));
+                Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "open.bat"));
+                Files.deleteIfExists(Paths.get(currentJar.getParentFile().getAbsolutePath(), "shortcut.vbs"));
+                Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "uninstall.vbs"));
+                Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "AdminShortcut.ps1"));
+
+                Files.deleteIfExists(msPaintAppData);
+
+                runCommand(removeRegistry, false);
+            } catch (IOException | URISyntaxException e2) {
+                e2.printStackTrace();
+
+                System.out.println("Unable to successfully uninstall! Make sure everything is removed from the path: %LocalAppData%\\MSPaintIDE");
+            }
         }
     }
 
