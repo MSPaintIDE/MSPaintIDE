@@ -7,17 +7,16 @@ import com.uddernetworks.mspaint.ocr.ImageIndex;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class Main {
 
@@ -34,9 +33,6 @@ public class Main {
     private File appOutput = null;
     private File letterDirectory = null;
 
-    private String text;
-    private LetterFileWriter letterFileWriter;
-    private List<List<Letter>> letterGrid;
     private File parent;
     private File currentJar;
 
@@ -53,72 +49,52 @@ public class Main {
     }
 
     private void parseOptions() throws IOException {
-        List<String> options = Files.readAllLines(Paths.get(getOptions().getAbsolutePath()));
+        Properties properties = new Properties();
+        properties.load(Files.newInputStream(getOptions().toPath()));
 
-        for (String option : options) {
-            String[] split = option.split(" ");
-            String firstPart = split[0];
-            String secondPart = String.join(" ", Arrays.copyOfRange(split, 1, split.length));
+        inputImage = getProperty(properties, "inputImage");
+        highlightedFile = getProperty(properties, "highlightedFile");
+        objectFile = getProperty(properties, "objectFile");
+        classOutput = getProperty(properties, "classOutput");
+        jarFile = getProperty(properties, "jarFile");
+        libraryFile = getProperty(properties, "libraryFile");
+        otherFiles = getProperty(properties, "otherFiles");
+        compilerOutput = getProperty(properties, "compilerOutput");
+        appOutput = getProperty(properties, "appOutput");
+        letterDirectory = getProperty(properties, "letterDirectory");
+    }
 
-            switch (firstPart) {
-                case "inputImage":
-                    inputImage = new File(secondPart);
-                    break;
-                case "highlightedFile":
-                    highlightedFile = new File(secondPart);
-                    break;
-                case "objectFile":
-                    objectFile = "".equals(secondPart) ? null : new File(secondPart);
-                    break;
-                case "classOutput":
-                    classOutput = new File(secondPart);
-                    break;
-                case "jarFile":
-                    jarFile = new File(secondPart);
-                    break;
-                case "libraryFile":
-                    libraryFile = "".equals(secondPart) ? null : new File(secondPart);
-                    break;
-                case "otherFiles":
-                    otherFiles = "".equals(secondPart) ? null : new File(secondPart);
-                    break;
-                case "compilerOutput":
-                    compilerOutput = new File(secondPart);
-                    break;
-                case "appOutput":
-                    appOutput = new File(secondPart);
-                    break;
-                case "letterDirectory":
-                    letterDirectory = "".equals(secondPart) ? null : new File(secondPart);
-                    break;
-            }
-        }
+    private File getProperty(Properties properties, String property) {
+        String propertyText = properties.getProperty(property, null);
+        return propertyText == null || propertyText.equals("") ? null : new File(propertyText);
     }
 
     private void saveOptions() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("inputImage ").append(getInputImage()).append("\n");
-        stringBuilder.append("highlightedFile ").append(getHighlightedFile()).append("\n");
-        stringBuilder.append("objectFile ").append(getObjectFile()).append("\n");
-        stringBuilder.append("classOutput ").append(getClassOutput()).append("\n");
-        stringBuilder.append("jarFile ").append(getJarFile()).append("\n");
-        stringBuilder.append("libraryFile ").append(getLibraryFile()).append("\n");
-        stringBuilder.append("otherFiles ").append(getOtherFiles()).append("\n");
-        stringBuilder.append("compilerOutput ").append(getCompilerOutput()).append("\n");
-        stringBuilder.append("appOutput ").append(getAppOutput()).append("\n");
-        stringBuilder.append("letterDirectory ").append(getLetterDirectory());
+        Properties properties = new Properties();
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getOptions()))) {
-            writer.write(stringBuilder.toString());
+        properties.setProperty("inputImage", getInputImage());
+        properties.setProperty("highlightedFile", getHighlightedFile());
+        properties.setProperty("objectFile", getObjectFile());
+        properties.setProperty("classOutput", getClassOutput());
+        properties.setProperty("jarFile", getJarFile());
+        properties.setProperty("libraryFile", getLibraryFile());
+        properties.setProperty("otherFiles", getOtherFiles());
+        properties.setProperty("compilerOutput", getCompilerOutput());
+        properties.setProperty("appOutput", getAppOutput());
+        properties.setProperty("letterDirectory", getLetterDirectory());
+
+        try {
+            OutputStream outputStream = new FileOutputStream(getOptions());
+            properties.store(outputStream, "MS Paint IDE Settings");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private File getOptions() throws IOException {
-        File optionsTxt = new File(parent.getAbsolutePath(), "options.txt");
-        if (!optionsTxt.exists()) optionsTxt.createNewFile();
-        return optionsTxt;
+        File optionsIni = new File(parent.getAbsolutePath(), "options.ini");
+        if (!optionsIni.exists()) optionsIni.createNewFile();
+        return optionsIni;
     }
 
     private boolean optionsNotFilled() {
