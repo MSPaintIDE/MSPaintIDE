@@ -6,7 +6,7 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
-<AnchorPane styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uddernetworks.mspaint.main.MainGUI">
+<AnchorPane styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <GridPane maxWidth="99999.0" minWidth="500.0" styleClass="gridpane-theme" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
             <columnConstraints>
@@ -14,7 +14,7 @@
                 <ColumnConstraints hgrow="ALWAYS" maxWidth="99999.0" minWidth="10.0" prefWidth="515.0" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="825.0" vgrow="ALWAYS" />
+                <RowConstraints minHeight="10.0" prefHeight="855.0" vgrow="ALWAYS" />
             </rowConstraints>
             <children>
                 <TextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" style="-fx-border-style: solid; -fx-border-radius: 0; -fx-border-color: white;" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
@@ -31,14 +31,14 @@
                 </TextArea>
                 <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="gridpane-theme">
                     <content>
-                        <GridPane maxHeight="821.0" maxWidth="500.0" minHeight="821.0" minWidth="500.0" prefHeight="821.0" prefWidth="500.0" styleClass="gridpane-theme">
+                        <GridPane maxHeight="851.0" maxWidth="500.0" minHeight="851.0" minWidth="500.0" prefHeight="851.0" prefWidth="500.0" styleClass="gridpane-theme">
                             <columnConstraints>
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             </columnConstraints>
                             <rowConstraints>
                                 <RowConstraints maxHeight="536.0" minHeight="10.0" prefHeight="536.0" vgrow="SOMETIMES" />
                                 <RowConstraints maxHeight="162.0" minHeight="10.0" prefHeight="162.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="208.0" minHeight="10.0" prefHeight="208.0" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="238.0" minHeight="10.0" prefHeight="238.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
                                 <GridPane prefHeight="589.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
@@ -177,7 +177,7 @@
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
                                         </JFXCheckBox>
-                                        <JFXCheckBox fx:id="compile" layoutX="207.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Compile">
+                                        <JFXCheckBox fx:id="compile" layoutX="207.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Compile/Interpret">
                                             <cursor>
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
@@ -192,13 +192,13 @@
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
                                         </JFXCheckBox>
-                                        <JFXButton buttonType="RAISED" layoutX="10.0" layoutY="94.0" onAction="#startScan" prefHeight="30" prefWidth="150.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" styleClass="theme-text" text="Start">
+                                        <JFXButton buttonType="RAISED" layoutX="10.0" layoutY="124.0" onAction="#startScan" prefHeight="30" prefWidth="150.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" styleClass="theme-text" text="Start">
                                             <cursor>
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
                                         </JFXButton>
-                                        <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="140.0" prefHeight="18.0" prefWidth="480.0" progress="0.0" styleClass="jfx-progress-bar" />
-                                        <Label fx:id="statusText" layoutX="170.0" layoutY="101.0" maxWidth="330.0" prefHeight="17.0" prefWidth="275.0" styleClass="theme-text" />
+                                        <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="170.0" prefHeight="18.0" prefWidth="480.0" progress="0.0" styleClass="jfx-progress-bar" />
+                                        <Label fx:id="statusText" layoutX="170.0" layoutY="131.0" maxWidth="330.0" prefHeight="17.0" prefWidth="275.0" styleClass="theme-text" />
                                         <JFXCheckBox fx:id="useCaches" layoutX="207.0" layoutY="48.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Use Caches">
                                             <cursor>
                                                 <Cursor fx:constant="HAND" />
@@ -209,11 +209,15 @@
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
                                         </JFXCheckBox>
-                                        <JFXButton fx:id="invertColors" layoutX="450.0" layoutY="95.0" prefHeight="30" prefWidth="30.0" style="-fx-text-fill: WHITE;" styleClass="invert-colors">
+                                        <JFXButton fx:id="invertColors" layoutX="450.0" layoutY="125.0" prefHeight="30" prefWidth="30.0" style="-fx-text-fill: WHITE;" styleClass="invert-colors">
                                             <cursor>
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
                                         </JFXButton>
+                              <JFXComboBox fx:id="languageComboBox" layoutX="10.0" layoutY="84.0" prefHeight="30.0" prefWidth="150.0" styleClass="language-selection">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor></JFXComboBox>
                                     </children>
                                 </Pane>
                             </children>

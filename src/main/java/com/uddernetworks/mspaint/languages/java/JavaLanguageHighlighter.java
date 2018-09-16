@@ -1,13 +1,13 @@
-package com.uddernetworks.mspaint.highlighter;
+package com.uddernetworks.mspaint.languages.java;
 
+import com.uddernetworks.mspaint.languages.LanguageHighlighter;
 import com.uwyn.jhighlight.highlighter.ExplicitStateHighlighter;
 import com.uwyn.jhighlight.highlighter.JavaHighlighter;
 import com.uwyn.jhighlight.tools.StringUtils;
 
 import java.io.*;
-import java.util.HashMap;
 
-public class CustomJavaRenderer {
+public class JavaLanguageHighlighter implements LanguageHighlighter {
 
     private String getCssClass(int style) {
         switch (style) {

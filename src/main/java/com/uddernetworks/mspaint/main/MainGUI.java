@@ -4,9 +4,12 @@ import com.jfoenix.controls.*;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
+import com.uddernetworks.mspaint.languages.Language;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,13 +28,13 @@ import javafx.stage.StageStyle;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.tools.ToolProvider;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -117,6 +120,8 @@ public class MainGUI extends Application implements Initializable {
     private JFXButton invertColors;
     @FXML
     private JFXButton remoteOriginVisibility;
+    @FXML
+    private JFXComboBox languageComboBox;
 
     @FXML
     private TextArea output;
@@ -134,6 +139,8 @@ public class MainGUI extends Application implements Initializable {
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
     private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
+
+    private ObservableList<Language> languages = FXCollections.observableArrayList();
 
     public MainGUI() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -157,12 +164,6 @@ public class MainGUI extends Application implements Initializable {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             return;
-        }
-
-        if (ToolProvider.getSystemJavaCompiler() != null) {
-            System.out.println("Using JDK");
-        } else {
-            System.out.println("Not using JDK, compiling/executing WILL NOT work");
         }
 
         Installer installer = new Installer();
@@ -213,7 +214,9 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void registerThings(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Main.fxml"));
+        loader.setController(this);
+        Parent root = loader.load();
 
         ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo.png").toString());
         icon.setFitHeight(25);
@@ -239,11 +242,16 @@ public class MainGUI extends Application implements Initializable {
     private void startScan(ActionEvent event) {
         new Thread(() -> {
             try {
-                if (ToolProvider.getSystemJavaCompiler() == null) {
+                if (getCurrentLanguage() == null) {
                     setHaveError();
-                    System.out.println("Error: No Java compiler found!" +
-                            "You must make sure you ran the IDE with with JDK and not the JRE." +
-                            "Please see usage instructions: https://github.com/RubbaBoy/MSPaintIDE/#usage-tutorial");
+                    System.out.println("No language selected!");
+                    return;
+                }
+
+                if (!getCurrentLanguage().meetsRequirements()) {
+                    setHaveError();
+                    System.out.println("You somehow selected a language that your\n" +
+                            "system doesn't have the proper requirements for!");
                     return;
                 }
 
@@ -257,8 +265,8 @@ public class MainGUI extends Application implements Initializable {
                     main.highlightAll();
                 }
 
-                if (compile.isSelected()) {
-                    main.compile(execute.isSelected());
+                if (compile.isSelected() || getCurrentLanguage().isInterpreted()) {
+                    main.compile(execute.isSelected() || getCurrentLanguage().isInterpreted());
                 }
 
                 setStatusText("");
@@ -351,14 +359,24 @@ public class MainGUI extends Application implements Initializable {
                     parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
                     parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
                     parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
+                    parent.lookup(".language-selection").getStyleClass().add("language-selection-dark");
                 } else {
                     parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
                     parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
                     parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
                     parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
+                    parent.lookup(".language-selection").getStyleClass().remove("language-selection-dark");
                 }
             });
         }
+    }
+
+    public void addLanguages(List<Language> languages) {
+        this.languages.addAll(languages);
+    }
+
+    public Language getCurrentLanguage() {
+        return this.main.getCurrentLanguage();
     }
 
     @FXML
@@ -367,6 +385,7 @@ public class MainGUI extends Application implements Initializable {
         initializeInputTextFields();
         setGitFeaturesDisabled(true);
         this.initialized.set(true);
+        this.languageComboBox.setItems(languages);
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 
@@ -414,6 +433,12 @@ public class MainGUI extends Application implements Initializable {
                 hiddenOriginURL.selectEnd();
                 parent.lookup(".remote-origin-visibility").getStyleClass().add("off");
             }
+        });
+
+        languageComboBox.setOnAction(event -> {
+            Language language = (Language) languageComboBox.getSelectionModel().getSelectedItem();
+            this.main.setCurrentLanguage(language);
+            compile.setDisable(language.isInterpreted());
         });
 
         this.gitController.getVersion(gitVersion -> {

@@ -100,3 +100,24 @@
     -fx-prompt-text-fill: WHITE;
     -jfx-unfocus-color: WHITE;
 }
+
+.language-selection-dark {
+    -fx-background-color: #424242;
+    -fx-border-color: #424242;
+    -fx-text-fill: white;
+}
+
+.language-selection-dark .list-view, .language-selection-dark .list-cell {
+    -fx-background-color: #616161;
+    -fx-border-color: #616161;
+    -fx-text-fill: white;
+}
+
+.language-selection-dark .list-cell {
+    -fx-cursor: hand;
+}
+
+.language-selection-dark .list-cell:focused, .language-selection-dark .list-cell:hover {
+    -fx-background-color: #424242;
+    -fx-border-color: #424242;
+}

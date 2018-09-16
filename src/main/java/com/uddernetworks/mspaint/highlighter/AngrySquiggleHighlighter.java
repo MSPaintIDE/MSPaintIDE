@@ -1,28 +1,25 @@
 package com.uddernetworks.mspaint.highlighter;
 
+import com.uddernetworks.mspaint.languages.LanguageError;
 import com.uddernetworks.mspaint.main.Letter;
 
 import javax.imageio.ImageIO;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class AngrySquiggleHighlighter {
 
     private BufferedImage image;
-    private int extraSquigglePadding = 0;
+    private int extraSquigglePadding;
     private BufferedImage squiggleImage;
     private File highlightedFile;
     private List<List<Letter>> grid;
-    private List<Diagnostic<? extends JavaFileObject>> errors;
+    private List<LanguageError> errors;
 
-    public AngrySquiggleHighlighter(BufferedImage image, int extraSquigglePadding, File squiggleFile, File highlightedFile, List<List<Letter>> grid, List<Diagnostic<? extends JavaFileObject>> errors) throws IOException {
+    public AngrySquiggleHighlighter(BufferedImage image, int extraSquigglePadding, File squiggleFile, File highlightedFile, List<List<Letter>> grid, List<LanguageError> errors) throws IOException {
         this.image = image;
         this.extraSquigglePadding = extraSquigglePadding;
         this.squiggleImage = ImageIO.read(squiggleFile);
@@ -32,7 +29,7 @@ public class AngrySquiggleHighlighter {
     }
 
     public void highlightAngrySquiggles() throws IOException {
-        for (Diagnostic<? extends JavaFileObject> error : errors) {
+        for (LanguageError error : errors) {
             int lineNumber = Long.valueOf(error.getLineNumber()).intValue();
             int columnNumber = Long.valueOf(error.getColumnNumber()).intValue();
 

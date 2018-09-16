@@ -1,6 +1,9 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.languages.java;
 
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.main.FileJarrer;
+import com.uddernetworks.mspaint.main.ImageClass;
+import com.uddernetworks.mspaint.main.MainGUI;
 
 import javax.tools.*;
 import java.awt.*;
@@ -193,16 +196,7 @@ public class CodeCompiler {
             runIt(namePackages.get(className), className);
         }
 
-        if (!errors.isEmpty()) {
-            for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {
-                for (Diagnostic<? extends JavaFileObject> error : errorList) {
-                    compilerOut.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
-                }
-            }
-        }
-
         System.setOut(oldPS);
-        System.out.println("errors = " + errors);
 
         compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
 

@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
-import com.uddernetworks.mspaint.highlighter.CustomJavaRenderer;
 import com.uddernetworks.mspaint.highlighter.LetterFormatter;
+import com.uddernetworks.mspaint.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.mspaint.ocr.LetterGrid;
 
@@ -55,14 +55,13 @@ public class ImageClass {
     public void highlight(File highlightImagePath) throws IOException {
         this.highlightedFile = new File(highlightImagePath, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_highlighted.png");
 
-
         final String prefix = "[" + inputImage.getName() + "] ";
 
         System.out.println("\n" + prefix + "Highlighting...");
         long start = System.currentTimeMillis();
 
-        CustomJavaRenderer renderer = new CustomJavaRenderer();
-        String highlighted = renderer.highlight(text);
+        LanguageHighlighter highlighter = this.mainGUI.getCurrentLanguage().getLanguageHighlighter();
+        String highlighted = highlighter.highlight(text);
 
         System.out.println(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 

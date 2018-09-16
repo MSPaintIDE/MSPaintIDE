@@ -2,10 +2,12 @@ package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.languages.Language;
+import com.uddernetworks.mspaint.languages.LanguageError;
+import com.uddernetworks.mspaint.languages.LanguageManager;
+import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.ocr.ImageIndex;
 
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,10 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class Main {
 
@@ -40,12 +39,28 @@ public class Main {
 
     private List<ImageClass> imageClasses = new ArrayList<>();
 
+    private LanguageManager languageManager = new LanguageManager();
+    private Language currentLanguage;
+
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         this.mainGUI = mainGUI;
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
         parseOptions();
+
+        languageManager.addLanguage(new JavaLanguage());
+
+        languageManager.initializeLanguages();
+        mainGUI.addLanguages(languageManager.getEnabledLanguages());
+    }
+
+    public void setCurrentLanguage(Language language) {
+        this.currentLanguage = language;
+    }
+
+    public Language getCurrentLanguage() {
+        return this.currentLanguage;
     }
 
     private void parseOptions() throws IOException {
@@ -130,7 +145,7 @@ public class Main {
         mainGUI.setStatusText(null);
 
         if (inputImage.isDirectory()) {
-            for (File imageFile : getFilesFromDirectory(inputImage, "png")) {
+            for (File imageFile : getFilesFromDirectory(inputImage, this.currentLanguage.getFileExtensions(), "png")) {
                 imageClasses.add(new ImageClass(imageFile, objectFile, mainGUI, images, useProbe, useCaches, saveCaches));
             }
         } else {
@@ -177,11 +192,15 @@ public class Main {
     public void compile(boolean execute) throws IOException {
         long start = System.currentTimeMillis();
 
-        System.out.println("Compiling...");
-        mainGUI.setStatusText("Compiling...");
-        mainGUI.setIndeterminate(true);
+        if (getCurrentLanguage().isInterpreted()) {
+            System.out.println("Interpreting...");
+            mainGUI.setStatusText("Interpreting...");
+        } else {
+            System.out.println("Compiling...");
+            mainGUI.setStatusText("Compiling...");
+        }
 
-        CodeCompiler codeCompiler = new CodeCompiler();
+        mainGUI.setIndeterminate(true);
 
         List<File> libFiles = new ArrayList<>();
         if (libraryFile != null) {
@@ -196,7 +215,7 @@ public class Main {
 
         ImageOutputStream imageOutputStream = new ImageOutputStream(appOutput, 500);
         ImageOutputStream compilerOutputStream = new ImageOutputStream(compilerOutput, 500);
-        Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
+        Map<ImageClass, List<LanguageError>> errors = getCurrentLanguage().compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
 
         System.out.println("Highlighting Angry Squiggles...");
         mainGUI.setStatusText("Highlighting Angry Squiggles...");
@@ -214,22 +233,30 @@ public class Main {
 
         mainGUI.setStatusText(null);
 
-        System.out.println("Finished compiling in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms");
 
         imageClasses.clear();
     }
 
     public List<File> getFilesFromDirectory(File directory, String extension) {
+        return getFilesFromDirectory(directory, new String[] {extension});
+    }
+
+    public List<File> getFilesFromDirectory(File directory, String[] extensions) {
         List<File> ret = new ArrayList<>();
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
-                ret.addAll(getFilesFromDirectory(file, extension));
+                ret.addAll(getFilesFromDirectory(file, extensions));
             } else {
-                if (extension == null || file.getName().endsWith("." + extension)) ret.add(file);
+                if (extensions == null || Arrays.stream(extensions).anyMatch(extension -> file.getName().endsWith("." + extension))) ret.add(file);
             }
         }
 
         return ret;
+    }
+
+    public List<File> getFilesFromDirectory(File directory, String[] extensions, String postExtension) {
+        return getFilesFromDirectory(directory, Arrays.stream(extensions).map(string -> string + "." + postExtension).toArray(String[]::new));
     }
 
     public void setInputImage(File inputImage) {
@@ -252,7 +279,7 @@ public class Main {
         }
 
         if (jarFile == null) {
-            setJarFile(new File(outputParent, "Output.jar"));
+            setJarFile(this.currentLanguage.getOutputFileExtension() == null ? null : new File(outputParent, "Output." + this.currentLanguage.getOutputFileExtension()));
         }
 
         if (classOutput == null) {

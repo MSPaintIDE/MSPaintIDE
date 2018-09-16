@@ -142,7 +142,7 @@ public class GitController {
         Main main = this.mainGUI.getMain();
 
         List<File> imageFiles = Arrays.stream(files).flatMap(file -> {
-            if (file.isDirectory()) return main.getFilesFromDirectory(file, null).stream();
+            if (file.isDirectory()) return main.getFilesFromDirectory(file, (String[]) null).stream();
             return Stream.of(file);
         }).collect(Collectors.toList());
 
