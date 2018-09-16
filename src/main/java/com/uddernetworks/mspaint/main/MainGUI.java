@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainGUI extends Application implements Initializable {
 
@@ -128,6 +129,7 @@ public class MainGUI extends Application implements Initializable {
     private boolean darkTheme = false;
     private boolean remoteURLVisible = true;
     private GitController gitController;
+    private AtomicBoolean initialized = new AtomicBoolean();
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
@@ -324,11 +326,47 @@ public class MainGUI extends Application implements Initializable {
         programOutputValue.setText(main.getAppOutput());
     }
 
+    public void setDarkTheme(boolean darkTheme) {
+        this.darkTheme = darkTheme;
+    }
+
+    public boolean useDarkTheme() {
+        return this.darkTheme;
+    }
+
+    public void updateTheme() {
+        if (this.initialized.get()) {
+            Platform.runLater(() -> {
+                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
+                parent.lookupAll(".theme-text").forEach(node -> {
+                    if (this.darkTheme) {
+                        node.getStyleClass().add("dark-text");
+                    } else {
+                        node.getStyleClass().remove("dark-text");
+                    }
+                });
+
+                if (this.darkTheme) {
+                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.add("gridpane-theme-dark"));
+                    parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
+                    parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
+                    parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
+                } else {
+                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
+                    parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
+                    parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
+                    parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
+                }
+            });
+        }
+    }
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeInputTextFields();
         setGitFeaturesDisabled(true);
+        this.initialized.set(true);
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 
@@ -346,27 +384,11 @@ public class MainGUI extends Application implements Initializable {
 
         invertColors.setOnAction(event -> {
             this.darkTheme = !this.darkTheme;
-            Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
-            parent.lookupAll(".theme-text").forEach(node -> {
-                if (this.darkTheme) {
-                    node.getStyleClass().add("dark-text");
-                } else {
-                    node.getStyleClass().remove("dark-text");
-                }
-            });
-
-            if (this.darkTheme) {
-                parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.add("gridpane-theme-dark"));
-                parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
-                parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
-                parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
-            } else {
-                parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
-                parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
-                parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
-                parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
-            }
+            updateTheme();
+            this.main.saveOptions();
         });
+
+        updateTheme();
 
         hiddenOriginURL.setManaged(false);
         hiddenOriginURL.setVisible(false);

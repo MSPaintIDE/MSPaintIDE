@@ -62,6 +62,9 @@ public class Main {
         compilerOutput = getProperty(properties, "compilerOutput");
         appOutput = getProperty(properties, "appOutput");
         letterDirectory = getProperty(properties, "letterDirectory");
+
+        this.mainGUI.setDarkTheme(properties.getProperty("darkTheme", "false").equals("true"));
+        this.mainGUI.updateTheme();
     }
 
     private File getProperty(Properties properties, String property) {
@@ -69,7 +72,7 @@ public class Main {
         return propertyText == null || propertyText.equals("") ? null : new File(propertyText);
     }
 
-    private void saveOptions() {
+    public void saveOptions() {
         Properties properties = new Properties();
 
         properties.setProperty("inputImage", getInputImage());
@@ -82,6 +85,7 @@ public class Main {
         properties.setProperty("compilerOutput", getCompilerOutput());
         properties.setProperty("appOutput", getAppOutput());
         properties.setProperty("letterDirectory", getLetterDirectory());
+        properties.setProperty("darkTheme", String.valueOf(this.mainGUI.useDarkTheme()));
 
         try {
             OutputStream outputStream = new FileOutputStream(getOptions());
