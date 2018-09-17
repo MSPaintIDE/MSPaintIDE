@@ -86,7 +86,7 @@ Identifier = [:jletter:][:jletterdigit:]*
   "." |
   "," { return IO_STYLE; }
 
-   "!" { yybegin(IN_INPUT); return INPUT_STYLE; }
+  "!" { yybegin(IN_INPUT); return INPUT_STYLE; }
 
   \n |
   {Identifier} |
