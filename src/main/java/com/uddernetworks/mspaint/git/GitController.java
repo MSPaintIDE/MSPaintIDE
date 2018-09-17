@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.git;
 
 import com.google.gson.Gson;
+import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.main.ImageClass;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -163,7 +164,7 @@ public class GitController {
             File addingFile;
             String relative = getRelativeClass(file);
             if (file.getName().endsWith(".png")) {
-                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
+                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, main.getCurrentLanguage() instanceof JavaLanguage && this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
                 relative = relative.replace(".png", ".java");
 
                 if (source == null) {

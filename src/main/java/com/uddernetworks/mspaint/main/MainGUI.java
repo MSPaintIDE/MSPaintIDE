@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
 import com.uddernetworks.mspaint.languages.Language;
+import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -439,6 +440,7 @@ public class MainGUI extends Application implements Initializable {
             Language language = (Language) languageComboBox.getSelectionModel().getSelectedItem();
             this.main.setCurrentLanguage(language);
             compile.setDisable(language.isInterpreted());
+            useProbe.setDisable(!(language instanceof JavaLanguage));
         });
 
         this.gitController.getVersion(gitVersion -> {

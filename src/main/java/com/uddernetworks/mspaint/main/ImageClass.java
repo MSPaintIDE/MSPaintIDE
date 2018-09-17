@@ -98,4 +98,8 @@ public class ImageClass {
     public String getText() {
         return text;
     }
+
+    public File getInputImage() {
+        return this.inputImage;
+    }
 }

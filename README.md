@@ -92,7 +92,7 @@ After you click the context menu button, a MS Paint window will pop up with an i
 
 _Note: All options are saved in a file named options.ini in the same directory of your jar, to keep you from re choosing everything every restart_
 
-   Once you have all of the options set, you can be free to program in MS Paint, saving to the file you set earlier. The font must be in font size **16**, with the font family being **Verdana**. If people are super interested in this (Which I doubt, but who knows) I would make it support more fonts, but right now that's not a top priority.
+Once you have all of the options set, you can be free to program in MS Paint, saving to the file you set earlier. The file name must have the extension of what it would normally be with a `.png` at the end of this. Some examples of file names are `Foo.java.png`, `Bar.py.png`, `Fizz.bf.png`, etc. The font must be in font size **16**, with the font family being **Verdana**. If people are super interested in this (Which I doubt, but who knows) I would make it support more fonts, but right now that's not a top priority.
 
 ## Screenshots
 

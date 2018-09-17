@@ -52,9 +52,9 @@ public class ImageOutputStream extends OutputStream {
             linesList.addAll(Arrays.asList(innerLines));
         }
 
-        int newHeight = linesList.size() + 20;
+        int newHeight = linesList.size() * 20;
 
-        image = new BufferedImage(width, (newHeight > minHeight) ? newHeight : minHeight, BufferedImage.TYPE_INT_ARGB);
+        image = new BufferedImage(width, Math.max(newHeight, minHeight), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
 
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

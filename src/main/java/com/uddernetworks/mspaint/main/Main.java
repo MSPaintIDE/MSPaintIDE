@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.languages.Language;
 import com.uddernetworks.mspaint.languages.LanguageError;
 import com.uddernetworks.mspaint.languages.LanguageManager;
+import com.uddernetworks.mspaint.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.ocr.ImageIndex;
 
@@ -50,6 +51,7 @@ public class Main {
         parseOptions();
 
         languageManager.addLanguage(new JavaLanguage());
+        languageManager.addLanguage(new BrainfuckLanguage());
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
