@@ -12,23 +12,23 @@ public class JavaLanguageHighlighter implements LanguageHighlighter {
     private String getCssClass(int style) {
         switch (style) {
             case 1:
-                return "000,000,000,"; // plain
+                return 0x000000 + ","; // plain
             case 2:
-                return "000,000,000,"; // keyword
+                return 0x000000 + ","; // keyword
             case 3:
-                return "000,044,221,"; // type
+                return 0x002cdd + ","; // type
             case 4:
-                return "000,124,031,"; // operator
+                return 0x007c1f + ","; // operator
             case 5:
-                return "000,033,255,"; // separator
+                return 0x0021ff + ","; // separator
             case 6:
-                return "188,000,000,"; // literal
+                return 0xbc0000 + ","; // literal
             case 7:
-                return "147,147,147,"; // comment
+                return 0x939393 + ","; // comment
             case 8:
-                return "147,147,147,"; // javadoc comment
+                return 0x939393 + ","; // javadoc comment
             case 9:
-                return "147,147,147,"; // javadoc tag
+                return 0x939393 + ","; // javadoc tag
             default:
                 return null;
         }

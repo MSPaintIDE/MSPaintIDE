@@ -20,21 +20,12 @@ public class LetterFormatter {
             if (letters.size() <= i) continue;
             List<Letter> letterRow = letters.get(i);
 
-            String line = lines[i].substring(0, lines[i].length() - 1).trim();
+            String line = lines[i].trim();
 
             String[] nums = line.split(",");
 
-            int index = 0;
-            for (int i2 = 0; i2 < nums.length; i2++) {
-                int r = Integer.valueOf(nums[i2]);
-                i2++;
-                int g = Integer.valueOf(nums[i2]);
-                i2++;
-                int b = Integer.valueOf(nums[i2]);
-
-                letterRow.get(index).setColor(new Color(r, g, b));
-                index++;
-            }
+            for (int j = 0; j < nums.length; j++)
+                letterRow.get(j).setColor(new Color(Integer.valueOf(nums[j])));
         }
     }
 }
