@@ -112,7 +112,6 @@
         </dependency>
 
 
-
         <!--  JHighlight  -->
         <dependency>
             <groupId>org.apache.tika</groupId>
