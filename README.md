@@ -130,6 +130,8 @@ Thank you to:
 
 [@iCodeHaven](https://www.spigotmc.org/members/482937/)
 
+[@AL1L](https://al1l.com/)
+
 Feel free to donate via [PayPal](https://rubbaboy.fund/)
 
 ## Special Thanks To:
