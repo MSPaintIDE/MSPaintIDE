@@ -109,7 +109,7 @@ public class GitController {
 
         String str = new String(Files.readAllBytes(gitIndexFile.toPath()));
 
-        return str != null && str.isEmpty() ? new GitIndex(new HashMap<>()) : this.gson.fromJson(str, GitIndex.class);
+        return str.isEmpty() ? new GitIndex(new HashMap<>()) : this.gson.fromJson(str, GitIndex.class);
     }
 
     public void getVersion(Consumer<String> result) {
