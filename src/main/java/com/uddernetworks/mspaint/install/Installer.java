@@ -77,8 +77,8 @@ public class Installer {
             Files.copy(getClass().getClassLoader().getResourceAsStream("uninstall.vbs"), uninstallPath);
 
 
-            Runtime.getRuntime().exec("cmd /c wscript \"" + shortcutGen.toAbsolutePath().toString() + "\" && del \"" + shortcutGen.toAbsolutePath().toString() + "\"");
-            Runtime.getRuntime().exec("cmd /c wscript \"" + uninstallPath.toAbsolutePath().toString() + "\" && del \"" + uninstallPath.toAbsolutePath().toString() + "\"");
+            Runtime.getRuntime().exec("cmd /c wscript \"" + shortcutGen.toAbsolutePath() + "\" && del \"" + shortcutGen.toAbsolutePath() + "\"");
+            Runtime.getRuntime().exec("cmd /c wscript \"" + uninstallPath.toAbsolutePath() + "\" && del \"" + uninstallPath.toAbsolutePath() + "\"");
 
 
             Path adminShortcutGen = Paths.get(msPaintAppData.getAbsolutePath(), "AdminShortcut.ps1");
@@ -89,7 +89,7 @@ public class Installer {
             Files.write(adminShortcutGen, adminShortcut.getBytes(), StandardOpenOption.CREATE_NEW);
 
             runCommand("cmd /c Powershell -Command \"Set-ExecutionPolicy RemoteSigned\"", false);
-            runCommand("cmd /c Powershell -File \"" + adminShortcutGen.toAbsolutePath().toString() + "\"", false);
+            runCommand("cmd /c Powershell -File \"" + adminShortcutGen.toAbsolutePath() + "\"", false);
 
             Runtime.getRuntime().exec("cmd /c ping localhost -n 2 > nul && del \"" + currentJar.getAbsolutePath() + "\"");
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class Installer {
                 .filter(pid -> pid != currentPID)
                 .collect(Collectors.toList());
 
-        if (runningProcesses.size() > 0) {
+        if (!runningProcesses.isEmpty()) {
             System.out.println("Found " + runningProcesses.size() + " process" + (runningProcesses.size() > 1 ? "es" : "") + " of MS Paint IDE running. Killing them...");
 
             runningProcesses.forEach(pid -> runCommand("taskkill /PID " + pid + " /F", false));
@@ -155,7 +155,7 @@ public class Installer {
         List<String> jdkLines = Arrays.stream(runCommand("where javaw", true).split("\n")).filter(line -> line.contains("\\Program Files") && line.contains("Java\\jdk") && line.contains("bin")).sorted().collect(Collectors.toList());
         Collections.reverse(jdkLines);
 
-        if (jdkLines.size() == 0) {
+        if (jdkLines.isEmpty()) {
             throw new FileNotFoundException("No installed JDK found! Please run the program with the JDK manually if you know where it is.");
         }
 
@@ -189,13 +189,12 @@ public class Installer {
             process = runtime.exec(command, null, directory);
 
             if (output) {
-                String line;
-                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                while ((line = input.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
+                try (BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = input.readLine()) != null) {
+                        stringBuilder.append(line).append("\n");
+                    }
                 }
-
-                input.close();
                 return stringBuilder.toString();
             }
 

@@ -37,7 +37,7 @@ public class LetterRow implements Serializable {
 
             int currentX = letter.getX();
 
-            if (letter.getLetter().equals("") || letter.getLetter().equals(" ")) {
+            if (letter.getLetter().isEmpty() || letter.getLetter().equals(" ")) {
                 row.set(minIndex, null);
                 continue;
             }
@@ -86,7 +86,7 @@ public class LetterRow implements Serializable {
         for (int i = 0; i < row.length(); i++) {
             Letter tempLetter = row.get(i);
             if (tempLetter == null) continue;
-            if (tempLetter.getLetter().equals("")) continue;
+            if (tempLetter.getLetter().isEmpty()) continue;
 
             int tempX = tempLetter.getX();
 
@@ -126,7 +126,7 @@ public class LetterRow implements Serializable {
             }
         }
 
-        ret.append(row.toString()).append("\n");
+        ret.append(row).append("\n");
 
         return ret.toString();
     }

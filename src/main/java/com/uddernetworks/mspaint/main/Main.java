@@ -86,7 +86,7 @@ public class Main {
 
     private File getProperty(Properties properties, String property) {
         String propertyText = properties.getProperty(property, null);
-        return propertyText == null || propertyText.equals("") ? null : new File(propertyText);
+        return propertyText == null || propertyText.isEmpty() ? null : new File(propertyText);
     }
 
     public void saveOptions() {

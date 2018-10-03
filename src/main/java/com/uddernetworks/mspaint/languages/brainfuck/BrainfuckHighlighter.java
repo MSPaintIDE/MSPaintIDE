@@ -194,7 +194,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
 
   private static int [] zzUnpackAction() {
     int [] result = new int[10];
-    int offset = 0;
+    int offset = 0; //TODO not used - probably bug?
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
   }
@@ -223,7 +223,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
 
   private static int [] zzUnpackRowMap() {
     int [] result = new int[10];
-    int offset = 0;
+    int offset = 0; //TODO not used - probably bug?
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
   }
@@ -250,7 +250,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
 
   private static int [] zzUnpackTrans() {
     int [] result = new int[36];
-    int offset = 0;
+    int offset = 0; //TODO not used - probably bug?
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
   }
@@ -282,7 +282,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -291,7 +291,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
 
   private static int [] zzUnpackAttribute() {
     int [] result = new int[10];
-    int offset = 0;
+    int offset = 0; //TODO not used - probably bug?
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
   }
@@ -399,18 +399,21 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
 		yybegin(newState-1);
 	}
 
-	public byte getNextToken()
+    @Override
+    public byte getNextToken()
 	throws IOException
 	{
 		return (byte) yylex();
 	}
 
-	public int getTokenLength()
+    @Override
+    public int getTokenLength()
 	{
 		return yylength();
 	}
 
-	public void setReader(Reader r)
+    @Override
+    public void setReader(Reader r)
 	{
 		this.zzReader = r;
 	}
@@ -452,7 +455,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
+   * @return      {@code false}, iff there was new input.
    * 
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
@@ -619,7 +622,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
     try {
       message = ZZ_ERROR_MSG[errorCode];
     }
-    catch (ArrayIndexOutOfBoundsException e) {
+    catch (ArrayIndexOutOfBoundsException ignored) {
       message = ZZ_ERROR_MSG[ZZ_UNKNOWN_ERROR];
     }
 
@@ -659,10 +662,6 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
     int zzMarkedPosL;
     int zzEndReadL = zzEndRead;
     char [] zzBufferL = zzBuffer;
-    char [] zzCMapL = ZZ_CMAP;
-
-    int [] zzTransL = ZZ_TRANS;
-    int [] zzRowMapL = ZZ_ROWMAP;
     int [] zzAttrL = ZZ_ATTRIBUTE;
 
     while (true) {
@@ -711,7 +710,7 @@ public class BrainfuckHighlighter implements ExplicitStateHighlighter {
               zzCurrentPosL += Character.charCount(zzInput);
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = ZZ_TRANS[ ZZ_ROWMAP[zzState] + ZZ_CMAP[zzInput] ];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 

@@ -29,7 +29,7 @@ public class ImageOutputStream extends OutputStream {
 
     @Override
     public void write(int b) {
-        string.append(String.valueOf((char) b));
+        string.append((char) b);
     }
 
     public void saveImage() {

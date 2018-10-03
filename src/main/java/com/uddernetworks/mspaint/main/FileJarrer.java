@@ -23,27 +23,21 @@ public class FileJarrer {
 
     private void zipIt(String zipFile) {
         byte[] buffer = new byte[1024];
-
-        try {
-            FileOutputStream fos = new FileOutputStream(zipFile);
-            JarOutputStream jarOutputStream = new JarOutputStream(fos);
+        try (JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(zipFile))) {
 
             for (String file : this.fileList) {
                 JarEntry jarEntry = new JarEntry(file.replace("\\", "/"));
                 jarOutputStream.putNextEntry(jarEntry);
 
-                FileInputStream in = new FileInputStream(sourceFile.getAbsolutePath() + File.separator + file);
-
-                int len;
-                while ((len = in.read(buffer)) > 0) {
-                    jarOutputStream.write(buffer, 0, len);
+                try (FileInputStream in = new FileInputStream(sourceFile.getAbsolutePath() + File.separator + file)) {
+                    int len;
+                    while ((len = in.read(buffer)) > 0) {
+                        jarOutputStream.write(buffer, 0, len);
+                    }
                 }
-
-                in.close();
             }
 
             jarOutputStream.closeEntry();
-            jarOutputStream.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
