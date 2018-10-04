@@ -61,13 +61,12 @@ public class GitController {
                 Runtime runtime = Runtime.getRuntime();
                 Process process = runtime.exec(command, null, directory);
 
-                String line;
-                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                while ((line = input.readLine()) != null) {
-                    stringBuilder.append(line);
+                try (BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = input.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
                 }
-
-                input.close();
 
                 this.mainGUI.updateLoading(0, 1);
                 this.mainGUI.setStatusText(null);
@@ -110,7 +109,7 @@ public class GitController {
 
         String str = new String(Files.readAllBytes(gitIndexFile.toPath()));
 
-        return "".equals(str) ? new GitIndex(new HashMap<>()) : this.gson.fromJson(str, GitIndex.class);
+        return str.isEmpty() ? new GitIndex(new HashMap<>()) : this.gson.fromJson(str, GitIndex.class);
     }
 
     public void getVersion(Consumer<String> result) {
@@ -208,12 +207,7 @@ public class GitController {
         Main main = this.mainGUI.getMain();
         File inputImage = new File(main.getInputImage());
         if (inputImage.isFile()) {
-            try {
-                throw new Exception("Tried to get relative class not in the input image path!");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            new Exception("Tried to get relative class not in the input image path!").printStackTrace();
             return "";
         }
 
@@ -237,7 +231,7 @@ public class GitController {
     }
 
     public void setRemoteOrigin(String url) {
-        if (url == null || "".equals(url)) {
+        if (url == null || url.isEmpty()) {
             System.out.println("Error: No URL for remote origin found");
             this.mainGUI.setHaveError();
             return;
@@ -261,7 +255,7 @@ public class GitController {
     }
 
     public void commit(String message) throws IOException {
-        if (message == null || "".equals(message)) {
+        if (message == null || message.isEmpty()) {
             System.out.println("Error: No commit message found");
             this.mainGUI.setHaveError();
             return;

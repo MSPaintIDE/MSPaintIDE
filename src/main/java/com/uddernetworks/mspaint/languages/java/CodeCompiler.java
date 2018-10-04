@@ -30,6 +30,7 @@ public class CodeCompiler {
 
     public class MyDiagnosticListener implements DiagnosticListener<JavaFileObject> {
 
+        @Override
         public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
             String packageName = diagnostic.getSource().getName().substring(1).replace("/", ".");
             packageName = packageName.substring(0, packageName.length() - 5);
@@ -48,7 +49,7 @@ public class CodeCompiler {
         }
     }
 
-    public class InMemoryJavaFileObject extends SimpleJavaFileObject {
+    public static class InMemoryJavaFileObject extends SimpleJavaFileObject {
         private String contents;
 
         private InMemoryJavaFileObject(String className, String contents) {
@@ -57,6 +58,7 @@ public class CodeCompiler {
             this.contents = contents;
         }
 
+        @Override
         public CharSequence getCharContent(boolean ignoreEncodingErrors) {
             return contents;
         }
@@ -92,12 +94,9 @@ public class CodeCompiler {
 
     private void runIt(String classPackage, String className) {
         try {
-            URL url = classOutputFolder.toURL();
-            URL[] urls = new URL[]{url};
+            classLoaders.add(new URLClassLoader(new URL[]{classOutputFolder.toURI().toURL()}));
 
-            classLoaders.add(new URLClassLoader(urls));
-
-            Class thisClass = classLoaders.get(classLoaders.size() - 1).loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
+            Class<?> thisClass = classLoaders.get(classLoaders.size() - 1).loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
 
             Object instance = thisClass.newInstance();
             Method thisMethod = thisClass.getDeclaredMethod("main", String[].class);
@@ -154,7 +153,7 @@ public class CodeCompiler {
 
         compile(filesList, libs);
 
-        compilerOut.println("Compiled in " + String.valueOf((System.currentTimeMillis() - start)) + "ms");
+        compilerOut.println("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         compilerOut.println("Packaging jar...");
@@ -225,18 +224,17 @@ public class CodeCompiler {
                 copyFolder(srcFile, destFile);
             }
         } else {
-            InputStream in = new FileInputStream(src);
-            OutputStream out = new FileOutputStream(dest);
+            try (InputStream in = new FileInputStream(src)) {
+                try (OutputStream out = new FileOutputStream(dest)) {
 
-            byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[1024];
 
-            int length;
-            while ((length = in.read(buffer)) > 0) {
-                out.write(buffer, 0, length);
+                    int length;
+                    while ((length = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, length);
+                    }
+                }
             }
-
-            in.close();
-            out.close();
         }
     }
 

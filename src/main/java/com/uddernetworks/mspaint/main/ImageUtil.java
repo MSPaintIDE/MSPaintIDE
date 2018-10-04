@@ -80,8 +80,7 @@ public class ImageUtil {
     }
 
     private static boolean checkingPoint(List<Point> points, int x, int y) {
-        if (points == null) return true;
-        return points.stream().noneMatch(point -> point.getX() == x && point.getY() == y);
+        return points == null || points.stream().noneMatch(point -> point.getX() == x && point.getY() == y);
     }
 
     public static int getWidth(BufferedImage image) {

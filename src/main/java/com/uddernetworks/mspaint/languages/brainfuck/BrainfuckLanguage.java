@@ -11,10 +11,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class BrainfuckLanguage implements Language {
 
@@ -74,7 +72,7 @@ public class BrainfuckLanguage implements Language {
             String error = check(multiLineBlock);
 
             if (error != null) {
-                errors.put(imageClass, Arrays.asList(new BrainfuckError(multiLineBlock.getLine() + 1, multiLineBlock.getCharacter() + 1, imageClass.getInputImage().getName(), error)));
+                errors.put(imageClass, Collections.singletonList(new BrainfuckError(multiLineBlock.getLine() + 1, multiLineBlock.getCharacter() + 1, imageClass.getInputImage().getName(), error)));
 
                 compilerOut.println("Error on " + imageClass.getInputImage().getName() + " [" + multiLineBlock.getLine() + ":" + multiLineBlock.getCharacter() + "] " + error);
 
@@ -118,37 +116,46 @@ public class BrainfuckLanguage implements Language {
 
         int l = 0;
         for (int i = 0; i < code.length(); i++) {
-            if (code.charAt(i) == '>') {
-                dataPointer = (dataPointer == LENGTH - 1) ? 0 : dataPointer + 1;
-            } else if (code.charAt(i) == '<') {
-                dataPointer = (dataPointer == 0) ? LENGTH - 1 : dataPointer - 1;
-            } else if (code.charAt(i) == '+') {
-                mem[dataPointer]++;
-            } else if (code.charAt(i) == '-') {
-                mem[dataPointer]--;
-            } else if (code.charAt(i) == '.') {
-                if (mem[dataPointer] != 0) System.out.print((char) mem[dataPointer]);
-            } else if (code.charAt(i) == ',') {
-                mem[dataPointer] = (byte) (input.length() <= lastInput ? 0 : input.charAt(lastInput++));
-            } else if (code.charAt(i) == '[') {
-                if (mem[dataPointer] == 0) {
-                    i++;
-                    while (l > 0 || code.charAt(i) != ']') {
-                        if (code.charAt(i) == '[') l++;
-                        if (code.charAt(i) == ']') l--;
+            switch (code.charAt(i)) {
+                case '>':
+                    dataPointer = (dataPointer == LENGTH - 1) ? 0 : dataPointer + 1;
+                    break;
+                case '<':
+                    dataPointer = (dataPointer == 0) ? LENGTH - 1 : dataPointer - 1;
+                    break;
+                case '+':
+                    mem[dataPointer]++;
+                    break;
+                case '-':
+                    mem[dataPointer]--;
+                    break;
+                case '.':
+                    if (mem[dataPointer] != 0) System.out.print((char) mem[dataPointer]);
+                    break;
+                case ',':
+                    mem[dataPointer] = (byte) (input.length() <= lastInput ? 0 : input.charAt(lastInput++));
+                    break;
+                case '[':
+                    if (mem[dataPointer] == 0) {
                         i++;
+                        while (l > 0 || code.charAt(i) != ']') {
+                            if (code.charAt(i) == '[') l++;
+                            if (code.charAt(i) == ']') l--;
+                            i++;
+                        }
                     }
-                }
-            } else if (code.charAt(i) == ']') {
-                if (mem[dataPointer] != 0) {
-                    i--;
-                    while (l > 0 || code.charAt(i) != '[') {
-                        if (code.charAt(i) == ']') l++;
-                        if (code.charAt(i) == '[') l--;
+                    break;
+                case ']':
+                    if (mem[dataPointer] != 0) {
+                        i--;
+                        while (l > 0 || code.charAt(i) != '[') {
+                            if (code.charAt(i) == ']') l++;
+                            if (code.charAt(i) == '[') l--;
+                            i--;
+                        }
                         i--;
                     }
-                    i--;
-                }
+                    break;
             }
         }
     }

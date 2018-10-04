@@ -28,7 +28,7 @@ public class ImageIndex {
                 this.directory.mkdirs();
 
                 for (String line : IOUtils.toString(ImageIndex.class.getResourceAsStream("/letters/index.txt")).split("\n")) {
-                    if ("".equals(line)) continue;
+                    if (line.isEmpty()) continue;
                     String[] spaceSplit = line.split("\\s+");
                     String filename = spaceSplit[0];
                     filename = filename.substring(1, filename.length() - 1);

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,7 +41,7 @@ public class ImageCompare {
             if (objectFile != null && !objectFile.exists() && !objectFile.isFile()) {
                 try {
                     readFromFile = objectFile.createNewFile();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                     readFromFile = false;
                 }
             }
@@ -102,7 +103,10 @@ public class ImageCompare {
                 }
 
                 executor.shutdown();
-                while (!executor.isTerminated()) {}
+                if (!executor.awaitTermination(1, TimeUnit.HOURS)) {
+                    int count = executor.shutdownNow().size();
+                    System.out.println("Warning: had to terminate " + count + " tasks");
+                }
 
                 while (true) {
                     if (waitingFor.get() == 0) {
@@ -117,22 +121,17 @@ public class ImageCompare {
                 if (saveCaches) {
                     if (mainGUI != null) mainGUI.setStatusText("Saving to cache file...");
 
-                    FileOutputStream fos = new FileOutputStream(objectFile);
-                    ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-                    oos.writeObject(grid);
-
-                    oos.close();
-                    fos.close();
+                    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(objectFile))) {
+                        oos.writeObject(grid);
+                    }
                 }
 
                 loading.set(false);
                 loadingBarThread.join();
             } else {
-                FileInputStream fi = new FileInputStream(objectFile);
-                ObjectInputStream oi = new ObjectInputStream(fi);
-
-                grid = (LetterGrid) oi.readObject();
+                try (ObjectInputStream oi = new ObjectInputStream(new FileInputStream(objectFile))) {
+                    grid = (LetterGrid) oi.readObject();
+                }
             }
 
             if (mainGUI != null) {
@@ -166,13 +165,12 @@ public class ImageCompare {
                 BufferedImage subImage = image.getSubimage(currentX, currentY, searching.getWidth(), searching.getHeight());
                 if (identifier.equals("\'")) {
                     int topRightX = currentX + searching.getWidth();
-                    int topRightY = currentY;
 
                     boolean matches = true;
 
                     for (int i = 0; i < 3; i++) {
-                        if (isInBounds(image, topRightX + i, topRightY)) {
-                            Color color = new Color(image.getRGB(topRightX + i, topRightY));
+                        if (isInBounds(image, topRightX + i, currentY)) {
+                            Color color = new Color(image.getRGB(topRightX + i, currentY));
                             if (!(color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
                                 matches = false;
                             }
@@ -182,8 +180,8 @@ public class ImageCompare {
                     }
 
                     for (int i = 0; i < 2; i++) {
-                        if (isInBounds(image, topRightX + i, topRightY + 1)) {
-                            Color color = new Color(image.getRGB(topRightX + i, topRightY + 1));
+                        if (isInBounds(image, topRightX + i, currentY + 1)) {
+                            Color color = new Color(image.getRGB(topRightX + i, currentY + 1));
                             if (!(color.getRed() == 0 && color.getGreen() == 0 && color.getBlue() == 0)) {
                                 matches = false;
                             }

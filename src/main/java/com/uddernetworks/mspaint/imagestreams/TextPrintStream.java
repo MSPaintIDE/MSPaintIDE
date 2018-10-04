@@ -10,8 +10,8 @@ public class TextPrintStream extends OutputStream {
 
     private TextArea textArea;
     private PrintStream original;
-    private String last = "";
-    private StringBuilder builder = new StringBuilder();
+    private String last = ""; //TODO not used - probably bug?
+    private StringBuilder builder = new StringBuilder(); //TODO not used - probably bug?
 
     public TextPrintStream(TextArea textArea, PrintStream original) {
         this.textArea = textArea;

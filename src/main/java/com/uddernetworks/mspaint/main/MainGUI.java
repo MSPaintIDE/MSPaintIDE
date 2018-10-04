@@ -122,7 +122,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXButton remoteOriginVisibility;
     @FXML
-    private JFXComboBox languageComboBox;
+    private JFXComboBox<Language> languageComboBox;
 
     @FXML
     private TextArea output;
@@ -452,9 +452,7 @@ public class MainGUI extends Application implements Initializable {
             }
         });
 
-        createRepo.setOnAction(event -> {
-            this.gitController.gitInit(new File(main.getInputImage()));
-        });
+        createRepo.setOnAction(event -> this.gitController.gitInit(new File(main.getInputImage())));
 
         addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileChoser(new File(main.getInputImage()), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
             try {
@@ -464,9 +462,7 @@ public class MainGUI extends Application implements Initializable {
             }
         }));
 
-        addRemote.setOnAction(event -> {
-            this.gitController.setRemoteOrigin(originURL.getText());
-        });
+        addRemote.setOnAction(event -> this.gitController.setRemoteOrigin(originURL.getText()));
 
         commit.setOnAction(event -> {
             try {
@@ -476,11 +472,9 @@ public class MainGUI extends Application implements Initializable {
             }
         });
 
-        push.setOnAction(event -> {
-            this.gitController.push();
-        });
+        push.setOnAction(event -> this.gitController.push());
 
-        inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().equals("") ? null : new File(inputName.getText())));
+        inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().isEmpty() ? null : new File(inputName.getText())));
 
         changeInputImage.setOnAction(event -> {
             File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
@@ -490,7 +484,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        highlightedImage.textProperty().addListener(event -> main.setHighlightedFile(highlightedImage.getText().trim().equals("") ? null : new File(highlightedImage.getText())));
+        highlightedImage.textProperty().addListener(event -> main.setHighlightedFile(highlightedImage.getText().trim().isEmpty() ? null : new File(highlightedImage.getText())));
 
         changeHighlightImage.setOnAction(event -> {
             File selected = main.getHighlightedFile().isEmpty() ? main.getCurrentJar() : new File(main.getHighlightedFile());
@@ -500,7 +494,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        cacheFile.textProperty().addListener(event -> main.setObjectFile(cacheFile.getText().trim().equals("") ? null : new File(cacheFile.getText())));
+        cacheFile.textProperty().addListener(event -> main.setObjectFile(cacheFile.getText().trim().isEmpty() ? null : new File(cacheFile.getText())));
 
         changeCacheFile.setOnAction(event -> {
             File selected = main.getObjectFile().isEmpty() ? main.getCurrentJar() : new File(main.getObjectFile());
@@ -510,7 +504,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        classOutput.textProperty().addListener(event -> main.setClassOutput(classOutput.getText().trim().equals("") ? null : new File(classOutput.getText())));
+        classOutput.textProperty().addListener(event -> main.setClassOutput(classOutput.getText().trim().isEmpty() ? null : new File(classOutput.getText())));
 
         changeClassOutput.setOnAction(event -> {
             File selected = main.getClassOutput().isEmpty() ? main.getCurrentJar() : new File(main.getClassOutput());
@@ -520,7 +514,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        compiledJarOutput.textProperty().addListener(event -> main.setJarFile(compiledJarOutput.getText().trim().equals("") ? null : new File(compiledJarOutput.getText())));
+        compiledJarOutput.textProperty().addListener(event -> main.setJarFile(compiledJarOutput.getText().trim().isEmpty() ? null : new File(compiledJarOutput.getText())));
 
         changeCompiledJar.setOnAction(event -> {
             File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
@@ -530,7 +524,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        libraryFile.textProperty().addListener(event -> main.setLibraryFile(libraryFile.getText().trim().equals("") ? null : new File(libraryFile.getText())));
+        libraryFile.textProperty().addListener(event -> main.setLibraryFile(libraryFile.getText().trim().isEmpty() ? null : new File(libraryFile.getText())));
 
         changeLibraries.setOnAction(event -> {
             File selected = main.getLibraryFile().isEmpty() ? main.getCurrentJar() : new File(main.getLibraryFile());
@@ -540,7 +534,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        otherFiles.textProperty().addListener(event -> main.setOtherFiles(otherFiles.getText().trim().equals("") ? null : new File(otherFiles.getText())));
+        otherFiles.textProperty().addListener(event -> main.setOtherFiles(otherFiles.getText().trim().isEmpty() ? null : new File(otherFiles.getText())));
 
         changeOtherFiles.setOnAction(event -> {
             File selected = main.getOtherFiles().isEmpty() ? main.getCurrentJar() : new File(main.getOtherFiles());
@@ -550,7 +544,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        letterDirectory.textProperty().addListener(event -> main.setLetterDirectory(letterDirectory.getText().trim().equals("") ? null : new File(letterDirectory.getText())));
+        letterDirectory.textProperty().addListener(event -> main.setLetterDirectory(letterDirectory.getText().trim().isEmpty() ? null : new File(letterDirectory.getText())));
 
         changeLetterDir.setOnAction(event -> {
             File selected = main.getLetterDirectory().isEmpty() ? main.getCurrentJar() : new File(main.getLetterDirectory());
@@ -560,7 +554,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        compilerOutputValue.textProperty().addListener(event -> main.setCompilerOutput(compilerOutputValue.getText().trim().equals("") ? null : new File(compilerOutputValue.getText())));
+        compilerOutputValue.textProperty().addListener(event -> main.setCompilerOutput(compilerOutputValue.getText().trim().isEmpty() ? null : new File(compilerOutputValue.getText())));
 
         compilerOutput.setOnAction(event -> {
             File selected = main.getCompilerOutput().isEmpty() ? main.getCurrentJar() : new File(main.getCompilerOutput());
@@ -570,7 +564,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        programOutputValue.textProperty().addListener(event -> main.setAppOutput(programOutputValue.getText().trim().equals("") ? null : new File(programOutputValue.getText())));
+        programOutputValue.textProperty().addListener(event -> main.setAppOutput(programOutputValue.getText().trim().isEmpty() ? null : new File(programOutputValue.getText())));
 
         programOutput.setOnAction(event -> {
             File selected = main.getAppOutput().isEmpty() ? main.getCurrentJar() : new File(main.getAppOutput());
