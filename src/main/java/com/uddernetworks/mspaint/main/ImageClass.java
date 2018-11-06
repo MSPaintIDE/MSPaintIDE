@@ -3,35 +3,31 @@ package com.uddernetworks.mspaint.main;
 import com.uddernetworks.mspaint.highlighter.LetterFormatter;
 import com.uddernetworks.mspaint.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
-import com.uddernetworks.mspaint.ocr.LetterGrid;
+import com.uddernetworks.newocr.ScannedImage;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 public class ImageClass {
 
     private File inputImage;
-    private List<List<Letter>> letterGrid;
+    private ScannedImage scannedImage;
     private String text;
     private LetterFileWriter letterFileWriter;
-    private Map<String, BufferedImage> images;
     private File highlightedFile;
     private MainGUI mainGUI;
 
-    public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, Map<String, BufferedImage> images, boolean useProbe, boolean useCaches, boolean saveCaches) {
+    public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, boolean useCaches, boolean saveCaches) {
         this.inputImage = inputImage;
         this.mainGUI = mainGUI;
-        this.images = images;
 
-        File objectFile = objectFileDir != null ? new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.txt") : null;
+        File objectFile = objectFileDir != null ? new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.json") : null;
 
-        scan(images, objectFile, useProbe, useCaches, saveCaches);
+        scan(objectFile, useCaches, saveCaches);
     }
 
-    public void scan(Map<String, BufferedImage> images, File objectFile, boolean useProbe, boolean useCaches, boolean saveCaches) {
+    public void scan(File objectFile,  boolean useCaches, boolean saveCaches) {
         System.out.println("Scanning image " + inputImage.getName() + "...");
         final String prefix = "[" + inputImage.getName() + "] ";
 
@@ -41,11 +37,9 @@ public class ImageClass {
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        LetterGrid grid = imageCompare.getText(inputImage, objectFile, mainGUI, images, useProbe, !modifiedDetector.imageChanged() && useCaches, saveCaches);
+        scannedImage = imageCompare.getText(inputImage, objectFile, mainGUI, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
-        text = grid.getPrettyString();
-
-        letterGrid = grid.getLetterGridArray();
+        text = scannedImage.getPrettyString();
 
         System.out.println("\n" + prefix + "text =\n" + text);
 
@@ -68,7 +62,7 @@ public class ImageClass {
         System.out.println(prefix + "Modifying letters...");
         start = System.currentTimeMillis();
 
-        LetterFormatter letterFormatter = new LetterFormatter(letterGrid);
+        LetterFormatter letterFormatter = new LetterFormatter(scannedImage);
         letterFormatter.formatLetters(highlighted);
 
         System.out.println(prefix + "Finished modifying letters in " + (System.currentTimeMillis() - start) + "ms");
@@ -77,8 +71,8 @@ public class ImageClass {
         start = System.currentTimeMillis();
 
 
-        letterFileWriter = new LetterFileWriter(letterGrid, inputImage, highlightedFile);
-        letterFileWriter.writeToFile(images);
+        letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
+        letterFileWriter.writeToFile();
 
         System.out.println(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -91,15 +85,15 @@ public class ImageClass {
         return highlightedFile;
     }
 
-    public List<List<Letter>> getLetterGrid() {
-        return letterGrid;
-    }
-
     public String getText() {
         return text;
     }
 
     public File getInputImage() {
         return this.inputImage;
+    }
+
+    public ScannedImage getScannedImage() {
+        return this.scannedImage;
     }
 }

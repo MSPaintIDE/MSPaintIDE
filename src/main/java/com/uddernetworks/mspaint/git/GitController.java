@@ -1,12 +1,10 @@
 package com.uddernetworks.mspaint.git;
 
 import com.google.gson.Gson;
-import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.main.ImageClass;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ModifiedDetector;
-import com.uddernetworks.mspaint.ocr.ImageIndex;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -147,7 +145,7 @@ public class GitController {
         }).collect(Collectors.toList());
 
         imageFiles.forEach(file ->
-                moveOrScan(file, null, true, gitIndex, getImageIndex(), (addingFile, relative) ->
+                moveOrScan(file, null, true, gitIndex, (addingFile, relative) ->
                         runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", false, getGitFolder(), result ->
                                 System.out.println("Finished adding " + relative))));
 
@@ -157,13 +155,13 @@ public class GitController {
         System.out.println("Finished adding " + imageFiles.size() + " file" + (imageFiles.size() > 1 ? "s" : ""));
     }
 
-    private void moveOrScan(File file, File source, boolean addToIndex, GitIndex gitIndex, Map<String, BufferedImage> images, BiConsumer<File, String> result) {
+    private void moveOrScan(File file, File source, boolean addToIndex, GitIndex gitIndex, BiConsumer<File, String> result) {
         Main main = this.mainGUI.getMain();
         try {
             File addingFile;
             String relative = getRelativeClass(file);
             if (file.getName().endsWith(".png")) {
-                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, images, main.getCurrentLanguage() instanceof JavaLanguage && this.mainGUI.shouldUseProbe(), this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
+                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
                 relative = relative.replace(".png", ".java");
 
                 if (source == null) {
@@ -192,15 +190,6 @@ public class GitController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private Map<String, BufferedImage> getImageIndex() {
-        if (this.images == null) {
-            ImageIndex imageIndex = new ImageIndex(new File(this.mainGUI.getMain().getLetterDirectory()));
-            this.images = imageIndex.index();
-        }
-
-        return this.images;
     }
 
     private String getRelativeClass(File file) {
@@ -269,7 +258,7 @@ public class GitController {
             ModifiedDetector modifiedDetector = new ModifiedDetector(imageFile, sourceFile);
 
             if (modifiedDetector.imageChanged()) {
-                moveOrScan(imageFile, sourceFile, false, null, getImageIndex(), (addingFile, relative) ->
+                moveOrScan(imageFile, sourceFile, false, null, (addingFile, relative) ->
                         System.out.println("Moved/scanned file " + relative));
             }
         });

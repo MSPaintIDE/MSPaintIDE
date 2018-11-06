@@ -5,7 +5,6 @@ import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
 import com.uddernetworks.mspaint.languages.Language;
-import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -19,10 +18,14 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -56,8 +59,6 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXTextField otherFiles;
     @FXML
-    private JFXTextField letterDirectory;
-    @FXML
     private JFXTextField compilerOutputValue;
     @FXML
     private JFXTextField programOutputValue;
@@ -82,8 +83,6 @@ public class MainGUI extends Application implements Initializable {
     private JFXButton changeLibraries;
     @FXML
     private JFXButton changeOtherFiles;
-    @FXML
-    private JFXButton changeLetterDir;
     @FXML
     private JFXButton compilerOutput;
     @FXML
@@ -112,8 +111,6 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXCheckBox execute;
     @FXML
-    private JFXCheckBox useProbe;
-    @FXML
     private JFXCheckBox useCaches;
     @FXML
     private JFXCheckBox saveCaches;
@@ -129,6 +126,9 @@ public class MainGUI extends Application implements Initializable {
 
     @FXML
     private AnchorPane rootAnchor;
+
+    @FXML
+    private MenuBar menu;
 
     private Main main;
     private Stage primaryStage;
@@ -153,6 +153,7 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException {
+        System.out.println("MainGUI.main");
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);
@@ -188,6 +189,7 @@ public class MainGUI extends Application implements Initializable {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
+        System.out.println("START");
         primaryStage.initStyle(StageStyle.UNDECORATED);
 
         primaryStage.setMinWidth(1000);
@@ -231,6 +233,12 @@ public class MainGUI extends Application implements Initializable {
         Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
 
+        System.out.println("111111111111111111111");
+        System.out.println(scene.getStylesheets());
+        scene.getStylesheets().forEach(sheet -> {
+            System.out.println("sheet = " + sheet);
+        });
+
         primaryStage.setScene(scene);
 
         primaryStage.setTitle("MS Paint IDE");
@@ -260,7 +268,7 @@ public class MainGUI extends Application implements Initializable {
                 progress.getStyleClass().remove("progressError");
 
                 long start = System.currentTimeMillis();
-                if (main.indexAll(useProbe.isSelected(), useCaches.isSelected(), saveCaches.isSelected()) == -1) return;
+                if (main.indexAll(useCaches.isSelected(), saveCaches.isSelected()) == -1) return;
 
                 if (syntaxHighlight.isSelected()) {
                     main.highlightAll();
@@ -279,10 +287,6 @@ public class MainGUI extends Application implements Initializable {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    public boolean shouldUseProbe() {
-        return this.useProbe.isSelected();
     }
 
     public boolean shouldUseCaches() {
@@ -330,7 +334,6 @@ public class MainGUI extends Application implements Initializable {
         libraryFile.setText(main.getLibraryFile());
         otherFiles.setText(main.getOtherFiles());
         classOutput.setText(main.getClassOutput());
-        letterDirectory.setText(main.getLetterDirectory());
         compilerOutputValue.setText(main.getCompilerOutput());
         programOutputValue.setText(main.getAppOutput());
     }
@@ -346,7 +349,7 @@ public class MainGUI extends Application implements Initializable {
     public void updateTheme() {
         if (this.initialized.get()) {
             Platform.runLater(() -> {
-                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
+                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent().getParent();
                 parent.lookupAll(".theme-text").forEach(node -> {
                     if (this.darkTheme) {
                         node.getStyleClass().add("dark-text");
@@ -361,12 +364,14 @@ public class MainGUI extends Application implements Initializable {
                     parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
                     parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
                     parent.lookup(".language-selection").getStyleClass().add("language-selection-dark");
+                    this.menu.getStyleClass().add("menubar-dark");
                 } else {
                     parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
                     parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
                     parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
                     parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
                     parent.lookup(".language-selection").getStyleClass().remove("language-selection-dark");
+                    this.menu.getStyleClass().remove("menubar-dark");
                 }
             });
         }
@@ -380,6 +385,14 @@ public class MainGUI extends Application implements Initializable {
         return this.main.getCurrentLanguage();
     }
 
+    private static DropShadow[] depth = new DropShadow[] {
+            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0), 0, 0, 0, 0),
+            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 10, 0.12, -1, 2),
+            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 15, 0.16, 0, 4),
+            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 20, 0.19, 0, 6),
+            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 25, 0.25, 0, 8),
+            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 30, 0.30, 0, 10)};
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -387,6 +400,13 @@ public class MainGUI extends Application implements Initializable {
         setGitFeaturesDisabled(true);
         this.initialized.set(true);
         this.languageComboBox.setItems(languages);
+        int level = 1;
+        this.menu.setEffect(new DropShadow(BlurType.GAUSSIAN,
+                depth[level].getColor(),
+                depth[level].getRadius(),
+                depth[level].getSpread(),
+                depth[level].getOffsetX(),
+                depth[level].getOffsetY()));
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 
@@ -440,7 +460,6 @@ public class MainGUI extends Application implements Initializable {
             Language language = (Language) languageComboBox.getSelectionModel().getSelectedItem();
             this.main.setCurrentLanguage(language);
             compile.setDisable(language.isInterpreted());
-            useProbe.setDisable(!(language instanceof JavaLanguage));
         });
 
         this.gitController.getVersion(gitVersion -> {
@@ -541,16 +560,6 @@ public class MainGUI extends Application implements Initializable {
             FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 otherFiles.setText(file.getAbsolutePath());
                 main.setOtherFiles(file);
-            });
-        });
-
-        letterDirectory.textProperty().addListener(event -> main.setLetterDirectory(letterDirectory.getText().trim().isEmpty() ? null : new File(letterDirectory.getText())));
-
-        changeLetterDir.setOnAction(event -> {
-            File selected = main.getLetterDirectory().isEmpty() ? main.getCurrentJar() : new File(main.getLetterDirectory());
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
-                letterDirectory.setText(file.getAbsolutePath());
-                main.setLetterDirectory(file);
             });
         });
 

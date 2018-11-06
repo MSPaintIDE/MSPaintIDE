@@ -1,0 +1,139 @@
+.root {
+    -fx-font-family: "Montserrat";
+    -fx-font-smoothing-type: gray;
+}
+
+.jfx-progress-bar > .track {
+    -fx-background-color: #E0E0E0;
+}
+
+.jfx-progress-bar > .bar {
+    -fx-background-color: #5472d3;
+}
+
+.progressError > .bar {
+    -fx-background-color: #c62828 !important;
+}
+
+.jfx-decorator {
+    -fx-decorator-color: #5472d3;
+    -fx-decorator-color: #5472d3;
+}
+
+.jfx-decorator .jfx-decorator-buttons-container {
+    -fx-background-color: #5472d3;
+}
+
+.jfx-decorator .resize-border {
+    -fx-border-color: #5472d3;
+    -fx-border-width: 0 4 4 4;
+}
+
+.unrounded {
+    border-radius: 10px !important;
+}
+
+.invert-colors {
+    -fx-background-image: url(icons/invert_colors/baseline_invert_colors_black_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.invert-colors-white {
+    -fx-background-image: url(icons/invert_colors/baseline_invert_colors_white_18dp.png);
+    -fx-background-size: 30px 30px;
+}
+
+.remote-origin-visibility {
+    -fx-background-image: url(icons/visibility/baseline_visibility_black_18dp.png);
+    -fx-background-size: 30px 30px;
+
+    &.dark {
+        -fx-background-image: url(icons/visibility/baseline_visibility_white_18dp.png);
+        -fx-background-size: 30px 30px;
+    }
+
+    &.off {
+        -fx-background-image: url(icons/visibility/baseline_visibility_off_black_18dp.png);
+        -fx-background-size: 30px 30px;
+    }
+
+    &.dark.off {
+        -fx-background-image: url(icons/visibility/baseline_visibility_off_white_18dp.png);
+        -fx-background-size: 30px 30px;
+    }
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.gridpane-theme-dark {
+    -fx-background-color: #424242;
+    -fx-text-fill: white;
+}
+
+.output-theme-dark {
+    -fx-background-color: #616161;
+    -fx-border-color: #616161 !important;
+    -fx-text-fill: white;
+
+    .content {
+        -fx-background-color: #616161;
+        -fx-border-color: #616161 !important;
+    }
+}
+
+.dark-text {
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: WHITE;
+    -jfx-unfocus-color: WHITE;
+}
+
+.language-selection-dark {
+    -fx-background-color: #424242;
+    -fx-border-color: #424242;
+    -fx-text-fill: white;
+
+    .list-view, .language-selection-dark .list-cell {
+        -fx-background-color: #616161;
+        -fx-border-color: #616161;
+        -fx-text-fill: white;
+    }
+
+    .list-cell {
+        -fx-cursor: hand;
+    }
+
+    .list-cell:focused, & .list-cell:hover {
+        -fx-background-color: #424242;
+        -fx-border-color: #424242;
+    }
+}
+
+.menubar-theme.menu-bar {
+    -fx-background-color: orange;
+
+    & .label {
+        -fx-text-fill: blue;
+    }
+
+    & .label:hover {
+        -fx-background-color: yellow;
+    }
+
+    &:focused {
+        -fx-background-color: green;
+    }
+
+    &:focused .label {
+        -fx-text-fill: red;
+    }
+
+    &.context-menu {
+        -fx-skin: "com.sun.javafx.scene.control.skin.ContextMenuSkin";
+        -fx-background-color: black;
+        -fx-background-insets: 0, 1, 2;
+        -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
+        -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
+    }
+}

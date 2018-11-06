@@ -1,31 +1,32 @@
 package com.uddernetworks.mspaint.highlighter;
 
-import com.uddernetworks.mspaint.main.Letter;
+import com.uddernetworks.newocr.ImageLetter;
+import com.uddernetworks.newocr.ScannedImage;
 
 import java.awt.*;
 import java.util.List;
 
 public class LetterFormatter {
 
-    private List<List<Letter>> letters;
+    private ScannedImage scannedImage;
 
-    public LetterFormatter(List<List<Letter>> letters) {
-        this.letters = letters;
+    public LetterFormatter(ScannedImage scannedImage) {
+        this.scannedImage = scannedImage;
     }
 
     public void formatLetters(String text) {
         String[] lines = text.split("\n");
 
-        for (int i = 0; i < lines.length; i++) {
-            if (letters.size() <= i) continue;
-            List<Letter> letterRow = letters.get(i);
+        for (int y = 0; y < lines.length; y++) {
+//            if (scannedImage.getLine(y).size() <= y) continue;
+            List<ImageLetter> colorWrapperRow = scannedImage.getLine(y);
 
-            String line = lines[i].trim();
+            String line = lines[y].trim();
 
             String[] nums = line.split(",");
 
             for (int j = 0; j < nums.length; j++)
-                letterRow.get(j).setColor(new Color(Integer.valueOf(nums[j])));
+                colorWrapperRow.get(j).setData(new Color(Integer.valueOf(nums[j])));
         }
     }
 }

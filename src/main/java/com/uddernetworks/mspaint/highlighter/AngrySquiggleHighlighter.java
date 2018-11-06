@@ -1,7 +1,8 @@
 package com.uddernetworks.mspaint.highlighter;
 
 import com.uddernetworks.mspaint.languages.LanguageError;
-import com.uddernetworks.mspaint.main.Letter;
+import com.uddernetworks.newocr.ImageLetter;
+import com.uddernetworks.newocr.ScannedImage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,15 +17,15 @@ public class AngrySquiggleHighlighter {
     private int extraSquigglePadding;
     private BufferedImage squiggleImage;
     private File highlightedFile;
-    private List<List<Letter>> grid;
+    private ScannedImage scannedImage;
     private List<LanguageError> errors;
 
-    public AngrySquiggleHighlighter(BufferedImage image, int extraSquigglePadding, File squiggleFile, File highlightedFile, List<List<Letter>> grid, List<LanguageError> errors) throws IOException {
+    public AngrySquiggleHighlighter(BufferedImage image, int extraSquigglePadding, File highlightedFile, ScannedImage scannedImage, List<LanguageError> errors) throws IOException {
         this.image = image;
         this.extraSquigglePadding = extraSquigglePadding;
-        this.squiggleImage = ImageIO.read(squiggleFile);
+        this.squiggleImage = ImageIO.read(getClass().getClassLoader().getResourceAsStream("angry_squiggle.png"));
         this.highlightedFile = highlightedFile;
-        this.grid = grid;
+        this.scannedImage = scannedImage;
         this.errors = errors;
     }
 
@@ -63,27 +64,27 @@ public class AngrySquiggleHighlighter {
     private int[] getLineAndLength(int lineNumber, int columnNumber) {
         int[] ret = new int[3]; // X index, Y index, length
 
-        Letter startLetter = null;
-        Letter lastLetter = null;
+        ImageLetter startLetter = null;
+        ImageLetter lastLetter = null;
         int index = 0;
-        for (Letter letter : grid.get(lineNumber - 1)) {
-            if (letter == null) continue;
+        for (ImageLetter colorWrapper : scannedImage.getLine(lineNumber - 1)) {
+            if (colorWrapper == null) continue;
             index++;
 
             if (columnNumber != -1) {
                 if (index == columnNumber) {
-                    ret[0] = letter.getX();
-                    ret[1] = letter.getY() + 21;
+                    ret[0] = colorWrapper.getX();
+                    ret[1] = colorWrapper.getY() + 21;
                     ret[2] = columnNumber;
                     break;
                 }
             }
 
             if (startLetter == null) {
-                if (!letter.getLetter().equals(" ")) startLetter = letter;
+                if (colorWrapper.getLetter() != ' ') startLetter = colorWrapper;
             }
 
-            lastLetter = letter;
+            lastLetter = colorWrapper;
         }
 
         if (columnNumber == -1) {

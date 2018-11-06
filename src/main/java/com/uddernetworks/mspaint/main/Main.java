@@ -8,7 +8,7 @@ import com.uddernetworks.mspaint.languages.LanguageManager;
 import com.uddernetworks.mspaint.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.languages.python.PythonLanguage;
-import com.uddernetworks.mspaint.ocr.ImageIndex;
+import com.uddernetworks.newocr.DatabaseManager;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -32,7 +32,6 @@ public class Main {
     private File otherFiles = null;
     private File compilerOutput = null;
     private File appOutput = null;
-    private File letterDirectory = null;
 
     private File parent;
     private File currentJar;
@@ -43,9 +42,11 @@ public class Main {
 
     private LanguageManager languageManager = new LanguageManager();
     private Language currentLanguage;
+    private DatabaseManager databaseManager;
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         this.mainGUI = mainGUI;
+        this.databaseManager = new DatabaseManager(System.getenv("database.url"), System.getenv("database.user"), System.getenv("database.pass"));
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
@@ -80,7 +81,6 @@ public class Main {
         otherFiles = getProperty(properties, "otherFiles");
         compilerOutput = getProperty(properties, "compilerOutput");
         appOutput = getProperty(properties, "appOutput");
-        letterDirectory = getProperty(properties, "letterDirectory");
 
         this.mainGUI.setDarkTheme(properties.getProperty("darkTheme", "false").equals("true"));
         this.mainGUI.updateTheme();
@@ -103,7 +103,6 @@ public class Main {
         properties.setProperty("otherFiles", getOtherFiles());
         properties.setProperty("compilerOutput", getCompilerOutput());
         properties.setProperty("appOutput", getAppOutput());
-        properties.setProperty("letterDirectory", getLetterDirectory());
         properties.setProperty("darkTheme", String.valueOf(this.mainGUI.useDarkTheme()));
 
         try {
@@ -121,17 +120,10 @@ public class Main {
     }
 
     private boolean optionsNotFilled() {
-        return inputImage == null || classOutput == null || compilerOutput == null || appOutput == null || letterDirectory == null;
+        return inputImage == null || classOutput == null || compilerOutput == null || appOutput == null;
     }
 
-    public int indexAll(boolean useProbe, boolean useCaches, boolean saveCaches) {
-        if (this.letterDirectory == null) {
-            File localMSPaintIDE = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
-            if (localMSPaintIDE.exists()) {
-                this.letterDirectory = new File(localMSPaintIDE, "letters");
-            }
-        }
-
+    public int indexAll(boolean useCaches, boolean saveCaches) {
         if (optionsNotFilled()) {
             System.err.println("Please select files for all options");
             mainGUI.setHaveError();
@@ -143,17 +135,17 @@ public class Main {
 
         mainGUI.setStatusText("Indexing letters...");
 
-        ImageIndex imageIndex = new ImageIndex(letterDirectory);
-        images = imageIndex.index();
-
         mainGUI.setStatusText(null);
 
         if (inputImage.isDirectory()) {
+            System.out.println("Found directory: " + inputImage.getAbsolutePath());
             for (File imageFile : getFilesFromDirectory(inputImage, this.currentLanguage.getFileExtensions(), "png")) {
-                imageClasses.add(new ImageClass(imageFile, objectFile, mainGUI, images, useProbe, useCaches, saveCaches));
+                System.out.println("2 Adding non directory: " + imageFile.getAbsolutePath());
+                imageClasses.add(new ImageClass(imageFile, objectFile, mainGUI, useCaches, saveCaches));
             }
         } else {
-            imageClasses.add(new ImageClass(inputImage, objectFile, mainGUI, images, useProbe, useCaches, saveCaches));
+            System.out.println("Adding non directory: " + inputImage.getAbsolutePath());
+            imageClasses.add(new ImageClass(inputImage, objectFile, mainGUI, useCaches, saveCaches));
         }
 
         mainGUI.setStatusText(null);
@@ -225,7 +217,7 @@ public class Main {
         mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
         for (ImageClass imageClass : errors.keySet()) {
-            AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, new File(letterDirectory.getAbsoluteFile(), "angry_squiggle.png"), imageClass.getHighlightedFile(), imageClass.getLetterGrid(), errors.get(imageClass));
+            AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
             highlighter.highlightAngrySquiggles();
         }
 
@@ -333,11 +325,6 @@ public class Main {
         saveOptions();
     }
 
-    public void setLetterDirectory(File letterDirectory) {
-        this.letterDirectory = letterDirectory;
-        saveOptions();
-    }
-
     public String getInputImage() {
         return (inputImage == null) ? "" : inputImage.getAbsolutePath();
     }
@@ -374,19 +361,11 @@ public class Main {
         return (appOutput == null) ? "" : appOutput.getAbsolutePath();
     }
 
-    public String getLetterDirectory() {
-        if (letterDirectory == null) {
-            File localMSPaintIDE = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
-            if (!localMSPaintIDE.exists()) return "";
-
-            File directory = new File(localMSPaintIDE, "letters");
-            return (directory.exists() && directory.isDirectory()) ? directory.getAbsolutePath() : "";
-        }
-
-        return letterDirectory.getAbsolutePath();
-    }
-
     public File getCurrentJar() {
         return currentJar;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }
