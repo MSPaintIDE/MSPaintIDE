@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.*?>
+<?import com.uddernetworks.mspaint.main.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.*?>
@@ -12,19 +13,22 @@
          <children>
             <MenuBar fx:id="menu" styleClass="menubar-theme">
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu mnemonicParsing="false" text="File" fx:id="fileMenu">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
+                    <CustomMenuItem mnemonicParsing="false" text="Test1" />
+                    <CustomMenuItem mnemonicParsing="false" text="Test2" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
+                    <CustomMenuItem mnemonicParsing="false" text="Test1" />
+                    <CustomMenuItem mnemonicParsing="false" text="Test2" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu mnemonicParsing="false" text="Git">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <CustomMenuItem mnemonicParsing="false" text="Test1"/>
+                    <CustomMenuItem mnemonicParsing="false" text="Test2" />
                   </items>
                 </Menu>
               </menus>
@@ -38,7 +42,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="855.0" vgrow="ALWAYS" />
                   </rowConstraints>
                   <children>
-                      <TextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" style="-fx-border-style: solid; -fx-border-radius: 0; -fx-border-color: white;" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
+                      <TextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
                           <opaqueInsets>
                               <Insets />
                           </opaqueInsets>

@@ -153,7 +153,6 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException {
-        System.out.println("MainGUI.main");
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);
@@ -189,7 +188,6 @@ public class MainGUI extends Application implements Initializable {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
-        System.out.println("START");
         primaryStage.initStyle(StageStyle.UNDECORATED);
 
         primaryStage.setMinWidth(1000);
@@ -233,7 +231,6 @@ public class MainGUI extends Application implements Initializable {
         Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
 
-        System.out.println("111111111111111111111");
         System.out.println(scene.getStylesheets());
         scene.getStylesheets().forEach(sheet -> {
             System.out.println("sheet = " + sheet);
@@ -401,12 +398,12 @@ public class MainGUI extends Application implements Initializable {
         this.initialized.set(true);
         this.languageComboBox.setItems(languages);
         int level = 1;
-        this.menu.setEffect(new DropShadow(BlurType.GAUSSIAN,
-                depth[level].getColor(),
-                depth[level].getRadius(),
-                depth[level].getSpread(),
-                depth[level].getOffsetX(),
-                depth[level].getOffsetY()));
+//        this.menu.setEffect(new DropShadow(BlurType.GAUSSIAN,
+//                depth[level].getColor(),
+//                depth[level].getRadius(),
+//                depth[level].getSpread(),
+//                depth[level].getOffsetX(),
+//                depth[level].getOffsetY()));
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 

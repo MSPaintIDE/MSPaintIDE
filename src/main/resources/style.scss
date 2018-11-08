@@ -1,6 +1,14 @@
+$left-background: #F4F4F4;
+$right-background: #FFFFFF;
+
+$left-background-dark: #424242;
+$right-background-dark: #616161;
+
 .root {
     -fx-font-family: "Montserrat";
     -fx-font-smoothing-type: gray;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
 
 .jfx-progress-bar > .track {
@@ -16,7 +24,6 @@
 }
 
 .jfx-decorator {
-    -fx-decorator-color: #5472d3;
     -fx-decorator-color: #5472d3;
 }
 
@@ -67,19 +74,23 @@
     -fx-background-color: transparent;
 }
 
+.gridpane-theme {
+    -fx-border-style: none;
+}
+
 .gridpane-theme-dark {
-    -fx-background-color: #424242;
+    -fx-background-color: $left-background-dark;
     -fx-text-fill: white;
 }
 
 .output-theme-dark {
-    -fx-background-color: #616161;
-    -fx-border-color: #616161 !important;
+    -fx-background-color: $right-background-dark;
+    -fx-border-color: $right-background-dark !important;
     -fx-text-fill: white;
 
     .content {
-        -fx-background-color: #616161;
-        -fx-border-color: #616161 !important;
+        -fx-background-color: $right-background-dark;
+        -fx-border-color: $right-background-dark !important;
     }
 }
 
@@ -90,13 +101,13 @@
 }
 
 .language-selection-dark {
-    -fx-background-color: #424242;
-    -fx-border-color: #424242;
+    -fx-background-color: $left-background-dark;
+    -fx-border-color: $left-background-dark;
     -fx-text-fill: white;
 
     .list-view, .language-selection-dark .list-cell {
-        -fx-background-color: #616161;
-        -fx-border-color: #616161;
+        -fx-background-color: $right-background-dark;
+        -fx-border-color: $right-background-dark;
         -fx-text-fill: white;
     }
 
@@ -105,35 +116,113 @@
     }
 
     .list-cell:focused, & .list-cell:hover {
-        -fx-background-color: #424242;
-        -fx-border-color: #424242;
+        -fx-background-color: $left-background-dark;
+        -fx-border-color: $left-background-dark;
     }
 }
 
-.menubar-theme.menu-bar {
-    -fx-background-color: orange;
+.output-text {
+    -fx-border-style: none;
+    -fx-border-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-insets: 0;
+    -fx-border-width: 0;
+}
 
-    & .label {
-        -fx-text-fill: blue;
+
+.menu-bar {
+    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
+    -fx-spacing: 0.166667em; /* 2 */
+    -fx-background-color: $left-background;
+    -fx-background-insets: 0, 0 0 0 0;
+    -fx-background-radius: 0, 0;
+    -fx-border-style: none;
+
+    > .container > .menu-button {
+        -fx-background-color: $left-background;
+        -fx-background-radius: 0;
+        -fx-background-insets: 0;
+
+        .label {
+            -fx-text-fill: black;
+        }
     }
 
-    & .label:hover {
-        -fx-background-color: yellow;
+    * > .context-menu {
+        $top-offset: 5px;
+        $vert-padding: 10px;
+
+        -fx-border-insets: $vert-padding 0 $vert-padding 0;
+        -fx-background-insets: $top-offset 0 $top-offset 0;
+        -fx-border-color: transparent;
+        -fx-border-style: solid none solid none;
     }
 
-    &:focused {
-        -fx-background-color: green;
+
+    &.menubar-dark {
+        -fx-background-color: $left-background-dark;
+        //-fx-border-insets: 0 0 1px 0; // top right bottom left
+        -fx-border-style: none none solid none;
+        -fx-border-width: 1px;
+        -fx-border-color: transparent transparent $right-background-dark transparent;
+
+        > .container > .menu-button {
+            -fx-background-color: $left-background-dark;
+
+            .label {
+                -fx-text-fill: white;
+            }
+        }
+
+        * > .context-menu {
+            -fx-background-color: $left-background-dark;
+            -fx-border-color: $left-background-dark;
+        }
+
+        & > *, .menu-item {
+            -fx-background-color: $left-background-dark;
+        }
+    }
+}
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-padding: 0.333em 0.5em 0.333em 0.5em; /* 4 6 4 6*/
+}
+
+$hover-color: darken($left-background, 10%);
+$hover-color-dark: lighten($left-background-dark, 10%);
+
+.menu-bar > * > * > * > * {
+    -fx-padding: -1px -1px -1px -1px;
+    //-fx-padding: 4px -1px 4px -1px;
+
+    -fx-background-color: $left-background;
+
+    > * .menu-item:focused {
+        -fx-background-color: $hover-color;
+    }
+}
+
+.menu-item, .menu-button {
+    -fx-cursor: hand;
+}
+
+.menu-bar.menubar-dark .menu-item:focused {
+    -fx-background-color: $hover-color-dark;
+}
+
+.menubar-dark .menu-item:focused {
+    -fx-background-color: $hover-color-dark;
+}
+
+$pseudos: hover, focused, showing;
+
+@each $pseudo in $pseudos {
+    .menu-bar > .container > .menu-button:#{$pseudo} {
+        -fx-background-color: $hover-color;
     }
 
-    &:focused .label {
-        -fx-text-fill: red;
-    }
-
-    &.context-menu {
-        -fx-skin: "com.sun.javafx.scene.control.skin.ContextMenuSkin";
-        -fx-background-color: black;
-        -fx-background-insets: 0, 1, 2;
-        -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
-        -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
+    .menu-bar.menubar-dark > .container > .menu-button:#{$pseudo} {
+        -fx-background-color: $hover-color-dark;
     }
 }

@@ -38,8 +38,14 @@ dependencies {
 
 }
 
-sassCompile.execute()
+task preLaunch {
+    println 'COMPILE'
+    sassCompile.execute()
+}
 
-ant.replaceregexp(match: '@charset "UTF-8";', replace: '') {
-    fileset(dir: 'src/main/resources', includes: 'style.css')
+preLaunch << {
+    println 'REPLACE'
+    ant.replaceregexp(match: '@charset "UTF-8";', replace: '') {
+        fileset(dir: 'src/main/resources', includes: 'style.css')
+    }
 }
