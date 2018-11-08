@@ -149,6 +149,8 @@ $right-background-dark: #616161;
     }
 
     * > .context-menu {
+        -fx-effect: dropshadow(three-pass-box, black, 2, 0.0, 0, 1);
+
         $top-offset: 5px;
         $vert-padding: 10px;
 
@@ -192,9 +194,8 @@ $right-background-dark: #616161;
 $hover-color: darken($left-background, 10%);
 $hover-color-dark: lighten($left-background-dark, 10%);
 
-.menu-bar > * > * > * > * {
+.menu-bar > * > * > * > .context-menu {
     -fx-padding: -1px -1px -1px -1px;
-    //-fx-padding: 4px -1px 4px -1px;
 
     -fx-background-color: $left-background;
 
