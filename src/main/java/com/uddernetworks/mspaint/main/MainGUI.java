@@ -21,11 +21,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.BlurType;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -382,14 +379,6 @@ public class MainGUI extends Application implements Initializable {
         return this.main.getCurrentLanguage();
     }
 
-    private static DropShadow[] depth = new DropShadow[] {
-            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0), 0, 0, 0, 0),
-            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 10, 0.12, -1, 2),
-            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 15, 0.16, 0, 4),
-            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 20, 0.19, 0, 6),
-            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 25, 0.25, 0, 8),
-            new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.26), 30, 0.30, 0, 10)};
-
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -397,20 +386,18 @@ public class MainGUI extends Application implements Initializable {
         setGitFeaturesDisabled(true);
         this.initialized.set(true);
         this.languageComboBox.setItems(languages);
-        int level = 1;
-//        this.menu.setEffect(new DropShadow(BlurType.GAUSSIAN,
-//                depth[level].getColor(),
-//                depth[level].getRadius(),
-//                depth[level].getSpread(),
-//                depth[level].getOffsetX(),
-//                depth[level].getOffsetY()));
+
+        menu.getMenus()
+                .stream()
+                .filter(CustomMenu.class::isInstance)
+                .map(CustomMenu.class::cast)
+                .forEach(customMenu -> customMenu.initialize(this));
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 
         Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
             System.err.println("Error happened! Thread " + thread + " exception: " + exception.getLocalizedMessage());
             exception.printStackTrace();
-            System.out.println(progress.getStyleClass());
             setHaveError();
         });
 
@@ -454,7 +441,7 @@ public class MainGUI extends Application implements Initializable {
         });
 
         languageComboBox.setOnAction(event -> {
-            Language language = (Language) languageComboBox.getSelectionModel().getSelectedItem();
+            Language language = languageComboBox.getSelectionModel().getSelectedItem();
             this.main.setCurrentLanguage(language);
             compile.setDisable(language.isInterpreted());
         });

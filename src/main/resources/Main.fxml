@@ -13,24 +13,49 @@
          <children>
             <MenuBar fx:id="menu" styleClass="menubar-theme">
               <menus>
-                <Menu mnemonicParsing="false" text="File" fx:id="fileMenu">
+                <CustomMenu text="File" bindClass="FileMenu">
                   <items>
-                    <CustomMenuItem mnemonicParsing="false" text="Test1" />
-                    <CustomMenuItem mnemonicParsing="false" text="Test2" />
+                    <CustomMenuItem text="New File" clickLabel="new"/>
+                    <CustomMenuItem text="Settings" clickLabel="settings"/>
+                    <CustomMenuItem text="Print" clickLabel="print"/>
+                    <CustomMenuItem text="Exit" clickLabel="exit"/>
                   </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
+                </CustomMenu>
+                <CustomMenu text="Edit" bindClass="EditMenu">
                   <items>
-                    <CustomMenuItem mnemonicParsing="false" text="Test1" />
-                    <CustomMenuItem mnemonicParsing="false" text="Test2" />
+                    <CustomMenuItem text="Find" clickLabel="find"/>
+                    <CustomMenuItem text="Replace" clickLabel="replace"/>
                   </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Git">
+                </CustomMenu>
+                <CustomMenu text="OCR" bindClass="OCRMenu">
                   <items>
-                    <CustomMenuItem mnemonicParsing="false" text="Test1"/>
-                    <CustomMenuItem mnemonicParsing="false" text="Test2" />
+                    <CustomMenuItem text="Settings" clickLabel="settings"/>
+                    <CustomMenuItem text="Train" clickLabel="train"/>
                   </items>
-                </Menu>
+                </CustomMenu>
+                <CustomMenu text="Run" bindClass="RunMenu">
+                  <items>
+                    <CustomMenuItem text="Run" clickLabel="run"/>
+                    <CustomMenuItem text="Build" clickLabel="build"/>
+                  </items>
+                </CustomMenu>
+                <CustomMenu text="Git" bindClass="GitMenu">
+                  <items>
+                    <CustomMenuItem text="Create Repo" clickLabel="create-repo"/>
+                    <CustomMenuItem text="Add Files" clickLabel="add-files"/>
+                    <CustomMenuItem text="Push" clickLabel="push"/>
+                    <CustomMenuItem text="Add Remote" clickLabel="add-remote"/>
+                    <CustomMenuItem text="Commit" clickLabel="commit"/>
+                  </items>
+                </CustomMenu>
+                <CustomMenu text="Help" bindClass="HelpMenu">
+                  <items>
+                    <CustomMenuItem text="Help" clickLabel="help"/>
+                    <CustomMenuItem text="Source" clickLabel="source"/>
+                    <CustomMenuItem text="Submit A Bug" clickLabel="submit-a-bug"/>
+                    <CustomMenuItem text="About" clickLabel="about"/>
+                  </items>
+                </CustomMenu>
               </menus>
             </MenuBar>
               <GridPane fx:id="test" maxWidth="99999.0" minWidth="500.0" styleClass="gridpane-theme" VBox.vgrow="ALWAYS">
