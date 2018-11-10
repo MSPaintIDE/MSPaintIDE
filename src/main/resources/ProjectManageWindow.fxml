@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <JFXScrollPane prefWidth="200.0" HBox.hgrow="NEVER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <children>
+                  <JFXListView fx:id="recentProjects" />
+               </children>
+            </JFXScrollPane>
+            <Pane HBox.hgrow="ALWAYS">
+               <children>
+                  <JFXButton fx:id="openProject" buttonType="RAISED" layoutX="138.0" layoutY="355.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Open Project">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </JFXButton>
+                  <JFXButton fx:id="createProject" buttonType="RAISED" layoutX="138.0" layoutY="275.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="New Project">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </JFXButton>
+                  <JFXButton fx:id="importProject" buttonType="RAISED" layoutX="138.0" layoutY="315.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Import Project">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </JFXButton>
+                  <ImageView fitHeight="250.0" fitWidth="250.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@ms-paint-logo-bw.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

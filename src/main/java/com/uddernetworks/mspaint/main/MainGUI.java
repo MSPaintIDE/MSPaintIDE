@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
 import com.uddernetworks.mspaint.languages.Language;
+import com.uddernetworks.mspaint.main.gui.window.WelcomeWindow;
 import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.project.PPFProject;
@@ -194,6 +195,9 @@ public class MainGUI extends Application implements Initializable {
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(100);
 
+        new WelcomeWindow();
+        if (true) return;
+
         registerThings(primaryStage);
         primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
     }
@@ -231,11 +235,6 @@ public class MainGUI extends Application implements Initializable {
 
         Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
-
-        System.out.println(scene.getStylesheets());
-        scene.getStylesheets().forEach(sheet -> {
-            System.out.println("sheet = " + sheet);
-        });
 
         primaryStage.setScene(scene);
 
@@ -395,9 +394,9 @@ public class MainGUI extends Application implements Initializable {
 
         menu.getMenus()
                 .stream()
-                .filter(CustomMenu.class::isInstance)
-                .map(CustomMenu.class::cast)
-                .forEach(customMenu -> customMenu.initialize(this));
+                .filter(MaterialMenu.class::isInstance)
+                .map(MaterialMenu.class::cast)
+                .forEach(materialMenu -> materialMenu.initialize(this));
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 

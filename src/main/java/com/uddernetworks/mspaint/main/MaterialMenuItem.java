@@ -7,7 +7,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 
-public class CustomMenuItem extends MenuItem {
+public class MaterialMenuItem extends MenuItem {
 
     private Label label;
     private String customText;
@@ -17,7 +17,7 @@ public class CustomMenuItem extends MenuItem {
         return customText;
     }
 
-    public CustomMenuItem() {
+    public MaterialMenuItem() {
         label = new Label();
 
         label.setPrefWidth(180);
@@ -52,6 +52,6 @@ public class CustomMenuItem extends MenuItem {
 
     @Override
     public String toString() {
-        return "CustomMenuItem[" + customText + "]";
+        return "MaterialMenuItem[" + customText + "]";
     }
 }

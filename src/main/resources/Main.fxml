@@ -13,49 +13,49 @@
          <children>
             <MenuBar fx:id="menu" styleClass="menubar-theme">
               <menus>
-                <CustomMenu text="File" bindClass="FileMenu">
+                <MaterialMenu text="File" bindClass="FileMenu">
                   <items>
-                    <CustomMenuItem text="New File" clickLabel="new"/>
-                    <CustomMenuItem text="Settings" clickLabel="settings"/>
-                    <CustomMenuItem text="Print" clickLabel="print"/>
-                    <CustomMenuItem text="Exit" clickLabel="exit"/>
+                    <MaterialMenuItem text="New File" clickLabel="new"/>
+                    <MaterialMenuItem text="Settings" clickLabel="settings"/>
+                    <MaterialMenuItem text="Print" clickLabel="print"/>
+                    <MaterialMenuItem text="Exit" clickLabel="exit"/>
                   </items>
-                </CustomMenu>
-                <CustomMenu text="Edit" bindClass="EditMenu">
+                </MaterialMenu>
+                <MaterialMenu text="Edit" bindClass="EditMenu">
                   <items>
-                    <CustomMenuItem text="Find" clickLabel="find"/>
-                    <CustomMenuItem text="Replace" clickLabel="replace"/>
+                    <MaterialMenuItem text="Find" clickLabel="find"/>
+                    <MaterialMenuItem text="Replace" clickLabel="replace"/>
                   </items>
-                </CustomMenu>
-                <CustomMenu text="OCR" bindClass="OCRMenu">
+                </MaterialMenu>
+                <MaterialMenu text="OCR" bindClass="OCRMenu">
                   <items>
-                    <CustomMenuItem text="Settings" clickLabel="settings"/>
-                    <CustomMenuItem text="Train" clickLabel="train"/>
+                    <MaterialMenuItem text="Settings" clickLabel="settings"/>
+                    <MaterialMenuItem text="Train" clickLabel="train"/>
                   </items>
-                </CustomMenu>
-                <CustomMenu text="Run" bindClass="RunMenu">
+                </MaterialMenu>
+                <MaterialMenu text="Run" bindClass="RunMenu">
                   <items>
-                    <CustomMenuItem text="Run" clickLabel="run"/>
-                    <CustomMenuItem text="Build" clickLabel="build"/>
+                    <MaterialMenuItem text="Run" clickLabel="run"/>
+                    <MaterialMenuItem text="Build" clickLabel="build"/>
                   </items>
-                </CustomMenu>
-                <CustomMenu text="Git" bindClass="GitMenu">
+                </MaterialMenu>
+                <MaterialMenu text="Git" bindClass="GitMenu">
                   <items>
-                    <CustomMenuItem text="Create Repo" clickLabel="create-repo"/>
-                    <CustomMenuItem text="Add Files" clickLabel="add-files"/>
-                    <CustomMenuItem text="Push" clickLabel="push"/>
-                    <CustomMenuItem text="Add Remote" clickLabel="add-remote"/>
-                    <CustomMenuItem text="Commit" clickLabel="commit"/>
+                    <MaterialMenuItem text="Create Repo" clickLabel="create-repo"/>
+                    <MaterialMenuItem text="Add Files" clickLabel="add-files"/>
+                    <MaterialMenuItem text="Push" clickLabel="push"/>
+                    <MaterialMenuItem text="Add Remote" clickLabel="add-remote"/>
+                    <MaterialMenuItem text="Commit" clickLabel="commit"/>
                   </items>
-                </CustomMenu>
-                <CustomMenu text="Help" bindClass="HelpMenu">
+                </MaterialMenu>
+                <MaterialMenu text="Help" bindClass="HelpMenu">
                   <items>
-                    <CustomMenuItem text="Help" clickLabel="help"/>
-                    <CustomMenuItem text="Source" clickLabel="source"/>
-                    <CustomMenuItem text="Submit A Bug" clickLabel="submit-a-bug"/>
-                    <CustomMenuItem text="About" clickLabel="about"/>
+                    <MaterialMenuItem text="Help" clickLabel="help"/>
+                    <MaterialMenuItem text="Source" clickLabel="source"/>
+                    <MaterialMenuItem text="Submit A Bug" clickLabel="submit-a-bug"/>
+                    <MaterialMenuItem text="About" clickLabel="about"/>
                   </items>
-                </CustomMenu>
+                </MaterialMenu>
               </menus>
             </MenuBar>
               <GridPane fx:id="test" maxWidth="99999.0" minWidth="500.0" styleClass="gridpane-theme" VBox.vgrow="ALWAYS">

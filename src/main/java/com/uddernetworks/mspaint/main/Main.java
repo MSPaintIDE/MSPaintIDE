@@ -43,7 +43,7 @@ public class Main {
 
         SettingsManager.initialize(new File(parent.getAbsolutePath(), "options.ini"));
 
-        this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, boolean.class));
+        this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
         this.mainGUI.updateTheme();
 
         languageManager.addLanguage(new JavaLanguage());

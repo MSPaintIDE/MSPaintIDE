@@ -76,20 +76,10 @@ public class Installer {
             Path uninstallPath = Paths.get(msPaintAppData.getAbsolutePath(), "uninstall.vbs");
             Files.copy(getClass().getClassLoader().getResourceAsStream("uninstall.vbs"), uninstallPath);
 
+            runCommand("cmd /c wscript \"" + shortcutGen.toAbsolutePath() + "\" && del \"" + shortcutGen.toAbsolutePath() + "\"", false);
+            runCommand("cmd /c wscript \"" + uninstallPath.toAbsolutePath() + "\" && del \"" + uninstallPath.toAbsolutePath() + "\"", false);
 
-            Runtime.getRuntime().exec("cmd /c wscript \"" + shortcutGen.toAbsolutePath() + "\" && del \"" + shortcutGen.toAbsolutePath() + "\"");
-            Runtime.getRuntime().exec("cmd /c wscript \"" + uninstallPath.toAbsolutePath() + "\" && del \"" + uninstallPath.toAbsolutePath() + "\"");
-
-
-            Path adminShortcutGen = Paths.get(msPaintAppData.getAbsolutePath(), "AdminShortcut.ps1");
-
-            String adminShortcut = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("AdminShortcut.ps1"));
-            adminShortcut = adminShortcut.replace("%SHORTCUT_PATH%", msPaintAppData.getAbsolutePath() + "\\Uninstall MS Paint IDE.lnk");
-
-            Files.write(adminShortcutGen, adminShortcut.getBytes(), StandardOpenOption.CREATE_NEW);
-
-            runCommand("cmd /c Powershell -Command \"Set-ExecutionPolicy RemoteSigned\"", false);
-            runCommand("cmd /c Powershell -File \"" + adminShortcutGen.toAbsolutePath() + "\"", false);
+            ShortcutUtil.makeAdmin(new File(msPaintAppData.getAbsolutePath() + "\\Uninstall MS Paint IDE.lnk"));
 
             Runtime.getRuntime().exec("cmd /c ping localhost -n 2 > nul && del \"" + currentJar.getAbsolutePath() + "\"");
         } catch (Exception e) {
@@ -114,7 +104,6 @@ public class Installer {
                 Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "open.bat"));
                 Files.deleteIfExists(Paths.get(currentJar.getParentFile().getAbsolutePath(), "shortcut.vbs"));
                 Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "uninstall.vbs"));
-                Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "AdminShortcut.ps1"));
 
                 Files.deleteIfExists(msPaintAppData);
 
@@ -151,9 +140,19 @@ public class Installer {
         runCommand("cmd /c ping localhost -n 3 > nul && rmdir \"" + msPaintAppData.getAbsolutePath() + "\" /q /s", false, false, new File("C:\\Windows\\system32"));
     }
 
-    public File getJDKLocation() throws FileNotFoundException {
-        List<String> jdkLines = Arrays.stream(runCommand("where javaw", true).split("\n")).filter(line -> line.contains("\\Program Files") && line.contains("Java\\jdk") && line.contains("bin")).sorted().collect(Collectors.toList());
+    private List<String> findJavaIn(boolean x86) {
+        List<String> jdkLines = Arrays.stream(runCommand("where javaw /r \"C:\\Program Files" + (x86 ? " (x86)" : "") + "\\Java\"", true)
+                .split("\n"))
+                .filter(line -> line.contains("\\Program Files") && line.contains("jdk") && line.contains("bin") && !line.contains("jre"))
+                .sorted()
+                .collect(Collectors.toList());
         Collections.reverse(jdkLines);
+        return jdkLines;
+    }
+
+    public File getJDKLocation() throws FileNotFoundException {
+        List<String> jdkLines = findJavaIn(false);
+        if (jdkLines.isEmpty()) jdkLines = findJavaIn(true);
 
         if (jdkLines.isEmpty()) {
             throw new FileNotFoundException("No installed JDK found! Please run the program with the JDK manually if you know where it is.");

@@ -43,7 +43,7 @@ public class SettingsWindow extends Stage implements Initializable {
 
         JFXDecorator jfxDecorator = new JFXDecorator(this, root, false, true, true);
         jfxDecorator.setGraphic(icon);
-        jfxDecorator.setTitle("MS Paint IDE");
+        jfxDecorator.setTitle("Settings");
 
         Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
@@ -51,16 +51,8 @@ public class SettingsWindow extends Stage implements Initializable {
         setScene(scene);
         show();
 
-        setTitle("MS Paint IDE");
+        setTitle("Settings");
         getIcons().add(icon.getImage());
-
-        setOnShown(event -> {
-            System.out.println("shown tree = " + tree);
-        });
-
-        setOnShowing(event -> {
-            System.out.println("showing tree = " + tree);
-        });
     }
 
     @FXML

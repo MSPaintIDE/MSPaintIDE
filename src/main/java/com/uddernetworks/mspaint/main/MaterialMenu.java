@@ -10,11 +10,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomMenu extends Menu {
+public class MaterialMenu extends Menu {
 
     private StringProperty bindClass;
 
-    public CustomMenu() {
+    public MaterialMenu() {
 
     }
 
@@ -25,12 +25,12 @@ public class CustomMenu extends Menu {
 
             MenuBind menuBind = menuClass.getConstructor(MainGUI.class).newInstance(mainGUI);
 
-            Map<String, CustomMenuItem> events = new HashMap<>();
+            Map<String, MaterialMenuItem> events = new HashMap<>();
 
             getItems()
                     .stream()
-                    .filter(CustomMenuItem.class::isInstance)
-                    .map(CustomMenuItem.class::cast)
+                    .filter(MaterialMenuItem.class::isInstance)
+                    .map(MaterialMenuItem.class::cast)
                     .forEach(menuItem -> {
                         events.put(menuItem.getClickLabel(), menuItem);
                         menuItem.initialize();
