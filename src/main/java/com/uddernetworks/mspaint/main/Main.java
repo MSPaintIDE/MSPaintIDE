@@ -8,30 +8,21 @@ import com.uddernetworks.mspaint.languages.LanguageManager;
 import com.uddernetworks.mspaint.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.languages.python.PythonLanguage;
+import com.uddernetworks.mspaint.main.settings.Setting;
+import com.uddernetworks.mspaint.main.settings.SettingsManager;
+import com.uddernetworks.mspaint.project.PPFProject;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.newocr.DatabaseManager;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
-
-    private Map<String, BufferedImage> images;
-
-    public File inputImage = null;
-    private File highlightedFile = null;
-    private File objectFile = null;
-    private File classOutput = null;
-    private File jarFile = null;
-    private File libraryFile = null;
-    private File otherFiles = null;
-    private File compilerOutput = null;
-    private File appOutput = null;
 
     private File parent;
     private File currentJar;
@@ -50,7 +41,10 @@ public class Main {
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
 
-        parseOptions();
+        SettingsManager.initialize(new File(parent.getAbsolutePath(), "options.ini"));
+
+        this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, boolean.class));
+        this.mainGUI.updateTheme();
 
         languageManager.addLanguage(new JavaLanguage());
         languageManager.addLanguage(new BrainfuckLanguage());
@@ -68,59 +62,9 @@ public class Main {
         return this.currentLanguage;
     }
 
-    private void parseOptions() throws IOException {
-        Properties properties = new Properties();
-        properties.load(Files.newInputStream(getOptions().toPath()));
-
-        inputImage = getProperty(properties, "inputImage");
-        highlightedFile = getProperty(properties, "highlightedFile");
-        objectFile = getProperty(properties, "objectFile");
-        classOutput = getProperty(properties, "classOutput");
-        jarFile = getProperty(properties, "jarFile");
-        libraryFile = getProperty(properties, "libraryFile");
-        otherFiles = getProperty(properties, "otherFiles");
-        compilerOutput = getProperty(properties, "compilerOutput");
-        appOutput = getProperty(properties, "appOutput");
-
-        this.mainGUI.setDarkTheme(properties.getProperty("darkTheme", "false").equals("true"));
-        this.mainGUI.updateTheme();
-    }
-
-    private File getProperty(Properties properties, String property) {
-        String propertyText = properties.getProperty(property, null);
-        return propertyText == null || propertyText.isEmpty() ? null : new File(propertyText);
-    }
-
-    public void saveOptions() {
-        Properties properties = new Properties();
-
-        properties.setProperty("inputImage", getInputImage());
-        properties.setProperty("highlightedFile", getHighlightedFile());
-        properties.setProperty("objectFile", getObjectFile());
-        properties.setProperty("classOutput", getClassOutput());
-        properties.setProperty("jarFile", getJarFile());
-        properties.setProperty("libraryFile", getLibraryFile());
-        properties.setProperty("otherFiles", getOtherFiles());
-        properties.setProperty("compilerOutput", getCompilerOutput());
-        properties.setProperty("appOutput", getAppOutput());
-        properties.setProperty("darkTheme", String.valueOf(this.mainGUI.useDarkTheme()));
-
-        try {
-            OutputStream outputStream = new FileOutputStream(getOptions());
-            properties.store(outputStream, "MS Paint IDE Settings");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private File getOptions() throws IOException {
-        File optionsIni = new File(parent.getAbsolutePath(), "options.ini");
-        if (!optionsIni.exists()) optionsIni.createNewFile();
-        return optionsIni;
-    }
-
     private boolean optionsNotFilled() {
-        return inputImage == null || classOutput == null || compilerOutput == null || appOutput == null;
+        PPFProject ppfProject = ProjectManager.getPPFProject();
+        return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || ppfProject.getCompilerOutput() == null || ppfProject.getCompilerOutput() == null;
     }
 
     public int indexAll(boolean useCaches, boolean saveCaches) {
@@ -136,6 +80,9 @@ public class Main {
         mainGUI.setStatusText("Indexing letters...");
 
         mainGUI.setStatusText(null);
+
+        File inputImage = ProjectManager.getPPFProject().getInputLocation();
+        File objectFile = ProjectManager.getPPFProject().getObjectLocation();
 
         if (inputImage.isDirectory()) {
             System.out.println("Found directory: " + inputImage.getAbsolutePath());
@@ -160,6 +107,8 @@ public class Main {
             mainGUI.setHaveError();
             return;
         }
+
+        File highlightedFile = ProjectManager.getPPFProject().getHighlightLocation();
 
         if (highlightedFile != null && !highlightedFile.isDirectory()) highlightedFile.mkdirs();
 
@@ -196,6 +145,8 @@ public class Main {
             mainGUI.setStatusText("Compiling...");
         }
 
+        File libraryFile = ProjectManager.getPPFProject().getLibraryLocation();
+
         mainGUI.setIndeterminate(true);
 
         List<File> libFiles = new ArrayList<>();
@@ -209,9 +160,9 @@ public class Main {
             }
         }
 
-        ImageOutputStream imageOutputStream = new ImageOutputStream(appOutput, 500);
-        ImageOutputStream compilerOutputStream = new ImageOutputStream(compilerOutput, 500);
-        Map<ImageClass, List<LanguageError>> errors = getCurrentLanguage().compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
+        ImageOutputStream imageOutputStream = new ImageOutputStream(ProjectManager.getPPFProject().getAppOutput(), 500);
+        ImageOutputStream compilerOutputStream = new ImageOutputStream(ProjectManager.getPPFProject().getCompilerOutput(), 500);
+        Map<ImageClass, List<LanguageError>> errors = getCurrentLanguage().compileAndExecute(imageClasses, ProjectManager.getPPFProject().getJarFile(), ProjectManager.getPPFProject().getOtherLocation(), ProjectManager.getPPFProject().getClassLocation(), mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
 
         System.out.println("Highlighting Angry Squiggles...");
         mainGUI.setStatusText("Highlighting Angry Squiggles...");
@@ -256,113 +207,20 @@ public class Main {
     }
 
     public void setInputImage(File inputImage) {
-        if (inputImage.equals(this.inputImage)) return;
-        this.inputImage = inputImage;
-        saveOptions();
+        PPFProject ppfProject = ProjectManager.getPPFProject();
+        if (inputImage.equals(ppfProject.getInputLocation())) return;
 
         File outputParent = inputImage.getParentFile();
 
-        if (highlightedFile == null) {
-            setHighlightedFile(new File(outputParent, "highlighted"));
-        }
 
-        if (compilerOutput == null) {
-            setCompilerOutput(new File(outputParent, "compiler.png"));
-        }
+        ppfProject.setHighlightLocation(new File(outputParent, "highlighted"), false);
+        ppfProject.setCompilerOutput(new File(outputParent, "compiler.png"), false);
+        ppfProject.setAppOutput(new File(outputParent, "program.png"), false);
+        ppfProject.setJarFile(this.currentLanguage.getOutputFileExtension() == null ? null : new File(outputParent, "Output." + this.currentLanguage.getOutputFileExtension()), false);
+        ppfProject.setClassLocation(new File(outputParent, "classes"), false);
 
-        if (appOutput == null) {
-            setAppOutput(new File(outputParent, "program.png"));
-        }
-
-        if (jarFile == null) {
-            setJarFile(this.currentLanguage.getOutputFileExtension() == null ? null : new File(outputParent, "Output." + this.currentLanguage.getOutputFileExtension()));
-        }
-
-        if (classOutput == null) {
-            setClassOutput(new File(outputParent, "classes"));
-        }
-
+        ProjectManager.save();
         this.mainGUI.initializeInputTextFields();
-    }
-
-    public void setHighlightedFile(File highlightedFile) {
-        this.highlightedFile = highlightedFile;
-        saveOptions();
-    }
-
-    public void setObjectFile(File objectFile) {
-        this.objectFile = objectFile;
-        saveOptions();
-    }
-
-    public void setClassOutput(File classOutput) {
-        this.classOutput = classOutput;
-        saveOptions();
-    }
-
-    public void setJarFile(File jarFile) {
-        this.jarFile = jarFile;
-        saveOptions();
-    }
-
-    public void setLibraryFile(File libraryFile) {
-        this.libraryFile = libraryFile;
-        saveOptions();
-    }
-
-    public void setOtherFiles(File libraryFile) {
-        this.otherFiles = libraryFile;
-        saveOptions();
-    }
-
-    public void setCompilerOutput(File compilerOutput) {
-        this.compilerOutput = compilerOutput;
-        saveOptions();
-    }
-
-    public void setAppOutput(File appOutput) {
-        this.appOutput = appOutput;
-        saveOptions();
-    }
-
-    public String getInputImage() {
-        return (inputImage == null) ? "" : inputImage.getAbsolutePath();
-    }
-
-    public String getHighlightedFile() {
-        return (highlightedFile == null) ? "" : highlightedFile.getAbsolutePath();
-    }
-
-    public String getObjectFile() {
-        return (objectFile == null) ? "" : objectFile.getAbsolutePath();
-    }
-
-    public String getClassOutput() {
-        return (classOutput == null) ? "" : classOutput.getAbsolutePath();
-    }
-
-    public String getJarFile() {
-        return (jarFile == null) ? "" : jarFile.getAbsolutePath();
-    }
-
-    public String getLibraryFile() {
-        return (libraryFile == null) ? "" : libraryFile.getAbsolutePath();
-    }
-
-    public String getOtherFiles() {
-        return (otherFiles == null) ? "" : otherFiles.getAbsolutePath();
-    }
-
-    public String getCompilerOutput() {
-        return (compilerOutput == null) ? "" : compilerOutput.getAbsolutePath();
-    }
-
-    public String getAppOutput() {
-        return (appOutput == null) ? "" : appOutput.getAbsolutePath();
-    }
-
-    public File getCurrentJar() {
-        return currentJar;
     }
 
     public DatabaseManager getDatabaseManager() {

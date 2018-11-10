@@ -9,12 +9,10 @@ import java.util.List;
 
 public class PPFReader {
 
-    private File file;
+    public static void main(String[] args) throws IllegalAccessException {
+        PPFReader ppfReader = new PPFReader();
 
-    public static void main(String[] args) throws IOException, IllegalAccessException {
-        PPFReader ppfReader = new PPFReader(new File("main.ppf"));
-
-        PPFProject ppfProject = ppfReader.read();
+        PPFProject ppfProject = ppfReader.read(new File("main.ppf"));
 
         for (Field declaredField : ppfProject.getClass().getDeclaredFields()) {
             declaredField.setAccessible(true);
@@ -22,38 +20,42 @@ public class PPFReader {
         }
     }
 
-    public PPFReader(File file) {
-        this.file = file;
-    }
+    public PPFProject read(File file) {
+        PPFProject ppfProject = new PPFProject(file);
+        try {
+            byte[] bFile = new byte[(int) file.length()];
 
-    public PPFProject read() throws IOException {
-        PPFProject ppfProject = new PPFProject();
-        byte[] bFile = new byte[(int) file.length()];
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(bFile);
 
-        FileInputStream fileInputStream = new FileInputStream(file);
-        fileInputStream.read(bFile);
+            boolean reading = false;
+            BinaryIdentifier binaryIdentifier = null;
+            List<Byte> byteList = new ArrayList<>();
 
-        boolean reading = false;
-        BinaryIdentifier binaryIdentifier = null;
-        List<Byte> byteList = new ArrayList<>();
+            for (byte curr : bFile) {
+                if (reading) {
+                    if (curr == BinaryIdentifier.END_VALUE) {
+                        if (byteList.size() > 0) {
+                            binaryIdentifier.setValue(ByteUtils.byteListToArray(byteList), ppfProject);
+                            byteList.clear();
+                        }
 
-        for (byte curr : bFile) {
-            if (reading) {
-                if (curr == BinaryIdentifier.END_VALUE) {
-                    binaryIdentifier.setValue(ByteUtils.byteListToArray(byteList), ppfProject);
-                    byteList.clear();
-                    reading = false;
-                    continue;
-                }
+                        reading = false;
+                        continue;
+                    }
 
-                byteList.add(curr);
-            } else {
-                BinaryIdentifier potBinaryIdentifier = BinaryIdentifier.fromByte(curr);
-                if (potBinaryIdentifier != null) {
-                    reading = true;
-                    binaryIdentifier = potBinaryIdentifier;
+                    byteList.add(curr);
+                } else {
+                    BinaryIdentifier potBinaryIdentifier = BinaryIdentifier.fromByte(curr);
+                    if (potBinaryIdentifier != null) {
+                        reading = true;
+                        binaryIdentifier = potBinaryIdentifier;
+                    }
                 }
             }
+        } catch (IOException e) {
+            System.err.println("Couldn't read project file correctly");
+            e.printStackTrace();
         }
 
         return ppfProject;

@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.main.ImageClass;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ModifiedDetector;
+import com.uddernetworks.mspaint.project.ProjectManager;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -93,7 +94,7 @@ public class GitController {
 
     private File getGitFolder() {
         if (gitFolder != null) return gitFolder;
-        File directory = new File(this.mainGUI.getMain().getInputImage()).getParentFile();
+        File directory = ProjectManager.getPPFProject().getInputLocation().getParentFile();
         return gitFolder = new File(directory, "git");
     }
 
@@ -161,7 +162,7 @@ public class GitController {
             File addingFile;
             String relative = getRelativeClass(file);
             if (file.getName().endsWith(".png")) {
-                ImageClass imageClass = new ImageClass(file, new File(main.getObjectFile()), mainGUI, this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
+                ImageClass imageClass = new ImageClass(file, ProjectManager.getPPFProject().getObjectLocation(), mainGUI, this.mainGUI.shouldUseCaches(), this.mainGUI.shouldSaveCaches());
                 relative = relative.replace(".png", ".java");
 
                 if (source == null) {
@@ -193,13 +194,11 @@ public class GitController {
     }
 
     private String getRelativeClass(File file) {
-        Main main = this.mainGUI.getMain();
-        File inputImage = new File(main.getInputImage());
+        File inputImage = ProjectManager.getPPFProject().getInputLocation();
         if (inputImage.isFile()) {
             new Exception("Tried to get relative class not in the input image path!").printStackTrace();
             return "";
         }
-
 
         return inputImage.getParentFile().toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
     }

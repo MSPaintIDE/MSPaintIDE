@@ -9,10 +9,8 @@ import java.util.List;
 
 public class PPFWriter {
 
-    private File file;
-
     public static void main(String[] args) {
-        PPFProject ppfProject = new PPFProject();
+        PPFProject ppfProject = new PPFProject(new File("main.ppf"));
         ppfProject.setInputLocation(new File("MSPaintIDE\\input"));
         ppfProject.setHighlightLocation(new File("MSPaintIDE\\highlight"));
         ppfProject.setClassLocation(new File("MSPaintIDE\\class"));
@@ -22,19 +20,15 @@ public class PPFWriter {
         ppfProject.setCompilerOutput(new File("MSPaintIDE\\compiler.png"));
         ppfProject.setAppOutput(new File("MSPaintIDE\\app.png"));
 
-
-
-        PPFWriter ppfWriter = new PPFWriter(new File("main.ppf"));
+        PPFWriter ppfWriter = new PPFWriter();
         ppfWriter.write(ppfProject);
-    }
-
-    public PPFWriter(File file) {
-        this.file = file;
     }
 
     public void write(PPFProject ppfProject) {
         List<Byte> bytes = new ArrayList<>();
-        Arrays.stream(ppfProject.getClass().getDeclaredFields()).forEach(field -> {
+        Arrays.stream(ppfProject.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(PPFSetting.class))
+                .forEach(field -> {
             BinaryIdentifier binaryIdentifier = BinaryIdentifier.fromField(field);
             if (binaryIdentifier == null) {
                 System.err.println("No binary identifier for: " + field.getName());
@@ -50,7 +44,7 @@ public class PPFWriter {
             bytes.add(BinaryIdentifier.END_VALUE);
         });
 
-        try (FileOutputStream fileOuputStream = new FileOutputStream(file)) {
+        try (FileOutputStream fileOuputStream = new FileOutputStream(ppfProject.getFile())) {
             fileOuputStream.write(ByteUtils.byteListToArray(bytes));
         } catch (IOException e) {
             e.printStackTrace();

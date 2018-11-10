@@ -5,6 +5,10 @@ import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
 import com.uddernetworks.mspaint.languages.Language;
+import com.uddernetworks.mspaint.main.settings.Setting;
+import com.uddernetworks.mspaint.main.settings.SettingsManager;
+import com.uddernetworks.mspaint.project.PPFProject;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -321,15 +325,16 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void initializeInputTextFields() {
-        inputName.setText(main.getInputImage());
-        highlightedImage.setText(main.getHighlightedFile());
-        cacheFile.setText(main.getObjectFile());
-        compiledJarOutput.setText(main.getJarFile());
-        libraryFile.setText(main.getLibraryFile());
-        otherFiles.setText(main.getOtherFiles());
-        classOutput.setText(main.getClassOutput());
-        compilerOutputValue.setText(main.getCompilerOutput());
-        programOutputValue.setText(main.getAppOutput());
+        PPFProject ppfProject = ProjectManager.getPPFProject();
+        inputName.setText(ppfProject.getInputLocation().getAbsolutePath());
+        highlightedImage.setText(ppfProject.getHighlightLocation().getAbsolutePath());
+        cacheFile.setText(ppfProject.getObjectLocation().getAbsolutePath());
+        compiledJarOutput.setText(ppfProject.getJarFile().getAbsolutePath());
+        libraryFile.setText(ppfProject.getLibraryLocation().getAbsolutePath());
+        otherFiles.setText(ppfProject.getObjectLocation().getAbsolutePath());
+        classOutput.setText(ppfProject.getClassLocation().getAbsolutePath());
+        compilerOutputValue.setText(ppfProject.getCompilerOutput().getAbsolutePath());
+        programOutputValue.setText(ppfProject.getAppOutput().getAbsolutePath());
     }
 
     public void setDarkTheme(boolean darkTheme) {
@@ -382,6 +387,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // TODO: Add project creation/selection window
         initializeInputTextFields();
         setGitFeaturesDisabled(true);
         this.initialized.set(true);
@@ -407,9 +413,8 @@ public class MainGUI extends Application implements Initializable {
         System.setErr(textOut);
 
         invertColors.setOnAction(event -> {
-            this.darkTheme = !this.darkTheme;
+            SettingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);
             updateTheme();
-            this.main.saveOptions();
         });
 
         updateTheme();
@@ -455,9 +460,9 @@ public class MainGUI extends Application implements Initializable {
             }
         });
 
-        createRepo.setOnAction(event -> this.gitController.gitInit(new File(main.getInputImage())));
+        createRepo.setOnAction(event -> this.gitController.gitInit(ProjectManager.getPPFProject().getInputLocation()));
 
-        addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileChoser(new File(main.getInputImage()), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
+        addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileChoser(ProjectManager.getPPFProject().getInputLocation(), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
             try {
                 this.gitController.addFiles(files);
             } catch (IOException e) {
@@ -480,90 +485,90 @@ public class MainGUI extends Application implements Initializable {
         inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().isEmpty() ? null : new File(inputName.getText())));
 
         changeInputImage.setOnAction(event -> {
-            File selected = main.getInputImage().isEmpty() ? main.getCurrentJar() : new File(main.getInputImage());
+            File selected = ProjectManager.getPPFProject().getInputLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getInputLocation();
             FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 inputName.setText(file.getAbsolutePath());
                 main.setInputImage(file);
             });
         });
 
-        highlightedImage.textProperty().addListener(event -> main.setHighlightedFile(highlightedImage.getText().trim().isEmpty() ? null : new File(highlightedImage.getText())));
+        highlightedImage.textProperty().addListener(event -> ProjectManager.getPPFProject().setHighlightLocation(highlightedImage.getText().trim().isEmpty() ? null : new File(highlightedImage.getText())));
 
         changeHighlightImage.setOnAction(event -> {
-            File selected = main.getHighlightedFile().isEmpty() ? main.getCurrentJar() : new File(main.getHighlightedFile());
+            File selected = ProjectManager.getPPFProject().getHighlightLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getHighlightLocation();
             FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 highlightedImage.setText(file.getAbsolutePath());
-                main.setHighlightedFile(file);
+                ProjectManager.getPPFProject().setHighlightLocation(file);
             });
         });
 
-        cacheFile.textProperty().addListener(event -> main.setObjectFile(cacheFile.getText().trim().isEmpty() ? null : new File(cacheFile.getText())));
+        cacheFile.textProperty().addListener(event -> ProjectManager.getPPFProject().setObjectLocation(cacheFile.getText().trim().isEmpty() ? null : new File(cacheFile.getText())));
 
         changeCacheFile.setOnAction(event -> {
-            File selected = main.getObjectFile().isEmpty() ? main.getCurrentJar() : new File(main.getObjectFile());
+            File selected = ProjectManager.getPPFProject().getObjectLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getObjectLocation();
             FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 cacheFile.setText(file.getAbsolutePath());
-                main.setObjectFile(file);
+                ProjectManager.getPPFProject().setObjectLocation(file);
             });
         });
 
-        classOutput.textProperty().addListener(event -> main.setClassOutput(classOutput.getText().trim().isEmpty() ? null : new File(classOutput.getText())));
+        classOutput.textProperty().addListener(event -> ProjectManager.getPPFProject().setClassLocation(classOutput.getText().trim().isEmpty() ? null : new File(classOutput.getText())));
 
         changeClassOutput.setOnAction(event -> {
-            File selected = main.getClassOutput().isEmpty() ? main.getCurrentJar() : new File(main.getClassOutput());
+            File selected = ProjectManager.getPPFProject().getClassLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getClassLocation();
             FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
                 classOutput.setText(file.getAbsolutePath());
-                main.setClassOutput(file);
+                ProjectManager.getPPFProject().setClassLocation(file);
             });
         });
 
-        compiledJarOutput.textProperty().addListener(event -> main.setJarFile(compiledJarOutput.getText().trim().isEmpty() ? null : new File(compiledJarOutput.getText())));
+        compiledJarOutput.textProperty().addListener(event -> ProjectManager.getPPFProject().setJarFile(compiledJarOutput.getText().trim().isEmpty() ? null : new File(compiledJarOutput.getText())));
 
         changeCompiledJar.setOnAction(event -> {
-            File selected = main.getJarFile().isEmpty() ? main.getCurrentJar() : new File(main.getJarFile());
+            File selected = ProjectManager.getPPFProject().getJarFile() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getJarFile();
             FileDirectoryChooser.openFileChooser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
                 compiledJarOutput.setText(file.getAbsolutePath());
-                main.setJarFile(file);
+                ProjectManager.getPPFProject().setJarFile(file);
             });
         });
 
-        libraryFile.textProperty().addListener(event -> main.setLibraryFile(libraryFile.getText().trim().isEmpty() ? null : new File(libraryFile.getText())));
+        libraryFile.textProperty().addListener(event -> ProjectManager.getPPFProject().setLibraryLocation(libraryFile.getText().trim().isEmpty() ? null : new File(libraryFile.getText())));
 
         changeLibraries.setOnAction(event -> {
-            File selected = main.getLibraryFile().isEmpty() ? main.getCurrentJar() : new File(main.getLibraryFile());
+            File selected = ProjectManager.getPPFProject().getLibraryLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getLibraryLocation();
             FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 libraryFile.setText(file.getAbsolutePath());
-                main.setLibraryFile(file);
+                ProjectManager.getPPFProject().setLibraryLocation(file);
             });
         });
 
-        otherFiles.textProperty().addListener(event -> main.setOtherFiles(otherFiles.getText().trim().isEmpty() ? null : new File(otherFiles.getText())));
+        otherFiles.textProperty().addListener(event -> ProjectManager.getPPFProject().setOtherLocation(otherFiles.getText().trim().isEmpty() ? null : new File(otherFiles.getText())));
 
         changeOtherFiles.setOnAction(event -> {
-            File selected = main.getOtherFiles().isEmpty() ? main.getCurrentJar() : new File(main.getOtherFiles());
+            File selected = ProjectManager.getPPFProject().getOtherLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getOtherLocation();
             FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 otherFiles.setText(file.getAbsolutePath());
-                main.setOtherFiles(file);
+                ProjectManager.getPPFProject().setOtherLocation(file);
             });
         });
 
-        compilerOutputValue.textProperty().addListener(event -> main.setCompilerOutput(compilerOutputValue.getText().trim().isEmpty() ? null : new File(compilerOutputValue.getText())));
+        compilerOutputValue.textProperty().addListener(event -> ProjectManager.getPPFProject().setCompilerOutput(compilerOutputValue.getText().trim().isEmpty() ? null : new File(compilerOutputValue.getText())));
 
         compilerOutput.setOnAction(event -> {
-            File selected = main.getCompilerOutput().isEmpty() ? main.getCurrentJar() : new File(main.getCompilerOutput());
+            File selected = ProjectManager.getPPFProject().getCompilerOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getCompilerOutput();
             FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
                 compilerOutputValue.setText(file.getAbsolutePath());
-                main.setCompilerOutput(file);
+                ProjectManager.getPPFProject().setCompilerOutput(file);
             });
         });
 
-        programOutputValue.textProperty().addListener(event -> main.setAppOutput(programOutputValue.getText().trim().isEmpty() ? null : new File(programOutputValue.getText())));
+        programOutputValue.textProperty().addListener(event -> ProjectManager.getPPFProject().setAppOutput(programOutputValue.getText().trim().isEmpty() ? null : new File(programOutputValue.getText())));
 
         programOutput.setOnAction(event -> {
-            File selected = main.getAppOutput().isEmpty() ? main.getCurrentJar() : new File(main.getAppOutput());
+            File selected = ProjectManager.getPPFProject().getAppOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getAppOutput();
             FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
                 programOutputValue.setText(file.getAbsolutePath());
-                main.setAppOutput(file);
+                ProjectManager.getPPFProject().setAppOutput(file);
             });
         });
     }

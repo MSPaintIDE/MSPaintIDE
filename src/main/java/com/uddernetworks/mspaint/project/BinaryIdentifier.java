@@ -7,12 +7,13 @@ import java.util.Arrays;
 public enum BinaryIdentifier {
     INPUT_LOCATION(5, "inputLocation"),
     HIGHLIGHT_LOCATION(6, "highlightLocation"),
-    CLASS_LOCATION(7, "classLocation"),
-    JAR_FILE(8, "jarFile"),
-    LIBRARY_LOCATION(9, "libraryLocation"),
-    OTHER_LOCATION(10, "otherLocation"),
-    COMPILER_OUTPUT(11, "compilerOutput"),
-    APP_OUTPUT(12, "appOutput");
+    OBJECT_LOCATION(7, "objectLocation"),
+    CLASS_LOCATION(8, "classLocation"),
+    JAR_FILE(9, "jarFile"),
+    LIBRARY_LOCATION(10, "libraryLocation"),
+    OTHER_LOCATION(11, "otherLocation"),
+    COMPILER_OUTPUT(12, "compilerOutput"),
+    APP_OUTPUT(13, "appOutput");
 
     public static final byte START_VALUE = 2;
     public static final byte END_VALUE = 3;
