@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class ProjectManager {
@@ -17,16 +18,32 @@ public class ProjectManager {
     private static PPFReader ppfReader = new PPFReader();
     private static List<PPFProject> recentProjects = new ArrayList<>();
 
+    public static void closeCurrentProject() {
+        if (ppfProject != null) save();
+        ppfProject = null;
+        writeRecent();
+    }
+
     public static List<PPFProject> getRecent() {
         if (!recentProjects.isEmpty()) return recentProjects;
 
         try {
+            AtomicBoolean open = new AtomicBoolean(false);
             recent.toFile().createNewFile();
-            return (recentProjects = Files.readAllLines(recent).stream()
+            recentProjects = Files.readAllLines(recent).stream()
+                    .filter(line -> {
+                        if (line.equalsIgnoreCase("true") || line.equalsIgnoreCase("false")) {
+                            open.set(line.equalsIgnoreCase("true"));
+                            return false;
+                        }
+                        return true;
+                    })
                     .map(File::new)
                     .filter(File::exists)
                     .map(ppfReader::read)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
+            if (open.get()) ppfProject = recentProjects.get(0);
+            return recentProjects;
         } catch (IOException e) {
             e.printStackTrace();
         }

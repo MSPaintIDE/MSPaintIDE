@@ -43,6 +43,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 public class MainGUI extends Application implements Initializable {
 
@@ -187,9 +188,18 @@ public class MainGUI extends Application implements Initializable {
         launch(args);
     }
 
-    private WelcomeWindow welcomeWindow;
-    public void createdProject() {
+    public void showWelcomeScreen() throws IOException {
+        this.primaryStage.hide();
+        ProjectManager.closeCurrentProject();
 
+        new WelcomeWindow(this, () -> {
+            try {
+                this.primaryStage.show();
+                registerThings(this.primaryStage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -209,11 +219,10 @@ public class MainGUI extends Application implements Initializable {
             }
         };
 
-        List<PPFProject> recent = ProjectManager.getRecent();
-        if (recent.isEmpty()) {
+        ProjectManager.getRecent();
+        if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this, ready);
         } else {
-            ProjectManager.setCurrentProject(recent.get(0));
             ready.run();
         }
     }
@@ -420,6 +429,10 @@ public class MainGUI extends Application implements Initializable {
                 .stream()
                 .filter(MaterialMenu.class::isInstance)
                 .map(MaterialMenu.class::cast)
+                .flatMap(menu -> Stream.concat(menu.getItems()
+                        .stream()
+                        .filter(MaterialMenu.class::isInstance)
+                        .map(MaterialMenu.class::cast), Stream.of(menu)))
                 .forEach(materialMenu -> materialMenu.initialize(this));
 
         inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));

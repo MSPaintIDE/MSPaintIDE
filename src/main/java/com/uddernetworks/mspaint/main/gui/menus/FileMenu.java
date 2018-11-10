@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.main.gui.BindItem;
 import com.uddernetworks.mspaint.main.gui.MenuBind;
 import com.uddernetworks.mspaint.main.gui.SettingItem;
 import com.uddernetworks.mspaint.main.gui.window.SettingsWindow;
+import com.uddernetworks.mspaint.project.ProjectManager;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,9 +17,14 @@ public class FileMenu extends MenuBind {
         super(mainGUI);
     }
 
-    @BindItem(label = "new")
-    private void onClickNew() {
-        System.out.println("FileMenu.onClickNew");
+    @BindItem(label = "new.project")
+    private void onClickNewProject() {
+        System.out.println("FileMenu.onClickNewProject");
+    }
+
+    @BindItem(label = "new.file")
+    private void onClickNewFile() {
+        System.out.println("FileMenu.onClickNewFile");
     }
 
     @BindItem(label = "settings")
@@ -32,11 +38,18 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "print")
     private void onClickPrint() {
-        System.out.println("FileMenu.onClickPrint");
+        // TODO: Print
+    }
+
+    @BindItem(label = "close-project")
+    private void onClickCloseProject() throws IOException {
+        this.mainGUI.showWelcomeScreen();
     }
 
     @BindItem(label = "exit")
     private void onClickExit() {
-        System.out.println("FileMenu.onClickExit");
+        ProjectManager.writeRecent();
+        ProjectManager.save();
+        System.exit(0);
     }
 }
