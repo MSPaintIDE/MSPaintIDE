@@ -43,17 +43,19 @@ public class TextEditorManager {
                 try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
                     path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 
+                    long last = System.currentTimeMillis();
                     while (true) {
                         WatchKey wk = watchService.take();
+                        boolean found = false;
                         for (WatchEvent<?> event : wk.pollEvents()) {
                             Path changed = ((Path) event.context()).toAbsolutePath();
+                            if (changed.toFile().getName().equals(this.imageFile.getName())) found = true;
+                        }
 
-                            if (changed.toFile().getName().equals(this.imageFile.getName())) {
-                                Thread.sleep(500);
-                                this.imageClass.scan(new File(objectDirectory, this.imageFile.getName().substring(0, this.imageFile.getName().length() - 4) + "_cache.json"),false, true);
-                                Files.write(this.originalFile.toPath(), this.imageClass.getText().getBytes());
-                                break;
-                            }
+                        if (found && (System.currentTimeMillis() - last) > 250) {
+                            this.imageClass.scan(new File(objectDirectory, this.imageFile.getName().substring(0, this.imageFile.getName().length() - 4) + "_cache.json"), false, true);
+                            Files.write(this.originalFile.toPath(), this.imageClass.getText().getBytes());
+                            last = System.currentTimeMillis();
                         }
 
                         if (!wk.reset()) {

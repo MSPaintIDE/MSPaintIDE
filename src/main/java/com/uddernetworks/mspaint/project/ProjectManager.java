@@ -42,7 +42,7 @@ public class ProjectManager {
                     .filter(File::exists)
                     .map(ppfReader::read)
                     .collect(Collectors.toList());
-            if (open.get()) ppfProject = recentProjects.get(0);
+            if (open.get() && !recentProjects.isEmpty()) ppfProject = recentProjects.get(0);
             return recentProjects;
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,10 +59,10 @@ public class ProjectManager {
     public static void writeRecent() {
         try {
             recent.toFile().createNewFile();
-            Files.write(recent, recentProjects.stream()
+            Files.write(recent, ((ppfProject == null ? "false" : "true") + recentProjects.stream()
                     .map(PPFProject::getFile)
                     .map(File::getAbsolutePath)
-                    .collect(Collectors.joining("\n"))
+                    .collect(Collectors.joining("\n")))
                     .getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
