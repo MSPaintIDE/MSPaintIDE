@@ -53,6 +53,7 @@ public class ProjectManager {
     }
 
     public static void setCurrentProject(PPFProject ppfProject) {
+        if (ProjectManager.ppfProject != null) save();
         ProjectManager.ppfProject = ppfProject;
     }
 

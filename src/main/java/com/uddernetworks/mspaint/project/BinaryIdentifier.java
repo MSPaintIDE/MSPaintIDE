@@ -13,7 +13,9 @@ public enum BinaryIdentifier {
     LIBRARY_LOCATION(10, "libraryLocation"),
     OTHER_LOCATION(11, "otherLocation"),
     COMPILER_OUTPUT(12, "compilerOutput"),
-    APP_OUTPUT(13, "appOutput");
+    APP_OUTPUT(13, "appOutput"),
+    NAME(14, "name"),
+    LANGUAGE(15, "language");
 
     public static final byte START_VALUE = 2;
     public static final byte END_VALUE = 3;
@@ -72,6 +74,7 @@ public enum BinaryIdentifier {
 
     public byte[] getValue(PPFProject ppfProject) {
         try {
+            if (field.get(ppfProject) == null) return new byte[0];
             switch (typeName) {
                 case "File":
                     return ((File) field.get(ppfProject)).getAbsolutePath().getBytes();

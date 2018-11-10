@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXTextField fx:id="projectName" layoutX="130.0" layoutY="30.0" prefHeight="25.0" prefWidth="460.0" />
+      <Label layoutX="10.0" layoutY="34.0" prefWidth="100.0" text="Project name:" />
+      <JFXTextField fx:id="projectLocation" layoutX="130.0" layoutY="75.0" prefHeight="25.0" prefWidth="420.0" />
+      <Label layoutX="10.0" layoutY="79.0" prefWidth="100.0" text="Project location:" />
+      <JFXButton fx:id="browse" buttonType="RAISED" layoutX="561.0" layoutY="75.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="..." />
+       <JFXComboBox fx:id="languageComboBox" layoutX="130.0" layoutY="115.0" prefHeight="30.0" prefWidth="150.0" styleClass="language-selection">
+           <cursor>
+               <Cursor fx:constant="HAND" />
+           </cursor>
+       </JFXComboBox>
+      <Label layoutX="10.0" layoutY="122.0" prefWidth="100.0" text="Project language:" />
+      <JFXButton fx:id="finish" buttonType="FLAT" layoutX="344.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Finish" />
+      <JFXButton fx:id="cancel" buttonType="FLAT" layoutX="429.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Cancel" />
+      <JFXButton fx:id="help" buttonType="FLAT" layoutX="514.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Help" />
+      <Label fx:id="error" layoutX="10.0" layoutY="165.0" prefWidth="580.0" style="-fx-text-fill: RED;" />
+   </children>
+</AnchorPane>

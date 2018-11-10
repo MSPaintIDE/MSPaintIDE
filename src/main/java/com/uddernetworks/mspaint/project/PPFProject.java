@@ -33,6 +33,12 @@ public class PPFProject {
     @PPFSetting
     private File appOutput;             // Application output image file
 
+    @PPFSetting
+    private String language;            // The language used in the project
+
+    @PPFSetting
+    private String name;                // The name of the project
+
     public PPFProject(File file) {
         this.file = file;
     }
@@ -149,5 +155,29 @@ public class PPFProject {
 
     public void setAppOutput(File appOutput, boolean override) {
         if (this.appOutput == null || override) this.appOutput = appOutput;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        setLanguage(language, true);
+    }
+
+    public void setLanguage(String language, boolean override) {
+        if (this.language == null || override) this.language = language;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        setName(name, true);
+    }
+
+    public void setName(String name, boolean override) {
+        if (this.name == null || override) this.name = name;
     }
 }

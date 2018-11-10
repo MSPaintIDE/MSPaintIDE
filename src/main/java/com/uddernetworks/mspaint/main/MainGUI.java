@@ -187,6 +187,11 @@ public class MainGUI extends Application implements Initializable {
         launch(args);
     }
 
+    private WelcomeWindow welcomeWindow;
+    public void createdProject() {
+
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
@@ -195,11 +200,22 @@ public class MainGUI extends Application implements Initializable {
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(100);
 
-        new WelcomeWindow();
-        if (true) return;
+        Runnable ready = () -> {
+            try {
+                registerThings(primaryStage);
+                primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
 
-        registerThings(primaryStage);
-        primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
+        List<PPFProject> recent = ProjectManager.getRecent();
+        if (recent.isEmpty()) {
+            new WelcomeWindow(this, ready);
+        } else {
+            ProjectManager.setCurrentProject(recent.get(0));
+            ready.run();
+        }
     }
 
     public Main getMain() {
@@ -231,14 +247,14 @@ public class MainGUI extends Application implements Initializable {
         JFXDecorator jfxDecorator = new JFXDecorator(primaryStage, root, false, true, true);
         jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
         jfxDecorator.setGraphic(icon);
-        jfxDecorator.setTitle("MS Paint IDE");
+        jfxDecorator.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
         Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
 
         primaryStage.setScene(scene);
 
-        primaryStage.setTitle("MS Paint IDE");
+        primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
         primaryStage.getIcons().add(icon.getImage());
 
         primaryStage.show();
@@ -325,15 +341,20 @@ public class MainGUI extends Application implements Initializable {
 
     public void initializeInputTextFields() {
         PPFProject ppfProject = ProjectManager.getPPFProject();
-        inputName.setText(ppfProject.getInputLocation().getAbsolutePath());
-        highlightedImage.setText(ppfProject.getHighlightLocation().getAbsolutePath());
-        cacheFile.setText(ppfProject.getObjectLocation().getAbsolutePath());
-        compiledJarOutput.setText(ppfProject.getJarFile().getAbsolutePath());
-        libraryFile.setText(ppfProject.getLibraryLocation().getAbsolutePath());
-        otherFiles.setText(ppfProject.getObjectLocation().getAbsolutePath());
-        classOutput.setText(ppfProject.getClassLocation().getAbsolutePath());
-        compilerOutputValue.setText(ppfProject.getCompilerOutput().getAbsolutePath());
-        programOutputValue.setText(ppfProject.getAppOutput().getAbsolutePath());
+        inputName.setText(getAbsolutePath(ppfProject.getInputLocation()));
+        highlightedImage.setText(getAbsolutePath(ppfProject.getHighlightLocation()));
+        cacheFile.setText(getAbsolutePath(ppfProject.getObjectLocation()));
+        compiledJarOutput.setText(getAbsolutePath(ppfProject.getJarFile()));
+        libraryFile.setText(getAbsolutePath(ppfProject.getLibraryLocation()));
+        otherFiles.setText(getAbsolutePath(ppfProject.getObjectLocation()));
+        classOutput.setText(getAbsolutePath(ppfProject.getClassLocation()));
+        compilerOutputValue.setText(getAbsolutePath(ppfProject.getCompilerOutput()));
+        programOutputValue.setText(getAbsolutePath(ppfProject.getAppOutput()));
+    }
+
+    private String getAbsolutePath(File file) {
+        if (file == null) return "";
+        return file.getAbsolutePath();
     }
 
     public void setDarkTheme(boolean darkTheme) {
@@ -379,6 +400,10 @@ public class MainGUI extends Application implements Initializable {
         this.languages.addAll(languages);
     }
 
+    public ObservableList<Language> getLanguages() {
+        return languages;
+    }
+
     public Language getCurrentLanguage() {
         return this.main.getCurrentLanguage();
     }
@@ -386,7 +411,6 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // TODO: Add project creation/selection window
         initializeInputTextFields();
         setGitFeaturesDisabled(true);
         this.initialized.set(true);

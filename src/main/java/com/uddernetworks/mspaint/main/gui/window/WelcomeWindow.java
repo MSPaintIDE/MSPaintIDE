@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.main.gui.window;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXListView;
+import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.collections.FXCollections;
@@ -32,8 +33,13 @@ public class WelcomeWindow extends Stage implements Initializable {
     @FXML
     private JFXListView<PPFProject> recentProjects;
 
-    public WelcomeWindow() throws IOException {
+    private MainGUI mainGUI;
+    private Runnable ready;
+
+    public WelcomeWindow(MainGUI mainGUI, Runnable ready) throws IOException {
         super();
+        this.mainGUI = mainGUI;
+        this.ready = ready;
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ProjectManageWindow.fxml"));
         loader.setController(this);
         Parent root = loader.load();
@@ -61,8 +67,12 @@ public class WelcomeWindow extends Stage implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         recentProjects.setItems(FXCollections.observableList(ProjectManager.getRecent()));
 
-
         createProject.setOnAction(event -> {
+            try {
+                new CreateProjectWindow(this.mainGUI, ready);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         });
 

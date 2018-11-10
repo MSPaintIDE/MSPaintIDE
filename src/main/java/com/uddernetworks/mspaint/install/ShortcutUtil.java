@@ -7,11 +7,8 @@ import java.nio.file.StandardOpenOption;
 
 public class ShortcutUtil {
     public static void makeAdmin(File createFor) throws IOException {
-        System.out.println(createFor.exists());
         byte[] bytes = Files.readAllBytes(createFor.toPath());
-        byte b = bytes[21];
-        b = (byte) (b | (1 << 5));
-        bytes[21] = b;
+        bytes[21] = (byte) (bytes[21] | (1 << 5));
         Files.write(createFor.toPath(), bytes, StandardOpenOption.TRUNCATE_EXISTING);
     }
 }
