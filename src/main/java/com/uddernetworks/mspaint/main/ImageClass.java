@@ -37,7 +37,17 @@ public class ImageClass {
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        scannedImage = imageCompare.getText(inputImage, objectFile, mainGUI, !modifiedDetector.imageChanged() && useCaches, saveCaches);
+        Main headlessMain = null;
+        try {
+            if (MainGUI.HEADLESS) {
+                headlessMain = new Main();
+                headlessMain.headlessStart();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        scannedImage = imageCompare.getText(inputImage, objectFile, mainGUI, headlessMain, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
         text = scannedImage.getPrettyString();
 

@@ -136,6 +136,7 @@ public class MainGUI extends Application implements Initializable {
     private Main main;
     private Stage primaryStage;
     private boolean darkTheme = false;
+    public static boolean HEADLESS = false;
     private boolean remoteURLVisible = true;
     private GitController gitController;
     private AtomicBoolean initialized = new AtomicBoolean();
@@ -143,6 +144,8 @@ public class MainGUI extends Application implements Initializable {
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
     private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
+
+    public static final File LOCAL_MSPAINT = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
@@ -180,12 +183,30 @@ public class MainGUI extends Application implements Initializable {
                 installer.uninstall();
                 System.exit(0);
             } else {
+                HEADLESS = true;
                 new TextEditorManager(args[0]);
                 return;
             }
         }
 
         launch(args);
+    }
+
+    public void createAndOpenFile(File file) {
+        try {
+//            BufferedImage image = new BufferedImage(500, 600, BufferedImage.TYPE_INT_RGB);
+//            for (int x = 0; x < image.getWidth(); x++) {
+//                for (int y = 0; y < image.getHeight(); y++) {
+//                    image.setRGB(x, y, Color.WHITE.getRGB());
+//                }
+//            }
+//
+//            ImageIO.write(image, "png", new File(file.getAbsolutePath() + ".png"));
+            file.createNewFile();
+            new TextEditorManager(file, this);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void showWelcomeScreen() throws IOException {
@@ -195,7 +216,7 @@ public class MainGUI extends Application implements Initializable {
         new WelcomeWindow(this, () -> {
             try {
                 this.primaryStage.show();
-                registerThings(this.primaryStage);
+                registerThings();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -212,7 +233,7 @@ public class MainGUI extends Application implements Initializable {
 
         Runnable ready = () -> {
             try {
-                registerThings(primaryStage);
+                registerThings();
                 primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -244,7 +265,7 @@ public class MainGUI extends Application implements Initializable {
         Platform.runLater(() -> progress.setProgress(indeterminate ? -1 : 1));
     }
 
-    public void registerThings(Stage primaryStage) throws IOException {
+    public void registerThings() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Main.fxml"));
         loader.setController(this);
         Parent root = loader.load();
@@ -253,7 +274,7 @@ public class MainGUI extends Application implements Initializable {
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 
-        JFXDecorator jfxDecorator = new JFXDecorator(primaryStage, root, false, true, true);
+        JFXDecorator jfxDecorator = new JFXDecorator(this.primaryStage, root, false, true, true);
         jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
         jfxDecorator.setGraphic(icon);
         jfxDecorator.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
@@ -261,12 +282,12 @@ public class MainGUI extends Application implements Initializable {
         Scene scene = new Scene(jfxDecorator);
         scene.getStylesheets().add("style.css");
 
-        primaryStage.setScene(scene);
+        this.primaryStage.setScene(scene);
 
-        primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
-        primaryStage.getIcons().add(icon.getImage());
+        this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
+        this.primaryStage.getIcons().add(icon.getImage());
 
-        primaryStage.show();
+        this.primaryStage.show();
     }
 
     @FXML

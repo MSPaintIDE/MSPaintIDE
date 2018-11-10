@@ -1,8 +1,12 @@
 package com.uddernetworks.mspaint.texteditor;
 
 import com.uddernetworks.mspaint.main.ImageClass;
+import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.newocr.ScannedImage;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -14,9 +18,13 @@ public class TextEditorManager {
     private ImageClass imageClass;
 
     public TextEditorManager(String file) throws IOException, InterruptedException {
-        this.originalFile = new File(file).getAbsoluteFile();
+        this(new File(file), null);
+    }
 
-        File localMSPaintIDE = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+    public TextEditorManager(File file, MainGUI mainGUI) throws IOException, InterruptedException {
+        this.originalFile = file.getAbsoluteFile();
+
+        File localMSPaintIDE = MainGUI.LOCAL_MSPAINT;
         File backup = new File(localMSPaintIDE, "opened\\backup");
         backup.mkdirs();
 
@@ -26,7 +34,8 @@ public class TextEditorManager {
 
         this.imageFile = createImageFile();
 
-        this.imageClass = new ImageClass(this.imageFile, null, null, false, true);
+        File objectDirectory = new File(localMSPaintIDE, "global_cache");
+        this.imageClass = new ImageClass(this.imageFile, objectDirectory, mainGUI, true, true);
 
         new Thread(() -> {
             try {
@@ -41,8 +50,7 @@ public class TextEditorManager {
 
                             if (changed.toFile().getName().equals(this.imageFile.getName())) {
                                 Thread.sleep(500);
-                                this.imageClass.scan(null, false, false);
-                                System.out.println(this.imageClass.getText());
+                                this.imageClass.scan(new File(objectDirectory, this.imageFile.getName().substring(0, this.imageFile.getName().length() - 4) + "_cache.json"),false, true);
                                 Files.write(this.originalFile.toPath(), this.imageClass.getText().getBytes());
                                 break;
                             }
@@ -128,6 +136,15 @@ public class TextEditorManager {
         String text = new String(Files.readAllBytes(this.originalFile.toPath()));
 
         int padding = 12;
+
+        BufferedImage image = new BufferedImage(500, 600, BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                image.setRGB(x, y, Color.WHITE.getRGB());
+            }
+        }
+
+        ImageIO.write(image, "png", tempImage);
 
 //        List<List<ColorWrapper>> letterGrid = generateLetterGrid(text);
 //        int[] coords = getBiggestCoordinates(letterGrid);

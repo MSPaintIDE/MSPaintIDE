@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.install;
 
 import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.MainGUI;
 import org.apache.tika.io.IOUtils;
 import sun.management.VMManagement;
 
@@ -30,7 +31,7 @@ public class Installer {
     public void install() {
         try {
             System.out.println("Started install");
-            File msPaintAppData = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+            File msPaintAppData = MainGUI.LOCAL_MSPAINT;
             msPaintAppData.mkdirs();
 
             File imagesFolder = new File(msPaintAppData, "images");
@@ -117,7 +118,7 @@ public class Installer {
     }
 
     public void uninstall() throws ReflectiveOperationException {
-        File msPaintAppData = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+        File msPaintAppData = MainGUI.LOCAL_MSPAINT;
 
         int currentPID = getProcessID();
 
@@ -175,11 +176,11 @@ public class Installer {
         return (Integer) pidMethod.invoke(mgmt);
     }
 
-    private String runCommand(String command, boolean output) {
+    public static String runCommand(String command, boolean output) {
         return runCommand(command, output, true, new File("C:\\Windows\\system32"));
     }
 
-    private String runCommand(String command, boolean output, boolean wait, File directory) {
+    public static String runCommand(String command, boolean output, boolean wait, File directory) {
         try {
             StringBuilder stringBuilder = new StringBuilder();
             Runtime runtime = Runtime.getRuntime();

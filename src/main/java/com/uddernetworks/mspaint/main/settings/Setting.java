@@ -7,7 +7,10 @@ import static com.uddernetworks.mspaint.main.settings.SettingType.STRING;
 
 public enum Setting {
     OPEN_PROJECT("openProject", STRING),
-    DARK_THEME("darkTheme", BOOLEAN);
+    DARK_THEME("darkTheme", BOOLEAN),
+    DATABASE_URL("databaseURL", STRING),
+    DATABASE_USER("databaseUser", STRING),
+    DATABASE_PASS("databasePass", STRING);
 
     private final String name;
     private final SettingType settingType;

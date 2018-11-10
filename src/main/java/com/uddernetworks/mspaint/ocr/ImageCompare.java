@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.ocr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.newocr.OCRHandle;
 import com.uddernetworks.newocr.ScannedImage;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class ImageCompare {
 
-    public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, boolean readFromFile, boolean saveCaches) {
+    public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, Main main, boolean readFromFile, boolean saveCaches) {
         if (readFromFile) {
             System.out.println("Image not changed since file changed, so using file...");
         } else {
@@ -27,6 +28,7 @@ public class ImageCompare {
         try {
             if (objectFile != null && !objectFile.exists() && !objectFile.isFile()) {
                 try {
+                    objectFile.getParentFile().mkdirs();
                     readFromFile = !objectFile.createNewFile();
                 } catch (IOException ignored) {
                     readFromFile = false;
@@ -34,20 +36,22 @@ public class ImageCompare {
             }
 
             if (!readFromFile) {
-                mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
+                if (!MainGUI.HEADLESS) mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
 
-                mainGUI.setIndeterminate(true);
+                if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(true);
 
-                OCRHandle ocrHandle = new OCRHandle(mainGUI.getMain().getDatabaseManager());
+                OCRHandle ocrHandle = new OCRHandle(MainGUI.HEADLESS ? main.getDatabaseManager() : mainGUI.getMain().getDatabaseManager());
                 scannedImage = ocrHandle.scanImage(inputImage);
 
                 if (saveCaches) {
-                    mainGUI.setStatusText("Saving to cache file...");
+                    if (!MainGUI.HEADLESS) {
+                        mainGUI.setStatusText("Saving to cache file...");
+                    }
 
                     Files.write(objectFile.toPath(), new Gson().toJson(scannedImage).getBytes());
                 }
 
-                mainGUI.setIndeterminate(false);
+                if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
             } else {
                 GsonBuilder gsonBuilder = new GsonBuilder();
 

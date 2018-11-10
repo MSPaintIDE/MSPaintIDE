@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main.settings;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -22,9 +23,11 @@ public class SettingsManager {
 
     public static void setSetting(Setting setting, Object value) {
         settings.put(setting, value);
+        save();
     }
 
     public static void initialize(File file) throws IOException {
+        file.createNewFile();
         SettingsManager.file = file;
         reload();
     }
@@ -33,6 +36,12 @@ public class SettingsManager {
         Properties properties = new Properties();
 
         settings.forEach((key, value) -> properties.setProperty(key.getName(), value.toString()));
+
+        try {
+            properties.store(new FileOutputStream(file), "MS Paint IDE Global Settings");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void reload() throws IOException {

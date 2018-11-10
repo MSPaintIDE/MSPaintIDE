@@ -157,7 +157,6 @@ public class GitController {
     }
 
     private void moveOrScan(File file, File source, boolean addToIndex, GitIndex gitIndex, BiConsumer<File, String> result) {
-        Main main = this.mainGUI.getMain();
         try {
             File addingFile;
             String relative = getRelativeClass(file);

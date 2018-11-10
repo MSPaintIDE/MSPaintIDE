@@ -1,12 +1,15 @@
 package com.uddernetworks.mspaint.main.gui.menus;
 
+import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.gui.BindItem;
 import com.uddernetworks.mspaint.main.gui.MenuBind;
 import com.uddernetworks.mspaint.main.gui.SettingItem;
+import com.uddernetworks.mspaint.main.gui.window.CreateProjectWindow;
 import com.uddernetworks.mspaint.main.gui.window.SettingsWindow;
 import com.uddernetworks.mspaint.project.ProjectManager;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -19,12 +22,24 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "new.project")
     private void onClickNewProject() {
-        System.out.println("FileMenu.onClickNewProject");
+        try {
+            new CreateProjectWindow(this.mainGUI, () -> {
+                try {
+                    this.mainGUI.registerThings();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @BindItem(label = "new.file")
     private void onClickNewFile() {
-        System.out.println("FileMenu.onClickNewFile");
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
+            this.mainGUI.createAndOpenFile(file);
+        });
     }
 
     @BindItem(label = "settings")

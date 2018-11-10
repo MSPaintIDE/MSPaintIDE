@@ -73,7 +73,6 @@ public class WelcomeWindow extends Stage implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         });
 
         importProject.setOnAction(event -> {

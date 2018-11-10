@@ -86,7 +86,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        File startAt = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+        File startAt = MainGUI.LOCAL_MSPAINT;
         this.languageComboBox.setItems(mainGUI.getLanguages());
 
         finish.setOnAction(event -> {

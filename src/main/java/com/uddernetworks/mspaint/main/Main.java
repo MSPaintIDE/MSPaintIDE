@@ -36,12 +36,10 @@ public class Main {
     private DatabaseManager databaseManager;
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
+        headlessStart();
         this.mainGUI = mainGUI;
-        this.databaseManager = new DatabaseManager(System.getenv("database.url"), System.getenv("database.user"), System.getenv("database.pass"));
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();
-
-        SettingsManager.initialize(new File(parent.getAbsolutePath(), "options.ini"));
 
         this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
         this.mainGUI.updateTheme();
@@ -52,6 +50,11 @@ public class Main {
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
+    }
+
+    public void headlessStart() throws IOException {
+        SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
+        this.databaseManager = new DatabaseManager(SettingsManager.getSetting(Setting.DATABASE_URL, String.class), SettingsManager.getSetting(Setting.DATABASE_USER, String.class), SettingsManager.getSetting(Setting.DATABASE_PASS, String.class));
     }
 
     public void setCurrentLanguage(Language language) {

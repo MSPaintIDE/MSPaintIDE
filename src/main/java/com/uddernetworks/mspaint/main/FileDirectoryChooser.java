@@ -28,16 +28,18 @@ public class FileDirectoryChooser {
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
             new Thread(() -> {
-                // Sketchy while loop fixes Issue #1
-                while (jDialog == null) {
-                    try {
-                        Thread.sleep(500);
-                        Field dialogField = JFileChooser.class.getDeclaredField("dialog");
-                        dialogField.setAccessible(true);
+                try {
+                    Field dialogField = JFileChooser.class.getDeclaredField("dialog");
+                    dialogField.setAccessible(true);
+
+                    // Sketchy while loop fixes Issue #1
+                    jDialog = (JDialog) dialogField.get(fileChooser);
+                    while (jDialog == null) {
+                        Thread.sleep(100);
                         jDialog = (JDialog) dialogField.get(fileChooser);
-                    } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
-                        e.printStackTrace();
                     }
+                } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
+                    e.printStackTrace();
                 }
 
                 jDialog.toFront();
@@ -67,16 +69,18 @@ public class FileDirectoryChooser {
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
             new Thread(() -> {
-                // Sketchy while loop fixes Issue #1
-                while (jDialog == null) {
-                    try {
-                        Thread.sleep(500);
-                        Field dialogField = JFileChooser.class.getDeclaredField("dialog");
-                        dialogField.setAccessible(true);
+                try {
+                    Field dialogField = JFileChooser.class.getDeclaredField("dialog");
+                    dialogField.setAccessible(true);
+
+                    // Sketchy while loop fixes Issue #1
+                    jDialog = (JDialog) dialogField.get(fileChooser);
+                    while (jDialog == null) {
+                        Thread.sleep(100);
                         jDialog = (JDialog) dialogField.get(fileChooser);
-                    } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
-                        e.printStackTrace();
                     }
+                } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
+                    e.printStackTrace();
                 }
 
                 jDialog.toFront();
