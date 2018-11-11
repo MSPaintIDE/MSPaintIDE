@@ -1,17 +1,19 @@
 package com.uddernetworks.mspaint.main.settings;
 
+import javafx.application.Platform;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class SettingsManager {
 
     private static File file;
     private static Map<Setting, Object> settings = new HashMap<>();
+    private static Map<Setting, List<Consumer>> onChangeSettings = new HashMap<>();
 
     public static Object getSetting(Setting setting) {
         return settings.getOrDefault(setting, null);
@@ -23,7 +25,18 @@ public class SettingsManager {
 
     public static void setSetting(Setting setting, Object value) {
         settings.put(setting, value);
+        Platform.runLater(() -> onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
         save();
+    }
+
+    public static <T> void onChangeSetting(Setting setting, Consumer<T> consumer, Class<T> clazz) {
+        onChangeSetting(setting, consumer, clazz, false);
+    }
+
+    public static <T> void onChangeSetting(Setting setting, Consumer<T> consumer, Class<T> clazz, boolean runInitial) {
+        onChangeSettings.putIfAbsent(setting, new ArrayList<>());
+        onChangeSettings.get(setting).add(consumer);
+        if (runInitial) consumer.accept((T) settings.get(setting));
     }
 
     public static void initialize(File file) throws IOException {

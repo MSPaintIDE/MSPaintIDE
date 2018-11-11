@@ -37,7 +37,7 @@
                   </JFXButton>
                   <ImageView fitHeight="250.0" fitWidth="250.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@ms-paint-logo-bw.png" />
+                        <Image url="@../ms-paint-logo-bw.png" />
                      </image>
                   </ImageView>
                </children>

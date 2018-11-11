@@ -33,7 +33,7 @@ public class SettingsWindow extends Stage implements Initializable {
     public SettingsWindow(List<SettingItem> settingItems) throws IOException {
         super();
         this.settingItems = settingItems;
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("PopupWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/PopupWindow.fxml"));
         loader.setController(this);
         Parent root = loader.load();
 
@@ -66,15 +66,11 @@ public class SettingsWindow extends Stage implements Initializable {
         children.addAll(settingItems.stream().map(TreeItem::new).collect(Collectors.toList()));
 
         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            TreeItem<SettingItem> selectedItem = newValue;
-            System.out.println("Selected Text : " + selectedItem.getValue());
-            // do what ever you want
-
             List<Node> contentChildren = this.content.getChildren();
             contentChildren.clear();
 
             try {
-                contentChildren.add(selectedItem.getValue().getPane());
+                contentChildren.add(newValue.getValue().getPane());
             } catch (IOException e) {
                 e.printStackTrace();
             }

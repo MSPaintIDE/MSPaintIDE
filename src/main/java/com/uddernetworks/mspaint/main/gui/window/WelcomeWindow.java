@@ -40,7 +40,7 @@ public class WelcomeWindow extends Stage implements Initializable {
         super();
         this.mainGUI = mainGUI;
         this.ready = ready;
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("ProjectManageWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/ProjectManageWindow.fxml"));
         loader.setController(this);
         Parent root = loader.load();
 

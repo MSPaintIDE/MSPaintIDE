@@ -194,14 +194,6 @@ public class MainGUI extends Application implements Initializable {
 
     public void createAndOpenFile(File file) {
         try {
-//            BufferedImage image = new BufferedImage(500, 600, BufferedImage.TYPE_INT_RGB);
-//            for (int x = 0; x < image.getWidth(); x++) {
-//                for (int y = 0; y < image.getHeight(); y++) {
-//                    image.setRGB(x, y, Color.WHITE.getRGB());
-//                }
-//            }
-//
-//            ImageIO.write(image, "png", new File(file.getAbsolutePath() + ".png"));
             file.createNewFile();
             new TextEditorManager(file, this);
         } catch (IOException | InterruptedException e) {
@@ -266,7 +258,7 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void registerThings() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
         loader.setController(this);
         Parent root = loader.load();
 

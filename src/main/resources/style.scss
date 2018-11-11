@@ -11,6 +11,10 @@ $right-background-dark: #616161;
     -fx-faint-focus-color: transparent;
 }
 
+JFXButton {
+    -fx-cursor: hand;
+}
+
 .jfx-progress-bar > .track {
     -fx-background-color: #E0E0E0;
 }
@@ -34,6 +38,11 @@ $right-background-dark: #616161;
 .jfx-decorator .resize-border {
     -fx-border-color: #5472d3;
     -fx-border-width: 0 4 4 4;
+}
+
+.jfx-radio-button, .check-box {
+    -jfx-selected-color: #5472d3;
+    -jfx-checked-color: #5472d3;
 }
 
 .unrounded {

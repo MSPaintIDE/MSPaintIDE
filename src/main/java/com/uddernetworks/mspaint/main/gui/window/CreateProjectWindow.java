@@ -61,7 +61,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
         super();
         this.mainGUI = mainGUI;
         this.ready = ready;
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("CreateProject.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/CreateProject.fxml"));
         loader.setController(this);
         Parent root = loader.load();
 
