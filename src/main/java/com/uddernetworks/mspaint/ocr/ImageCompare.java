@@ -40,7 +40,7 @@ public class ImageCompare {
 
                 if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(true);
 
-                OCRHandle ocrHandle = new OCRHandle(MainGUI.HEADLESS ? main.getDatabaseManager() : mainGUI.getMain().getDatabaseManager());
+                OCRHandle ocrHandle = new OCRHandle(main.getDatabaseManager());
                 scannedImage = ocrHandle.scanImage(inputImage);
 
                 if (saveCaches) {

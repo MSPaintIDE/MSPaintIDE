@@ -42,6 +42,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -158,7 +159,7 @@ public class MainGUI extends Application implements Initializable {
         this.gitController = new GitController(this);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException {
+    public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException, ExecutionException {
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);
@@ -194,11 +195,14 @@ public class MainGUI extends Application implements Initializable {
 
     public void createAndOpenFile(File file) {
         try {
+            setIndeterminate(true);
             file.createNewFile();
             new TextEditorManager(file, this);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+
+        setIndeterminate(false);
     }
 
     public void showWelcomeScreen() throws IOException {

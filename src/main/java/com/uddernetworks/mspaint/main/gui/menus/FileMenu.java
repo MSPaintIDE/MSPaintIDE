@@ -8,11 +8,13 @@ import com.uddernetworks.mspaint.main.gui.SettingItem;
 import com.uddernetworks.mspaint.main.gui.window.CreateProjectWindow;
 import com.uddernetworks.mspaint.main.gui.window.SettingsWindow;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class FileMenu extends MenuBind {
 
@@ -39,6 +41,23 @@ public class FileMenu extends MenuBind {
     private void onClickNewFile() {
         FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
             this.mainGUI.createAndOpenFile(file);
+        });
+    }
+
+    @BindItem(label = "open.project")
+    private void onClickOpenProject() {
+        // TODO: Open project
+        System.out.println("FileMenu.onClickOpenProject");
+    }
+
+    @BindItem(label = "open.file")
+    private void onClickOpenFile() {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
+            try {
+                new TextEditorManager(file, this.mainGUI);
+            } catch (IOException | InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         });
     }
 

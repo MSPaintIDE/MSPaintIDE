@@ -21,9 +21,15 @@
                             <MaterialMenuItem text="File" clickLabel="file"/>
                         </items>
                     </MaterialMenu>
+                      <MaterialMenu text="Open" clickLabel="open" bindClass="FileMenu">
+                          <items>
+                              <MaterialMenuItem text="Project" clickLabel="project"/>
+                              <MaterialMenuItem text="File" clickLabel="file"/>
+                          </items>
+                      </MaterialMenu>
                     <MaterialMenuItem text="Settings" clickLabel="settings"/>
                     <MaterialMenuItem text="Print" clickLabel="print"/>
-                    <MaterialMenuItem text="CLose Project" clickLabel="close-project"/>
+                    <MaterialMenuItem text="Close Project" clickLabel="close-project"/>
                     <MaterialMenuItem text="Exit" clickLabel="exit"/>
                   </items>
                 </MaterialMenu>

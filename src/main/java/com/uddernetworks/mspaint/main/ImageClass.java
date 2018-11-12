@@ -17,10 +17,16 @@ public class ImageClass {
     private LetterFileWriter letterFileWriter;
     private File highlightedFile;
     private MainGUI mainGUI;
+    private Main headlessMain;
 
     public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, boolean useCaches, boolean saveCaches) {
+        this(inputImage, objectFileDir, mainGUI, null, useCaches, saveCaches);
+    }
+
+    public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, Main headlessMain, boolean useCaches, boolean saveCaches) {
         this.inputImage = inputImage;
         this.mainGUI = mainGUI;
+        this.headlessMain = headlessMain;
 
         File objectFile = objectFileDir != null ? new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.json") : null;
 
@@ -37,17 +43,19 @@ public class ImageClass {
 
         ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
 
-        Main headlessMain = null;
-        try {
-            if (MainGUI.HEADLESS) {
-                headlessMain = new Main();
-                headlessMain.headlessStart();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (this.headlessMain == null) {
+            this.headlessMain = mainGUI.getMain();
         }
+//        try {
+//            if (MainGUI.HEADLESS) {
+//                this.headlessMain = new Main();
+//                this.headlessMain.headlessStart();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-        scannedImage = imageCompare.getText(inputImage, objectFile, mainGUI, headlessMain, !modifiedDetector.imageChanged() && useCaches, saveCaches);
+        scannedImage = imageCompare.getText(inputImage, objectFile, mainGUI, this.headlessMain, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
         text = scannedImage.getPrettyString();
 
@@ -105,5 +113,13 @@ public class ImageClass {
 
     public ScannedImage getScannedImage() {
         return this.scannedImage;
+    }
+
+    public MainGUI getMainGUI() {
+        return mainGUI;
+    }
+
+    public Main getHeadlessMain() {
+        return headlessMain;
     }
 }
