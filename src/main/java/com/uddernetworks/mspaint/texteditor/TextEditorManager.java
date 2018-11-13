@@ -28,6 +28,7 @@ public class TextEditorManager {
     private File imageFile;
     private ImageClass imageClass;
     private Main headlessMain;
+    private Thread savingThread;
 
     private static final FontBounds[] FONT_BOUNDS = {
             new FontBounds(0, 12),
@@ -51,8 +52,7 @@ public class TextEditorManager {
             this.headlessMain = mainGUI.getMain();
         }
 
-        File localMSPaintIDE = MainGUI.LOCAL_MSPAINT;
-        File backup = new File(localMSPaintIDE, "opened\\backup");
+        File backup = new File(MainGUI.LOCAL_MSPAINT, "opened\\backup");
         backup.mkdirs();
 
         File backupFile = new File(backup, "original_" + this.originalFile.getName());
@@ -61,10 +61,10 @@ public class TextEditorManager {
 
         this.imageFile = createImageFile();
 
-        File objectDirectory = new File(localMSPaintIDE, "global_cache");
+        File objectDirectory = new File(MainGUI.LOCAL_MSPAINT, "global_cache");
         this.imageClass = new ImageClass(this.imageFile, objectDirectory, mainGUI, this.headlessMain, true, true);
 
-        new Thread(() -> {
+        (this.savingThread = new Thread(() -> {
             try {
                 Path path = FileSystems.getDefault().getPath(this.imageFile.getParent());
                 try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
@@ -90,10 +90,8 @@ public class TextEditorManager {
                         }
                     }
                 }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+            } catch (IOException | InterruptedException e) {}
+        })).start();
 
         initialProcess();
         mainGUI.setIndeterminate(false);
@@ -195,7 +193,7 @@ public class TextEditorManager {
 
         int padding = 12;
 
-        BufferedImage image = new BufferedImage(500, 600, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 image.setRGB(x, y, Color.WHITE.getRGB());
@@ -230,11 +228,13 @@ public class TextEditorManager {
 
         System.out.println("Closed MS Paint!");
 
+        savingThread.join();
+
         if (!this.imageFile.delete()) {
             Thread.sleep(3000);
             this.imageFile.delete();
         }
 
-        System.exit(0);
+        if (MainGUI.HEADLESS) System.exit(0);
     }
 }

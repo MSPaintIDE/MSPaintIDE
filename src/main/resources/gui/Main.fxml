@@ -18,7 +18,8 @@
                     <MaterialMenu text="New" clickLabel="new" bindClass="FileMenu">
                         <items>
                             <MaterialMenuItem text="Project" clickLabel="project"/>
-                            <MaterialMenuItem text="File" clickLabel="file"/>
+                            <MaterialMenuItem text="Image File" clickLabel="image-file"/>
+                            <MaterialMenuItem text="Text File" clickLabel="text-file"/>
                         </items>
                     </MaterialMenu>
                       <MaterialMenu text="Open" clickLabel="open" bindClass="FileMenu">

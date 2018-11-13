@@ -31,10 +31,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -193,7 +195,7 @@ public class MainGUI extends Application implements Initializable {
         launch(args);
     }
 
-    public void createAndOpenFile(File file) {
+    public void createAndOpenTextFile(File file) {
         try {
             setIndeterminate(true);
             file.createNewFile();
@@ -202,7 +204,33 @@ public class MainGUI extends Application implements Initializable {
             e.printStackTrace();
         }
 
-        setIndeterminate(false);
+        progress.setProgress(0);
+    }
+
+    public void createAndOpenImageFile(File file) {
+        try {
+            if (!file.getName().endsWith(".png")) file = new File(file.getAbsolutePath() + ".png");
+            setIndeterminate(true);
+
+            BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_ARGB);
+            clearImage(image);
+            ImageIO.write(image, "png", file);
+
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec("mspaint.exe \"" + file.getAbsolutePath() + "\"");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        updateLoading(0, 1);
+    }
+
+    private void clearImage(BufferedImage image) {
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                image.setRGB(x, y, Color.WHITE.getRGB());
+            }
+        }
     }
 
     public void showWelcomeScreen() throws IOException {

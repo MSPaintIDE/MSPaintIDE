@@ -37,10 +37,17 @@ public class FileMenu extends MenuBind {
         }
     }
 
-    @BindItem(label = "new.file")
-    private void onClickNewFile() {
+    @BindItem(label = "new.image-file")
+    private void onClickNewImageFile() {
         FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
-            this.mainGUI.createAndOpenFile(file);
+            this.mainGUI.createAndOpenImageFile(file);
+        });
+    }
+
+    @BindItem(label = "new.text-file")
+    private void onClickNewTextFile() {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
+            this.mainGUI.createAndOpenTextFile(file);
         });
     }
 

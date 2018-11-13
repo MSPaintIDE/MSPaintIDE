@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import java.lang.String?>
+<AnchorPane fx:id="anchor" prefHeight="15" prefWidth="584.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="fileName" layoutX="459.0" prefHeight="15.0" prefWidth="100.0" styleClass="search-label" text="File Name" textFill="#3c3c3c" />
+      <Label fx:id="lineNumber" layoutX="559.0" prefHeight="15.0" prefWidth="25.0" text="0">
+         <styleClass>
+            <String fx:value="search-label" />
+            <String fx:value="line-number" />
+         </styleClass></Label>
+      <FlowPane fx:id="flowText" prefHeight="15.0" prefWidth="458.0" />
+   </children>
+</AnchorPane>

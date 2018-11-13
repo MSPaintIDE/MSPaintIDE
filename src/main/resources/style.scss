@@ -103,6 +103,62 @@ JFXButton {
     }
 }
 
+.list-cell {
+    -fx-background-color: $left-background;
+
+    .dark & {
+        -fx-background-color: $left-background-dark;
+    }
+}
+
+.result-pane > * {
+    -fx-border-insets: 0 !important;
+    -fx-border-style: none !important;
+    -fx-border-width: 0 !important;
+}
+
+.line-number {
+    -fx-text-fill: darken(white, 30%) !important;
+
+    .dark & {
+        -fx-text-fill: lighten(black, 70%) !important;
+    }
+}
+
+#searchResults {
+    -fx-background-color: $left-background;
+
+    &.dark {
+        -fx-background-color: $left-background-dark;
+    }
+}
+
+.search-label {
+    -fx-background-color: $left-background;
+    -fx-text-fill: black;
+
+    &.dark {
+        -fx-background-color: $left-background-dark;
+        -fx-text-fill: white;
+    }
+}
+
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:focused:selected {
+    -fx-background-color: #4b6eaf;
+
+    & * {
+        -fx-background-color: #4b6eaf;
+    }
+}
+
+.found-context.dark {
+    -fx-fill: white;
+}
+
+.search-highlight {
+    -fx-fill: red;
+}
+
 .dark-text {
     -fx-text-fill: white;
     -fx-prompt-text-fill: WHITE;

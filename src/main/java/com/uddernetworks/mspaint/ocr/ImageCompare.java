@@ -17,11 +17,13 @@ import java.util.Map;
 public class ImageCompare {
 
     public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, Main main, boolean readFromFile, boolean saveCaches) {
+        /*
         if (readFromFile) {
             System.out.println("Image not changed since file changed, so using file...");
         } else {
             System.out.println("Image has changed since last write to data file, reading image...");
         }
+        */
 
         ScannedImage scannedImage;
 
