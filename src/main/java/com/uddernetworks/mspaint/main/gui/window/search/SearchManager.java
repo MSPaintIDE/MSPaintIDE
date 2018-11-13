@@ -52,6 +52,10 @@ public class SearchManager {
                             textCharacter = Character.toLowerCase(textCharacter);
                         }
 
+                        if (textIndex > 0 && current != textCharacter) {
+                            textIndex = 0;
+                        }
+
                         if (current == textCharacter && ++textIndex >= text.length()) {
                             return new SearchResult(file, scannedImage, text, ignoreCase, line.subList(i - textIndex + 1, i + 1), line, i - textIndex + 1, lineNumber.incrementAndGet());
                         }

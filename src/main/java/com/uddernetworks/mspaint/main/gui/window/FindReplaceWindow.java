@@ -26,12 +26,11 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FindReplaceWindow extends Stage implements Initializable {
 
@@ -47,16 +46,10 @@ public class FindReplaceWindow extends Stage implements Initializable {
     private JFXTextField directoryPath;
 
     @FXML
-    private JFXButton search;
-
-    @FXML
-    private JFXButton replace;
+    private JFXButton action;
 
     @FXML
     private JFXButton browse;
-
-    @FXML
-    private JFXButton openFile;
 
     @FXML
     private JFXButton cancel;
@@ -84,7 +77,6 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
     @FXML
     private Label notice;
-
 
     private MainGUI mainGUI;
     private SearchManager searchManager;
@@ -149,57 +141,94 @@ public class FindReplaceWindow extends Stage implements Initializable {
         });
     }
 
+    private List<SearchResult> searchFor(String extension, boolean inFile, boolean inProject, String directoryPath, String searchText, boolean caseInsensitive) {
+        if (extension.startsWith(".")) extension = extension.substring(1);
+
+        if (extension.isEmpty() || extension.matches("[^a-zA-Z\\d_.]")) {
+            setError("You have an invalid file extension!");
+            return Collections.emptyList();
+        }
+
+        if (inFile) {
+            return this.searchManager.searchFile(new File(directoryPath), searchText, caseInsensitive);
+        } else if (inProject) {
+            return this.searchManager.searchProject(searchText, extension, caseInsensitive);
+        }
+
+        return this.searchManager.searchDirectory(new File(directoryPath), searchText, extension, caseInsensitive);
+    }
+
+    private final AtomicLong lastChanged = new AtomicLong();
+    private final AtomicBoolean alreadySearched = new AtomicBoolean(false);
+    private final AtomicBoolean hasChanged = new AtomicBoolean(false);
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         searchResults.setCellFactory(t -> new SearchListCell());
 
+        new Thread(() -> {
+            try {
+                while (true) {
+                    if (hasChanged.get()) {
+                        lastChanged.set(System.currentTimeMillis());
+                        alreadySearched.set(false);
+                        hasChanged.set(false);
+                    } else if (!alreadySearched.get() && lastChanged.get() + 250 <= System.currentTimeMillis()) {
+                        long start = System.currentTimeMillis();
+                        setError(null);
+
+                        Platform.runLater(() -> {
+                            final String fileExtension = this.fileExtension.getText();
+                            final boolean inFile = this.inFile.isSelected();
+                            final boolean inProject = this.inProject.isSelected();
+                            final String directoryPath = this.directoryPath.getText();
+                            final String searchText = this.searchText.getText();
+                            final boolean caseInsensitive = this.caseInsensitive.isSelected();
+
+                            if (searchText.trim().isEmpty()) {
+                                alreadySearched.set(true);
+                                this.searchResults.getItems().clear();
+                                return;
+                            }
+
+                            executorService.execute(() -> {
+                                List<SearchResult> results = searchFor(fileExtension, inFile, inProject, directoryPath, searchText, caseInsensitive);
+
+                                Platform.runLater(() -> {
+                                    ObservableList<SearchResult> items = this.searchResults.getItems();
+                                    items.clear();
+                                    items.addAll(results);
+
+                                    setNotice("Found " + results.size() + " results in " + (System.currentTimeMillis() - start) + "ms");
+
+                                    alreadySearched.set(true);
+                                });
+                            });
+                        });
+                    }
+
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException ignored) {}
+        }).start();
+
+        this.searchText.textProperty().addListener(((observable, oldValue, newValue) -> hasChanged.set(true)));
+
         inFile.setSelected(true);
-        search.setOnAction(event -> {
-            executorService.execute(() -> {
-                long start = System.currentTimeMillis();
-                setError(null);
-                String extension = fileExtension.getText();
-                if (extension.startsWith(".")) extension = extension.substring(1);
+        action.setOnAction(event -> {
 
-                if (extension.isEmpty() || extension.matches("[^a-zA-Z\\d_.]")) {
-                    setError("You have an invalid file extension!");
-                    return;
-                }
-
-                List<SearchResult> results;
-
-                if (inFile.isSelected()) {
-                    results = this.searchManager.searchFile(new File(directoryPath.getText()), searchText.getText(), caseInsensitive.isSelected());
-                } else if (inProject.isSelected()) {
-                    results = this.searchManager.searchProject(searchText.getText(), extension, caseInsensitive.isSelected());
-                } else {
-                    results = this.searchManager.searchDirectory(new File(directoryPath.getText()), searchText.getText(), extension, caseInsensitive.isSelected());
-                }
-
-                Platform.runLater(() -> {
-                    ObservableList<SearchResult> items = searchResults.getItems();
-                    items.clear();
-                    items.addAll(results);
-
-                    setNotice("Found " + results.size() + " results in " + (System.currentTimeMillis() - start) + "ms");
-                });
-            });
         });
 
         replaceToggle.setSelected(initiallyReplace);
         if (!initiallyReplace) {
             replaceText.setDisable(true);
-            replace.setDisable(true);
+            action.setText("Search");
         }
 
         replaceToggle.selectedProperty().addListener((observer, oldValue, newValue) -> {
             replaceText.setDisable(!newValue);
-            replace.setDisable(!newValue);
-        });
-
-        replace.setOnAction(event -> {
-
+            action.setText(newValue ? "Replace" : "Search");
         });
 
         browse.setOnAction(event -> {
@@ -209,10 +238,6 @@ public class FindReplaceWindow extends Stage implements Initializable {
             FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, selectingFile ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY, file -> {
                 directoryPath.setText(file.getAbsolutePath());
             });
-        });
-
-        openFile.setOnAction(event -> {
-
         });
 
         cancel.setOnAction(event -> close());

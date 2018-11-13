@@ -32,7 +32,10 @@ public class SearchListCell extends ListCell<SearchResult> {
     @FXML
     private Label lineNumber;
 
-    private FXMLLoader mLLoader;
+    private FXMLLoader fxmlLoader;
+    private Text beforeText = new Text();
+    private Text highlightedText = new Text();
+    private Text afterText = new Text();
 
     @Override
     public void updateItem(SearchResult searchResult, boolean empty) {
@@ -42,15 +45,20 @@ public class SearchListCell extends ListCell<SearchResult> {
             setText(null);
             setGraphic(null);
         } else {
-            if (mLLoader == null) {
-                mLLoader = new FXMLLoader(getClass().getClassLoader().getResource("gui/SearchCell.fxml"));
-                mLLoader.setController(this);
+            if (fxmlLoader == null) {
+                fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("gui/SearchCell.fxml"));
+                fxmlLoader.setController(this);
 
                 try {
-                    mLLoader.load();
+                    fxmlLoader.load();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
+                flowText.getChildren().add(beforeText);
+                flowText.getChildren().add(highlightedText);
+                flowText.getChildren().add(afterText);
 
                 Map<String, String> changeDark = new HashMap<>();
                 changeDark.put("gridpane-theme", "gridpane-theme-dark");
@@ -81,17 +89,14 @@ public class SearchListCell extends ListCell<SearchResult> {
             String beforeContext = beforeIndex != 0 ? SearchResult.imageLettersToString(contextLine.subList(0, beforeIndex)) : "";
             String afterContext = afterIndex <= contextLine.size() ? SearchResult.imageLettersToString(contextLine.subList(afterIndex, contextLine.size())) : "";
 
-            Text beforeText = new Text(beforeContext);
+            beforeText.setText(beforeContext);
             beforeText.getStyleClass().add("found-context");
-            flowText.getChildren().add(beforeText);
 
-            Text highlightedText = new Text(SearchResult.imageLettersToString(searchResult.getImageLetters()));
+            highlightedText.setText(SearchResult.imageLettersToString(searchResult.getImageLetters()));
             highlightedText.getStyleClass().add("search-highlight");
-            flowText.getChildren().add(highlightedText);
 
-            Text afterText = new Text(afterContext);
+            afterText.setText(afterContext);
             afterText.getStyleClass().add("found-context");
-            flowText.getChildren().add(afterText);
 
             fileName.setText(searchResult.getFile().getName());
             lineNumber.setText(searchResult.getLineNumber() + "\n");

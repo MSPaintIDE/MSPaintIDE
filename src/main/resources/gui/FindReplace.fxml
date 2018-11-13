@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane prefHeight="500.0" prefWidth="600.0" scaleShape="false" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <JFXTextField fx:id="searchText" layoutX="10.0" layoutY="52.0" prefWidth="470.0" styleClass="theme-text" />
-      <JFXButton fx:id="search" buttonType="RAISED" layoutX="490.0" layoutY="52.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Search" />
+      <JFXTextField fx:id="searchText" layoutX="10.0" layoutY="52.0" prefWidth="580.0" promptText="Search for" styleClass="theme-text" />
       <JFXRadioButton fx:id="inFile" layoutX="12.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: #0d47a1;" styleClass="theme-text" text="In File">
           <cursor>
               <Cursor fx:constant="HAND" />
@@ -29,19 +28,18 @@
       </JFXRadioButton>
       <JFXTextField fx:id="directoryPath" layoutX="318.0" layoutY="134.0" prefWidth="230.0" styleClass="theme-text" />
       <JFXButton fx:id="browse" buttonType="RAISED" layoutX="558.0" layoutY="132.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="..." />
-      <JFXTextField fx:id="replaceText" layoutX="14.0" layoutY="92.0" prefWidth="390.0" styleClass="theme-text" />
-      <JFXCheckBox fx:id="replaceToggle" layoutX="413.0" layoutY="96.0" mnemonicParsing="false" styleClass="theme-text" text="Replace">
+      <JFXTextField fx:id="replaceText" layoutX="10.0" layoutY="92.0" prefWidth="500.0" promptText="Replace with" styleClass="theme-text" />
+      <JFXCheckBox fx:id="replaceToggle" layoutX="523.0" layoutY="96.0" mnemonicParsing="false" styleClass="theme-text" text="Replace">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXCheckBox>
-      <JFXButton fx:id="replace" buttonType="RAISED" layoutX="490.0" layoutY="90.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Replace" />
       <JFXScrollPane fx:id="scrollPane" layoutY="175.0" prefHeight="275.0" prefWidth="600.0" styleClass="result-pane">
          <children>
             <JFXListView id="searchResults" fx:id="searchResults" layoutX="1.0" prefHeight="250.0" prefWidth="600.0" styleClass="gridpane-theme" />
          </children></JFXScrollPane>
       <Label fx:id="resultText" layoutX="10.0" layoutY="125.0" prefWidth="580.0" styleClass="theme-text" textFill="#575757" />
-      <JFXButton fx:id="openFile" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Open File" />
+      <JFXButton fx:id="action" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Search" />
       <JFXButton fx:id="cancel" layoutX="490.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-font-size:14px;" styleClass="theme-text" text="Cancel" />
       <JFXCheckBox fx:id="caseInsensitive" layoutX="260.0" layoutY="15.0" mnemonicParsing="false" styleClass="theme-text" text="Case Insensitive">
          <cursor>
