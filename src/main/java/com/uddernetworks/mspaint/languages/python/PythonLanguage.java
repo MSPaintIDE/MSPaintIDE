@@ -24,7 +24,7 @@ public class PythonLanguage implements Language {
 
     @Override
     public String[] getFileExtensions() {
-        return new String[]{"py", "py3"};
+        return new String[]{"py", "py3", "pyw"};
     }
 
     @Override
