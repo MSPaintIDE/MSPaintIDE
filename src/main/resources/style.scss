@@ -143,10 +143,11 @@ JFXButton {
     }
 }
 
-.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:focused:selected {
+.list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
     -fx-background-color: #4b6eaf;
 
-    & * {
+    * {
         -fx-background-color: #4b6eaf;
     }
 }

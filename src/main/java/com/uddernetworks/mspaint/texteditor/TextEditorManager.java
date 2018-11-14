@@ -37,6 +37,11 @@ public class TextEditorManager {
             new FontBounds(31, 100),
     };
 
+    // Doesn't actually manage text files, used for generation
+    public TextEditorManager(Main main) {
+        this.headlessMain = main;
+    }
+
     public TextEditorManager(String file) throws IOException, InterruptedException, ExecutionException {
         this(new File(file), null);
     }
@@ -97,7 +102,7 @@ public class TextEditorManager {
         mainGUI.setIndeterminate(false);
     }
 
-    private ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
+    public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
         ScannedImage scannedImage = new ScannedImage();
         LetterGenerator letterGenerator = new LetterGenerator(this.headlessMain);
 
@@ -125,16 +130,10 @@ public class TextEditorManager {
         for (String textLine : text.split("\n")) {
             List<ImageLetter> line = new ArrayList<>();
             for (char cha : textLine.toCharArray()) {
-                DatabaseCharacter foundCharacter = databaseCharacters
-                        .stream()
-                        .filter(databaseCharacter -> databaseCharacter.getLetter() == cha)
-                        .findFirst()
-                        .orElse(null);
-
                 boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
                 int center = (int) ((size/ 2D) - centerPopulator.getCenter(cha, (int) size));
 
-                ImageLetter letter = new ImageLetter(foundCharacter, x, y + center, letterGrid[0].length, letterGrid.length, -1D, null);
+                ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, y + center, letterGrid[0].length, letterGrid.length, -1D, null);
                 letter.setValues(letterGrid);
                 letter.setData(Color.BLACK);
                 line.add(letter);
@@ -155,31 +154,6 @@ public class TextEditorManager {
 
     private FontBounds matchNearestFontSize(int fontSize) {
         return Arrays.stream(FONT_BOUNDS).filter(fontBounds -> fontBounds.isInbetween(fontSize)).findFirst().get();
-    }
-
-    private int[] getBiggestCoordinates(ScannedImage scannedImage) {
-        int xCoord = 0;
-        int yCoord = 0;
-
-        for (int y = 0; y < scannedImage.getLineCount(); y++) {
-            List<ImageLetter> line = scannedImage.getLine(y);
-            for (ImageLetter imageLetter : line) {
-                xCoord = Math.max(imageLetter.getX() + imageLetter.getWidth(), xCoord);
-                yCoord = Math.max(imageLetter.getY() + imageLetter.getHeight(), yCoord);
-            }
-        }
-
-        return new int[] {xCoord, yCoord};
-    }
-
-    private void applyPadding(ScannedImage scannedImage, int xAmount, int yAmount) {
-        for (int y = 0; y < scannedImage.getLineCount(); y++) {
-            List<ImageLetter> line = scannedImage.getLine(y);
-            for (ImageLetter imageLetter : line) {
-                imageLetter.setX(imageLetter.getX() + xAmount);
-                imageLetter.setY(imageLetter.getY() + yAmount);
-            }
-        }
     }
 
     private File createImageFile() throws IOException, ExecutionException, InterruptedException {
@@ -208,8 +182,6 @@ public class TextEditorManager {
         applyPadding(letterGrid, padding, padding);
 
         BufferedImage bufferedImage = new BufferedImage(coords[0] + padding * 2, coords[1] + padding * 2, BufferedImage.TYPE_INT_ARGB);
-        System.out.println("Width: " + bufferedImage.getWidth());
-        System.out.println("Height: " + bufferedImage.getHeight());
 
         LetterFileWriter letterFileWriter = new LetterFileWriter(letterGrid, bufferedImage, tempImage);
         letterFileWriter.writeToFile();
@@ -236,5 +208,32 @@ public class TextEditorManager {
         }
 
         if (MainGUI.HEADLESS) System.exit(0);
+    }
+
+    // Utility methods
+
+    public static int[] getBiggestCoordinates(ScannedImage scannedImage) {
+        int xCoord = 0;
+        int yCoord = 0;
+
+        for (int y = 0; y < scannedImage.getLineCount(); y++) {
+            List<ImageLetter> line = scannedImage.getLine(y);
+            for (ImageLetter imageLetter : line) {
+                xCoord = Math.max(imageLetter.getX() + imageLetter.getWidth(), xCoord);
+                yCoord = Math.max(imageLetter.getY() + imageLetter.getHeight(), yCoord);
+            }
+        }
+
+        return new int[] {xCoord, yCoord};
+    }
+
+    public static void applyPadding(ScannedImage scannedImage, int xAmount, int yAmount) {
+        for (int y = 0; y < scannedImage.getLineCount(); y++) {
+            List<ImageLetter> line = scannedImage.getLine(y);
+            for (ImageLetter imageLetter : line) {
+                imageLetter.setX(imageLetter.getX() + xAmount);
+                imageLetter.setY(imageLetter.getY() + yAmount);
+            }
+        }
     }
 }

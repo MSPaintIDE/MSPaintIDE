@@ -28,7 +28,7 @@ public class ImageCompare {
         ScannedImage scannedImage;
 
         try {
-            if (objectFile != null && !objectFile.exists() && !objectFile.isFile()) {
+            if (readFromFile && objectFile != null && !objectFile.isFile()) {
                 try {
                     objectFile.getParentFile().mkdirs();
                     readFromFile = !objectFile.createNewFile();

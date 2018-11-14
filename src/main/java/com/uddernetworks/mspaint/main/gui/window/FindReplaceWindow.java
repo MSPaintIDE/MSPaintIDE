@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.main.gui.window;
 import com.jfoenix.controls.*;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.gui.window.search.ReplaceManager;
 import com.uddernetworks.mspaint.main.gui.window.search.SearchListCell;
 import com.uddernetworks.mspaint.main.gui.window.search.SearchManager;
 import com.uddernetworks.mspaint.main.gui.window.search.SearchResult;
@@ -18,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -27,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,7 +81,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
     @FXML
     private Label notice;
 
-    private MainGUI mainGUI;
+    private final MainGUI mainGUI;
     private SearchManager searchManager;
     private boolean initiallyReplace;
 
@@ -160,11 +163,13 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
     private final AtomicLong lastChanged = new AtomicLong();
     private final AtomicBoolean alreadySearched = new AtomicBoolean(false);
+    private final AtomicBoolean currentlySearching = new AtomicBoolean(false);
     private final AtomicBoolean hasChanged = new AtomicBoolean(false);
 
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.searchResults.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         searchResults.setCellFactory(t -> new SearchListCell());
 
         new Thread(() -> {
@@ -174,8 +179,9 @@ public class FindReplaceWindow extends Stage implements Initializable {
                         lastChanged.set(System.currentTimeMillis());
                         alreadySearched.set(false);
                         hasChanged.set(false);
-                    } else if (!alreadySearched.get() && lastChanged.get() + 250 <= System.currentTimeMillis()) {
+                    } else if (!alreadySearched.get() && !currentlySearching.get() && lastChanged.get() + 250 <= System.currentTimeMillis()) {
                         long start = System.currentTimeMillis();
+                        currentlySearching.set(true);
                         setError(null);
 
                         Platform.runLater(() -> {
@@ -188,13 +194,13 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
                             if (searchText.trim().isEmpty()) {
                                 alreadySearched.set(true);
+                                currentlySearching.set(false);
                                 this.searchResults.getItems().clear();
                                 return;
                             }
 
                             executorService.execute(() -> {
                                 List<SearchResult> results = searchFor(fileExtension, inFile, inProject, directoryPath, searchText, caseInsensitive);
-
                                 Platform.runLater(() -> {
                                     ObservableList<SearchResult> items = this.searchResults.getItems();
                                     items.clear();
@@ -203,6 +209,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
                                     setNotice("Found " + results.size() + " results in " + (System.currentTimeMillis() - start) + "ms");
 
                                     alreadySearched.set(true);
+                                    currentlySearching.set(false);
                                 });
                             });
                         });
@@ -217,18 +224,35 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
         inFile.setSelected(true);
         action.setOnAction(event -> {
+            setError(null);
+            String replaceText = this.replaceText.getText();
 
+            if (replaceText.isEmpty()) {
+                setError("The replace text is empty!");
+                return;
+            }
+
+            this.searchResults.getSelectionModel().getSelectedItems()
+                    .parallelStream()
+                    .forEach(searchResult -> {
+                        ReplaceManager replaceManager = new ReplaceManager(this.mainGUI);
+                        try {
+                            replaceManager.replaceText(searchResult, replaceText);
+                        } catch (IOException | ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
         });
 
         replaceToggle.setSelected(initiallyReplace);
         if (!initiallyReplace) {
             replaceText.setDisable(true);
-            action.setText("Search");
+            action.setDisable(true);
         }
 
         replaceToggle.selectedProperty().addListener((observer, oldValue, newValue) -> {
             replaceText.setDisable(!newValue);
-            action.setText(newValue ? "Replace" : "Search");
+            action.setDisable(!newValue);
         });
 
         browse.setOnAction(event -> {
@@ -239,6 +263,11 @@ public class FindReplaceWindow extends Stage implements Initializable {
                 directoryPath.setText(file.getAbsolutePath());
             });
         });
+
+        Arrays.asList(inFile, inProject, inDirectory).forEach(radio ->
+                radio.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+                    hasChanged.set(true);
+                })));
 
         cancel.setOnAction(event -> close());
     }

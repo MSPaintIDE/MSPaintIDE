@@ -39,7 +39,7 @@
             <JFXListView id="searchResults" fx:id="searchResults" layoutX="1.0" prefHeight="250.0" prefWidth="600.0" styleClass="gridpane-theme" />
          </children></JFXScrollPane>
       <Label fx:id="resultText" layoutX="10.0" layoutY="125.0" prefWidth="580.0" styleClass="theme-text" textFill="#575757" />
-      <JFXButton fx:id="action" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Search" />
+      <JFXButton fx:id="action" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Replace" />
       <JFXButton fx:id="cancel" layoutX="490.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-font-size:14px;" styleClass="theme-text" text="Cancel" />
       <JFXCheckBox fx:id="caseInsensitive" layoutX="260.0" layoutY="15.0" mnemonicParsing="false" styleClass="theme-text" text="Case Insensitive">
          <cursor>
