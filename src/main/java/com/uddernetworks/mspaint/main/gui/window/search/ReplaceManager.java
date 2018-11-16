@@ -32,7 +32,7 @@ public class ReplaceManager {
     public void replaceText(SearchResult searchResult, String text) throws IOException, ExecutionException, InterruptedException {
         ScannedImage scannedImage = searchResult.getScannedImage();
         LetterGenerator letterGenerator = new LetterGenerator();
-        double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
+        double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class) * 1.3333333D;
         List<DatabaseCharacter> databaseCharacters = this.mainGUI.getMain().getDatabaseManager().getAllCharacterSegments(TextEditorManager.matchNearestFontSize((int) size)).get();
         DatabaseCharacter space = databaseCharacters
                 .stream()

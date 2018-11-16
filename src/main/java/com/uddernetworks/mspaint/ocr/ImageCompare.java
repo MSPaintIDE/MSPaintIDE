@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.ocr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.google.gson.JsonParseException;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.newocr.OCRHandle;
@@ -17,14 +18,6 @@ import java.util.Map;
 public class ImageCompare {
 
     public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, Main main, boolean readFromFile, boolean saveCaches) {
-        /*
-        if (readFromFile) {
-            System.out.println("Image not changed since file changed, so using file...");
-        } else {
-            System.out.println("Image has changed since last write to data file, reading image...");
-        }
-        */
-
         ScannedImage scannedImage;
 
         try {
@@ -55,11 +48,17 @@ public class ImageCompare {
 
                 if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
             } else {
-                GsonBuilder gsonBuilder = new GsonBuilder();
+                try {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
 
-                gsonBuilder.registerTypeAdapter(Map.Entry.class, (InstanceCreator<Map.Entry>) type -> new AbstractMap.SimpleEntry(null, null));
+                    gsonBuilder.registerTypeAdapter(Map.Entry.class, (InstanceCreator<Map.Entry>) type -> new AbstractMap.SimpleEntry<>(null, null));
 
-                scannedImage = gsonBuilder.create().fromJson(new String(Files.readAllBytes(objectFile.toPath())), ScannedImage.class);
+                    scannedImage = gsonBuilder.create().fromJson(new String(Files.readAllBytes(objectFile.toPath())), ScannedImage.class);
+                } catch (JsonParseException e) {
+                    if (!MainGUI.HEADLESS) mainGUI.setHaveError();
+                    System.err.println("There was a problem reading the cache for " + inputImage.getName() + "! Try resetting caches.");
+                    scannedImage = null;
+                }
             }
 
             return scannedImage;
