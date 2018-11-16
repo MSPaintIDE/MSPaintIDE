@@ -105,7 +105,7 @@ public class TextEditorManager {
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
         ScannedImage scannedImage = new ScannedImage();
-        LetterGenerator letterGenerator = new LetterGenerator(this.headlessMain);
+        LetterGenerator letterGenerator = new LetterGenerator();
 
         double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
         List<DatabaseCharacter> databaseCharacters = this.headlessMain.getDatabaseManager().getAllCharacterSegments(matchNearestFontSize((int) size)).get();
