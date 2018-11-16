@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextEditorManager {
 
@@ -143,7 +144,7 @@ public class TextEditorManager {
                 if (cha == ' ') x += spaceRatio * size;
             }
 
-            scannedImage.addLine(line);
+            scannedImage.addLine(y, line);
 
             y += size + ((int) (size * 0.5D));
             x = 0;
@@ -152,7 +153,7 @@ public class TextEditorManager {
         return scannedImage;
     }
 
-    private FontBounds matchNearestFontSize(int fontSize) {
+    public static FontBounds matchNearestFontSize(int fontSize) {
         return Arrays.stream(FONT_BOUNDS).filter(fontBounds -> fontBounds.isInbetween(fontSize)).findFirst().get();
     }
 
@@ -213,27 +214,25 @@ public class TextEditorManager {
     // Utility methods
 
     public static int[] getBiggestCoordinates(ScannedImage scannedImage) {
-        int xCoord = 0;
-        int yCoord = 0;
+        AtomicInteger xCoord = new AtomicInteger();
+        AtomicInteger yCoord = new AtomicInteger();
 
-        for (int y = 0; y < scannedImage.getLineCount(); y++) {
-            List<ImageLetter> line = scannedImage.getLine(y);
+        scannedImage.getGrid().values().forEach(line -> {
             for (ImageLetter imageLetter : line) {
-                xCoord = Math.max(imageLetter.getX() + imageLetter.getWidth(), xCoord);
-                yCoord = Math.max(imageLetter.getY() + imageLetter.getHeight(), yCoord);
+                xCoord.set(Math.max(imageLetter.getX() + imageLetter.getWidth(), xCoord.get()));
+                yCoord.set(Math.max(imageLetter.getY() + imageLetter.getHeight(), yCoord.get()));
             }
-        }
+        });
 
-        return new int[] {xCoord, yCoord};
+        return new int[] {xCoord.get(), yCoord.get()};
     }
 
     public static void applyPadding(ScannedImage scannedImage, int xAmount, int yAmount) {
-        for (int y = 0; y < scannedImage.getLineCount(); y++) {
-            List<ImageLetter> line = scannedImage.getLine(y);
+        scannedImage.getGrid().values().forEach(line -> {
             for (ImageLetter imageLetter : line) {
                 imageLetter.setX(imageLetter.getX() + xAmount);
                 imageLetter.setY(imageLetter.getY() + yAmount);
             }
-        }
+        });
     }
 }

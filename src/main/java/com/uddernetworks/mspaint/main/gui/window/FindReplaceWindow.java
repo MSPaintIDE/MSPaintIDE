@@ -224,24 +224,30 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
         inFile.setSelected(true);
         action.setOnAction(event -> {
+            action.setDisable(true);
             setError(null);
             String replaceText = this.replaceText.getText();
 
             if (replaceText.isEmpty()) {
                 setError("The replace text is empty!");
+                action.setDisable(false);
                 return;
             }
 
-            this.searchResults.getSelectionModel().getSelectedItems()
-                    .parallelStream()
-                    .forEach(searchResult -> {
-                        ReplaceManager replaceManager = new ReplaceManager(this.mainGUI);
-                        try {
-                            replaceManager.replaceText(searchResult, replaceText);
-                        } catch (IOException | ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            executorService.execute(() -> {
+                this.searchResults.getSelectionModel().getSelectedItems()
+                        .parallelStream()
+                        .forEach(searchResult -> {
+                            ReplaceManager replaceManager = new ReplaceManager(this.mainGUI);
+                            try {
+                                replaceManager.replaceText(searchResult, replaceText);
+                            } catch (IOException | ExecutionException | InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                Platform.runLater(() -> action.setDisable(false));
+            });
         });
 
         replaceToggle.setSelected(initiallyReplace);

@@ -31,11 +31,11 @@ public class LetterFileWriter {
         image = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         background(Color.WHITE);
 
-        for (int y = 0; y < scannedImage.getLineCount(); y++) {
-            scannedImage.getLine(y).forEach(imageLetter -> {
+        scannedImage.getGrid().values().forEach(line -> {
+            line.forEach(imageLetter -> {
                 if (imageLetter.getLetter() != ' ') writeLetterToFile(image, imageLetter);
             });
-        }
+        });
 
         if (writeFile != null) ImageIO.write(image, "png", writeFile);
     }

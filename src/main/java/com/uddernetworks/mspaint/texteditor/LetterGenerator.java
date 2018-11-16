@@ -19,7 +19,7 @@ public class LetterGenerator {
     public LetterGenerator(Main main) {
         databaseManager = main.getDatabaseManager();
 
-        image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
         graphics = image.createGraphics();
 
         clearImage();
@@ -47,8 +47,8 @@ public class LetterGenerator {
                 if (input[y][x]) {
                     minX = Math.min(x, minX);
                     minY = Math.min(y, minY);
-                    maxX = Math.max(x, maxX);
-                    maxY = Math.max(y, maxY);
+                    maxX = Math.max(x + 2, maxX);
+                    maxY = Math.max(y + 2, maxY);
                 }
             }
         }
