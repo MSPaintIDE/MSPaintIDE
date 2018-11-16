@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LetterFileWriter {
 
@@ -28,7 +30,17 @@ public class LetterFileWriter {
     }
 
     public void writeToFile() throws IOException {
-        image = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        AtomicInteger width = new AtomicInteger(this.image.getWidth());
+        AtomicInteger height = new AtomicInteger(this.image.getHeight());
+        scannedImage.getGrid().values()
+                .stream()
+                .flatMap(Collection::stream)
+                .forEach(imageLetter -> {
+                    width.set(Math.max(imageLetter.getX() + imageLetter.getWidth() + 10, width.get()));
+                    height.set(Math.max(imageLetter.getY() + imageLetter.getHeight() + 10, height.get()));
+                });
+
+        image = new BufferedImage(width.get(), height.get(), BufferedImage.TYPE_INT_ARGB);
         background(Color.WHITE);
 
         scannedImage.getGrid().values().forEach(line -> {
@@ -47,9 +59,9 @@ public class LetterFileWriter {
     private void writeLetterToFile(BufferedImage image, ImageLetter imageLetter) {
         int color = imageLetter.getData(Color.class).getRGB();
         boolean[][] data = imageLetter.getValues();
-        if(data == null) return;
+        if (data == null) return;
 
-        for (int y = 0; y < imageLetter.getHeight(); y++) {
+        for (int y = 0; y < imageLetter.getHeight() + 1; y++) {
             for (int x = 0; x < imageLetter.getWidth(); x++) {
                 if (data[y][x]) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, color);
             }

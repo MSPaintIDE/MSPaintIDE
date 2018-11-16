@@ -31,7 +31,7 @@ public class ReplaceManager {
 
     public void replaceText(SearchResult searchResult, String text) throws IOException, ExecutionException, InterruptedException {
         ScannedImage scannedImage = searchResult.getScannedImage();
-        LetterGenerator letterGenerator = new LetterGenerator(this.mainGUI.getMain());
+        LetterGenerator letterGenerator = new LetterGenerator();
         double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
         List<DatabaseCharacter> databaseCharacters = this.mainGUI.getMain().getDatabaseManager().getAllCharacterSegments(TextEditorManager.matchNearestFontSize((int) size)).get();
         DatabaseCharacter space = databaseCharacters
@@ -56,32 +56,17 @@ public class ReplaceManager {
         List<ImageLetter> line = lineEntry.getValue();
         int lineY = lineEntry.getKey();
 
-        System.out.println("lineY = " + lineY);
-
-        final int sizee = searchResult.getImageLetters().size();
-//        IntStream.range(foundPos, foundPos + sizee).forEach(line::remove);
-//        IntStream.rangeClosed(foundPos, foundPos + sizee).forEach(line::remove);
-
-        System.out.println("sizee = " + sizee);
+        final int imageLettersSize = searchResult.getImageLetters().size();
 
         int x = line.get(foundPos).getX();
 
-        int farRight = line.get(foundPos + sizee).getX() - x;
-        System.out.println("farRight = " + farRight);
+        int farRight = line.get(foundPos + imageLettersSize).getX() - x;
 
-        for (int i = 0; i < sizee; i++) {
+        for (int i = 0; i < imageLettersSize; i++) {
             line.remove(foundPos);
         }
 
-        System.out.println("foundPos = " + foundPos);
-//        line.remove(foundPos);
-//        for (int i = 0; i < sizee; i++) {
-//            line.remove(foundPos + i);
-//        }
-        System.out.println("orig x = " + x);
-
         int addBy = 0;
-//        line.stream().skip(foundPos + text.length() + 1).forEach(imageLetter -> imageLetter.setX(imageLetter.getX() - farRight));
 
         line.forEach(imageLetter -> imageLetter.setX(imageLetter.getX() - farRight));
 
@@ -91,11 +76,9 @@ public class ReplaceManager {
             x += addBy;
             char cha = text.charAt(i);
             boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
-            int center = (int) (centerPopulator.getCenter(cha, (int) size));
+            int center = centerPopulator.getCenter(cha, (int) size);
 
-            System.out.println("center = " + center);
-
-            ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, (int) (lineY - center - (int) size + (int) size), letterGrid[0].length, letterGrid.length, -1D, null);
+            ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, -1D, null);
             letter.setValues(letterGrid);
             letter.setData(Color.BLACK);
             adding.add(letter);
@@ -104,26 +87,15 @@ public class ReplaceManager {
 
             int finalAddBy = addBy;
             line.forEach(imageLetter -> imageLetter.setX(imageLetter.getX() + finalAddBy));
-
-            System.out.println("x = " + x + " (" + cha + ")");
         }
 
         line.addAll(adding);
-
-        scannedImage.getGrid().values().forEach(forLine -> {
-            forLine.forEach(imageLetter -> {
-                System.out.println(imageLetter.getLetter() + " (" + imageLetter.getX() + ", " + imageLetter.getY() + ")");
-            });
-
-            System.out.println("");
-        });
 
         BufferedImage original = ImageIO.read(searchResult.getFile());
 
         BufferedImage bufferedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         LetterFileWriter letterFileWriter = new LetterFileWriter(scannedImage, bufferedImage, searchResult.getFile());
-        System.out.println("Writing to: " +  searchResult.getFile().getAbsolutePath());
         letterFileWriter.writeToFile();
     }
 }

@@ -1,8 +1,6 @@
 package com.uddernetworks.mspaint.texteditor;
 
-import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.newocr.DatabaseCharacter;
-import com.uddernetworks.newocr.DatabaseManager;
 import com.uddernetworks.newocr.OCRUtils;
 
 import java.awt.*;
@@ -11,14 +9,11 @@ import java.util.Arrays;
 
 public class LetterGenerator {
 
-    private DatabaseManager databaseManager;
     private Graphics2D graphics;
     private int lastSize = -1;
     private BufferedImage image;
 
-    public LetterGenerator(Main main) {
-        databaseManager = main.getDatabaseManager();
-
+    public LetterGenerator() {
         image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
         graphics = image.createGraphics();
 
@@ -53,8 +48,8 @@ public class LetterGenerator {
             }
         }
 
-        int width = maxX - minX + 1;
-        int height = maxY - minY + 1;
+        int width = maxX - minX;
+        int height = maxY - minY;
 
         boolean[][] output = new boolean[height][width];
         for (int y = 0; y < output.length; y++) {
