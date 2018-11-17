@@ -26,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -143,6 +144,7 @@ public class MainGUI extends Application implements Initializable {
     private boolean remoteURLVisible = true;
     private GitController gitController;
     private AtomicBoolean initialized = new AtomicBoolean();
+    private static File initialProject = null;
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
@@ -185,6 +187,9 @@ public class MainGUI extends Application implements Initializable {
             } else if (args[0].equalsIgnoreCase("uninstall")) {
                 installer.uninstall();
                 System.exit(0);
+            } if (args[0].endsWith(".ppf")) {
+                initialProject = new File(args[0]);
+                if (!initialProject.isFile()) initialProject = null;
             } else {
                 HEADLESS = true;
                 new TextEditorManager(args[0]);
@@ -265,6 +270,8 @@ public class MainGUI extends Application implements Initializable {
         };
 
         ProjectManager.getRecent();
+
+        if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this, ready);
         } else {
@@ -309,7 +316,7 @@ public class MainGUI extends Application implements Initializable {
         this.primaryStage.setScene(scene);
 
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
-        this.primaryStage.getIcons().add(icon.getImage());
+        this.primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
         this.primaryStage.show();
     }

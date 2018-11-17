@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
@@ -80,7 +81,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
         show();
 
         setTitle("Welcome to MS Paint IDE");
-        getIcons().add(icon.getImage());
+        getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
     }
 
     @FXML
@@ -104,10 +105,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
                 ppfProject.setLanguage(language.getName());
 
                 Platform.runLater(() -> {
-                    ProjectManager.setCurrentProject(ppfProject);
-                    ProjectManager.save();
-                    ProjectManager.addRecent(ppfProject);
-                    ProjectManager.writeRecent();
+                    ProjectManager.switchProject(ppfProject);
                     ready.run();
                     close();
                 });

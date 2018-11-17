@@ -19,14 +19,22 @@ import java.util.stream.Collectors;
 
 public class Installer {
 
-    private List<String> regCommands = Arrays.asList(
+    private List<String> commands = Arrays.asList(
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /d \"Edit with MS Paint IDE\"",
-            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\\command\" /d \"%APPDATA_BAT% \\\"%1\\\"\"",
-            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Icon /d \"%APPDATA_LOGO%\"",
-            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Position /d \"Top\""
+            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\\command\" /t REG_EXPAND_SZ /d \"\\\"%LocalAppData%\\MSPaintIDE\\open.bat\\\" \\\"%1\\\"\"",
+            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Icon /d \"%LocalAppData%\\MSPaintIDE\\ms-paint-logo.ico\"",
+            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Position /d \"Top\"",
+            "reg add \"HKEY_CLASSES_ROOT\\.ppf\" /ve /d \"PaintProjectFile\"",
+            "reg add \"HKEY_CLASSES_ROOT\\PaintProjectFile\\shell\\open\\command\" /ve /t REG_EXPAND_SZ /d \"%LocalAppData%\\MSPaintIDE\\open.bat \\\"%1\\\"\"",
+            "reg add \"HKEY_CLASSES_ROOT\\PaintProjectFile\\DefaultIcon\" /ve /t REG_EXPAND_SZ /d \"%LocalAppData%\\MSPaintIDE\\images\\ms-paint-logo.ico\"",
+            "ie4uinit.exe -show"
     );
 
-    private String removeRegistry = "reg delete \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /f";
+    private List<String> removeRegistry = Arrays.asList(
+            "reg delete \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /f",
+            "reg delete \"HKEY_CLASSES_ROOT\\PaintProjectFile\" /f",
+            "reg delete \"HKEY_CLASSES_ROOT\\.ppf\" /f"
+    );
 
     public void install() {
         try {
@@ -41,8 +49,8 @@ public class Installer {
             Path appDataJar = Paths.get(msPaintAppData.getAbsolutePath(), "MSPaintIDE.jar");
             Files.copy(currentJar.toPath(), appDataJar, StandardCopyOption.REPLACE_EXISTING);
 
-            Path newIcon = Paths.get(imagesFolder.getAbsolutePath(), "logo.ico");
-            Files.copy(getClass().getClassLoader().getResourceAsStream("logo.ico"), newIcon, StandardCopyOption.REPLACE_EXISTING);
+            Path newIcon = Paths.get(imagesFolder.getAbsolutePath(), "ms-paint-logo.ico");
+            Files.copy(getClass().getClassLoader().getResourceAsStream("ms-paint-logo.ico"), newIcon, StandardCopyOption.REPLACE_EXISTING);
 
             Path uninstallIcon = Paths.get(imagesFolder.getAbsolutePath(), "uninstall.ico");
             Files.copy(getClass().getClassLoader().getResourceAsStream("uninstall.ico"), uninstallIcon, StandardCopyOption.REPLACE_EXISTING);
@@ -54,10 +62,12 @@ public class Installer {
 
             Files.write(openBat, open.getBytes(), StandardOpenOption.CREATE_NEW);
 
-            for (String regCommand : regCommands) {
+            for (String regCommand : commands) {
                 regCommand = regCommand.replace("%APPDATA_BAT%", openBat.toAbsolutePath().toString());
                 regCommand = regCommand.replace("%APPDATA_LOGO%", newIcon.toAbsolutePath().toString());
-                if ("TIMEOUT".equals(runCommand(regCommand, false))) {
+                String ran = runCommand(regCommand, false);
+                System.out.println(ran);
+                if ("TIMEOUT".equals(ran)) {
                     break;
                 }
             }
@@ -100,7 +110,7 @@ public class Installer {
                 File currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 
                 Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "MSPaintIDE.jar"));
-                Files.deleteIfExists(Paths.get(imagesFolder.getAbsolutePath(), "logo.ico"));
+                Files.deleteIfExists(Paths.get(imagesFolder.getAbsolutePath(), "ms-paint-logo.ico"));
                 Files.deleteIfExists(Paths.get(imagesFolder.getAbsolutePath(), "uninstall.ico"));
                 Files.deleteIfExists(Paths.get(msPaintAppData.toString(), "open.bat"));
                 Files.deleteIfExists(Paths.get(currentJar.getParentFile().getAbsolutePath(), "shortcut.vbs"));
@@ -108,7 +118,9 @@ public class Installer {
 
                 Files.deleteIfExists(msPaintAppData);
 
-                runCommand(removeRegistry, false);
+                for (String regCommand : removeRegistry) {
+                    if ("TIMEOUT".equals(runCommand(regCommand, false))) break;
+                }
             } catch (IOException | URISyntaxException e2) {
                 e2.printStackTrace();
 
@@ -137,7 +149,10 @@ public class Installer {
             System.out.println("Killed all processes. Continuing...");
         }
 
-        runCommand(removeRegistry, false);
+        for (String regCommand : removeRegistry) {
+            if ("TIMEOUT".equals(runCommand(regCommand, false))) break;
+        }
+
         runCommand("cmd /c ping localhost -n 3 > nul && rmdir \"" + msPaintAppData.getAbsolutePath() + "\" /q /s", false, false, new File("C:\\Windows\\system32"));
     }
 

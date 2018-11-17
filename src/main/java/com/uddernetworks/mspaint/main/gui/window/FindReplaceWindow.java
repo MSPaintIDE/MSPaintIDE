@@ -20,6 +20,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -110,7 +111,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
         show();
 
         setTitle("Find" + (replace ? "/Replace" : ""));
-        getIcons().add(icon.getImage());
+        getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
         Map<String, String> changeDark = new HashMap<>();
         changeDark.put(".gridpane-theme", "gridpane-theme-dark");

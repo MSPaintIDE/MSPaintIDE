@@ -59,7 +59,7 @@ public class ProjectManager {
     public static void writeRecent() {
         try {
             recent.toFile().createNewFile();
-            Files.write(recent, ((ppfProject == null ? "false" : "true") + recentProjects.stream()
+            Files.write(recent, ((ppfProject == null ? "false" : "true") + "\n" + recentProjects.stream()
                     .map(PPFProject::getFile)
                     .map(File::getAbsolutePath)
                     .collect(Collectors.joining("\n")))
@@ -84,5 +84,12 @@ public class ProjectManager {
 
     public static PPFProject readProject(File file) {
         return (ppfProject = ppfReader.read(file));
+    }
+
+    public static void switchProject(PPFProject ppfProject) {
+        setCurrentProject(ppfProject);
+        save();
+        addRecent(ppfProject);
+        writeRecent();
     }
 }

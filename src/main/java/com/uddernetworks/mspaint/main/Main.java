@@ -54,7 +54,16 @@ public class Main {
 
     public void headlessStart() throws IOException {
         SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
-        this.databaseManager = new DatabaseManager(SettingsManager.getSetting(Setting.DATABASE_URL, String.class), SettingsManager.getSetting(Setting.DATABASE_USER, String.class), SettingsManager.getSetting(Setting.DATABASE_PASS, String.class));
+        String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
+        String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
+        String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
+
+        if (url == null || user == null || pass == null) {
+            System.out.println("Couldn't set up database manager, partial/missing credentials in settings.");
+            return;
+        }
+
+        this.databaseManager = new DatabaseManager(url, user, pass);
     }
 
     public void setCurrentLanguage(Language language) {

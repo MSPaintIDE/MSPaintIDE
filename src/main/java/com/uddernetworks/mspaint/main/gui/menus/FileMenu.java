@@ -11,6 +11,8 @@ import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -53,8 +55,9 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.project")
     private void onClickOpenProject() {
-        // TODO: Open project
-        System.out.println("FileMenu.onClickOpenProject");
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
+            ProjectManager.switchProject(ProjectManager.readProject(file));
+        });
     }
 
     @BindItem(label = "open.file")
@@ -68,10 +71,22 @@ public class FileMenu extends MenuBind {
         });
     }
 
+    @BindItem(label = "clear-caches")
+    private void onClickClearCaches() {
+        System.out.println("Clearing caches...");
+
+        File objects = ProjectManager.getPPFProject().getObjectLocation();
+        if (objects.isDirectory()) {
+            Arrays.stream(objects.listFiles()).forEach(File::delete);
+        } else {
+            objects.delete();
+        }
+
+        System.out.println("Cleared caches!");
+    }
+
     @BindItem(label = "settings")
     private void onClickSettings() throws IOException {
-        System.out.println("FileMenu.onClickSettings");
-
         List<SettingItem> settingItems = Arrays.asList(new SettingItem("Appearance", "file\\Appearance.fxml"));
 
         new SettingsWindow(settingItems);

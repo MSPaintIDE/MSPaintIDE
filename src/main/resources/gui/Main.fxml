@@ -28,6 +28,7 @@
                               <MaterialMenuItem text="File" clickLabel="file"/>
                           </items>
                       </MaterialMenu>
+                    <MaterialMenuItem text="Clear Caches" clickLabel="clear-caches"/>
                     <MaterialMenuItem text="Settings" clickLabel="settings"/>
                     <MaterialMenuItem text="Print" clickLabel="print"/>
                     <MaterialMenuItem text="Close Project" clickLabel="close-project"/>

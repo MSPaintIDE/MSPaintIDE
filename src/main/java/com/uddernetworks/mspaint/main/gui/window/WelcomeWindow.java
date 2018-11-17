@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
@@ -59,7 +60,7 @@ public class WelcomeWindow extends Stage implements Initializable {
         show();
 
         setTitle("Welcome to MS Paint IDE");
-        getIcons().add(icon.getImage());
+        getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
     }
 
     @FXML
