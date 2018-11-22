@@ -66,7 +66,6 @@ public class Installer {
                 regCommand = regCommand.replace("%APPDATA_BAT%", openBat.toAbsolutePath().toString());
                 regCommand = regCommand.replace("%APPDATA_LOGO%", newIcon.toAbsolutePath().toString());
                 String ran = runCommand(regCommand, false);
-                System.out.println(ran);
                 if ("TIMEOUT".equals(ran)) {
                     break;
                 }

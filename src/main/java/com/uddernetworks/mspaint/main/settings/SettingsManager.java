@@ -40,7 +40,6 @@ public class SettingsManager {
     }
 
     public static void initialize(File file) throws IOException {
-        file.createNewFile();
         SettingsManager.file = file;
         reload();
     }
@@ -59,6 +58,18 @@ public class SettingsManager {
 
     public static void reload() throws IOException {
         settings.clear();
+
+        if (!file.exists()) {
+            file.createNewFile();
+            Properties properties = new Properties();
+            Arrays.stream(Setting.values()).forEach(setting -> {
+                properties.setProperty(setting.getName(), String.valueOf(setting.getDefault()));
+                settings.put(setting, setting.getDefault());
+            });
+
+            properties.store(new FileOutputStream(file), "MS Paint IDE Global Settings");
+            return;
+        }
 
         Properties properties = new Properties();
         properties.load(Files.newInputStream(file.toPath()));

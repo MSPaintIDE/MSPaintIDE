@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.main.gui.window;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXListView;
+import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
@@ -16,6 +17,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -77,11 +80,13 @@ public class WelcomeWindow extends Stage implements Initializable {
         });
 
         importProject.setOnAction(event -> {
-
+            // TODO: Not sure how to import projects/what to import from
         });
 
         openProject.setOnAction(event -> {
-
+            FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
+                ProjectManager.switchProject(ProjectManager.readProject(file));
+            });
         });
     }
 }
