@@ -10,8 +10,6 @@ public class TextPrintStream extends OutputStream {
 
     private TextArea textArea;
     private PrintStream original;
-    private String last = ""; //TODO not used - probably bug?
-    private StringBuilder builder = new StringBuilder(); //TODO not used - probably bug?
 
     public TextPrintStream(TextArea textArea, PrintStream original) {
         this.textArea = textArea;
@@ -21,7 +19,6 @@ public class TextPrintStream extends OutputStream {
 
     @Override
     public void write(int b) {
-        builder.append((char) b);
         original.write(b);
         Platform.runLater(() -> textArea.appendText(String.valueOf((char) b)));
     }

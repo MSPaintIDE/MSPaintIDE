@@ -287,6 +287,10 @@ public class MainGUI extends Application implements Initializable {
         Platform.runLater(() -> statusText.setText(text));
     }
 
+    public GitController getGitController() {
+        return this.gitController;
+    }
+
     public void updateLoading(double current, double total) {
         Platform.runLater(() -> progress.setProgress(current / total));
     }
@@ -469,6 +473,10 @@ public class MainGUI extends Application implements Initializable {
 
     public Language getCurrentLanguage() {
         return this.main.getCurrentLanguage();
+    }
+
+    public String getOrigin() {
+        return this.originURL.getText();
     }
 
     @FXML

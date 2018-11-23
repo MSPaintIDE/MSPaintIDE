@@ -21,6 +21,5 @@ public class EditMenu extends MenuBind {
     @BindItem(label = "replace")
     public void onClickReplace() throws IOException {
         new FindReplaceWindow(this.mainGUI, true);
-
     }
 }

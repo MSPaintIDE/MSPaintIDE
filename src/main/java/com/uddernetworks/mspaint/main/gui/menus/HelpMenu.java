@@ -4,6 +4,11 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.gui.BindItem;
 import com.uddernetworks.mspaint.main.gui.MenuBind;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class HelpMenu extends MenuBind {
 
     public HelpMenu(MainGUI mainGUI) {
@@ -11,22 +16,17 @@ public class HelpMenu extends MenuBind {
     }
 
     @BindItem(label = "help")
-    public void onClickHelp() {
-        System.out.println("HelpMenu.onClickHelp");
+    public void onClickHelp() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/blob/master/README.md"));
     }
 
     @BindItem(label = "source")
-    public void onClickSource() {
-        System.out.println("HelpMenu.onClickSource");
+    public void onClickSource() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE"));
     }
 
     @BindItem(label = "submit-a-bug")
-    public void onClickSubmitABug() {
-        System.out.println("HelpMenu.onClickSubmitABug");
-    }
-
-    @BindItem(label = "about")
-    public void onClickAbout() {
-        System.out.println("HelpMenu.onClickAbout");
+    public void onClickSubmitABug() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/issues/new"));
     }
 }
