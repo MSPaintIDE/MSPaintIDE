@@ -180,4 +180,9 @@ public class PPFProject {
     public void setName(String name, boolean override) {
         if (this.name == null || override) this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

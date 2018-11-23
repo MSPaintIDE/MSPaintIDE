@@ -161,9 +161,9 @@ JFXButton {
 }
 
 .dark-text {
-    -fx-text-fill: white;
-    -fx-prompt-text-fill: WHITE;
-    -jfx-unfocus-color: WHITE;
+    -fx-text-fill: white !important;
+    -fx-prompt-text-fill: WHITE !important;
+    -jfx-unfocus-color: WHITE !important;
 }
 
 .language-selection-dark {
@@ -291,5 +291,14 @@ $pseudos: hover, focused, showing;
 
     .menu-bar.menubar-dark > .container > .menu-button:#{$pseudo} {
         -fx-background-color: $hover-color-dark;
+    }
+}
+
+.logo-image {
+    -fx-image: url("ms-paint-logo-bw.png");
+    -fx-background-size: 250px 250px;
+
+    &.dark {
+        -fx-image: url("ms-paint-logo-bw-inverted.png");
     }
 }

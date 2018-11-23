@@ -3,10 +3,9 @@
 <?import com.jfoenix.controls.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -15,7 +14,7 @@
                   <Insets />
                </HBox.margin>
                <children>
-                  <JFXListView fx:id="recentProjects" />
+                  <JFXListView fx:id="recentProjects" styleClass="gridpane-theme" />
                </children>
             </JFXScrollPane>
             <Pane HBox.hgrow="ALWAYS">
@@ -35,11 +34,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </JFXButton>
-                  <ImageView fitHeight="250.0" fitWidth="250.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../ms-paint-logo-bw.png" />
-                     </image>
-                  </ImageView>
+                  <ImageView fitHeight="250.0" fitWidth="250.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" styleClass="logo-image" />
                </children>
             </Pane>
          </children>
