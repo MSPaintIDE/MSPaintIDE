@@ -14,7 +14,7 @@
                   <Insets />
                </HBox.margin>
                <children>
-                  <JFXListView fx:id="recentProjects" styleClass="gridpane-theme" />
+                  <JFXListView fx:id="recentProjects" styleClass="recent-projects" />
                </children>
             </JFXScrollPane>
             <Pane HBox.hgrow="ALWAYS">

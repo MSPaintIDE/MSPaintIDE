@@ -444,6 +444,7 @@ public class MainGUI extends Application implements Initializable {
                     parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
                     parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
                     parent.lookup(".language-selection").getStyleClass().add("language-selection-dark");
+                    parent.lookup(".vbox-theme").getStyleClass().add("vbox-theme-dark");
                     this.menu.getStyleClass().add("menubar-dark");
                 } else {
                     parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
@@ -451,6 +452,7 @@ public class MainGUI extends Application implements Initializable {
                     parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
                     parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
                     parent.lookup(".language-selection").getStyleClass().remove("language-selection-dark");
+                    parent.lookup(".vbox-theme").getStyleClass().remove("vbox-theme-dark");
                     this.menu.getStyleClass().remove("menubar-dark");
                 }
             });

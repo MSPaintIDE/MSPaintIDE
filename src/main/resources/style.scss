@@ -90,6 +90,7 @@ JFXButton {
 .gridpane-theme-dark {
     -fx-background-color: $left-background-dark;
     -fx-text-fill: white;
+    -fx-border-style: none;
 }
 
 .output-theme-dark {
@@ -106,7 +107,7 @@ JFXButton {
 .list-cell {
     -fx-background-color: $left-background;
 
-    .dark & {
+    .dark &, .language-selection-dark & {
         -fx-background-color: $left-background-dark;
     }
 }
@@ -156,14 +157,21 @@ JFXButton {
     -fx-fill: white;
 }
 
-.search-highlight {
-    -fx-fill: red;
-}
-
 .dark-text {
     -fx-text-fill: white !important;
     -fx-prompt-text-fill: WHITE !important;
     -jfx-unfocus-color: WHITE !important;
+}
+
+.language-selection {
+    .list-cell {
+        -fx-text-fill: black;
+        -fx-cursor: hand;
+    }
+
+    .list-cell:hover {
+        -fx-background-color: #C0C0C0;
+    }
 }
 
 .language-selection-dark {
@@ -171,14 +179,15 @@ JFXButton {
     -fx-border-color: $left-background-dark;
     -fx-text-fill: white;
 
-    .list-view, .language-selection-dark .list-cell {
+    .list-cell {
         -fx-background-color: $right-background-dark;
         -fx-border-color: $right-background-dark;
         -fx-text-fill: white;
     }
 
-    .list-cell {
-        -fx-cursor: hand;
+    .list-view {
+        -fx-background-color: transparent;
+        -fx-border-color: transparent;
     }
 
     .list-cell:focused, & .list-cell:hover {
@@ -195,14 +204,27 @@ JFXButton {
     -fx-border-width: 0;
 }
 
+.vbox-theme > * > * {
+    -fx-border-color: $left-background;
+}
+
+.vbox-theme-dark > * > * {
+    -fx-border-color: $left-background-dark;
+}
+
+.text-area {
+    -fx-focus-color: transparent;
+    -fx-text-box-border: transparent;
+}
 
 .menu-bar {
-    -fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
-    -fx-spacing: 0.166667em; /* 2 */
+    //-fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
+    //-fx-spacing: 0.166667em; /* 2 */
     -fx-background-color: $left-background;
-    -fx-background-insets: 0, 0 0 0 0;
-    -fx-background-radius: 0, 0;
-    -fx-border-style: none;
+    //-fx-background-insets: 0, 0 0 0 0;
+    //-fx-background-radius: 0, 0;
+    //-fx-border-width: 5px;
+    //-fx-border-color: red;
 
     > .container > .menu-button {
         -fx-background-color: $left-background;
@@ -230,9 +252,14 @@ JFXButton {
     &.menubar-dark {
         -fx-background-color: $left-background-dark;
         //-fx-border-insets: 0 0 1px 0; // top right bottom left
-        -fx-border-style: none none solid none;
-        -fx-border-width: 1px;
-        -fx-border-color: transparent transparent $right-background-dark transparent;
+        //-fx-border-style: none none solid none;
+        //-fx-border-width: 1px;
+        //-fx-border-color: transparent transparent $right-background-dark transparent;
+        -fx-border-style: none;
+
+
+        //-fx-border-width: 1px;
+        //-fx-border-color: green;
 
         > .container > .menu-button {
             -fx-background-color: $left-background-dark;
@@ -300,5 +327,17 @@ $pseudos: hover, focused, showing;
 
     &.dark {
         -fx-image: url("ms-paint-logo-bw-inverted.png");
+    }
+}
+
+.recent-projects-dark {
+    &, & .list-cell {
+        -fx-background-color: $left-background-dark;
+        -fx-border-color: $left-background-dark;
+        -fx-text-fill: white;
+    }
+
+    .list-cell {
+        -fx-cursor: hand;
     }
 }

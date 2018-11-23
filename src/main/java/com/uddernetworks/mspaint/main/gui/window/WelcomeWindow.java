@@ -9,6 +9,7 @@ import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -74,6 +75,7 @@ public class WelcomeWindow extends Stage implements Initializable {
         Map<String, String> changeDark = new HashMap<>();
         changeDark.put("gridpane-theme", "gridpane-theme-dark");
         changeDark.put("logo-image", "dark");
+        changeDark.put("recent-projects", "recent-projects-dark");
 
         SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
                 changeDark.forEach((key, value) -> root.lookupAll("." + key)
@@ -93,6 +95,12 @@ public class WelcomeWindow extends Stage implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         recentProjects.setItems(FXCollections.observableList(ProjectManager.getRecent()));
 
+        recentProjects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            ProjectManager.switchProject(newValue);
+            this.ready.run();
+            Platform.runLater(this::close);
+        });
+
         createProject.setOnAction(event -> {
             try {
                 new CreateProjectWindow(this.mainGUI, this.ready);
@@ -110,6 +118,7 @@ public class WelcomeWindow extends Stage implements Initializable {
             FileDirectoryChooser.openFileChooser(openAt, new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
                 ProjectManager.switchProject(ProjectManager.readProject(file));
                 this.ready.run();
+                Platform.runLater(this::close);
             });
         });
     }
