@@ -93,6 +93,42 @@ JFXButton {
     -fx-border-style: none;
 }
 
+.tree-view.gridpane-theme-dark > * > * > * > * {
+    -fx-background-color: $left-background-dark;
+}
+
+.tree-view > * > * > * > * {
+    -fx-background-color: $left-background;
+}
+
+.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell > *,
+.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell > * {
+    -fx-cursor: hand;
+}
+
+.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
+    -fx-background: $right-background;
+    -fx-background-color: $right-background;
+    -fx-text-fill: black;
+}
+
+.gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell,
+.gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell {
+    -fx-text-fill: white;
+}
+
+.gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
+    -fx-background: $right-background-dark;
+    -fx-background-color: $right-background-dark;
+    -fx-text-fill: white;
+}
+
+.split-pane.gridpane-theme-dark > .split-pane-divider {
+    -fx-background-color: $right-background-dark;
+}
+
 .output-theme-dark {
     -fx-background-color: $right-background-dark;
     -fx-border-color: $right-background-dark !important;
@@ -163,6 +199,10 @@ JFXButton {
     -jfx-unfocus-color: WHITE !important;
 }
 
+.check-box {
+    -fx-cursor: hand;
+}
+
 .language-selection {
     .list-cell {
         -fx-text-fill: black;
@@ -218,13 +258,7 @@ JFXButton {
 }
 
 .menu-bar {
-    //-fx-padding: 0.0em 0.666667em 0.0em 0.666667em; /* 0 8 0 8 */
-    //-fx-spacing: 0.166667em; /* 2 */
     -fx-background-color: $left-background;
-    //-fx-background-insets: 0, 0 0 0 0;
-    //-fx-background-radius: 0, 0;
-    //-fx-border-width: 5px;
-    //-fx-border-color: red;
 
     > .container > .menu-button {
         -fx-background-color: $left-background;
@@ -251,15 +285,7 @@ JFXButton {
 
     &.menubar-dark {
         -fx-background-color: $left-background-dark;
-        //-fx-border-insets: 0 0 1px 0; // top right bottom left
-        //-fx-border-style: none none solid none;
-        //-fx-border-width: 1px;
-        //-fx-border-color: transparent transparent $right-background-dark transparent;
         -fx-border-style: none;
-
-
-        //-fx-border-width: 1px;
-        //-fx-border-color: green;
 
         > .container > .menu-button {
             -fx-background-color: $left-background-dark;

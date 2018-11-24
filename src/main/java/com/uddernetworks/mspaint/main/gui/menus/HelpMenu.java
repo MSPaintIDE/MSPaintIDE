@@ -29,4 +29,9 @@ public class HelpMenu extends MenuBind {
     public void onClickSubmitABug() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/issues/new"));
     }
+
+    @BindItem(label = "donate")
+    public void onClickDonate() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://paypal.me/RubbaBoy"));
+    }
 }

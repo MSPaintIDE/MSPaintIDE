@@ -76,6 +76,12 @@ public class FileMenu extends MenuBind {
         System.out.println("Clearing caches...");
 
         File objects = ProjectManager.getPPFProject().getObjectLocation();
+
+        if (objects == null) {
+            System.out.println("No cache directory found!");
+            return;
+        }
+
         if (objects.isDirectory()) {
             Arrays.stream(objects.listFiles()).forEach(File::delete);
         } else {
