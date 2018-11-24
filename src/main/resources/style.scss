@@ -367,3 +367,29 @@ $pseudos: hover, focused, showing;
         -fx-cursor: hand;
     }
 }
+
+.settings-group-title {
+    -fx-background-color: $left-background;
+    -fx-translate-y: -10;
+}
+
+.settings-group-border {
+    -fx-content-display: top;
+    -fx-border-insets: 20 15 15 15;
+    -fx-background-color: $left-background;
+    -fx-border-color: $right-background-dark;
+    -fx-border-width: 2;
+}
+
+.settings-group-content {
+    -fx-padding: 26 10 10 10;
+}
+
+.gridpane-theme-dark .settings-group-title {
+    -fx-background-color: $left-background-dark;
+}
+
+.settings-group-border.gridpane-theme-dark {
+    -fx-background-color: $left-background-dark;
+    -fx-border-color: lighten($right-background-dark, 0.1);
+}

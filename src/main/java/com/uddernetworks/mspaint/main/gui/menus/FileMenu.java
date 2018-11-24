@@ -93,7 +93,10 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "settings")
     private void onClickSettings() throws IOException {
-        List<SettingItem> settingItems = Arrays.asList(new SettingItem("Appearance", "file\\Appearance.fxml"));
+        List<SettingItem> settingItems = Arrays.asList(
+                new SettingItem("Appearance", "file\\Appearance.fxml"),
+                new SettingItem("OCR", "file\\OCR.fxml")
+        );
 
         new SettingsWindow(settingItems);
     }
