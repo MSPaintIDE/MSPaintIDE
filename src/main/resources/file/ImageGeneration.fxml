@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.uddernetworks.mspaint.main.settings.guielements.SettingCheckBox?>
+<?import com.uddernetworks.mspaint.main.settings.guielements.SettingNumberField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.VBox?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <SettingCheckBox text="Dark Theme" setting="DARK_THEME"/>
-   </children>
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
    </padding>
+   <children>
+      <SettingNumberField setting="EDIT_FILE_SIZE" label="Editing File Size:"/>
+   </children>
 </VBox>

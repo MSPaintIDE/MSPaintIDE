@@ -10,6 +10,7 @@ public class SettingTextField extends JFXTextField {
     private ObjectProperty<Setting> settingProperty = new SimpleObjectProperty<>(null);
 
     public SettingTextField() {
+        getStyleClass().add("theme-text");
         textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue)));
     }
 

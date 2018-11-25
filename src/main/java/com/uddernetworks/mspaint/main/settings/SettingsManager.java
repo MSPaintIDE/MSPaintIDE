@@ -47,7 +47,7 @@ public class SettingsManager {
     public static void save() {
         Properties properties = new Properties();
 
-        settings.forEach((key, value) -> properties.setProperty(key.getName(), value.toString()));
+        settings.forEach((key, value) -> properties.setProperty(key.getName(), value == null ? "" : value.toString()));
 
         try {
             properties.store(new FileOutputStream(file), "MS Paint IDE Global Settings");
@@ -81,23 +81,28 @@ public class SettingsManager {
                     Setting setting = Setting.fromName(key);
                     if (setting == null) return;
 
-                    String string = properties.getProperty(key, null);
+                    String string = properties.getProperty(key, "");
 
                     switch (setting.getSettingType()) {
                         case STRING:
                             settings.put(setting, string);
                             break;
                         case INT:
-                            settings.put(setting, Integer.valueOf(string));
+                            settings.put(setting, string.isEmpty() ? 0 : Integer.valueOf(string));
                             break;
                         case DOUBLE:
-                            settings.put(setting, Double.valueOf(string));
+                            settings.put(setting, string.isEmpty() ? 0 : Double.valueOf(string));
                             break;
                         case BOOLEAN:
                             settings.put(setting, string.equalsIgnoreCase("true"));
                             break;
                     }
                 });
+
+        Arrays.stream(Setting.values())
+                .filter(setting -> !settings.containsKey(setting))
+                .forEach(setting -> settings.put(setting, setting.getDefault()));
+
     }
 
 }

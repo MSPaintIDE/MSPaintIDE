@@ -1,40 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.uddernetworks.mspaint.main.settings.guielements.SettingsGroup?>
-<?import com.uddernetworks.mspaint.main.settings.guielements.SettingTextField?>
+<?import com.uddernetworks.mspaint.main.settings.guielements.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="525.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
-   <padding>
-      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-   </padding>
-   <children>
-      <SettingsGroup prefHeight="200.0" prefWidth="710.0" styleClass="gridpane-theme" title="Database">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <Label text="Database URL" styleClass="theme-text">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin></Label>
-                  <SettingTextField setting="DATABASE_URL" styleClass="theme-text"/>
-                  <Label text="Database User" styleClass="theme-text">
-                     <VBox.margin>
-                        <Insets top="15.0" />
-                     </VBox.margin></Label>
-                  <SettingTextField setting="DATABASE_USER" styleClass="theme-text"/>
-                  <Label text="Database Password" styleClass="theme-text">
-                     <VBox.margin>
-                        <Insets top="15.0" />
-                     </VBox.margin></Label>
-                  <SettingTextField setting="DATABASE_PASS" styleClass="theme-text"/>
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
-               </padding>
-            </VBox>
-         </children>
-      </SettingsGroup>
-   </children>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
+      prefWidth="525.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+    </padding>
+    <children>
+        <SettingCheckBox text="OCR Debug/Info Messages" setting="OCR_DEBUG"/>
+        <Label text="Train Image" styleClass="theme-text">
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
+        </Label>
+        <SettingsFilePicker setting="TRAIN_IMAGE" options="FILES_ONLY"/>
+        <SettingsGroup prefHeight="200.0" prefWidth="710.0" styleClass="gridpane-theme" title="Database">
+            <children>
+                <VBox prefHeight="200.0" prefWidth="100.0">
+                    <children>
+                        <Label text="Database URL" styleClass="theme-text"/>
+                        <SettingTextField setting="DATABASE_URL"/>
+                        <Label text="Database User" styleClass="theme-text">
+                            <VBox.margin>
+                                <Insets top="15.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <SettingTextField setting="DATABASE_USER"/>
+                        <Label text="Database Password" styleClass="theme-text">
+                            <VBox.margin>
+                                <Insets top="15.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <SettingTextField setting="DATABASE_PASS"/>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="15.0"/>
+                    </padding>
+                </VBox>
+            </children>
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
+        </SettingsGroup>
+    </children>
 </VBox>

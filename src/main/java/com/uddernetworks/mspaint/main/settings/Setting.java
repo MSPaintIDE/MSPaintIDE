@@ -10,6 +10,8 @@ public enum Setting {
     DATABASE_URL("databaseURL", "", STRING),
     DATABASE_USER("databaseUser", "", STRING),
     DATABASE_PASS("databasePass", "", STRING),
+    TRAIN_IMAGE("trainImage", "", STRING),
+    OCR_DEBUG("ocrDebug", false, BOOLEAN),
     EDIT_FILE_SIZE("editFileFontSize", 36, INT); // The font size that files are generated in
 
     private final String name;
