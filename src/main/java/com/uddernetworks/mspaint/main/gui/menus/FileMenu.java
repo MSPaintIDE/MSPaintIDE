@@ -27,13 +27,7 @@ public class FileMenu extends MenuBind {
     @BindItem(label = "new.project")
     private void onClickNewProject() {
         try {
-            new CreateProjectWindow(this.mainGUI, () -> {
-                try {
-                    this.mainGUI.registerThings();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            new CreateProjectWindow(this.mainGUI);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,6 +51,7 @@ public class FileMenu extends MenuBind {
     private void onClickOpenProject() {
         FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
             ProjectManager.switchProject(ProjectManager.readProject(file));
+            this.mainGUI.refreshProject();
         });
     }
 

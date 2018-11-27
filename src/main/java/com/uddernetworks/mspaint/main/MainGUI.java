@@ -26,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -242,14 +243,7 @@ public class MainGUI extends Application implements Initializable {
         this.primaryStage.hide();
         ProjectManager.closeCurrentProject();
 
-        new WelcomeWindow(this, () -> {
-            try {
-                this.primaryStage.show();
-                registerThings();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        new WelcomeWindow(this);
     }
 
     @Override
@@ -260,22 +254,26 @@ public class MainGUI extends Application implements Initializable {
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(100);
 
-        Runnable ready = () -> {
-            try {
-                registerThings();
-                primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        };
-
         ProjectManager.getRecent();
 
         if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
-            new WelcomeWindow(this, ready);
+            new WelcomeWindow(this);
         } else {
-            ready.run();
+            refreshProject();
+        }
+    }
+
+    public void refreshProject() {
+        String languageClass = ProjectManager.getPPFProject().getLanguage();
+        try {
+            registerThings();
+            primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
+            setSelectedLanguage(Class.forName(languageClass));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("No language found with a class of \"" + languageClass + "\"");
         }
     }
 
@@ -479,6 +477,17 @@ public class MainGUI extends Application implements Initializable {
         return this.originURL.getText();
     }
 
+    public void setSelectedLanguage(Class<?> languageClass) {
+        List<Language> items = this.languageComboBox.getItems();
+        SelectionModel<Language> selectionModel = this.languageComboBox.getSelectionModel();
+
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getClass().equals(languageClass)) {
+                selectionModel.clearAndSelect(i);
+            }
+        }
+    }
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -547,6 +556,9 @@ public class MainGUI extends Application implements Initializable {
             Language language = languageComboBox.getSelectionModel().getSelectedItem();
             this.main.setCurrentLanguage(language);
             compile.setDisable(language.isInterpreted());
+
+            ProjectManager.getPPFProject().setLanguage(language.getClass().getCanonicalName());
+            ProjectManager.save();
         });
 
         this.gitController.getVersion(gitVersion -> {

@@ -45,12 +45,10 @@ public class WelcomeWindow extends Stage implements Initializable {
     private JFXListView<PPFProject> recentProjects;
 
     private MainGUI mainGUI;
-    private Runnable ready;
 
-    public WelcomeWindow(MainGUI mainGUI, Runnable ready) throws IOException {
+    public WelcomeWindow(MainGUI mainGUI) throws IOException {
         super();
         this.mainGUI = mainGUI;
-        this.ready = ready;
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/ProjectManageWindow.fxml"));
         loader.setController(this);
         Parent root = loader.load();
@@ -97,13 +95,13 @@ public class WelcomeWindow extends Stage implements Initializable {
 
         recentProjects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             ProjectManager.switchProject(newValue);
-            this.ready.run();
+            this.mainGUI.refreshProject();
             Platform.runLater(this::close);
         });
 
         createProject.setOnAction(event -> {
             try {
-                new CreateProjectWindow(this.mainGUI, this.ready);
+                new CreateProjectWindow(this.mainGUI);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -117,7 +115,7 @@ public class WelcomeWindow extends Stage implements Initializable {
             File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile() : new File("");
             FileDirectoryChooser.openFileChooser(openAt, new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
                 ProjectManager.switchProject(ProjectManager.readProject(file));
-                this.ready.run();
+                this.mainGUI.refreshProject();
                 Platform.runLater(this::close);
             });
         });

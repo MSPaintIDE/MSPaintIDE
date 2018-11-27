@@ -61,12 +61,10 @@ public class CreateProjectWindow extends Stage implements Initializable {
     private Label error;
 
     private MainGUI mainGUI;
-    private Runnable ready;
 
-    public CreateProjectWindow(MainGUI mainGUI, Runnable ready) throws IOException {
+    public CreateProjectWindow(MainGUI mainGUI) throws IOException {
         super();
         this.mainGUI = mainGUI;
-        this.ready = ready;
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/CreateProject.fxml"));
         loader.setController(this);
         Parent root = loader.load();
@@ -126,11 +124,11 @@ public class CreateProjectWindow extends Stage implements Initializable {
 
                 PPFProject ppfProject = new PPFProject(new File(fileLocation, name.replaceAll("[^\\w\\-. ]+", "") + ".ppf"));
                 ppfProject.setName(name);
-                ppfProject.setLanguage(language.getName());
+                ppfProject.setLanguage(language.getClass().getCanonicalName());
 
                 Platform.runLater(() -> {
                     ProjectManager.switchProject(ppfProject);
-                    ready.run();
+                    this.mainGUI.refreshProject();
                     close();
                 });
             } catch (IOException e) {
