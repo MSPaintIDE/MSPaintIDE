@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.main.gui.menus;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.gui.BindItem;
 import com.uddernetworks.mspaint.main.gui.MenuBind;
+import com.uddernetworks.mspaint.main.gui.window.SettingsWindow;
 import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.ocr.TrainGenerator;
@@ -18,8 +19,8 @@ public class OCRMenu extends MenuBind {
     }
 
     @BindItem(label = "settings")
-    public void onClickSettings() {
-        System.out.println("OCRMenu.onClickSettings");
+    public void onClickSettings() throws IOException {
+        new SettingsWindow("OCR");
     }
 
     @BindItem(label = "train")

@@ -4,7 +4,6 @@ import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.gui.BindItem;
 import com.uddernetworks.mspaint.main.gui.MenuBind;
-import com.uddernetworks.mspaint.main.gui.SettingItem;
 import com.uddernetworks.mspaint.main.gui.window.CreateProjectWindow;
 import com.uddernetworks.mspaint.main.gui.window.SettingsWindow;
 import com.uddernetworks.mspaint.project.ProjectManager;
@@ -15,7 +14,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class FileMenu extends MenuBind {
@@ -88,13 +86,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "settings")
     private void onClickSettings() throws IOException {
-        List<SettingItem> settingItems = Arrays.asList(
-                new SettingItem("Appearance", "file\\Appearance.fxml"),
-                new SettingItem("OCR", "file\\OCR.fxml"),
-                new SettingItem("Image Generation", "file\\ImageGeneration.fxml")
-        );
-
-        new SettingsWindow(settingItems);
+        new SettingsWindow(null);
     }
 
     @BindItem(label = "print")
