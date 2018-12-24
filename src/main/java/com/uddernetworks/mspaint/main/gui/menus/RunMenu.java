@@ -12,11 +12,19 @@ public class RunMenu extends MenuBind {
 
     @BindItem(label = "run")
     public void onClickRun() {
-        System.out.println("RunMenu.onClickRun");
+        System.out.println("Running...");
+        this.mainGUI.fullCompile(true);
     }
 
     @BindItem(label = "build")
     public void onClickBuild() {
-        System.out.println("RunMenu.onClickBuild");
+        System.out.println("Building...");
+        if (this.mainGUI.getCurrentLanguage().isInterpreted()) {
+            this.mainGUI.setHaveError();
+            System.err.println("The selected language does not support building.");
+            return;
+        }
+
+        this.mainGUI.fullCompile(false);
     }
 }

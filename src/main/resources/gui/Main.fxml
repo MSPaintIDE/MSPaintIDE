@@ -45,6 +45,7 @@
                   <items>
                     <MaterialMenuItem clickLabel="settings" text="Settings" />
                     <MaterialMenuItem clickLabel="train" text="Train" />
+                    <MaterialMenuItem clickLabel="generate" text="Generate" />
                   </items>
                 </MaterialMenu>
                 <MaterialMenu bindClass="RunMenu" text="Run">
@@ -121,6 +122,7 @@
                                               <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
                                               <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
                                               <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
+                                    <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
                                           </rowConstraints>
                                           <children>
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Input Image/Image Folder" />
@@ -187,6 +189,14 @@
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
+                                    <JFXButton fx:id="generate" buttonType="RAISED" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Generate" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                       <GridPane.margin>
+                                          <Insets left="10.0" />
+                                       </GridPane.margin>
+                                    </JFXButton>
                                           </children>
                                       </GridPane>
                                       <Pane prefHeight="100.0" prefWidth="500.0" GridPane.rowIndex="1">

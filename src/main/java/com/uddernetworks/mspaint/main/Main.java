@@ -197,11 +197,11 @@ public class Main {
         imageClasses.clear();
     }
 
-    public List<File> getFilesFromDirectory(File directory, String extension) {
+    public static List<File> getFilesFromDirectory(File directory, String extension) {
         return getFilesFromDirectory(directory, new String[] {extension});
     }
 
-    public List<File> getFilesFromDirectory(File directory, String[] extensions) {
+    public static List<File> getFilesFromDirectory(File directory, String[] extensions) {
         List<File> ret = new ArrayList<>();
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {

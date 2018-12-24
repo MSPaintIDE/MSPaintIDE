@@ -21,6 +21,7 @@ public class SettingNumberField extends HBox {
 
     public SettingNumberField() {
         getStyleClass().add("theme-text");
+        setStyle("-fx-padding: 10px 0");
         label.getStyleClass().add("theme-text");
         numberField.getStyleClass().add("theme-text");
 

@@ -44,10 +44,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class MainGUI extends Application implements Initializable {
@@ -97,6 +100,8 @@ public class MainGUI extends Application implements Initializable {
     private JFXButton programOutput;
     @FXML
     private JFXButton createRepo;
+    @FXML
+    private JFXButton generate;
     @FXML
     private JFXButton addRemote;
     @FXML
@@ -188,7 +193,7 @@ public class MainGUI extends Application implements Initializable {
             } else if (args[0].equalsIgnoreCase("uninstall")) {
                 installer.uninstall();
                 System.exit(0);
-            } if (args[0].endsWith(".ppf")) {
+            } else if (args[0].endsWith(".ppf")) {
                 initialProject = new File(args[0]);
                 if (!initialProject.isFile()) initialProject = null;
             } else {
@@ -323,46 +328,48 @@ public class MainGUI extends Application implements Initializable {
         this.primaryStage.show();
     }
 
+    public void fullCompile(boolean execute) {
+        try {
+            if (getCurrentLanguage() == null) {
+                setHaveError();
+                System.out.println("No language selected!");
+                return;
+            }
+
+            if (!getCurrentLanguage().meetsRequirements()) {
+                setHaveError();
+                System.out.println("You somehow selected a language that your\n" +
+                        "system doesn't have the proper requirements for!");
+                return;
+            }
+
+            progress.setProgress(0);
+            progress.getStyleClass().remove("progressError");
+
+            long start = System.currentTimeMillis();
+            if (main.indexAll(useCaches.isSelected(), saveCaches.isSelected()) == -1) return;
+
+            if (syntaxHighlight.isSelected()) {
+                main.highlightAll();
+            }
+
+            if (compile.isSelected() || getCurrentLanguage().isInterpreted()) {
+                main.compile(execute);
+            }
+
+            setStatusText("");
+            updateLoading(0, 1);
+
+            System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void startScan(ActionEvent event) {
-        new Thread(() -> {
-            try {
-                if (getCurrentLanguage() == null) {
-                    setHaveError();
-                    System.out.println("No language selected!");
-                    return;
-                }
-
-                if (!getCurrentLanguage().meetsRequirements()) {
-                    setHaveError();
-                    System.out.println("You somehow selected a language that your\n" +
-                            "system doesn't have the proper requirements for!");
-                    return;
-                }
-
-                progress.setProgress(0);
-                progress.getStyleClass().remove("progressError");
-
-                long start = System.currentTimeMillis();
-                if (main.indexAll(useCaches.isSelected(), saveCaches.isSelected()) == -1) return;
-
-                if (syntaxHighlight.isSelected()) {
-                    main.highlightAll();
-                }
-
-                if (compile.isSelected() || getCurrentLanguage().isInterpreted()) {
-                    main.compile(execute.isSelected() || getCurrentLanguage().isInterpreted());
-                }
-
-                setStatusText("");
-                updateLoading(0, 1);
-
-                System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        new Thread(() -> fullCompile(execute.isSelected() || getCurrentLanguage().isInterpreted())).start();
     }
 
     public boolean shouldUseCaches() {
@@ -488,6 +495,23 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
+    private boolean runListeners = true;
+
+    private <T> void addOptionalListener(TextField textField, Class<T> clazz, Consumer<T> callback) {
+        textField.textProperty().addListener(event -> {
+            if (runListeners) {
+                if (clazz.equals(File.class)) {
+                    String text = textField.getText();
+                    callback.accept((T) (text.trim().isEmpty() ? null : new File(text)));
+                } else if (clazz.equals(String.class)) {
+                    callback.accept((T) textField.getText().trim());
+                } else {
+                    System.out.println("Unknown class " + clazz.getCanonicalName());
+                }
+            }
+        });
+    }
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -505,8 +529,6 @@ public class MainGUI extends Application implements Initializable {
                         .filter(MaterialMenu.class::isInstance)
                         .map(MaterialMenu.class::cast), Stream.of(menu)))
                 .forEach(materialMenu -> materialMenu.initialize(this));
-
-        inputName.textProperty().addListener(event -> main.setInputImage(new File(inputName.getText())));
 
         Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
             System.err.println("Error happened! Thread " + thread + " exception: " + exception.getLocalizedMessage());
@@ -570,6 +592,38 @@ public class MainGUI extends Application implements Initializable {
             }
         });
 
+        generate.setOnAction(event -> {
+            PPFProject project = ProjectManager.getPPFProject();
+            File parent = project.getFile().getParentFile();
+
+            runListeners = false;
+            createAndSetFolder(inputName, parent, "src");
+            createAndSetFolder(highlightedImage, parent, "highlighted");
+            createAndSetFolder(cacheFile, parent, "cache");
+            createAndSetFolder(classOutput, parent, "out");
+
+            File out = new File(parent, "Output" + this.main.getCurrentLanguage().getOutputFileExtension());
+            compiledJarOutput.setText(out.getAbsolutePath());
+
+            Map<String, TextField> imageGen = new HashMap<>();
+            imageGen.put("program.png", programOutputValue);
+            imageGen.put("compiler.png", compilerOutputValue);
+
+            imageGen.forEach((file, textField) -> {
+                try {
+                    File classOutputImage = new File(parent, file);
+                    BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_ARGB);
+                    clearImage(image);
+                    ImageIO.write(image, "png", classOutputImage);
+                    textField.setText(classOutputImage.getAbsolutePath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            runListeners = true;
+        });
+
         createRepo.setOnAction(event -> this.gitController.gitInit(ProjectManager.getPPFProject().getInputLocation()));
 
         addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileChoser(ProjectManager.getPPFProject().getInputLocation(), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
@@ -592,7 +646,7 @@ public class MainGUI extends Application implements Initializable {
 
         push.setOnAction(event -> this.gitController.push());
 
-        inputName.textProperty().addListener(event -> main.setInputImage(inputName.getText().trim().isEmpty() ? null : new File(inputName.getText())));
+        addOptionalListener(inputName, File.class, main::setInputImage);
 
         changeInputImage.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getInputLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getInputLocation();
@@ -602,7 +656,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        highlightedImage.textProperty().addListener(event -> ProjectManager.getPPFProject().setHighlightLocation(highlightedImage.getText().trim().isEmpty() ? null : new File(highlightedImage.getText())));
+        addOptionalListener(highlightedImage, File.class, ProjectManager.getPPFProject()::setHighlightLocation);
 
         changeHighlightImage.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getHighlightLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getHighlightLocation();
@@ -612,7 +666,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        cacheFile.textProperty().addListener(event -> ProjectManager.getPPFProject().setObjectLocation(cacheFile.getText().trim().isEmpty() ? null : new File(cacheFile.getText())));
+        addOptionalListener(cacheFile, File.class, ProjectManager.getPPFProject()::setObjectLocation);
 
         changeCacheFile.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getObjectLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getObjectLocation();
@@ -622,7 +676,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        classOutput.textProperty().addListener(event -> ProjectManager.getPPFProject().setClassLocation(classOutput.getText().trim().isEmpty() ? null : new File(classOutput.getText())));
+        addOptionalListener(classOutput, File.class, ProjectManager.getPPFProject()::setClassLocation);
 
         changeClassOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getClassLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getClassLocation();
@@ -632,7 +686,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        compiledJarOutput.textProperty().addListener(event -> ProjectManager.getPPFProject().setJarFile(compiledJarOutput.getText().trim().isEmpty() ? null : new File(compiledJarOutput.getText())));
+        addOptionalListener(compiledJarOutput, File.class, ProjectManager.getPPFProject()::setJarFile);
 
         changeCompiledJar.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getJarFile() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getJarFile();
@@ -642,7 +696,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        libraryFile.textProperty().addListener(event -> ProjectManager.getPPFProject().setLibraryLocation(libraryFile.getText().trim().isEmpty() ? null : new File(libraryFile.getText())));
+        addOptionalListener(libraryFile, File.class, ProjectManager.getPPFProject()::setLibraryLocation);
 
         changeLibraries.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getLibraryLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getLibraryLocation();
@@ -652,7 +706,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        otherFiles.textProperty().addListener(event -> ProjectManager.getPPFProject().setOtherLocation(otherFiles.getText().trim().isEmpty() ? null : new File(otherFiles.getText())));
+        addOptionalListener(otherFiles, File.class, ProjectManager.getPPFProject()::setOtherLocation);
 
         changeOtherFiles.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getOtherLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getOtherLocation();
@@ -662,7 +716,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        compilerOutputValue.textProperty().addListener(event -> ProjectManager.getPPFProject().setCompilerOutput(compilerOutputValue.getText().trim().isEmpty() ? null : new File(compilerOutputValue.getText())));
+        addOptionalListener(compilerOutputValue, File.class, ProjectManager.getPPFProject()::setCompilerOutput);
 
         compilerOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getCompilerOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getCompilerOutput();
@@ -672,7 +726,7 @@ public class MainGUI extends Application implements Initializable {
             });
         });
 
-        programOutputValue.textProperty().addListener(event -> ProjectManager.getPPFProject().setAppOutput(programOutputValue.getText().trim().isEmpty() ? null : new File(programOutputValue.getText())));
+        addOptionalListener(programOutputValue, File.class, ProjectManager.getPPFProject()::setAppOutput);
 
         programOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getAppOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getAppOutput();
@@ -681,6 +735,12 @@ public class MainGUI extends Application implements Initializable {
                 ProjectManager.getPPFProject().setAppOutput(file);
             });
         });
+    }
+
+    private void createAndSetFolder(TextField textField, File parent, String folder) {
+        File out = new File(parent, folder);
+        out.mkdirs();
+        textField.setText(out.getAbsolutePath());
     }
 
     public TextArea getOutputTextArea() {
