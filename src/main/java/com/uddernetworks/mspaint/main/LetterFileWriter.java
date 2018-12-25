@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
-import com.uddernetworks.newocr.ImageLetter;
 import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.character.ImageLetter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

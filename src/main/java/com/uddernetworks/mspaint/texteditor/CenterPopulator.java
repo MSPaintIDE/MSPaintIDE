@@ -1,9 +1,9 @@
 package com.uddernetworks.mspaint.texteditor;
 
 import com.uddernetworks.newocr.OCRHandle;
-import com.uddernetworks.newocr.OCRUtils;
-import com.uddernetworks.newocr.SearchCharacter;
 import com.uddernetworks.newocr.SearchImage;
+import com.uddernetworks.newocr.character.SearchCharacter;
+import com.uddernetworks.newocr.utils.OCRUtils;
 import javafx.util.Pair;
 
 import java.awt.*;

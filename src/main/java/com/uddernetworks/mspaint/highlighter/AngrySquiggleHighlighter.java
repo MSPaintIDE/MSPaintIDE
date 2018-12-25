@@ -1,8 +1,8 @@
 package com.uddernetworks.mspaint.highlighter;
 
 import com.uddernetworks.mspaint.languages.LanguageError;
-import com.uddernetworks.newocr.ImageLetter;
 import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.character.ImageLetter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

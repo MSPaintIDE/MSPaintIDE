@@ -6,10 +6,10 @@ import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
-import com.uddernetworks.newocr.DatabaseCharacter;
 import com.uddernetworks.newocr.FontBounds;
-import com.uddernetworks.newocr.ImageLetter;
 import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.database.DatabaseCharacter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

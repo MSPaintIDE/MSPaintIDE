@@ -7,9 +7,9 @@ import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
 import com.uddernetworks.mspaint.texteditor.LetterGenerator;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
-import com.uddernetworks.newocr.DatabaseCharacter;
-import com.uddernetworks.newocr.ImageLetter;
 import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.database.DatabaseCharacter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

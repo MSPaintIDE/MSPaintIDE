@@ -45,6 +45,8 @@ public class Installer {
             File imagesFolder = new File(msPaintAppData, "images");
             imagesFolder.mkdirs();
 
+            new File(msPaintAppData, "database").mkdirs();
+
             File currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
             Path appDataJar = Paths.get(msPaintAppData.getAbsolutePath(), "MSPaintIDE.jar");
             Files.copy(currentJar.toPath(), appDataJar, StandardCopyOption.REPLACE_EXISTING);

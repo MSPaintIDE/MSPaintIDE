@@ -12,7 +12,8 @@ import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import com.uddernetworks.newocr.DatabaseManager;
+import com.uddernetworks.newocr.database.DatabaseManager;
+import com.uddernetworks.newocr.database.OCRDatabaseManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,16 +55,29 @@ public class Main {
 
     public void headlessStart() throws IOException {
         SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
-        String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
-        String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
-        String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
 
-        if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
-            System.out.println("Couldn't set up database manager, partial/missing credentials in settings.");
-            return;
+        if (SettingsManager.getSetting(Setting.DATABASE_USE_INTERNAL, Boolean.class)) {
+            String location = SettingsManager.getSetting(Setting.DATABASE_INTERNAL_LOCATION, String.class);
+            File file = location != null && !location.trim().equals("") ? new File(location) : null;
+
+            if (file == null || (!file.isDirectory() && !file.mkdirs())) {
+                System.out.println("Invalid/unset internal database location");
+                return;
+            }
+
+            this.databaseManager = new OCRDatabaseManager(new File(file, "ocr_db"));
+        } else {
+            String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
+            String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
+            String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
+
+            if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+                System.out.println("Couldn't set up database manager, partial/missing credentials in settings.");
+                return;
+            }
+
+            this.databaseManager = new OCRDatabaseManager(url, user, pass);
         }
-
-        this.databaseManager = new DatabaseManager(url, user, pass);
     }
 
     public void setCurrentLanguage(Language language) {

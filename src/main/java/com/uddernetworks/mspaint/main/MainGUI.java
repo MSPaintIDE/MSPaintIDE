@@ -156,7 +156,7 @@ public class MainGUI extends Application implements Initializable {
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
     private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
 
-    public static final File LOCAL_MSPAINT = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE");
+    public static final File LOCAL_MSPAINT = new File(System.getenv("LocalAppData"), "\\MSPaintIDE");
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 

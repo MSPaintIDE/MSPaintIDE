@@ -2,7 +2,7 @@ package com.uddernetworks.mspaint.main.gui.window.search;
 
 import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
-import com.uddernetworks.newocr.ImageLetter;
+import com.uddernetworks.newocr.character.ImageLetter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
