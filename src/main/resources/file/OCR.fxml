@@ -2,7 +2,7 @@
 
 <?import com.uddernetworks.mspaint.main.settings.guielements.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
       prefWidth="525.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
@@ -38,14 +38,29 @@
             <children>
                 <VBox prefWidth="100.0">
                     <children>
-                        <Label text="Database URL" styleClass="theme-text"/>
+                        <SettingCheckBox text="Use internal database" setting="DATABASE_USE_INTERNAL"/>
+
+                        <Label text="Internal database location" styleClass="theme-text">
+                            <VBox.margin>
+                                <Insets top="15.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <SettingTextField setting="DATABASE_INTERNAL_LOCATION"/>
+
+                        <Label text="Database URL" styleClass="theme-text">
+                            <VBox.margin>
+                                <Insets top="15.0"/>
+                            </VBox.margin>
+                        </Label>
                         <SettingTextField setting="DATABASE_URL"/>
+
                         <Label text="Database User" styleClass="theme-text">
                             <VBox.margin>
                                 <Insets top="15.0"/>
                             </VBox.margin>
                         </Label>
                         <SettingTextField setting="DATABASE_USER"/>
+
                         <Label text="Database Password" styleClass="theme-text">
                             <VBox.margin>
                                 <Insets top="15.0"/>

@@ -35,6 +35,7 @@ public class Main {
     private LanguageManager languageManager = new LanguageManager();
     private Language currentLanguage;
     private DatabaseManager databaseManager;
+    private boolean usingInternal;
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         headlessStart();
@@ -56,28 +57,40 @@ public class Main {
     public void headlessStart() throws IOException {
         SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
 
-        if (SettingsManager.getSetting(Setting.DATABASE_USE_INTERNAL, Boolean.class)) {
-            String location = SettingsManager.getSetting(Setting.DATABASE_INTERNAL_LOCATION, String.class);
-            File file = location != null && !location.trim().equals("") ? new File(location) : null;
+        SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
+            System.out.println("On change");
+            try {
+                if (useInternal == this.usingInternal) return;
+                this.usingInternal = useInternal;
 
-            if (file == null || (!file.isDirectory() && !file.mkdirs())) {
-                System.out.println("Invalid/unset internal database location");
-                return;
+                if (this.databaseManager != null) this.databaseManager.shutdown();
+
+                if (useInternal) {
+                    String location = SettingsManager.getSetting(Setting.DATABASE_INTERNAL_LOCATION, String.class);
+                    File file = location != null && !location.trim().equals("") ? new File(location) : null;
+
+                    if (file == null || (!file.isDirectory() && !file.mkdirs())) {
+                        System.out.println("Invalid/unset internal database location");
+                        return;
+                    }
+
+                    this.databaseManager = new OCRDatabaseManager(new File(file, "ocr_db"));
+                } else {
+                    String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
+                    String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
+                    String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
+
+                    if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+                        System.out.println("Couldn't set up database manager, partial/missing credentials in settings.");
+                        return;
+                    }
+
+                    this.databaseManager = new OCRDatabaseManager(url, user, pass);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            this.databaseManager = new OCRDatabaseManager(new File(file, "ocr_db"));
-        } else {
-            String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
-            String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
-            String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
-
-            if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
-                System.out.println("Couldn't set up database manager, partial/missing credentials in settings.");
-                return;
-            }
-
-            this.databaseManager = new OCRDatabaseManager(url, user, pass);
-        }
+        }, Boolean.class, true);
     }
 
     public void setCurrentLanguage(Language language) {

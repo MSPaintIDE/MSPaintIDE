@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.main.settings;
 
 import com.uddernetworks.mspaint.main.MainGUI;
 
+import java.io.File;
 import java.util.Arrays;
 
 import static com.uddernetworks.mspaint.main.settings.SettingType.*;
@@ -10,7 +11,7 @@ public enum Setting {
     OPEN_PROJECT("openProject", "", STRING),
     DARK_THEME("darkTheme", true, BOOLEAN),
     DATABASE_USE_INTERNAL("databaseUseInternal", true, BOOLEAN),
-    DATABASE_INTERNAL_LOCATION("databaseInternalLocation", MainGUI.LOCAL_MSPAINT + "database", STRING),
+    DATABASE_INTERNAL_LOCATION("databaseInternalLocation", MainGUI.LOCAL_MSPAINT + File.separator + "database", STRING),
     DATABASE_URL("databaseURL", "", STRING),
     DATABASE_USER("databaseUser", "", STRING),
     DATABASE_PASS("databasePass", "", STRING),
