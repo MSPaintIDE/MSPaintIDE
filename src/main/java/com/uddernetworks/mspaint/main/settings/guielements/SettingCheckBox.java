@@ -25,6 +25,6 @@ public class SettingCheckBox extends JFXCheckBox {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        setSelected(SettingsManager.getSetting(setting, Boolean.class));
+        setSelected(SettingsManager.getSetting(setting, Boolean.class, false));
     }
 }

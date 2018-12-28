@@ -48,7 +48,7 @@ public class SettingNumberField extends HBox {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        numberField.setText(SettingsManager.getSetting(setting, Integer.class).toString());
+        numberField.setText(SettingsManager.getSetting(setting, Integer.class, 0).toString());
     }
 
     public StringProperty labelProperty() {

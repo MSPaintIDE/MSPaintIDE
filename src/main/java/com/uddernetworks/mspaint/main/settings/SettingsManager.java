@@ -16,11 +16,19 @@ public class SettingsManager {
     private static Map<Setting, List<Consumer>> onChangeSettings = new HashMap<>();
 
     public static Object getSetting(Setting setting) {
-        return settings.getOrDefault(setting, null);
+        return getSetting(setting, (Object) null);
+    }
+
+    public static Object getSetting(Setting setting, Object def) {
+        return settings.getOrDefault(setting, def);
     }
 
     public static <T> T getSetting(Setting setting, Class<T> type) {
-        return type.cast(settings.getOrDefault(setting, null));
+        return getSetting(setting, type, null);
+    }
+
+    public static <T> T getSetting(Setting setting, Class<T> type, T def) {
+        return type.cast(settings.getOrDefault(setting, def));
     }
 
     public static void setSetting(Setting setting, Object value) {

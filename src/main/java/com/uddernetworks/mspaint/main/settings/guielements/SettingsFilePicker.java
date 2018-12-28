@@ -80,7 +80,7 @@ public class SettingsFilePicker extends HBox {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        textField.setText(SettingsManager.getSetting(setting, String.class));
+        textField.setText(SettingsManager.getSetting(setting, String.class, ""));
     }
 
     public ObjectProperty<ChooseOptions> optionsProperty() {

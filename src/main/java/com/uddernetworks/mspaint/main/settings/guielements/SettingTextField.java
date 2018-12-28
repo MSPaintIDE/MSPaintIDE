@@ -24,6 +24,6 @@ public class SettingTextField extends JFXTextField {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        setText(SettingsManager.getSetting(setting, String.class));
+        setText(SettingsManager.getSetting(setting, String.class, ""));
     }
 }
