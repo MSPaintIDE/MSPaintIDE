@@ -39,9 +39,9 @@ public class SettingsWindow extends Stage implements Initializable {
 
     public SettingsWindow(String startPath) throws IOException {
         this(Arrays.asList(
-                new SettingItem("Appearance", "file\\Appearance.fxml"),
-                new SettingItem("OCR", "file\\OCR.fxml"),
-                new SettingItem("Image Generation", "file\\ImageGeneration.fxml")
+                new SettingItem("Appearance", "file/Appearance.fxml"),
+                new SettingItem("OCR", "file/OCR.fxml"),
+                new SettingItem("Image Generation", "file/ImageGeneration.fxml")
         ), startPath);
     }
 
