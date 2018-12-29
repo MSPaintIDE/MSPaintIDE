@@ -58,7 +58,6 @@ public class Main {
         SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
 
         SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
-            System.out.println("On change");
             try {
                 if (useInternal == this.usingInternal) return;
                 this.usingInternal = useInternal;

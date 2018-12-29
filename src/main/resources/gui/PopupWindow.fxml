@@ -8,7 +8,7 @@
    <children>
       <HBox styleClass="gridpane-theme" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <SplitPane dividerPositions="0.29797979797979796" styleClass="gridpane-theme" HBox.hgrow="ALWAYS">
+            <SplitPane dividerPositions="0.273" styleClass="gridpane-theme" HBox.hgrow="ALWAYS">
               <items>
                 <AnchorPane styleClass="gridpane-theme">
                      <children>
@@ -25,11 +25,7 @@
                   </AnchorPane>
                 <AnchorPane styleClass="gridpane-theme">
                      <children>
-                        <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="-32.0" layoutY="-62.0" prefHeight="200.0" prefWidth="200.0" styleClass="gridpane-theme" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <content>
-                            <AnchorPane fx:id="content" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="gridpane-theme" />
-                          </content>
-                        </ScrollPane>
+                        <ScrollPane fx:id="content" fitToHeight="true" fitToWidth="true" layoutX="-32.0" layoutY="-62.0" prefHeight="200.0" prefWidth="200.0" styleClass="gridpane-theme" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
               </items>

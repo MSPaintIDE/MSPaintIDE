@@ -11,11 +11,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class SettingsWindow extends Stage implements Initializable {
     private TreeView<SettingItem> tree;
 
     @FXML
-    private AnchorPane content;
+    private ScrollPane content;
 
     private List<SettingItem> settingItems;
     private String startPath;
@@ -113,11 +113,11 @@ public class SettingsWindow extends Stage implements Initializable {
         children.addAll(settingItems.stream().map(TreeItem::new).collect(Collectors.toList()));
 
         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            List<Node> contentChildren = this.content.getChildren();
-            contentChildren.clear();
+//            List<Node> contentChildren = this.content.getChildren();
+//            contentChildren.clear();
 
             try {
-                contentChildren.add(newValue.getValue().getPane());
+                this.content.setContent(newValue.getValue().getPane());
                 toggleStuff.accept(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
             } catch (IOException e) {
                 e.printStackTrace();
