@@ -308,7 +308,7 @@ public class MainGUI extends Application implements Initializable {
         loader.setController(this);
         Parent root = loader.load();
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo.png").toString());
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo-small.png").toString());
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 

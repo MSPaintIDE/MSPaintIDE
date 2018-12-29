@@ -38,7 +38,7 @@
             <children>
                 <VBox prefWidth="100.0">
                     <children>
-                        <SettingCheckBox text="Use internal database" setting="DATABASE_USE_INTERNAL"/>
+                        <SettingCheckBox text="Use internal database (up to 13x faster)" setting="DATABASE_USE_INTERNAL"/>
 
                         <Label text="Internal database location" styleClass="theme-text">
                             <VBox.margin>

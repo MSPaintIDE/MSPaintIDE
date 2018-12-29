@@ -348,12 +348,8 @@ $pseudos: hover, focused, showing;
 }
 
 .logo-image {
-    -fx-image: url("ms-paint-logo-bw.png");
+    -fx-image: url("ms-paint-logo.png");
     -fx-background-size: 250px 250px;
-
-    &.dark {
-        -fx-image: url("ms-paint-logo-bw-inverted.png");
-    }
 }
 
 .recent-projects-dark {
