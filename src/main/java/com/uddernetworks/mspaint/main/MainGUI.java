@@ -151,6 +151,7 @@ public class MainGUI extends Application implements Initializable {
     private GitController gitController;
     private AtomicBoolean initialized = new AtomicBoolean();
     private static File initialProject = null;
+    private static PrintStreamStringCopy printStreamStringCopy;
 
     private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
     private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
@@ -170,6 +171,8 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException, ExecutionException {
+        printStreamStringCopy = new PrintStreamStringCopy();
+
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);
@@ -270,7 +273,9 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void refreshProject() {
+        System.out.println("Refreshing project!");
         String languageClass = ProjectManager.getPPFProject().getLanguage();
+        System.out.println("languageClass = " + languageClass);
         try {
             registerThings();
             primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
@@ -536,8 +541,13 @@ public class MainGUI extends Application implements Initializable {
             setHaveError();
         });
 
+        String previous = printStreamStringCopy.getPrevious();
+
         TextPrintStream textPrintStream = new TextPrintStream(output, System.out);
         PrintStream textOut = new PrintStream(textPrintStream);
+
+        textOut.println(previous);
+
         System.setOut(textOut);
         System.setErr(textOut);
 

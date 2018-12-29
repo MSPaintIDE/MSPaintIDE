@@ -47,6 +47,10 @@ public class Installer {
 
             new File(msPaintAppData, "database").mkdirs();
 
+            File jdkPath = getJDKLocation();
+
+            System.out.println("Using JDK path: " + jdkPath.getAbsolutePath());
+
             File currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
             Path appDataJar = Paths.get(msPaintAppData.getAbsolutePath(), "MSPaintIDE.jar");
             Files.copy(currentJar.toPath(), appDataJar, StandardCopyOption.REPLACE_EXISTING);
@@ -60,7 +64,8 @@ public class Installer {
             Path openBat = Paths.get(msPaintAppData.getAbsolutePath(), "open.bat");
 
             String open = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("open.bat"));
-            open = open.replace("%APPDATA_JAR%", appDataJar.toString());
+            open = open.replace("%APPDATA_JAR%", appDataJar.toString())
+                .replace("%JAVAW_JDK%", jdkPath.getAbsolutePath());
 
             Files.write(openBat, open.getBytes(), StandardOpenOption.CREATE_NEW);
 
@@ -74,10 +79,6 @@ public class Installer {
             }
 
             Path shortcutGen = Paths.get(currentJar.getParentFile().getAbsolutePath(), "shortcut.vbs");
-
-            File jdkPath = getJDKLocation();
-
-            System.out.println("Using JDK path: " + jdkPath.getAbsolutePath());
 
             String shortcut = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("shortcut.vbs"));
             shortcut = shortcut.replace("JDK_PATH_HERE", jdkPath.getAbsolutePath());
