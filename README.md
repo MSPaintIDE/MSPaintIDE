@@ -1,8 +1,21 @@
-# MSPaintIDE
-
-_For Spigot thread, check [here](https://www.spigotmc.org/threads/programming-in-ms-paint.289868). For website, click [here](https://ms-paint-i.de/). For a demo/installation tutorial video, check [here](https://www.youtube.com/watch?v=eyH4aXlB1Js)_
-
-**Update: The OCR has been worked on continuously since the popularity boom on the project and is in the process of being implemented. The OCR may be found here: [NewOCR](https://github.com/RubbaBoy/NewOCR)**
+<h1 align="center">
+  <a href="http://hits.dwyl.io/RubbaBoy/MSPaintIDE"><img src="http://hits.dwyl.io/RubbaBoy/MSPaintIDE.svg" alt="HitCount"/></a>
+  <img src="https://img.shields.io/github/commit-activity/y/RubbaBoy/MSPaintIDE.svg" alt="Commit activity"/>
+  <img src="https://img.shields.io/github/stars/RubbaBoy/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
+  <a href="https://github.com/RubbaBoy/MSPaintIDE/issues"><img src="https://img.shields.io/github/issues/RubbaBoy/MSPaintIDE.svg" alt="GitHub issues"/></a>
+  <a href="https://github.com/RubbaBoy/MSPaintIDE/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/RubbaBoy/MSPaintIDE.svg" alt="GitHub issues"/></a>
+</h1>
+<h1 align="center">
+    <img src="https://ms-paint-i.de/images/Logo-Header.png">
+</h1>
+<p align="center">
+  <b>
+    <a href="https://www.spigotmc.org/threads/programming-in-ms-paint.289868">Spigot</a> |
+    <a href="https://ms-paint-i.de/">Website</a> |
+    <a href="https://www.youtube.com/watch?v=eyH4aXlB1Js">Installation/Demo</a> |
+    <a href="https://github.com/RubbaBoy/NewOCR">Proprietary OCR</a>
+  </b>
+</p>
 
 People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
 
