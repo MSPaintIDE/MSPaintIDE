@@ -48,7 +48,6 @@ public class TextEditorManager {
     }
 
     public TextEditorManager(File file, MainGUI mainGUI) throws IOException, InterruptedException, ExecutionException {
-        mainGUI.setIndeterminate(true);
         this.originalFile = file.getAbsoluteFile();
 
         if (MainGUI.HEADLESS) {
@@ -56,6 +55,7 @@ public class TextEditorManager {
             this.headlessMain.headlessStart();
         } else {
             this.headlessMain = mainGUI.getMain();
+            mainGUI.setIndeterminate(true);
         }
 
         File backup = new File(MainGUI.LOCAL_MSPAINT, "opened\\backup");
@@ -100,7 +100,7 @@ public class TextEditorManager {
         })).start();
 
         initialProcess();
-        mainGUI.setIndeterminate(false);
+        if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
     }
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {

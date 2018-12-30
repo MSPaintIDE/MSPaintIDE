@@ -21,7 +21,7 @@ public class ImageCompare {
         ScannedImage scannedImage;
 
         try {
-            if (readFromFile && objectFile != null && !objectFile.isFile()) {
+            if (/* readFromFile &&*/ objectFile != null && !objectFile.isFile()) {
                 try {
                     objectFile.getParentFile().mkdirs();
                     readFromFile = !objectFile.createNewFile();
@@ -29,6 +29,8 @@ public class ImageCompare {
                     readFromFile = false;
                 }
             }
+
+            System.out.println("Reading from file: " + readFromFile);
 
             if (!readFromFile) {
                 if (!MainGUI.HEADLESS) mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");

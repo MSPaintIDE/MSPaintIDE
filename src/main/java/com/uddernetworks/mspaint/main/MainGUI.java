@@ -513,6 +513,8 @@ public class MainGUI extends Application implements Initializable {
                 } else {
                     System.out.println("Unknown class " + clazz.getCanonicalName());
                 }
+
+                ProjectManager.save();
             }
         });
     }
@@ -630,6 +632,8 @@ public class MainGUI extends Application implements Initializable {
                     e.printStackTrace();
                 }
             });
+
+            ProjectManager.save();
 
             runListeners = true;
         });

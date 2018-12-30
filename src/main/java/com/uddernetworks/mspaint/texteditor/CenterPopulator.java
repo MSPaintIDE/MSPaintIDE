@@ -20,12 +20,13 @@ public class CenterPopulator {
     private Map<Integer, Map<Character, Integer>> centers = new HashMap<>();
 
     // Code loosely adapted from com.uddernetworks.newocr.OCRHandle.java
+    // TODO: Clean this up a ton
     public void generateCenters(int fontSize) {
         Map<Character, Integer> currentCenters = new HashMap<>();
         centers.put(fontSize, currentCenters);
 
 
-        BufferedImage input = new BufferedImage(2000, fontSize * 2, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage input = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = input.createGraphics();
 
         clearImage(input);
@@ -35,9 +36,17 @@ public class CenterPopulator {
 
         Font font = new Font("Verdana", Font.PLAIN, fontSize);
         graphics.setFont(font);
-        graphics.setColor(Color.BLACK);
 
         String drawString = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghjiklmnopqrstuvwxyz{|}~";
+
+        input = new BufferedImage(graphics.getFontMetrics().stringWidth(drawString) + 50, fontSize * 2, BufferedImage.TYPE_INT_ARGB);;
+        graphics = input.createGraphics();
+        graphics.setRenderingHints(rht);
+
+        graphics.setFont(font);
+        graphics.setColor(Color.BLACK);
+
+        clearImage(input);
 
         graphics.drawString(drawString, 10, fontSize);
 
