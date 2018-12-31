@@ -273,18 +273,18 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void refreshProject() {
-        System.out.println("Refreshing project!");
         String languageClass = ProjectManager.getPPFProject().getLanguage();
-        System.out.println("languageClass = " + languageClass);
-        try {
-            registerThings();
-            primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
-            setSelectedLanguage(Class.forName(languageClass));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("No language found with a class of \"" + languageClass + "\"");
-        }
+        Platform.runLater(() -> {
+            try {
+                registerThings();
+                primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
+                setSelectedLanguage(Class.forName(languageClass));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                System.out.println("No language found with a class of \"" + languageClass + "\"");
+            }
+        });
     }
 
     public Main getMain() {

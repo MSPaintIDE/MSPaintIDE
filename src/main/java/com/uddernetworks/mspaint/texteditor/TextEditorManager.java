@@ -120,17 +120,23 @@ public class TextEditorManager {
             return null;
         }
 
+        double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
+        int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
+
         CenterPopulator centerPopulator = new CenterPopulator();
         centerPopulator.generateCenters((int) size);
-
-        double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
-        int characterBetweenSpace = (int) ((spaceRatio * size) / 3);
 
         int x = 0;
         int y = 0;
         for (String textLine : text.split("\n")) {
             List<ImageLetter> line = new ArrayList<>();
             for (char cha : textLine.toCharArray()) {
+
+                if (cha == ' ') {
+                    x += Math.floor(spaceRatio * size) - characterBetweenSpace;
+                    continue;
+                }
+
                 boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
                 int center = (int) ((size/ 2D) - centerPopulator.getCenter(cha, (int) size));
 
@@ -140,8 +146,6 @@ public class TextEditorManager {
                 line.add(letter);
 
                 x += letterGrid[0].length + characterBetweenSpace;
-
-                if (cha == ' ') x += spaceRatio * size;
             }
 
             scannedImage.addLine(y, line);

@@ -75,15 +75,20 @@ public class ReplaceManager {
         for (int i = 0; i < text.toCharArray().length; i++) {
             x += addBy;
             char cha = text.charAt(i);
-            boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
-            int center = centerPopulator.getCenter(cha, (int) size);
 
-            ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, -1D, null);
-            letter.setValues(letterGrid);
-            letter.setData(Color.BLACK);
-            adding.add(letter);
+            if (cha == ' ') {
+                addBy = (int) Math.floor(spaceRatio * size) - characterBetweenSpace;
+            } else {
+                boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
+                int center = centerPopulator.getCenter(cha, (int) size);
 
-            addBy = letterGrid[0].length + characterBetweenSpace;
+                ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, -1D, null);
+                letter.setValues(letterGrid);
+                letter.setData(Color.BLACK);
+                adding.add(letter);
+
+                addBy = letterGrid[0].length + characterBetweenSpace;
+            }
 
             int finalAddBy = addBy;
             line.forEach(imageLetter -> imageLetter.setX(imageLetter.getX() + finalAddBy));
