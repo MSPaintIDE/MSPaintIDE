@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextEditorManager {
@@ -30,6 +31,7 @@ public class TextEditorManager {
     private ImageClass imageClass;
     private Main headlessMain;
     private Thread savingThread;
+    private final AtomicBoolean stopping = new AtomicBoolean(false);
 
     private static final FontBounds[] FONT_BOUNDS = {
             new FontBounds(0, 12),
@@ -77,7 +79,7 @@ public class TextEditorManager {
                     path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 
                     long last = System.currentTimeMillis();
-                    while (true) {
+                    while (!stopping.get()) {
                         WatchKey wk = watchService.take();
                         boolean found = false;
                         for (WatchEvent<?> event : wk.pollEvents()) {
@@ -96,7 +98,7 @@ public class TextEditorManager {
                         }
                     }
                 }
-            } catch (IOException | InterruptedException e) {}
+            } catch (IOException | InterruptedException ignored) {}
         })).start();
 
         initialProcess();
@@ -162,8 +164,6 @@ public class TextEditorManager {
     }
 
     private File createImageFile() throws IOException, ExecutionException, InterruptedException {
-        System.out.println("originalFile = " + originalFile.getAbsolutePath());
-        System.out.println("TextEditorManager.createImageFile");
         File tempImage = new File(MainGUI.LOCAL_MSPAINT, "opened\\" + this.originalFile.getName() + ".png");
         tempImage.mkdirs();
 
@@ -183,7 +183,6 @@ public class TextEditorManager {
 
         ScannedImage letterGrid = generateLetterGrid(text);
         int[] coords = getBiggestCoordinates(letterGrid);
-        System.out.println("coords = " + Arrays.toString(coords));
         applyPadding(letterGrid, padding, padding);
 
         BufferedImage bufferedImage = new BufferedImage(coords[0] + padding * 2, coords[1] + padding * 2, BufferedImage.TYPE_INT_ARGB);
@@ -205,6 +204,8 @@ public class TextEditorManager {
 
         System.out.println("Closed MS Paint!");
 
+        stopping.set(true);
+        savingThread.interrupt();
         savingThread.join();
 
         if (!this.imageFile.delete()) {
