@@ -15,7 +15,12 @@ public enum BinaryIdentifier {
     COMPILER_OUTPUT(12, "compilerOutput"),
     APP_OUTPUT(13, "appOutput"),
     NAME(14, "name"),
-    LANGUAGE(15, "language");
+    LANGUAGE(15, "language"),
+    SYNTAX_HIGHLIGHT(16, "syntaxHighlight"),
+    COMPILE(17, "compile"),
+    EXECUTE(18, "execute"),
+    USE_CACHES(19, "useCaches"),
+    SAVE_CACHES(20, "saveCaches");
 
     public static final byte START_VALUE = 2;
     public static final byte END_VALUE = 3;

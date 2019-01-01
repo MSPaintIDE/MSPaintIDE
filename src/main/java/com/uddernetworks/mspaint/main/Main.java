@@ -251,6 +251,7 @@ public class Main {
     public void setInputImage(File inputImage) {
         PPFProject ppfProject = ProjectManager.getPPFProject();
         if (inputImage.equals(ppfProject.getInputLocation())) return;
+        ProjectManager.getPPFProject().setInputLocation(inputImage);
 
         File outputParent = inputImage.getParentFile();
 

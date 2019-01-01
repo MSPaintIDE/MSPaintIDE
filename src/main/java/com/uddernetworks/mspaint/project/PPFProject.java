@@ -39,6 +39,21 @@ public class PPFProject {
     @PPFSetting
     private String name;                // The name of the project
 
+    @PPFSetting
+    private boolean syntaxHighlight;    // If the IDE should highlight the code
+
+    @PPFSetting
+    private boolean compile;            // If the IDE should compile the code
+
+    @PPFSetting
+    private boolean execute;            // If the IDE should execute the code
+
+    @PPFSetting
+    private boolean useCaches;          // If caches should be used
+
+    @PPFSetting
+    private boolean saveCaches;         // If caches should be saved
+
     public PPFProject(File file) {
         this.file = file;
     }
@@ -61,6 +76,7 @@ public class PPFProject {
         if (this.inputLocation == null || override) this.inputLocation = inputLocation;
     }
 
+
     public File getHighlightLocation() {
         return highlightLocation;
     }
@@ -72,6 +88,7 @@ public class PPFProject {
     public void setHighlightLocation(File highlightLocation, boolean override) {
         if (this.highlightLocation == null || override) this.highlightLocation = highlightLocation;
     }
+
 
     public File getObjectLocation() {
         return objectLocation;
@@ -85,6 +102,7 @@ public class PPFProject {
         if (this.objectLocation == null || override) this.objectLocation = objectLocation;
     }
 
+
     public File getClassLocation() {
         return classLocation;
     }
@@ -96,6 +114,7 @@ public class PPFProject {
     public void setClassLocation(File classLocation, boolean override) {
         if (this.classLocation == null || override) this.classLocation = classLocation;
     }
+
 
     public File getJarFile() {
         return jarFile;
@@ -109,6 +128,7 @@ public class PPFProject {
         if (this.jarFile == null || override) this.jarFile = jarFile;
     }
 
+
     public File getLibraryLocation() {
         return libraryLocation;
     }
@@ -120,6 +140,7 @@ public class PPFProject {
     public void setLibraryLocation(File libraryLocation, boolean override) {
         if (this.libraryLocation == null || override) this.libraryLocation = libraryLocation;
     }
+
 
     public File getOtherLocation() {
         return otherLocation;
@@ -133,6 +154,7 @@ public class PPFProject {
         if (this.otherLocation == null || override) this.otherLocation = otherLocation;
     }
 
+
     public File getCompilerOutput() {
         return compilerOutput;
     }
@@ -144,6 +166,7 @@ public class PPFProject {
     public void setCompilerOutput(File compilerOutput, boolean override) {
         if (this.compilerOutput == null || override) this.compilerOutput = compilerOutput;
     }
+
 
     public File getAppOutput() {
         return appOutput;
@@ -157,6 +180,7 @@ public class PPFProject {
         if (this.appOutput == null || override) this.appOutput = appOutput;
     }
 
+
     public String getLanguage() {
         return language;
     }
@@ -169,6 +193,7 @@ public class PPFProject {
         if (this.language == null || override) this.language = language;
     }
 
+
     public String getName() {
         return name;
     }
@@ -180,6 +205,52 @@ public class PPFProject {
     public void setName(String name, boolean override) {
         if (this.name == null || override) this.name = name;
     }
+
+
+    public boolean isSyntaxHighlight() {
+        return syntaxHighlight;
+    }
+
+    public void setSyntaxHighlight(boolean syntaxHighlight) {
+        this.syntaxHighlight = syntaxHighlight;
+    }
+
+
+    public boolean isCompile() {
+        return compile;
+    }
+
+    public void setCompile(boolean compile) {
+        this.compile = compile;
+    }
+
+
+    public boolean isExecute() {
+        return execute;
+    }
+
+    public void setExecute(boolean execute) {
+        this.execute = execute;
+    }
+
+
+    public boolean isUseCaches() {
+        return useCaches;
+    }
+
+    public void setUseCaches(boolean useCaches) {
+        this.useCaches = useCaches;
+    }
+
+
+    public boolean isSaveCaches() {
+        return saveCaches;
+    }
+
+    public void setSaveCaches(boolean saveCaches) {
+        this.saveCaches = saveCaches;
+    }
+
 
     @Override
     public String toString() {

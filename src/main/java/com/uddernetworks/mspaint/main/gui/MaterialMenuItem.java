@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.main.gui;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

@@ -1,7 +1,6 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.main.gui;
 
-import com.uddernetworks.mspaint.main.gui.BindItem;
-import com.uddernetworks.mspaint.main.gui.MenuBind;
+import com.uddernetworks.mspaint.main.MainGUI;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;

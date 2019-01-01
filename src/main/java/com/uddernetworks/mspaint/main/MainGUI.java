@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
 import com.uddernetworks.mspaint.languages.Language;
+import com.uddernetworks.mspaint.main.gui.MaterialMenu;
 import com.uddernetworks.mspaint.main.gui.window.WelcomeWindow;
 import com.uddernetworks.mspaint.main.settings.Setting;
 import com.uddernetworks.mspaint.main.settings.SettingsManager;
@@ -193,9 +194,11 @@ public class MainGUI extends Application implements Initializable {
             if (args[0].equalsIgnoreCase("install")) {
                 installer.install();
                 System.exit(0);
+                return;
             } else if (args[0].equalsIgnoreCase("uninstall")) {
                 installer.uninstall();
                 System.exit(0);
+                return;
             } else if (args[0].endsWith(".ppf")) {
                 initialProject = new File(args[0]);
                 if (!initialProject.isFile()) initialProject = null;
@@ -269,6 +272,7 @@ public class MainGUI extends Application implements Initializable {
         if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this);
+            Splash.end();
         } else {
             refreshProject();
         }
@@ -339,6 +343,7 @@ public class MainGUI extends Application implements Initializable {
 
     public void fullCompile(boolean execute) {
         try {
+            PPFProject ppfProject = ProjectManager.getPPFProject();
             if (getCurrentLanguage() == null) {
                 setHaveError();
                 System.out.println("No language selected!");
@@ -356,13 +361,13 @@ public class MainGUI extends Application implements Initializable {
             progress.getStyleClass().remove("progressError");
 
             long start = System.currentTimeMillis();
-            if (main.indexAll(useCaches.isSelected(), saveCaches.isSelected()) == -1) return;
+            if (main.indexAll(ppfProject.isUseCaches(), ppfProject.isSaveCaches()) == -1) return;
 
-            if (syntaxHighlight.isSelected()) {
+            if (ppfProject.isSyntaxHighlight()) {
                 main.highlightAll();
             }
 
-            if (compile.isSelected() || getCurrentLanguage().isInterpreted()) {
+            if (ppfProject.isCompile() || getCurrentLanguage().isInterpreted()) {
                 main.compile(execute);
             }
 
@@ -378,15 +383,7 @@ public class MainGUI extends Application implements Initializable {
 
     @FXML
     private void startScan(ActionEvent event) {
-        new Thread(() -> fullCompile(execute.isSelected() || getCurrentLanguage().isInterpreted())).start();
-    }
-
-    public boolean shouldUseCaches() {
-        return this.useCaches.isSelected();
-    }
-
-    public boolean shouldSaveCaches() {
-        return this.saveCaches.isSelected();
+        new Thread(() -> fullCompile(ProjectManager.getPPFProject().isExecute() || getCurrentLanguage().isInterpreted())).start();
     }
 
     public void setHaveError() {
@@ -429,6 +426,12 @@ public class MainGUI extends Application implements Initializable {
         classOutput.setText(getAbsolutePath(ppfProject.getClassLocation()));
         compilerOutputValue.setText(getAbsolutePath(ppfProject.getCompilerOutput()));
         programOutputValue.setText(getAbsolutePath(ppfProject.getAppOutput()));
+
+        syntaxHighlight.setSelected(ProjectManager.getPPFProject().isSyntaxHighlight());
+        compile.setSelected(ProjectManager.getPPFProject().isCompile());
+        execute.setSelected(ProjectManager.getPPFProject().isExecute());
+        useCaches.setSelected(ProjectManager.getPPFProject().isUseCaches());
+        saveCaches.setSelected(ProjectManager.getPPFProject().isSaveCaches());
     }
 
     private String getAbsolutePath(File file) {
@@ -518,6 +521,15 @@ public class MainGUI extends Application implements Initializable {
                     System.out.println("Unknown class " + clazz.getCanonicalName());
                 }
 
+                ProjectManager.save();
+            }
+        });
+    }
+
+    private void addOptionalListener(CheckBox checkBox, Consumer<Boolean> callback) {
+        checkBox.selectedProperty().addListener(event -> {
+            if (runListeners) {
+                callback.accept(checkBox.isSelected());
                 ProjectManager.save();
             }
         });
@@ -616,6 +628,10 @@ public class MainGUI extends Application implements Initializable {
 
             runListeners = false;
             createAndSetFolder(inputName, parent, "src");
+            runListeners = true;
+
+            ProjectManager.getPPFProject().setInputLocation(new File(inputName.getText()));
+
             createAndSetFolder(highlightedImage, parent, "highlighted");
             createAndSetFolder(cacheFile, parent, "cache");
             createAndSetFolder(classOutput, parent, "out");
@@ -639,9 +655,9 @@ public class MainGUI extends Application implements Initializable {
                 }
             });
 
-            ProjectManager.save();
 
-            runListeners = true;
+
+            ProjectManager.save();
         });
 
         createRepo.setOnAction(event -> this.gitController.gitInit(ProjectManager.getPPFProject().getInputLocation()));
@@ -755,6 +771,12 @@ public class MainGUI extends Application implements Initializable {
                 ProjectManager.getPPFProject().setAppOutput(file);
             });
         });
+
+        addOptionalListener(syntaxHighlight, ProjectManager.getPPFProject()::setSyntaxHighlight);
+        addOptionalListener(compile, ProjectManager.getPPFProject()::setCompile);
+        addOptionalListener(execute, ProjectManager.getPPFProject()::setExecute);
+        addOptionalListener(useCaches, ProjectManager.getPPFProject()::setUseCaches);
+        addOptionalListener(saveCaches, ProjectManager.getPPFProject()::setSaveCaches);
     }
 
     private void createAndSetFolder(TextField textField, File parent, String folder) {

@@ -22,7 +22,7 @@ public class Installer {
     private List<String> commands = Arrays.asList(
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /d \"Edit with MS Paint IDE\"",
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\\command\" /t REG_EXPAND_SZ /d \"\\\"%LocalAppData%\\MSPaintIDE\\open.bat\\\" \\\"%1\\\"\"",
-            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Icon /d \"%LocalAppData%\\MSPaintIDE\\ms-paint-logo.ico\"",
+            "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Icon /d \"%LocalAppData%\\MSPaintIDE\\images\\ms-paint-logo.ico\"",
             "reg add \"HKEY_CLASSES_ROOT\\*\\shell\\MSPaintIDE\" /v Position /d \"Top\"",
             "reg add \"HKEY_CLASSES_ROOT\\.ppf\" /ve /d \"PaintProjectFile\"",
             "reg add \"HKEY_CLASSES_ROOT\\PaintProjectFile\\shell\\open\\command\" /ve /t REG_EXPAND_SZ /d \"%LocalAppData%\\MSPaintIDE\\open.bat \\\"%1\\\"\"",
