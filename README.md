@@ -1,6 +1,9 @@
 <h1 align="center">
   <a href="http://hits.dwyl.io/RubbaBoy/MSPaintIDE"><img src="http://hits.dwyl.io/RubbaBoy/MSPaintIDE.svg" alt="HitCount"/></a>
-  <img src="https://img.shields.io/github/commit-activity/y/RubbaBoy/MSPaintIDE.svg" alt="Commit activity"/>
+  <a href="https://discord.gg/RXmPkPJ">
+        <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
+            alt="MS Paint IDE's Discord server">
+  </a>
   <img src="https://img.shields.io/github/stars/RubbaBoy/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
   <a href="https://github.com/RubbaBoy/MSPaintIDE/issues"><img src="https://img.shields.io/github/issues/RubbaBoy/MSPaintIDE.svg" alt="GitHub issues"/></a>
   <a href="https://github.com/RubbaBoy/MSPaintIDE/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/RubbaBoy/MSPaintIDE.svg" alt="GitHub issues"/></a>
@@ -12,6 +15,7 @@
   <b>
     <a href="https://www.spigotmc.org/threads/programming-in-ms-paint.289868">Spigot</a> |
     <a href="https://ms-paint-i.de/">Website</a> |
+    <a href="https://discord.gg/RXmPkPJ">Discord</a> |
     <a href="https://www.youtube.com/watch?v=eyH4aXlB1Js">Installation/Demo</a> |
     <a href="https://github.com/RubbaBoy/NewOCR">Proprietary OCR</a>
   </b>
