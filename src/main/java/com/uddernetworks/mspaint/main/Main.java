@@ -46,6 +46,8 @@ public class Main {
         this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
         this.mainGUI.updateTheme();
 
+        Splash.setStatus("Adding languages...");
+
         languageManager.addLanguage(new JavaLanguage());
         languageManager.addLanguage(new BrainfuckLanguage());
         languageManager.addLanguage(new PythonLanguage());
@@ -55,8 +57,10 @@ public class Main {
     }
 
     public void headlessStart() throws IOException {
+        Splash.setStatus("Loading settings...");
         SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
 
+        Splash.setStatus("Loading database...");
         SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
             try {
                 if (useInternal == this.usingInternal) return;

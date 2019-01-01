@@ -206,6 +206,8 @@ public class MainGUI extends Application implements Initializable {
             }
         }
 
+        new Splash();
+
         launch(args);
     }
 
@@ -330,6 +332,8 @@ public class MainGUI extends Application implements Initializable {
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
         this.primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
+        Splash.setStatus("Starting...");
+        this.primaryStage.setOnShown(event -> Splash.end());
         this.primaryStage.show();
     }
 
@@ -522,6 +526,8 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Splash.setStatus("Loading GUI...");
+
         initializeInputTextFields();
         setGitFeaturesDisabled(true);
         this.initialized.set(true);
