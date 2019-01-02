@@ -40,7 +40,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "new.text-file")
     private void onClickNewTextFile() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile().getParentFile(), null, JFileChooser.FILES_ONLY, file -> {
             this.mainGUI.createAndOpenTextFile(file);
         });
     }
@@ -55,7 +55,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.file")
     private void onClickOpenFile() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile().getParentFile(), null, JFileChooser.FILES_ONLY, file -> {
             try {
                 new TextEditorManager(file, this.mainGUI);
             } catch (IOException | InterruptedException | ExecutionException e) {

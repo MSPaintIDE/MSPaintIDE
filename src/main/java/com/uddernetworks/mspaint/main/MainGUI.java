@@ -422,7 +422,7 @@ public class MainGUI extends Application implements Initializable {
         cacheFile.setText(getAbsolutePath(ppfProject.getObjectLocation()));
         compiledJarOutput.setText(getAbsolutePath(ppfProject.getJarFile()));
         libraryFile.setText(getAbsolutePath(ppfProject.getLibraryLocation()));
-        otherFiles.setText(getAbsolutePath(ppfProject.getObjectLocation()));
+        otherFiles.setText(getAbsolutePath(ppfProject.getOtherLocation()));
         classOutput.setText(getAbsolutePath(ppfProject.getClassLocation()));
         compilerOutputValue.setText(getAbsolutePath(ppfProject.getCompilerOutput()));
         programOutputValue.setText(getAbsolutePath(ppfProject.getAppOutput()));

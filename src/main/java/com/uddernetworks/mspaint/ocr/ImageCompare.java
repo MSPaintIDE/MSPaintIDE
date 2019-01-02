@@ -17,22 +17,20 @@ import java.util.Map;
 
 public class ImageCompare {
 
-    public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, Main main, boolean readFromFile, boolean saveCaches) {
+    public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, Main main, boolean readFromCache, boolean saveCaches) {
         ScannedImage scannedImage;
 
         try {
-            if (/* readFromFile &&*/ objectFile != null && !objectFile.isFile()) {
+            if (readFromCache && objectFile != null && !objectFile.isFile()) {
                 try {
                     objectFile.getParentFile().mkdirs();
-                    readFromFile = !objectFile.createNewFile();
+                    readFromCache = !objectFile.createNewFile();
                 } catch (IOException ignored) {
-                    readFromFile = false;
+                    readFromCache = false;
                 }
             }
 
-            System.out.println("Reading from file: " + readFromFile);
-
-            if (!readFromFile) {
+            if (!readFromCache) {
                 if (!MainGUI.HEADLESS) mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
 
                 if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(true);

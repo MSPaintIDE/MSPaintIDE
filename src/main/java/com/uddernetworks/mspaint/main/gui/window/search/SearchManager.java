@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.main.gui.window.search;
 
+import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.mspaint.project.ProjectManager;
@@ -29,7 +30,7 @@ public class SearchManager {
 
     public List<SearchResult> searchDirectory(File directory, String text, String extension, boolean ignoreCase) {
         if (!directory.isDirectory()) return Collections.emptyList();
-        return this.mainGUI.getMain().getFilesFromDirectory(directory, extension)
+        return Main.getFilesFromDirectory(directory, extension)
                 .parallelStream()
                 .map(file -> searchFile(file, text, ignoreCase))
                 .flatMap(List::stream)

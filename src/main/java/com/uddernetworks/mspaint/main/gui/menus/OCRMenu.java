@@ -11,6 +11,7 @@ import com.uddernetworks.newocr.OCRHandle;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public class OCRMenu extends MenuBind {
 
@@ -39,11 +40,22 @@ public class OCRMenu extends MenuBind {
             return;
         }
 
-        try {
-            ocrHandle.trainImage(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Training OCR on image " + file.getAbsolutePath());
+        this.mainGUI.setStatusText("Training OCR...");
+        this.mainGUI.setIndeterminate(true);
+
+        final long start = System.currentTimeMillis();
+        CompletableFuture.runAsync(() -> {
+            try {
+                ocrHandle.trainImage(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).thenRun(() -> {
+            System.out.println("Completed training in " + (System.currentTimeMillis() - start) + "ms");
+            this.mainGUI.updateLoading(0, 1);
+            this.mainGUI.setStatusText(null);
+        });
     }
 
     @BindItem(label = "generate")
