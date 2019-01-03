@@ -567,6 +567,7 @@ public class MainGUI extends Application implements Initializable {
         PrintStream textOut = new PrintStream(textPrintStream);
 
         textOut.println(previous);
+        textPrintStream.setPrintOriginal(true);
 
         System.setOut(textOut);
         System.setErr(textOut);

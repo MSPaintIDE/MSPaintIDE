@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -173,7 +174,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
         this.searchResults.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         searchResults.setCellFactory(t -> new SearchListCell());
 
-        new Thread(() -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 while (true) {
                     if (hasChanged.get()) {
@@ -209,6 +210,9 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
                                     setNotice("Found " + results.size() + " results in " + (System.currentTimeMillis() - start) + "ms");
 
+                                    this.mainGUI.updateLoading(0, 1);
+                                    this.mainGUI.setStatusText(null);
+
                                     alreadySearched.set(true);
                                     currentlySearching.set(false);
                                 });
@@ -219,7 +223,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
                     Thread.sleep(100);
                 }
             } catch (InterruptedException ignored) {}
-        }).start();
+        });
 
         this.searchText.textProperty().addListener(((observable, oldValue, newValue) -> hasChanged.set(true)));
 
