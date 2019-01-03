@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class FileMenu extends MenuBind {
@@ -64,24 +65,35 @@ public class FileMenu extends MenuBind {
         });
     }
 
-    @BindItem(label = "clear-caches")
-    private void onClickClearCaches() {
-        System.out.println("Clearing caches...");
+    @BindItem(label = "clear-project-caches")
+    private void onClickClearProjectCaches() {
+        System.out.println("Clearing project caches...");
 
-        File objects = ProjectManager.getPPFProject().getObjectLocation();
+        clearCaches(ProjectManager.getPPFProject().getObjectLocation());
 
-        if (objects == null) {
+        System.out.println("Cleared project caches!");
+    }
+
+    @BindItem(label = "clear-global-caches")
+    private void onClickClearGlobalCaches() {
+        System.out.println("Clearing global caches...");
+
+        clearCaches(new File(MainGUI.LOCAL_MSPAINT, "global_cache"));
+
+        System.out.println("Cleared global caches!");
+    }
+
+    private void clearCaches(File file) {
+        if (file == null) {
             System.out.println("No cache directory found!");
             return;
         }
 
-        if (objects.isDirectory()) {
-            Arrays.stream(objects.listFiles()).forEach(File::delete);
+        if (file.isDirectory()) {
+            Arrays.stream(Objects.requireNonNull(file.listFiles())).forEach(File::delete);
         } else {
-            objects.delete();
+            file.delete();
         }
-
-        System.out.println("Cleared caches!");
     }
 
     @BindItem(label = "settings")

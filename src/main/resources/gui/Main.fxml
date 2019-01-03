@@ -28,7 +28,8 @@
                               <MaterialMenuItem clickLabel="file" text="File" />
                           </items>
                       </MaterialMenu>
-                    <MaterialMenuItem clickLabel="clear-caches" text="Clear Caches" />
+                    <MaterialMenuItem clickLabel="clear-project-caches" text="Clear Project Caches" />
+                    <MaterialMenuItem clickLabel="clear-global-caches" text="Clear Global Caches" />
                     <MaterialMenuItem clickLabel="settings" text="Settings" />
                     <MaterialMenuItem clickLabel="print" text="Print" />
                     <MaterialMenuItem clickLabel="close-project" text="Close Project" />
