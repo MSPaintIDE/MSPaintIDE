@@ -34,4 +34,9 @@ public class HelpMenu extends MenuBind {
     public void onClickDonate() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI("https://paypal.me/RubbaBoy"));
     }
+
+    @BindItem(label = "discord")
+    public void onClickDiscord() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://discord.gg/RXmPkPJ"));
+    }
 }

@@ -69,6 +69,7 @@
                     <MaterialMenuItem clickLabel="source" text="Source" />
                     <MaterialMenuItem clickLabel="submit-a-bug" text="Submit A Bug" />
                     <MaterialMenuItem clickLabel="donate" text="Donate" />
+                    <MaterialMenuItem clickLabel="discord" text="Join our Discord" />
                   </items>
                 </MaterialMenu>
               </menus>
