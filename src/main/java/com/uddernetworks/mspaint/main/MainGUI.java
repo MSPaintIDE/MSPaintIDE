@@ -637,7 +637,7 @@ public class MainGUI extends Application implements Initializable {
             createAndSetFolder(cacheFile, parent, "cache");
             createAndSetFolder(classOutput, parent, "out");
 
-            File out = new File(parent, "Output" + this.main.getCurrentLanguage().getOutputFileExtension());
+            File out = new File(parent, "Output." + this.main.getCurrentLanguage().getOutputFileExtension());
             compiledJarOutput.setText(out.getAbsolutePath());
 
             Map<String, TextField> imageGen = new HashMap<>();

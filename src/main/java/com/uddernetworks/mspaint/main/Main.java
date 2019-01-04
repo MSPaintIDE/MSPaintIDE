@@ -18,10 +18,7 @@ import com.uddernetworks.newocr.database.OCRDatabaseManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
 
@@ -119,8 +116,6 @@ public class Main {
         System.out.println("Scanning all images...");
         long start = System.currentTimeMillis();
 
-        mainGUI.setStatusText("Indexing letters...");
-
         mainGUI.setStatusText(null);
 
         File inputImage = ProjectManager.getPPFProject().getInputLocation();
@@ -204,25 +199,44 @@ public class Main {
 
         ImageOutputStream imageOutputStream = new ImageOutputStream(ProjectManager.getPPFProject().getAppOutput(), 500);
         ImageOutputStream compilerOutputStream = new ImageOutputStream(ProjectManager.getPPFProject().getCompilerOutput(), 500);
-        Map<ImageClass, List<LanguageError>> errors = getCurrentLanguage().compileAndExecute(imageClasses, ProjectManager.getPPFProject().getJarFile(), ProjectManager.getPPFProject().getOtherLocation(), ProjectManager.getPPFProject().getClassLocation(), mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
+        Map<ImageClass, List<LanguageError>> errors = null;
 
-        System.out.println("Highlighting Angry Squiggles...");
-        mainGUI.setStatusText("Highlighting Angry Squiggles...");
+        try {
+            errors = getCurrentLanguage().compileAndExecute(imageClasses, ProjectManager.getPPFProject().getJarFile(), ProjectManager.getPPFProject().getOtherLocation(), ProjectManager.getPPFProject().getClassLocation(), mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
 
-        for (ImageClass imageClass : errors.keySet()) {
-            AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
-            highlighter.highlightAngrySquiggles();
+            System.out.println("Highlighting Angry Squiggles...");
+            mainGUI.setStatusText("Highlighting Angry Squiggles...");
+
+            for (ImageClass imageClass : errors.keySet()) {
+                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
+                highlighter.highlightAngrySquiggles();
+            }
+
+        } finally {
+            Optional<Map.Entry<ImageClass, List<LanguageError>>> firstEntry = errors != null ? errors.entrySet().stream().findFirst() : Optional.empty();
+            String append = "";
+            if (firstEntry.isPresent()) {
+                append += " With ";
+                List<LanguageError> languageErrors = firstEntry.get().getValue();
+                if (languageErrors.size() > 1) {
+                    append += languageErrors.size() + " errors";
+                } else {
+                    append += "an error (" + languageErrors.get(0).getMessage() + " in " + firstEntry.get().getKey().getInputImage().getPath() + ")";
+                }
+
+                append += ". See compiler output image for details";
+            }
+
+            System.out.println("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms" + append);
+
+            System.out.println("Saving output images...");
+            mainGUI.setStatusText("Saving output images...");
+
+            imageOutputStream.saveImage();
+            compilerOutputStream.saveImage();
+
+            mainGUI.setStatusText(null);
         }
-
-        System.out.println("Saving output images...");
-        mainGUI.setStatusText("Saving output images...");
-
-        imageOutputStream.saveImage();
-        compilerOutputStream.saveImage();
-
-        mainGUI.setStatusText(null);
-
-        System.out.println("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms");
 
         imageClasses.clear();
     }
