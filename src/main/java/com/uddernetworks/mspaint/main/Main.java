@@ -1,17 +1,18 @@
 package com.uddernetworks.mspaint.main;
 
-import com.uddernetworks.mspaint.highlighter.AngrySquiggleHighlighter;
+import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
+import com.uddernetworks.mspaint.code.languages.Language;
+import com.uddernetworks.mspaint.code.languages.LanguageError;
+import com.uddernetworks.mspaint.code.languages.LanguageManager;
+import com.uddernetworks.mspaint.code.languages.brainfuck.BrainfuckLanguage;
+import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
+import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
-import com.uddernetworks.mspaint.languages.Language;
-import com.uddernetworks.mspaint.languages.LanguageError;
-import com.uddernetworks.mspaint.languages.LanguageManager;
-import com.uddernetworks.mspaint.languages.brainfuck.BrainfuckLanguage;
-import com.uddernetworks.mspaint.languages.java.JavaLanguage;
-import com.uddernetworks.mspaint.languages.python.PythonLanguage;
-import com.uddernetworks.mspaint.main.settings.Setting;
-import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.database.DatabaseManager;
 import com.uddernetworks.newocr.database.OCRDatabaseManager;
 
@@ -208,7 +209,7 @@ public class Main {
             mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
             for (ImageClass imageClass : errors.keySet()) {
-                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass.getImage(), 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
+                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass, 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
                 highlighter.highlightAngrySquiggles();
             }
 

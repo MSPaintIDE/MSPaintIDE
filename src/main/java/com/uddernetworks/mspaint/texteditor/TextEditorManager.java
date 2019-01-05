@@ -1,11 +1,11 @@
 package com.uddernetworks.mspaint.texteditor;
 
-import com.uddernetworks.mspaint.main.ImageClass;
+import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.main.settings.Setting;
-import com.uddernetworks.mspaint.main.settings.SettingsManager;
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.FontBounds;
 import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;

@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.ocr;
 
-import com.uddernetworks.mspaint.main.settings.Setting;
-import com.uddernetworks.mspaint.main.settings.SettingsManager;
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

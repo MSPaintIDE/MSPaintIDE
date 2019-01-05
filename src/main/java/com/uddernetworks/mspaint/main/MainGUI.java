@@ -1,16 +1,16 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.git.GitController;
+import com.uddernetworks.mspaint.gui.MaterialMenu;
+import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
 import com.uddernetworks.mspaint.install.Installer;
-import com.uddernetworks.mspaint.languages.Language;
-import com.uddernetworks.mspaint.main.gui.MaterialMenu;
-import com.uddernetworks.mspaint.main.gui.window.WelcomeWindow;
-import com.uddernetworks.mspaint.main.settings.Setting;
-import com.uddernetworks.mspaint.main.settings.SettingsManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -315,7 +315,7 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void registerThings() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("../gui/Main.fxml"));
         loader.setController(this);
         Parent root = loader.load();
 

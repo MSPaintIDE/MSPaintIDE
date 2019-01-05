@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.uddernetworks.mspaint.main.settings.guielements.SettingNumberField?>
+<?import com.uddernetworks.mspaint.settings.guielements.SettingNumberField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.VBox?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">

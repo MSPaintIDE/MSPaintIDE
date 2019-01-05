@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.uddernetworks.mspaint.main.settings.guielements.*?>
+<?import com.uddernetworks.mspaint.settings.guielements.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
