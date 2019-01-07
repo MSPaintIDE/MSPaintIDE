@@ -315,7 +315,7 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void registerThings() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("../gui/Main.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
         loader.setController(this);
         Parent root = loader.load();
 

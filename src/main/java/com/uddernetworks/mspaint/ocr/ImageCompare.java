@@ -6,7 +6,6 @@ import com.google.gson.InstanceCreator;
 import com.google.gson.JsonParseException;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.newocr.OCRHandle;
 import com.uddernetworks.newocr.ScannedImage;
 
 import java.io.File;
@@ -35,8 +34,7 @@ public class ImageCompare {
 
                 if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(true);
 
-                OCRHandle ocrHandle = new OCRHandle(main.getDatabaseManager());
-                scannedImage = ocrHandle.scanImage(inputImage);
+                scannedImage = main.getOCRHandle().scanImage(inputImage);
 
                 if (saveCaches) {
                     if (!MainGUI.HEADLESS) {

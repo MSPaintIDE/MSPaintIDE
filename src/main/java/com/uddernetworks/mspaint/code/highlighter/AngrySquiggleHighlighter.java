@@ -2,8 +2,10 @@ package com.uddernetworks.mspaint.code.highlighter;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
+import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.utils.ConversionUtils;
 import org.apache.batik.transcoder.TranscoderException;
 
 import javax.imageio.ImageIO;
@@ -12,38 +14,35 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AngrySquiggleHighlighter {
 
+    private Main main;
     private ImageClass imageClass;
     private BufferedImage image;
     private int extraSquigglePadding;
-    private BufferedImage squiggleImage;
     private File highlightedFile;
     private ScannedImage scannedImage;
     private List<LanguageError> errors;
+    private BufferedImage squiggleImage; // The highlighter will use the size of the first character to calculate the persistent angry squiggle image
 
-    public AngrySquiggleHighlighter(ImageClass imageClass, int extraSquigglePadding, File highlightedFile, ScannedImage scannedImage, List<LanguageError> errors) throws IOException, TranscoderException {
+    public AngrySquiggleHighlighter(Main main, ImageClass imageClass, int extraSquigglePadding, File highlightedFile, ScannedImage scannedImage, List<LanguageError> errors) throws IOException, TranscoderException {
+        this.main = main;
         this.imageClass = imageClass;
         this.image = imageClass.getImage();
         this.extraSquigglePadding = extraSquigglePadding;
-        this.squiggleImage = ImageIO.read(getClass().getClassLoader().getResourceAsStream("angry_squiggle.png"));
         this.highlightedFile = highlightedFile;
         this.scannedImage = scannedImage;
         this.errors = errors;
     }
 
-    public void highlightAngrySquiggles() throws IOException {
+    public void highlightAngrySquiggles() throws IOException, TranscoderException, ExecutionException, InterruptedException {
         for (LanguageError error : errors) {
-            int lineNumber = Long.valueOf(error.getLineNumber()).intValue();
-            int columnNumber = Long.valueOf(error.getColumnNumber()).intValue();
+            int lineNumber = Long.valueOf(error.getLineNumber()).intValue() - 1;
+            int columnNumber = Long.valueOf(error.getColumnNumber()).intValue() - 1;
 
-            int[] locs = getLineAndLength(lineNumber, columnNumber);
-            int xIndex = locs[0];
-            int yIndex = locs[1];
-            int length = locs[2];
-
-            drawAngrySquiggle(xIndex, yIndex, length);
+            getLineAndLength(lineNumber, columnNumber);
         }
     }
 
@@ -53,11 +52,9 @@ public class AngrySquiggleHighlighter {
                 int squiggleImageX = (x - squiggleX) % squiggleImage.getWidth();
                 int squiggleImageY = y - squiggleY;
 
-                Color imageColor = new Color(image.getRGB(x, y));
-                Color squiggleColor = new Color(squiggleImage.getRGB(squiggleImageX, squiggleImageY));
-                Color combinedAlpha = new Color(squiggleColor.getRed(), squiggleColor.getGreen(), squiggleColor.getBlue(), imageColor.getAlpha());
+                Color squiggleColor = new Color(squiggleImage.getRGB(squiggleImageX, squiggleImageY), true);
 
-                image.setRGB(x, y, combinedAlpha.getRGB());
+                if (squiggleColor.getAlpha() == 255) image.setRGB(x, y, squiggleColor.getRGB());
             }
         }
 
@@ -65,46 +62,57 @@ public class AngrySquiggleHighlighter {
     }
 
 
-    private int[] getLineAndLength(int lineNumber, int columnNumber) {
-        int[] ret = new int[3]; // X index, Y index, length
+    private void getLineAndLength(int lineNumber, int columnNumber) throws IOException, TranscoderException, ExecutionException, InterruptedException {
+        int xIndex;
+        int yIndex;
+        int length;
+        int fontSize;
 
-        ImageLetter startLetter = null;
-        ImageLetter lastLetter = null;
-        int index = 0;
-        for (ImageLetter colorWrapper : scannedImage.getLine(lineNumber - 1)) {
-            if (colorWrapper == null) continue;
-            index++;
-
-            if (columnNumber != -1) {
-                if (index == columnNumber) {
-                    ret[0] = colorWrapper.getX();
-                    ret[1] = colorWrapper.getY() + 21;
-                    ret[2] = columnNumber;
-                    break;
-                }
-            }
-
-            if (startLetter == null) {
-                if (colorWrapper.getLetter() != ' ') startLetter = colorWrapper;
-            }
-
-            lastLetter = colorWrapper;
-        }
-
+        List<ImageLetter> line = this.scannedImage.getLine(lineNumber);
+        ImageLetter first = line.get(0);
+        ImageLetter last = line.get(line.size() - 1);
+        ImageLetter calcXY;
         if (columnNumber == -1) {
-            ret[0] = startLetter.getX();
-            ret[1] = startLetter.getY() + 21;
-            ret[2] = lastLetter.getX() + lastLetter.getWidth() - startLetter.getX();
-        } else if (index != columnNumber) {
-            ret[0] = lastLetter.getX() + 7;
-            ret[1] = lastLetter.getY() + 21;
-            ret[2] = 6;
+            calcXY = first;
+
+            length = last.getX() + last.getWidth() - first.getX();
+
+            fontSize = this.main.getOCRHandle().getFontSize(first).get();
+        } else {
+            ImageLetter columnLetter = line.get(columnNumber - 1); // Need to get BEFORE
+            calcXY = columnLetter;
+            length = columnLetter.getWidth();
+
+            fontSize = this.main.getOCRHandle().getFontSize(columnLetter).get();
         }
 
-        ret[0] = ret[0] - extraSquigglePadding;
-        ret[2] = ret[2] + extraSquigglePadding * 2;
+        xIndex = calcXY.getX() + calcXY.getWidth();
+        yIndex = calcXY.getY() + calcXY.getHeight();
 
-        return ret;
+        fontSize = ConversionUtils.pointToPixel(fontSize); // fontSize is now in pixels
+
+        xIndex -= extraSquigglePadding;
+        length = length + extraSquigglePadding * 2;
+
+        if (this.squiggleImage == null) {
+            AngrySquiggleGenerator angrySquiggleGenerator = new AngrySquiggleGenerator(fontSize);
+            this.squiggleImage = angrySquiggleGenerator.getGeneratedPNG();
+        }
+
+        length = getRoundedSquiggleLength(length);
+
+        drawAngrySquiggle(xIndex, yIndex, length);
+    }
+
+    private int getRoundedSquiggleLength(int originalLength) {
+        int finalLength = originalLength;
+        int imageWidth = this.squiggleImage.getWidth();
+
+        int extra = originalLength % imageWidth;
+        finalLength -= extra;
+        if (extra > 0) finalLength += imageWidth;
+
+        return finalLength;
     }
 
 }

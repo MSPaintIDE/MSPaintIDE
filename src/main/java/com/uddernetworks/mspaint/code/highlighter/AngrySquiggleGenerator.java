@@ -12,6 +12,7 @@ public class AngrySquiggleGenerator {
 
     public AngrySquiggleGenerator(int fontSize) throws TranscoderException {
         double squiggleHeight = fontSize / 3D;
+        squiggleHeight /= 2;
 
         AngrySquiggleTranscoder transcoder = new AngrySquiggleTranscoder();
         transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, (float) (int) Math.floor(squiggleHeight));

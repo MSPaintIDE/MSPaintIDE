@@ -13,13 +13,16 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.newocr.OCRHandle;
 import com.uddernetworks.newocr.database.DatabaseManager;
 import com.uddernetworks.newocr.database.OCRDatabaseManager;
+import org.apache.batik.transcoder.TranscoderException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class Main {
 
@@ -33,6 +36,7 @@ public class Main {
     private LanguageManager languageManager = new LanguageManager();
     private Language currentLanguage;
     private DatabaseManager databaseManager;
+    private OCRHandle ocrHandle;
     private boolean usingInternal;
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
@@ -209,10 +213,12 @@ public class Main {
             mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
             for (ImageClass imageClass : errors.keySet()) {
-                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(imageClass, 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
+                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getMain(), imageClass, 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
                 highlighter.highlightAngrySquiggles();
             }
 
+        } catch (TranscoderException | ExecutionException | InterruptedException e) {
+            e.printStackTrace();
         } finally {
             Optional<Map.Entry<ImageClass, List<LanguageError>>> firstEntry = errors != null ? errors.entrySet().stream().findFirst() : Optional.empty();
             String append = "";
@@ -283,5 +289,11 @@ public class Main {
 
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public OCRHandle getOCRHandle() {
+        System.out.println("Getting OCR handle from " + this.databaseManager);
+        if (this.ocrHandle == null) this.ocrHandle = new OCRHandle(this.databaseManager);
+        return ocrHandle;
     }
 }

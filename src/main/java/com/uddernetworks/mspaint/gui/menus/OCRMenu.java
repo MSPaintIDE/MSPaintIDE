@@ -7,7 +7,6 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.ocr.TrainGenerator;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import com.uddernetworks.newocr.OCRHandle;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +25,6 @@ public class OCRMenu extends MenuBind {
 
     @BindItem(label = "train")
     public void onClickTrain() {
-        OCRHandle ocrHandle = new OCRHandle(this.mainGUI.getMain().getDatabaseManager());
         String filePath = SettingsManager.getSetting(Setting.TRAIN_IMAGE, String.class);
         if (filePath == null || filePath.trim().isEmpty()) {
             System.err.println("No training file path found, can't train the OCR.");
@@ -47,7 +45,7 @@ public class OCRMenu extends MenuBind {
         final long start = System.currentTimeMillis();
         CompletableFuture.runAsync(() -> {
             try {
-                ocrHandle.trainImage(file);
+                this.mainGUI.getMain().getOCRHandle().trainImage(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
