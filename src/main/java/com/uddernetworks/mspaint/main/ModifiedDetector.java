@@ -18,7 +18,6 @@ public class ModifiedDetector {
      */
     public boolean imageChanged() {
         return fileObject == null || !image.exists() || !fileObject.exists() || fileObject.lastModified() < image.lastModified();
-
     }
 
 }

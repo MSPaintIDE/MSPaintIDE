@@ -161,7 +161,7 @@ public class GitController {
             File addingFile;
             String relative = getRelativeClass(file);
             if (file.getName().endsWith(".png")) {
-                ImageClass imageClass = new ImageClass(file, ProjectManager.getPPFProject().getObjectLocation(), mainGUI, ProjectManager.getPPFProject().isUseCaches(), ProjectManager.getPPFProject().isSaveCaches());
+                ImageClass imageClass = new ImageClass(file, mainGUI, true, ProjectManager.getPPFProject().isUseCaches(), ProjectManager.getPPFProject().isSaveCaches());
                 relative = relative.replace(".png", ".java");
 
                 if (source == null) {

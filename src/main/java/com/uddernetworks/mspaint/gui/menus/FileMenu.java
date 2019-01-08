@@ -6,11 +6,11 @@ import com.uddernetworks.mspaint.gui.window.CreateProjectWindow;
 import com.uddernetworks.mspaint.gui.window.SettingsWindow;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "new.image-file")
     private void onClickNewImageFile() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
             this.mainGUI.createAndOpenImageFile(file);
         });
     }
@@ -48,7 +48,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.project")
     private void onClickOpenProject() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
             ProjectManager.switchProject(ProjectManager.readProject(file));
             this.mainGUI.refreshProject();
         });
@@ -56,7 +56,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.file")
     private void onClickOpenFile() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile().getParentFile(), null, JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile().getParentFile(), ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
             try {
                 new TextEditorManager(file, this.mainGUI);
             } catch (IOException | InterruptedException | ExecutionException e) {

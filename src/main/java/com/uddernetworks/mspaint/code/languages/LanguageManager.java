@@ -1,7 +1,9 @@
 package com.uddernetworks.mspaint.code.languages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LanguageManager {
@@ -36,5 +38,13 @@ public class LanguageManager {
                     return false;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Language> getLanguageFromFileExtension(String fileExtension) {
+        return this.enabledLanguages.stream()
+                .filter(language ->
+                        Arrays.stream(language.getFileExtensions()).anyMatch(extension ->
+                                extension.equalsIgnoreCase(fileExtension)))
+                .findFirst();
     }
 }

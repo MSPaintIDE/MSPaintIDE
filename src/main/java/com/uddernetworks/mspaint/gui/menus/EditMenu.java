@@ -3,8 +3,15 @@ package com.uddernetworks.mspaint.gui.menus;
 import com.uddernetworks.mspaint.gui.BindItem;
 import com.uddernetworks.mspaint.gui.MenuBind;
 import com.uddernetworks.mspaint.gui.window.FindReplaceWindow;
+import com.uddernetworks.mspaint.gui.window.InspectWindow;
+import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ProjectFileFilter;
+import com.uddernetworks.mspaint.project.PPFProject;
+import com.uddernetworks.mspaint.project.ProjectManager;
+import javafx.application.Platform;
 
+import javax.swing.*;
 import java.io.IOException;
 
 public class EditMenu extends MenuBind {
@@ -21,5 +28,19 @@ public class EditMenu extends MenuBind {
     @BindItem(label = "replace")
     public void onClickReplace() throws IOException {
         new FindReplaceWindow(this.mainGUI, true);
+    }
+
+    @BindItem(label = "inspect")
+    public void onClickInspect() {
+        PPFProject ppfProject = ProjectManager.getPPFProject();
+
+        FileDirectoryChooser.openFileChooser(ppfProject.getInputLocation(), ProjectFileFilter.PNG, JFileChooser.FILES_AND_DIRECTORIES, file ->
+                Platform.runLater(() -> {
+            try {
+                new InspectWindow(this.mainGUI, file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 }

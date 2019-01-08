@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXListView;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -22,7 +23,6 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -113,7 +113,7 @@ public class WelcomeWindow extends Stage implements Initializable {
 
         openProject.setOnAction(event -> {
             File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile() : new File("");
-            FileDirectoryChooser.openFileChooser(openAt, new FileNameExtensionFilter("Paint Project File", "ppf"), JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(openAt, ProjectFileFilter.PPF, JFileChooser.FILES_ONLY, file -> {
                 ProjectManager.switchProject(ProjectManager.readProject(file));
                 this.mainGUI.refreshProject();
                 Platform.runLater(this::close);

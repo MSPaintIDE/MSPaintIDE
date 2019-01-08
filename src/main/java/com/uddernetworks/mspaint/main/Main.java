@@ -124,17 +124,16 @@ public class Main {
         mainGUI.setStatusText(null);
 
         File inputImage = ProjectManager.getPPFProject().getInputLocation();
-        File objectFile = ProjectManager.getPPFProject().getObjectLocation();
 
         if (inputImage.isDirectory()) {
             System.out.println("Found directory: " + inputImage.getAbsolutePath());
             for (File imageFile : getFilesFromDirectory(inputImage, this.currentLanguage.getFileExtensions(), "png")) {
                 System.out.println("2 Adding non directory: " + imageFile.getAbsolutePath());
-                imageClasses.add(new ImageClass(imageFile, objectFile, mainGUI, useCaches, saveCaches));
+                imageClasses.add(new ImageClass(imageFile, mainGUI, true, useCaches, saveCaches));
             }
         } else {
             System.out.println("Adding non directory: " + inputImage.getAbsolutePath());
-            imageClasses.add(new ImageClass(inputImage, objectFile, mainGUI, useCaches, saveCaches));
+            imageClasses.add(new ImageClass(inputImage, mainGUI, true, useCaches, saveCaches));
         }
 
         mainGUI.setStatusText(null);
@@ -287,12 +286,15 @@ public class Main {
         this.mainGUI.initializeInputTextFields();
     }
 
+    public LanguageManager getLanguageManager() {
+        return this.languageManager;
+    }
+
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
 
     public OCRHandle getOCRHandle() {
-        System.out.println("Getting OCR handle from " + this.databaseManager);
         if (this.ocrHandle == null) this.ocrHandle = new OCRHandle(this.databaseManager);
         return ocrHandle;
     }

@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class FileDirectoryChooser {
@@ -11,7 +12,7 @@ public class FileDirectoryChooser {
     private static JFileChooser fileChooser;
     private static JDialog jDialog;
 
-    // This is a horrible way of doing this, before anyone yells at me, the standard JacaFX file chooser
+    // This is a horrible way of doing this, before anyone yells at me, the standard JavaFX file chooser
     // doesn't allow file and directory selection in the same window
     public static void openMultiFileChoser(File selectedFile, FileFilter fileFilter, int type, Consumer<File[]> onSelected) {
         if (fileChooser != null) {
@@ -19,7 +20,7 @@ public class FileDirectoryChooser {
             jDialog.hide();
         }
 
-        new Thread(() -> {
+        CompletableFuture.runAsync(() -> {
             fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(type);
             fileChooser.setSelectedFile(selectedFile);
@@ -27,7 +28,7 @@ public class FileDirectoryChooser {
             fileChooser.setMultiSelectionEnabled(true);
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
-            new Thread(() -> {
+            CompletableFuture.runAsync(() -> {
                 try {
                     Field dialogField = JFileChooser.class.getDeclaredField("dialog");
                     dialogField.setAccessible(true);
@@ -43,17 +44,17 @@ public class FileDirectoryChooser {
                 }
 
                 jDialog.toFront();
-            }).start();
+            });
 
             int returnVal = fileChooser.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 onSelected.accept(fileChooser.getSelectedFiles());
             }
-        }).start();
+        });
     }
 
-    // This is a horrible way of doing this, before anyone yells at me, the standard JacaFX file chooser
+    // This is a horrible way of doing this, before anyone yells at me, the standard JavaFX file chooser
     // doesn't allow file and directory selection in the same window
     public static void openFileChooser(File selectedFile, FileFilter fileFilter, int type, Consumer<File> onSelected) {
         if (fileChooser != null) {
@@ -61,14 +62,14 @@ public class FileDirectoryChooser {
             jDialog.hide();
         }
 
-        new Thread(() -> {
+        CompletableFuture.runAsync(() -> {
             fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(type);
             fileChooser.setSelectedFile(selectedFile);
             fileChooser.setFileFilter(fileFilter);
             fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
-            new Thread(() -> {
+            CompletableFuture.runAsync(() -> {
                 try {
                     Field dialogField = JFileChooser.class.getDeclaredField("dialog");
                     dialogField.setAccessible(true);
@@ -84,14 +85,14 @@ public class FileDirectoryChooser {
                 }
 
                 jDialog.toFront();
-            }).start();
+            });
 
             int returnVal = fileChooser.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 onSelected.accept(fileChooser.getSelectedFile());
             }
-        }).start();
+        });
     }
 
 }

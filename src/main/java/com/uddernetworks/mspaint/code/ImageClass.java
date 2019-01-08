@@ -2,10 +2,7 @@ package com.uddernetworks.mspaint.code;
 
 import com.uddernetworks.mspaint.code.highlighter.LetterFormatter;
 import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
-import com.uddernetworks.mspaint.main.LetterFileWriter;
-import com.uddernetworks.mspaint.main.Main;
-import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.main.ModifiedDetector;
+import com.uddernetworks.mspaint.main.*;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.newocr.ScannedImage;
 
@@ -22,22 +19,35 @@ public class ImageClass {
     private File highlightedFile;
     private MainGUI mainGUI;
     private Main headlessMain;
+    private final boolean internal;
+    private final boolean useCaches;
+    private final boolean saveCaches;
 
-    public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, boolean useCaches, boolean saveCaches) {
-        this(inputImage, objectFileDir, mainGUI, null, useCaches, saveCaches);
+    public ImageClass(File inputImage, MainGUI mainGUI, boolean internal, boolean useCaches, boolean saveCaches) {
+        this(inputImage, mainGUI, null, internal, useCaches, saveCaches);
     }
 
-    public ImageClass(File inputImage, File objectFileDir, MainGUI mainGUI, Main headlessMain, boolean useCaches, boolean saveCaches) {
+    public ImageClass(File inputImage, MainGUI mainGUI, Main headlessMain, boolean internal, boolean useCaches, boolean saveCaches) {
         this.inputImage = inputImage;
         this.mainGUI = mainGUI;
         this.headlessMain = headlessMain;
+        this.internal = internal;
+        this.useCaches = useCaches;
+        this.saveCaches = saveCaches;
 
-        File objectFile = objectFileDir != null ? new File(objectFileDir, inputImage.getName().substring(0, inputImage.getName().length() - 4) + "_cache.json") : null;
-
-        scan(objectFile, useCaches, saveCaches);
+        scan(internal, useCaches, saveCaches);
     }
 
-    public void scan(File objectFile,  boolean useCaches, boolean saveCaches) {
+    public void scan() {
+        scan(this.internal, this.useCaches, this.saveCaches);
+    }
+
+    public void scan(boolean useCaches, boolean saveCaches) {
+        scan(this.internal, useCaches, saveCaches);
+    }
+
+    public void scan(boolean internal, boolean useCaches, boolean saveCaches) {
+        File cacheFile = CacheUtils.getCacheFor(this.inputImage, internal);
         System.out.println("Scanning image " + inputImage.getName() + "...");
         final String prefix = "[" + inputImage.getName() + "] ";
 
@@ -45,21 +55,13 @@ public class ImageClass {
 
         ImageCompare imageCompare = new ImageCompare();
 
-        ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, objectFile);
+        ModifiedDetector modifiedDetector = new ModifiedDetector(inputImage, cacheFile);
 
         if (this.headlessMain == null) {
             this.headlessMain = mainGUI.getMain();
         }
-//        try {
-//            if (MainGUI.HEADLESS) {
-//                this.headlessMain = new Main();
-//                this.headlessMain.headlessStart();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
-        scannedImage = imageCompare.getText(inputImage, objectFile, mainGUI, this.headlessMain, !modifiedDetector.imageChanged() && useCaches, saveCaches);
+        scannedImage = imageCompare.getText(inputImage, cacheFile, mainGUI, this.headlessMain, !modifiedDetector.imageChanged() && useCaches, saveCaches);
 
         text = scannedImage.getPrettyString();
 

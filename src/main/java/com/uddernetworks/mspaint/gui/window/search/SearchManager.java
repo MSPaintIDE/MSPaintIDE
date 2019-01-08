@@ -39,9 +39,9 @@ public class SearchManager {
 
     public List<SearchResult> searchFile(File file, String text, boolean ignoreCase) {
         if (!file.isFile()) return Collections.emptyList();
-        File objectFile = new File(MainGUI.LOCAL_MSPAINT, "global_cache\\" + file.getName().substring(0, file.getName().length() - 4) + "_cache.json");
+        File cacheFile = new File(MainGUI.LOCAL_MSPAINT, "global_cache\\" + file.getName().substring(0, file.getName().length() - 4) + "_cache.json");
 
-        ScannedImage scannedImage = imageCompare.getText(file, objectFile, this.mainGUI, this.mainGUI.getMain(), true, true);
+        ScannedImage scannedImage = imageCompare.getText(file, cacheFile, this.mainGUI, this.mainGUI.getMain(), true, true);
         AtomicInteger lineNumber = new AtomicInteger(0);
         return scannedImage.getGrid().values()
                 .stream()

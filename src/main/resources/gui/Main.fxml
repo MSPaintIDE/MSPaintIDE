@@ -40,6 +40,7 @@
                   <items>
                     <MaterialMenuItem clickLabel="find" text="Find" />
                     <MaterialMenuItem clickLabel="replace" text="Replace" />
+                    <MaterialMenuItem clickLabel="inspect" text="Inspect" />
                   </items>
                 </MaterialMenu>
                 <MaterialMenu bindClass="OCRMenu" text="OCR">

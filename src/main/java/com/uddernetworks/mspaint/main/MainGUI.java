@@ -36,8 +36,6 @@ import javafx.stage.StageStyle;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -153,10 +151,6 @@ public class MainGUI extends Application implements Initializable {
     private AtomicBoolean initialized = new AtomicBoolean();
     private static File initialProject = null;
     private static PrintStreamStringCopy printStreamStringCopy;
-
-    private FileFilter imageFilter = new FileNameExtensionFilter("Image files", "png");
-    private FileFilter txtFilter = new FileNameExtensionFilter("Text document", "txt");
-    private FileFilter jarFilter = new FileNameExtensionFilter("JAR Archive", "jar");
 
     public static final File LOCAL_MSPAINT = new File(System.getenv("LocalAppData"), "\\MSPaintIDE");
 
@@ -687,7 +681,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeInputImage.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getInputLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getInputLocation();
-            FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            FileDirectoryChooser.openFileChooser(selected, ProjectFileFilter.PNG, JFileChooser.FILES_AND_DIRECTORIES, file -> {
                 inputName.setText(file.getAbsolutePath());
                 main.setInputImage(file);
             });
@@ -727,7 +721,7 @@ public class MainGUI extends Application implements Initializable {
 
         changeCompiledJar.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getJarFile() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getJarFile();
-            FileDirectoryChooser.openFileChooser(selected, jarFilter, JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_ONLY, file -> {
                 compiledJarOutput.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setJarFile(file);
             });
@@ -757,7 +751,7 @@ public class MainGUI extends Application implements Initializable {
 
         compilerOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getCompilerOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getCompilerOutput();
-            FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
                 compilerOutputValue.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setCompilerOutput(file);
             });
@@ -767,7 +761,7 @@ public class MainGUI extends Application implements Initializable {
 
         programOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getAppOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getAppOutput();
-            FileDirectoryChooser.openFileChooser(selected, imageFilter, JFileChooser.FILES_ONLY, file -> {
+            FileDirectoryChooser.openFileChooser(selected, ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
                 programOutputValue.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setAppOutput(file);
             });

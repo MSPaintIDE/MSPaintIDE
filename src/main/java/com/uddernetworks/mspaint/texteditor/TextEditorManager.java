@@ -69,8 +69,7 @@ public class TextEditorManager {
 
         this.imageFile = createImageFile();
 
-        File objectDirectory = new File(MainGUI.LOCAL_MSPAINT, "global_cache");
-        this.imageClass = new ImageClass(this.imageFile, objectDirectory, mainGUI, this.headlessMain, true, true);
+        this.imageClass = new ImageClass(this.imageFile, mainGUI, this.headlessMain, false, true, true);
 
         (this.savingThread = new Thread(() -> {
             try {
@@ -88,7 +87,7 @@ public class TextEditorManager {
                         }
 
                         if (found && (System.currentTimeMillis() - last) > 250) {
-                            this.imageClass.scan(new File(objectDirectory, this.imageFile.getName().substring(0, this.imageFile.getName().length() - 4) + "_cache.json"), false, true);
+                            this.imageClass.scan();
                             Files.write(this.originalFile.toPath(), this.imageClass.getText().getBytes());
                             last = System.currentTimeMillis();
                         }
@@ -106,7 +105,7 @@ public class TextEditorManager {
     }
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
-        ScannedImage scannedImage = new ScannedImage();
+        ScannedImage scannedImage = new ScannedImage(this.originalFile, this.imageClass.getImage());
         LetterGenerator letterGenerator = new LetterGenerator();
 
         double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class) * 1.3333333D;

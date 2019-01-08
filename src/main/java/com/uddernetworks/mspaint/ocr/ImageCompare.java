@@ -16,14 +16,14 @@ import java.util.Map;
 
 public class ImageCompare {
 
-    public ScannedImage getText(File inputImage, File objectFile, MainGUI mainGUI, Main main, boolean readFromCache, boolean saveCaches) {
+    public ScannedImage getText(File inputImage, File cacheFile, MainGUI mainGUI, Main main, boolean readFromCache, boolean saveCaches) {
         ScannedImage scannedImage;
 
         try {
-            if (readFromCache && objectFile != null && !objectFile.isFile()) {
+            if (readFromCache && cacheFile != null && !cacheFile.isFile()) {
                 try {
-                    objectFile.getParentFile().mkdirs();
-                    readFromCache = !objectFile.createNewFile();
+                    cacheFile.getParentFile().mkdirs();
+                    readFromCache = !cacheFile.createNewFile();
                 } catch (IOException ignored) {
                     readFromCache = false;
                 }
@@ -41,7 +41,7 @@ public class ImageCompare {
                         mainGUI.setStatusText("Saving to cache file...");
                     }
 
-                    Files.write(objectFile.toPath(), new Gson().toJson(scannedImage).getBytes());
+                    Files.write(cacheFile.toPath(), new Gson().toJson(scannedImage).getBytes());
                 }
 
                 if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
@@ -51,7 +51,7 @@ public class ImageCompare {
 
                     gsonBuilder.registerTypeAdapter(Map.Entry.class, (InstanceCreator<Map.Entry>) type -> new AbstractMap.SimpleEntry<>(null, null));
 
-                    scannedImage = gsonBuilder.create().fromJson(new String(Files.readAllBytes(objectFile.toPath())), ScannedImage.class);
+                    scannedImage = gsonBuilder.create().fromJson(new String(Files.readAllBytes(cacheFile.toPath())), ScannedImage.class);
                 } catch (JsonParseException e) {
                     if (!MainGUI.HEADLESS) mainGUI.setHaveError();
                     System.err.println("There was a problem reading the cache for " + inputImage.getName() + "! Try resetting caches.");
