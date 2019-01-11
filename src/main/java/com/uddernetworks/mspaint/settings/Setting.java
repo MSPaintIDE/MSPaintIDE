@@ -19,7 +19,8 @@ public enum Setting {
     OCR_DEBUG("ocrDebug", false, BOOLEAN),
     EDIT_FILE_SIZE("editFileFontSize", 36, INT), // The font size that files are generated in
     TRAIN_LOWER_BOUND("trainGenLowerBound", 20, INT),
-    TRAIN_UPPER_BOUND("trainGenUpperBound", 90, INT);
+    TRAIN_UPPER_BOUND("trainGenUpperBound", 90, INT),
+    TASKBAR_ICON("taskbarIcon", "Colored", STRING);
 
     private final String name;
     private Object def;

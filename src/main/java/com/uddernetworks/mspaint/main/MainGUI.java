@@ -152,6 +152,9 @@ public class MainGUI extends Application implements Initializable {
     private static File initialProject = null;
     private static PrintStreamStringCopy printStreamStringCopy;
 
+    private Map<String, Image> cachedTaksbarIcons = new HashMap<>();
+    private Map<String, ImageView> cachedImageViews = new HashMap<>();
+
     public static final File LOCAL_MSPAINT = new File(System.getenv("LocalAppData"), "\\MSPaintIDE");
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
@@ -313,13 +316,8 @@ public class MainGUI extends Application implements Initializable {
         loader.setController(this);
         Parent root = loader.load();
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo-small.png").toString());
-        icon.setFitHeight(25);
-        icon.setFitWidth(25);
-
         JFXDecorator jfxDecorator = new JFXDecorator(this.primaryStage, root, false, true, true);
         jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
-        jfxDecorator.setGraphic(icon);
         jfxDecorator.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
         Scene scene = new Scene(jfxDecorator);
@@ -327,12 +325,42 @@ public class MainGUI extends Application implements Initializable {
 
         this.primaryStage.setScene(scene);
 
+        SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
+            String path = "";
+            switch (icon) {
+                case "Colored":
+                    path = "ms-paint-logo-colored.png";
+                    break;
+                case "White":
+                    path = "ms-paint-logo-white.png";
+                    break;
+                case "Black":
+                    path = "ms-paint-logo.png";
+                    break;
+            }
+
+            changeImage(path);
+        }, String.class, true);
+
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
-        this.primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
         Splash.setStatus("Starting...");
         this.primaryStage.setOnShown(event -> Splash.end());
         this.primaryStage.show();
+    }
+
+    public void changeImage(String path) {
+        List<Image> icons = this.primaryStage.getIcons();
+        icons.clear();
+        icons.add(this.cachedTaksbarIcons.computeIfAbsent(path, path2 -> new Image(getClass().getClassLoader().getResourceAsStream("icons\\taskbar\\" + path))));
+
+        JFXDecorator root = (JFXDecorator) this.primaryStage.getScene().getRoot();
+        root.setGraphic(this.cachedImageViews.computeIfAbsent(path, path2 -> {
+            ImageView imageView = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\" + path).toString());
+            imageView.setFitHeight(25);
+            imageView.setFitWidth(25);
+            return imageView;
+        }));
     }
 
     public void fullCompile(boolean execute) {

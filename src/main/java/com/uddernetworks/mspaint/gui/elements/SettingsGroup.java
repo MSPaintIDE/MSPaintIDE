@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.settings.guielements;
+package com.uddernetworks.mspaint.gui.elements;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;

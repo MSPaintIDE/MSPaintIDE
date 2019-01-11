@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.settings.guielements;
+package com.uddernetworks.mspaint.gui.elements;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
