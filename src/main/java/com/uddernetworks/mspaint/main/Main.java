@@ -41,7 +41,6 @@ public class Main {
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         headlessStart();
-        System.out.println("111111111111111111111");
         this.mainGUI = mainGUI;
         currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         parent = currentJar.getParentFile();

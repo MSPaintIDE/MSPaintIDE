@@ -98,7 +98,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "settings")
     private void onClickSettings() throws IOException {
-        new SettingsWindow(null);
+        new SettingsWindow(this.mainGUI, null);
     }
 
     @BindItem(label = "print")

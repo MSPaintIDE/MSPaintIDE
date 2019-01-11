@@ -8,7 +8,7 @@
 <AnchorPane prefHeight="500.0" prefWidth="600.0" scaleShape="false" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <JFXTextField fx:id="searchText" layoutX="10.0" layoutY="52.0" prefWidth="580.0" promptText="Search for" styleClass="theme-text" />
-      <JFXRadioButton fx:id="inFile" layoutX="12.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: #0d47a1;" styleClass="theme-text" text="In File">
+      <JFXRadioButton fx:id="inFile" layoutX="12.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: -primary-button-color;" styleClass="theme-text" text="In File">
           <cursor>
               <Cursor fx:constant="HAND" />
           </cursor>
@@ -16,18 +16,18 @@
             <ToggleGroup fx:id="inLocation" />
          </toggleGroup>
       </JFXRadioButton>
-      <JFXRadioButton fx:id="inProject" layoutX="98.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: #0d47a1;" styleClass="theme-text" text="In Project" toggleGroup="$inLocation">
+      <JFXRadioButton fx:id="inProject" layoutX="98.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: -primary-button-color;" styleClass="theme-text" text="In Project" toggleGroup="$inLocation">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXRadioButton>
-      <JFXRadioButton fx:id="inDirectory" layoutX="203.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: #0d47a1;" styleClass="theme-text" text="In Directory" toggleGroup="$inLocation">
+      <JFXRadioButton fx:id="inDirectory" layoutX="203.0" layoutY="137.0" mnemonicParsing="false" style="-fx-selected-color: -primary-button-color;" styleClass="theme-text" text="In Directory" toggleGroup="$inLocation">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXRadioButton>
       <JFXTextField fx:id="directoryPath" layoutX="318.0" layoutY="134.0" prefWidth="230.0" styleClass="theme-text" />
-      <JFXButton fx:id="browse" buttonType="RAISED" layoutX="558.0" layoutY="132.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="..." />
+      <JFXButton fx:id="browse" buttonType="RAISED" layoutX="558.0" layoutY="132.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-text-fill:WHITE;-fx-background-color:-primary-button-color;-fx-font-size:14px;" text="..." />
       <JFXTextField fx:id="replaceText" layoutX="10.0" layoutY="92.0" prefWidth="500.0" promptText="Replace with" styleClass="theme-text" />
       <JFXCheckBox fx:id="replaceToggle" layoutX="523.0" layoutY="96.0" mnemonicParsing="false" styleClass="theme-text" text="Replace">
          <cursor>
@@ -39,7 +39,7 @@
             <JFXListView id="searchResults" fx:id="searchResults" layoutX="1.0" prefHeight="250.0" prefWidth="600.0" styleClass="gridpane-theme" />
          </children></JFXScrollPane>
       <Label fx:id="resultText" layoutX="10.0" layoutY="125.0" prefWidth="580.0" styleClass="theme-text" textFill="#575757" />
-      <JFXButton fx:id="action" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Replace" />
+      <JFXButton fx:id="action" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" styleClass="primary-button" text="Replace" />
       <JFXButton fx:id="cancel" layoutX="490.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-font-size:14px;" styleClass="theme-text" text="Cancel" />
       <JFXCheckBox fx:id="caseInsensitive" layoutX="260.0" layoutY="15.0" mnemonicParsing="false" styleClass="theme-text" text="Case Insensitive">
          <cursor>

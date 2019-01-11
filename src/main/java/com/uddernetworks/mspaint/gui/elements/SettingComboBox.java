@@ -12,7 +12,7 @@ public class SettingComboBox extends JFXComboBox<String> {
     private ObjectProperty<ObservableList<String>> options;
 
     public SettingComboBox() {
-        setStyle("-jfx-checked-color:  #0d47a1;");
+        setStyle("-jfx-checked-color:  -primary-button-color;");
         getStyleClass().add("theme-text");
 
         getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -32,8 +32,6 @@ public class SettingComboBox extends JFXComboBox<String> {
         settingProperty().set(setting);
 
         getSelectionModel().select(SettingsManager.getSetting(getSetting(), String.class, "?"));
-
-        System.out.println("Select = " + SettingsManager.getSetting(getSetting(), String.class, "?"));
     }
 
     public ObjectProperty<ObservableList<String>> optionsProperty() {

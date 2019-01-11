@@ -10,14 +10,14 @@
       <Label layoutX="10.0" layoutY="34.0" prefWidth="100.0" text="Project name:" styleClass="theme-text" />
       <JFXTextField fx:id="projectLocation" layoutX="130.0" layoutY="75.0" prefHeight="25.0" prefWidth="420.0" styleClass="theme-text" />
       <Label layoutX="10.0" layoutY="79.0" prefWidth="100.0" text="Project location:" styleClass="theme-text" />
-      <JFXButton fx:id="browse" buttonType="RAISED" layoutX="561.0" layoutY="75.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="..." />
+      <JFXButton fx:id="browse" buttonType="RAISED" layoutX="561.0" layoutY="75.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" styleClass="primary-button" text="..." />
        <JFXComboBox fx:id="languageComboBox" layoutX="130.0" layoutY="115.0" prefHeight="30.0" prefWidth="150.0" styleClass="language-selection-dark">
            <cursor>
                <Cursor fx:constant="HAND" />
            </cursor>
        </JFXComboBox>
       <Label layoutX="10.0" layoutY="122.0" prefWidth="100.0" text="Project language:" styleClass="theme-text" />
-      <JFXButton fx:id="finish" buttonType="FLAT" layoutX="344.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Finish" />
+      <JFXButton fx:id="finish" buttonType="FLAT" layoutX="344.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="primary-button" text="Finish" />
       <JFXButton fx:id="cancel" buttonType="FLAT" layoutX="429.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Cancel" styleClass="theme-text" />
       <JFXButton fx:id="help" buttonType="FLAT" layoutX="514.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Help" styleClass="theme-text" />
       <Label fx:id="error" layoutX="10.0" layoutY="165.0" prefWidth="580.0" style="-fx-text-fill: RED;" />

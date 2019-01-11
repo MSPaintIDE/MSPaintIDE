@@ -20,7 +20,7 @@ public class OCRMenu extends MenuBind {
 
     @BindItem(label = "settings")
     public void onClickSettings() throws IOException {
-        new SettingsWindow("OCR");
+        new SettingsWindow(this.mainGUI, "OCR");
     }
 
     @BindItem(label = "train")

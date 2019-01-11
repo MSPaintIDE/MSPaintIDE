@@ -19,17 +19,17 @@
             </JFXScrollPane>
             <Pane HBox.hgrow="ALWAYS">
                <children>
-                  <JFXButton fx:id="openProject" buttonType="RAISED" layoutX="138.0" layoutY="355.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Open Project">
+                  <JFXButton fx:id="openProject" buttonType="RAISED" layoutX="138.0" layoutY="355.0" prefHeight="30" prefWidth="125.0" styleClass="primary-button" text="Open Project">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </JFXButton>
-                  <JFXButton fx:id="createProject" buttonType="RAISED" layoutX="138.0" layoutY="275.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="New Project">
+                  <JFXButton fx:id="createProject" buttonType="RAISED" layoutX="138.0" layoutY="275.0" prefHeight="30" prefWidth="125.0" styleClass="primary-button" text="New Project">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </JFXButton>
-                  <JFXButton fx:id="importProject" buttonType="RAISED" layoutX="138.0" layoutY="315.0" prefHeight="30" prefWidth="125.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Import Project">
+                  <JFXButton fx:id="importProject" buttonType="RAISED" layoutX="138.0" layoutY="315.0" prefHeight="30" prefWidth="125.0" styleClass="primary-button" text="Import Project">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>

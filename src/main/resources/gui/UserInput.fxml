@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane prefHeight="100.0" prefWidth="500.0" scaleShape="false" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <JFXButton fx:id="okay" buttonType="RAISED" layoutX="280.0" layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Okay" />
+      <JFXButton fx:id="okay" buttonType="RAISED" layoutX="280.0" layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" styleClass="primary-button" text="Okay" />
       <JFXButton fx:id="cancel" layoutX="390.0" layoutY="60.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-font-size:14px;" styleClass="theme-text" text="Cancel" />
       <JFXTextField fx:id="userInput" layoutX="10" layoutY="25.0" prefHeight="25.0" prefWidth="480.0" styleClass="theme-text" />
       <Label fx:id="promptText" layoutX="15.0" layoutY="6.0" prefWidth="480" text="Label" styleClass="theme-text"/>

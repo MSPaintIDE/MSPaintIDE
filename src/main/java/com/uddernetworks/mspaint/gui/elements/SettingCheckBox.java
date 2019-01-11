@@ -10,7 +10,7 @@ public class SettingCheckBox extends JFXCheckBox {
     private ObjectProperty<Setting> settingProperty = new SimpleObjectProperty<>(null);
 
     public SettingCheckBox() {
-        setStyle("-jfx-checked-color:  #0d47a1;");
+        setStyle("-jfx-checked-color:  -primary-button-color;");
         getStyleClass().add("theme-text");
         selectedProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue)));
     }

@@ -151,6 +151,7 @@ public class MainGUI extends Application implements Initializable {
     private AtomicBoolean initialized = new AtomicBoolean();
     private static File initialProject = null;
     private static PrintStreamStringCopy printStreamStringCopy;
+    private ThemeManager themeManager;
 
     private Map<String, Image> cachedTaksbarIcons = new HashMap<>();
     private Map<String, ImageView> cachedImageViews = new HashMap<>();
@@ -325,6 +326,12 @@ public class MainGUI extends Application implements Initializable {
 
         this.primaryStage.setScene(scene);
 
+        this.themeManager = new ThemeManager();
+        this.themeManager.addStage(this.primaryStage);
+
+        this.themeManager.loadTheme("Default", "default.css");
+        this.themeManager.loadTheme("Extra Dark", "extra-dark.css");
+
         SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
             String path = "";
             switch (icon) {
@@ -361,6 +368,10 @@ public class MainGUI extends Application implements Initializable {
             imageView.setFitWidth(25);
             return imageView;
         }));
+    }
+
+    public ObservableList<String> getStylesheets() {
+        return this.primaryStage.getScene().getStylesheets();
     }
 
     public void fullCompile(boolean execute) {
@@ -810,5 +821,9 @@ public class MainGUI extends Application implements Initializable {
 
     public TextArea getOutputTextArea() {
         return output;
+    }
+
+    public ThemeManager getThemeManager() {
+        return themeManager;
     }
 }

@@ -85,6 +85,7 @@ public class InspectWindow extends Stage implements Initializable {
         scene.getStylesheets().add("style.css");
 
         setScene(scene);
+        this.mainGUI.getThemeManager().addStage(this);
         show();
 
         setTitle("Inspecting " + this.inspecting.getName());

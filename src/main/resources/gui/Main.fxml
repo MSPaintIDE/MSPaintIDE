@@ -147,52 +147,52 @@
                                               <JFXTextField fx:id="compilerOutputValue" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                                               <JFXTextField fx:id="programOutputValue" styleClass="theme-text" GridPane.columnIndex="1" GridPane.rowIndex="8" />
 
-                                              <JFXButton fx:id="changeInputImage" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeInputImage" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                                                   <cursor>
                                                             <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="changeHighlightImage" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeHighlightImage" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="changeCacheFile" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeCacheFile" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="changeClassOutput" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeClassOutput" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                                </JFXButton>
-                                              <JFXButton fx:id="changeCompiledJar" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeCompiledJar" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="changeLibraries" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeLibraries" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="changeOtherFiles" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="changeOtherFiles" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="compilerOutput" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="compilerOutput" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="programOutput" buttonType="RAISED" prefHeight="30" prefWidth="75" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                                              <JFXButton fx:id="programOutput" buttonType="RAISED" prefHeight="30" prefWidth="75" styleClass="primary-button" text="Change" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                    <JFXButton fx:id="generate" buttonType="RAISED" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Generate" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                    <JFXButton fx:id="generate" buttonType="RAISED" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Generate" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                                        <cursor>
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
@@ -204,29 +204,29 @@
                                       </GridPane>
                                       <Pane prefHeight="100.0" prefWidth="500.0" GridPane.rowIndex="1">
                                           <children>
-                                              <JFXButton fx:id="createRepo" buttonType="RAISED" layoutX="10.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Create Repo">
+                                              <JFXButton fx:id="createRepo" buttonType="RAISED" layoutX="10.0" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Create Repo">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="addRemote" buttonType="RAISED" layoutX="10.0" layoutY="40.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Add Remote">
+                                              <JFXButton fx:id="addRemote" buttonType="RAISED" layoutX="10.0" layoutY="40.0" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Add Remote">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="addFiles" buttonType="RAISED" layoutX="120.0" layoutY="-1.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Add Files">
+                                              <JFXButton fx:id="addFiles" buttonType="RAISED" layoutX="120.0" layoutY="-1.0" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Add Files">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
-                                              <JFXButton fx:id="commit" buttonType="RAISED" layoutX="10.0" layoutY="80.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Commit">
+                                              <JFXButton fx:id="commit" buttonType="RAISED" layoutX="10.0" layoutY="80.0" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Commit">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
                                               <JFXTextField fx:id="commitMessage" labelFloat="true" layoutX="130.0" layoutY="83.0" prefHeight="25.0" prefWidth="328.0" promptText="Commit message" styleClass="theme-text" />
                                               <JFXTextField fx:id="originURL" labelFloat="true" layoutX="130.0" layoutY="43.0" prefHeight="25.0" prefWidth="328.0" promptText="Remote origin URL" styleClass="theme-text" />
-                                              <JFXButton fx:id="push" buttonType="RAISED" layoutX="230.0" layoutY="-1.0" prefHeight="30" prefWidth="100.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" text="Push">
+                                              <JFXButton fx:id="push" buttonType="RAISED" layoutX="230.0" layoutY="-1.0" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Push">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
@@ -241,34 +241,34 @@
                                       </Pane>
                                       <Pane prefHeight="212.0" prefWidth="500.0" GridPane.rowIndex="2">
                                           <children>
-                                              <JFXCheckBox fx:id="syntaxHighlight" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Syntax Highlight">
+                                              <JFXCheckBox fx:id="syntaxHighlight" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Syntax Highlight">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXCheckBox>
-                                              <JFXCheckBox fx:id="compile" layoutX="207.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Compile/Interpret">
+                                              <JFXCheckBox fx:id="compile" layoutX="207.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Compile/Interpret">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXCheckBox>
-                                              <JFXCheckBox fx:id="execute" layoutX="399.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Execute">
+                                              <JFXCheckBox fx:id="execute" layoutX="399.0" layoutY="14.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Execute">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXCheckBox>
-                                              <JFXButton buttonType="RAISED" layoutX="10.0" layoutY="124.0" onAction="#startScan" prefHeight="30" prefWidth="150.0" style="-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;" styleClass="theme-text" text="Start">
+                                              <JFXButton buttonType="RAISED" layoutX="10.0" layoutY="124.0" onAction="#startScan" prefHeight="30" prefWidth="150.0" styleClass="primary-button, theme-text" text="Start">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXButton>
                                               <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="170.0" prefHeight="18.0" prefWidth="480.0" progress="0.0" styleClass="jfx-progress-bar" />
                                               <Label fx:id="statusText" layoutX="170.0" layoutY="131.0" maxWidth="330.0" prefHeight="17.0" prefWidth="275.0" styleClass="theme-text" />
-                                              <JFXCheckBox fx:id="useCaches" layoutX="14.0" layoutY="57.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Use Caches">
+                                              <JFXCheckBox fx:id="useCaches" layoutX="14.0" layoutY="57.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Use Caches">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>
                                               </JFXCheckBox>
-                                              <JFXCheckBox fx:id="saveCaches" layoutX="205.0" layoutY="57.0" mnemonicParsing="false" style="-jfx-checked-color: #0d47a1;" styleClass="theme-text" text="Save Caches">
+                                              <JFXCheckBox fx:id="saveCaches" layoutX="205.0" layoutY="57.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Save Caches">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>

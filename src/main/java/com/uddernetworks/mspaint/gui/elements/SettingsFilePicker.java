@@ -42,7 +42,7 @@ public class SettingsFilePicker extends HBox {
         browse.setButtonType(JFXButton.ButtonType.RAISED);
         browse.setPrefWidth(25);
         browse.setPrefHeight(25);
-        browse.setStyle("-fx-text-fill:WHITE;-fx-background-color:#0d47a1;-fx-font-size:14px;");
+        browse.setStyle("-fx-text-fill:WHITE;-fx-background-color:-primary-button-color;-fx-font-size:14px;");
 
         textField.getStyleClass().add("theme-text");
         getChildren().add(textField);

@@ -1,0 +1,15 @@
+.root {
+    -left-background: #F4F4F4;
+    -right-background: #FFFFFF;
+    -left-background-dark: #424242;
+    -right-background-dark: #616161;
+    -window-border: #5472d3;
+
+    -primary-button-color: #0d47a1;
+    -input-accent: #5472d3;
+    -input-accent-hover: #4b6eaf;
+    -error-accent: #c62828;
+
+    -hover-color: #dadada;
+    -hover-color-dark: #5b5b5b;
+}

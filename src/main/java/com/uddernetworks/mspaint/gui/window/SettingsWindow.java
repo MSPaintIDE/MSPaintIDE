@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.gui.window;
 
 import com.jfoenix.controls.JFXDecorator;
 import com.uddernetworks.mspaint.gui.SettingItem;
+import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import javafx.fxml.FXML;
@@ -33,20 +34,22 @@ public class SettingsWindow extends Stage implements Initializable {
     @FXML
     private ScrollPane content;
 
+    private MainGUI mainGUI;
     private List<SettingItem> settingItems;
     private String startPath;
     private Consumer<Boolean> toggleStuff;
 
-    public SettingsWindow(String startPath) throws IOException {
-        this(Arrays.asList(
+    public SettingsWindow(MainGUI mainGUI, String startPath) throws IOException {
+        this(mainGUI, Arrays.asList(
                 new SettingItem("Appearance", "file/Appearance.fxml"),
                 new SettingItem("OCR", "file/OCR.fxml"),
                 new SettingItem("Image Generation", "file/ImageGeneration.fxml")
         ), startPath);
     }
 
-    public SettingsWindow(List<SettingItem> settingItems, String startPath) throws IOException {
+    public SettingsWindow(MainGUI mainGUI, List<SettingItem> settingItems, String startPath) throws IOException {
         super();
+        this.mainGUI = mainGUI;
         this.settingItems = settingItems;
         this.startPath = startPath;
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/PopupWindow.fxml"));
@@ -65,6 +68,7 @@ public class SettingsWindow extends Stage implements Initializable {
         scene.getStylesheets().add("style.css");
 
         setScene(scene);
+        this.mainGUI.getThemeManager().addStage(this);
         show();
 
         setTitle("Settings");

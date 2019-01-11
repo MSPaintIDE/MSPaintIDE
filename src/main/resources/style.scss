@@ -1,14 +1,28 @@
-$left-background: #F4F4F4;
-$right-background: #FFFFFF;
-
-$left-background-dark: #424242;
-$right-background-dark: #616161;
-
 .root {
     -fx-font-family: "Montserrat";
     -fx-font-smoothing-type: gray;
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
+
+    -left-background: #F4F4F4;
+    -right-background: #FFFFFF;
+    -left-background-dark: #424242;
+    -right-background-dark: #616161;
+    -window-border: #5472d3;
+
+    -primary-button-color: #0d47a1;
+    -input-accent: #5472d3;
+    -input-accent-hover: #4b6eaf;
+    -error-accent: #c62828;
+
+    -hover-color: #dadada; // darken(-left-background, 10%);
+    -hover-color-dark: #5b5b5b; // lighten(-left-background-dark, 10%);
+}
+
+.primary-button {
+    -fx-background-color: -primary-button-color;
+    -fx-text-fill: WHITE;
+    -fx-font-size: 14px;
 }
 
 JFXButton {
@@ -20,29 +34,29 @@ JFXButton {
 }
 
 .jfx-progress-bar > .bar {
-    -fx-background-color: #5472d3;
+    -fx-background-color: -input-accent;
 }
 
 .progressError > .bar {
-    -fx-background-color: #c62828 !important;
+    -fx-background-color: -error-accent !important;
 }
 
 .jfx-decorator {
-    -fx-decorator-color: #5472d3;
+    -fx-decorator-color: -window-border;
 }
 
 .jfx-decorator .jfx-decorator-buttons-container {
-    -fx-background-color: #5472d3;
+    -fx-background-color: -window-border;
 }
 
 .jfx-decorator .resize-border {
-    -fx-border-color: #5472d3;
+    -fx-border-color: -window-border;
     -fx-border-width: 0 4 4 4;
 }
 
 .jfx-radio-button, .check-box {
-    -jfx-selected-color: #5472d3;
-    -jfx-checked-color: #5472d3;
+    -jfx-selected-color: -input-accent;
+    -jfx-checked-color: -input-accent;
 }
 
 .unrounded {
@@ -88,17 +102,17 @@ JFXButton {
 }
 
 .gridpane-theme-dark {
-    -fx-background-color: $left-background-dark;
+    -fx-background-color: -left-background-dark;
     -fx-text-fill: white;
     -fx-border-style: none;
 }
 
 .tree-view.gridpane-theme-dark > * > * > * > * {
-    -fx-background-color: $left-background-dark;
+    -fx-background-color: -left-background-dark;
 }
 
 .tree-view > * > * > * > * {
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
 }
 
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell > *,
@@ -108,8 +122,8 @@ JFXButton {
 
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
-    -fx-background: $right-background;
-    -fx-background-color: $right-background;
+    -fx-background: -right-background;
+    -fx-background-color: -right-background;
     -fx-text-fill: black;
 }
 
@@ -120,31 +134,31 @@ JFXButton {
 
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
-    -fx-background: $right-background-dark;
-    -fx-background-color: $right-background-dark;
+    -fx-background: -right-background-dark;
+    -fx-background-color: -right-background-dark;
     -fx-text-fill: white;
 }
 
 .split-pane.gridpane-theme-dark > .split-pane-divider {
-    -fx-background-color: $right-background-dark;
+    -fx-background-color: -right-background-dark;
 }
 
 .output-theme-dark {
-    -fx-background-color: $right-background-dark;
-    -fx-border-color: $right-background-dark !important;
+    -fx-background-color: -right-background-dark;
+    -fx-border-color: -right-background-dark !important;
     -fx-text-fill: white;
 
     .content {
-        -fx-background-color: $right-background-dark;
-        -fx-border-color: $right-background-dark !important;
+        -fx-background-color: -right-background-dark;
+        -fx-border-color: -right-background-dark !important;
     }
 }
 
 .list-cell {
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
 
     .dark &, .language-selection-dark & {
-        -fx-background-color: $left-background-dark;
+        -fx-background-color: -left-background-dark;
     }
 }
 
@@ -163,29 +177,29 @@ JFXButton {
 }
 
 #searchResults {
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
 
     &.dark {
-        -fx-background-color: $left-background-dark;
+        -fx-background-color: -left-background-dark;
     }
 }
 
 .search-label {
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
     -fx-text-fill: black;
 
     &.dark {
-        -fx-background-color: $left-background-dark;
+        -fx-background-color: -left-background-dark;
         -fx-text-fill: white;
     }
 }
 
 .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
-    -fx-background-color: #4b6eaf;
+    -fx-background-color: -input-accent-hover;
 
     * {
-        -fx-background-color: #4b6eaf;
+        -fx-background-color: -input-accent-hover;
     }
 }
 
@@ -215,13 +229,13 @@ JFXButton {
 }
 
 .language-selection-dark {
-    -fx-background-color: $left-background-dark;
-    -fx-border-color: $left-background-dark;
+    -fx-background-color: -left-background-dark;
+    -fx-border-color: -left-background-dark;
     -fx-text-fill: white;
 
     .list-cell {
-        -fx-background-color: $right-background-dark;
-        -fx-border-color: $right-background-dark;
+        -fx-background-color: -right-background-dark;
+        -fx-border-color: -right-background-dark;
         -fx-text-fill: white;
     }
 
@@ -231,8 +245,8 @@ JFXButton {
     }
 
     .list-cell:focused, & .list-cell:hover {
-        -fx-background-color: $left-background-dark;
-        -fx-border-color: $left-background-dark;
+        -fx-background-color: -left-background-dark;
+        -fx-border-color: -left-background-dark;
     }
 }
 
@@ -245,11 +259,11 @@ JFXButton {
 }
 
 .vbox-theme > * > * {
-    -fx-border-color: $left-background;
+    -fx-border-color: -left-background;
 }
 
 .vbox-theme-dark > * > * {
-    -fx-border-color: $left-background-dark;
+    -fx-border-color: -left-background-dark;
 }
 
 .text-area {
@@ -258,10 +272,10 @@ JFXButton {
 }
 
 .menu-bar {
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
 
     > .container > .menu-button {
-        -fx-background-color: $left-background;
+        -fx-background-color: -left-background;
         -fx-background-radius: 0;
         -fx-background-insets: 0;
 
@@ -284,11 +298,11 @@ JFXButton {
 
 
     &.menubar-dark {
-        -fx-background-color: $left-background-dark;
+        -fx-background-color: -left-background-dark;
         -fx-border-style: none;
 
         > .container > .menu-button {
-            -fx-background-color: $left-background-dark;
+            -fx-background-color: -left-background-dark;
 
             .label {
                 -fx-text-fill: white;
@@ -296,12 +310,12 @@ JFXButton {
         }
 
         * > .context-menu {
-            -fx-background-color: $left-background-dark;
-            -fx-border-color: $left-background-dark;
+            -fx-background-color: -left-background-dark;
+            -fx-border-color: -left-background-dark;
         }
 
         & > *, .menu-item {
-            -fx-background-color: $left-background-dark;
+            -fx-background-color: -left-background-dark;
         }
     }
 }
@@ -310,16 +324,13 @@ JFXButton {
     -fx-padding: 0.333em 0.5em 0.333em 0.5em; /* 4 6 4 6*/
 }
 
-$hover-color: darken($left-background, 10%);
-$hover-color-dark: lighten($left-background-dark, 10%);
-
 .menu-bar > * > * > * > .context-menu {
     -fx-padding: -1px -1px -1px -1px;
 
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
 
     > * .menu-item:focused {
-        -fx-background-color: $hover-color;
+        -fx-background-color: -hover-color;
     }
 }
 
@@ -328,22 +339,22 @@ $hover-color-dark: lighten($left-background-dark, 10%);
 }
 
 .menu-bar.menubar-dark .menu-item:focused {
-    -fx-background-color: $hover-color-dark;
+    -fx-background-color: -hover-color-dark;
 }
 
 .menubar-dark .menu-item:focused {
-    -fx-background-color: $hover-color-dark;
+    -fx-background-color: -hover-color-dark;
 }
 
 $pseudos: hover, focused, showing;
 
 @each $pseudo in $pseudos {
     .menu-bar > .container > .menu-button:#{$pseudo} {
-        -fx-background-color: $hover-color;
+        -fx-background-color: -hover-color;
     }
 
     .menu-bar.menubar-dark > .container > .menu-button:#{$pseudo} {
-        -fx-background-color: $hover-color-dark;
+        -fx-background-color: -hover-color-dark;
     }
 }
 
@@ -354,8 +365,8 @@ $pseudos: hover, focused, showing;
 
 .recent-projects-dark {
     &, & .list-cell {
-        -fx-background-color: $left-background-dark;
-        -fx-border-color: $left-background-dark;
+        -fx-background-color: -left-background-dark;
+        -fx-border-color: -left-background-dark;
         -fx-text-fill: white;
     }
 
@@ -365,15 +376,15 @@ $pseudos: hover, focused, showing;
 }
 
 .settings-group-title {
-    -fx-background-color: $left-background;
+    -fx-background-color: -left-background;
     -fx-translate-y: -10;
 }
 
 .settings-group-border {
     -fx-content-display: top;
     -fx-border-insets: 20 15 15 15;
-    -fx-background-color: $left-background;
-    -fx-border-color: $right-background-dark;
+    -fx-background-color: -left-background;
+    -fx-border-color: -right-background-dark;
     -fx-border-width: 2;
 }
 
@@ -382,10 +393,10 @@ $pseudos: hover, focused, showing;
 }
 
 .gridpane-theme-dark .settings-group-title {
-    -fx-background-color: $left-background-dark;
+    -fx-background-color: -left-background-dark;
 }
 
 .settings-group-border.gridpane-theme-dark {
-    -fx-background-color: $left-background-dark;
-    -fx-border-color: lighten($right-background-dark, 0.1);
+    -fx-background-color: -left-background-dark;
+    //-fx-border-color: lighten(-right-background-dark, 0.1);
 }
