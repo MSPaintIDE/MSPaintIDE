@@ -332,6 +332,8 @@ public class MainGUI extends Application implements Initializable {
         this.themeManager.loadTheme("Default", "default.css");
         this.themeManager.loadTheme("Extra Dark", "extra-dark.css");
 
+        this.themeManager.init();
+
         SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
             String path = "";
             switch (icon) {

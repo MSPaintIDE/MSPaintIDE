@@ -38,7 +38,7 @@
             <SettingComboBox layoutX="10.0" layoutY="84.0" prefHeight="30.0" prefWidth="150.0" styleClass="language-selection" setting="EXTRA_THEME">
                <options>
                    <FXCollections fx:factory="observableArrayList">
-                       <String fx:value="None"/>
+                       <String fx:value="Default"/>
                        <String fx:value="Extra Dark"/>
                    </FXCollections>
                </options>
