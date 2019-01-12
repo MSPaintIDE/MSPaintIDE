@@ -56,7 +56,7 @@ public class UserInputWindow extends Stage implements Initializable {
         loader.setController(this);
         Parent root = loader.load();
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo-small.png").toString());
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\ms-paint-logo-colored.png").toString());
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 

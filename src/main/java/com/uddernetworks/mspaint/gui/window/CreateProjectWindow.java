@@ -18,8 +18,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
@@ -69,7 +67,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
         loader.setController(this);
         Parent root = loader.load();
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("ms-paint-logo-small.png").toString());
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\ms-paint-logo-colored.png").toString());
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 
