@@ -3,7 +3,6 @@ package com.uddernetworks.mspaint.install;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import org.apache.tika.io.IOUtils;
-import sun.management.VMManagement;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -16,6 +15,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+//import sun.management.VMManagement;
 
 public class Installer {
 
@@ -183,7 +184,8 @@ public class Installer {
         RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
         Field jvm = runtime.getClass().getDeclaredField("jvm");
         jvm.setAccessible(true);
-        VMManagement mgmt = (VMManagement) jvm.get(runtime);
+//        VMManagement mgmt = (VMManagement) jvm.get(runtime);
+        Object mgmt = jvm.get(runtime);
 
         System.out.println("VM id: " + mgmt.getClass());
 

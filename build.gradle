@@ -36,11 +36,11 @@ idea {
     }
 }
 
-mainClassName = 'com.uddernetworks.mspaint.main.MainGUI'
+mainClassName = 'com.uddernetworks.mspaint.main.JFXWorkaround'
 
 jar {
     manifest {
-        attributes("Main-Class": "com.uddernetworks.mspaint.main.MainGUI")
+        attributes("Main-Class": "com.uddernetworks.mspaint.main.JFXWorkaround")
         attributes("SplashScreen-Image": "splash/splash-full.png")
     }
 }
@@ -53,7 +53,25 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-applicationDefaultJvmArgs = ["--add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED"]
+applicationDefaultJvmArgs = [
+        "--add-exports=javafx.base/com.sun.javafx=ALL-UNNAMED",
+        "--add-exports=javafx.base/com.sun.javafx.beans=ALL-UNNAMED",
+        "--add-exports=javafx.base/com.sun.javafx.binding=ALL-UNNAMED",
+        "--add-exports=javafx.base/com.sun.javafx.collections=ALL-UNNAMED",
+        "--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED",
+        "--add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED",
+        "--add-exports=javafx.base/com.sun.javafx.reflect=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.scene.input=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.scene.text=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED",
+        "--add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED"
+]
 
 dependencies {
     compile group: 'com.intellij', name: 'forms_rt', version:'7.0.3'

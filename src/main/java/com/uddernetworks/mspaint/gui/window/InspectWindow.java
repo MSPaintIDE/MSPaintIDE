@@ -12,13 +12,6 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.OCRHandle;
 import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,6 +22,14 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class InspectWindow extends Stage implements Initializable {
 
@@ -71,7 +72,7 @@ public class InspectWindow extends Stage implements Initializable {
         loader.setController(this);
         Parent root = loader.load();
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\ms-paint-logo-colored.png").toString());
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons/taskbar/ms-paint-logo-colored.png").toString());
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 
@@ -116,18 +117,18 @@ public class InspectWindow extends Stage implements Initializable {
         ScannedImage scannedImage = ocrHandle.scanImage(this.inspecting);
         int ptSize = scannedImage.getFirstFontSize(this.mainGUI.getMain().getOCRHandle());
         int pxSize = ConversionUtils.pointToPixel(ptSize);
-    
+
         String nameNoExtension = name.substring(0, name.length() - 4);
         int periodIndex = nameNoExtension.lastIndexOf('.');
         nameNoExtension = periodIndex == -1 ? "" : nameNoExtension.substring(periodIndex + 1);
-    
+
         LanguageManager languageManager = this.mainGUI.getMain().getLanguageManager();
         String language = languageManager.getLanguageFromFileExtension(nameNoExtension)
                 .map(Language::getName)
                 .orElse("Unknown");
-    
+
         BufferedImage image = scannedImage.getOriginalImage();
-    
+
         long sizeKB = this.inspecting.length() / 1024;
         imageName.setText(name);
         imageDimensions.setText(image.getWidth() + " x " + image.getHeight());

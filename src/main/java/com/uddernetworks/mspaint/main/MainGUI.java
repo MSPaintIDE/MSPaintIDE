@@ -1,12 +1,6 @@
 package com.uddernetworks.mspaint.main;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDecorator;
-import com.jfoenix.controls.JFXPasswordField;
-import com.jfoenix.controls.JFXProgressBar;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
@@ -18,8 +12,31 @@ import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
-import java.awt.Color;
-import java.awt.GraphicsEnvironment;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,36 +51,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.SelectionModel;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.WindowConstants;
 
 public class MainGUI extends Application implements Initializable {
 
@@ -379,11 +366,11 @@ public class MainGUI extends Application implements Initializable {
     public void changeImage(String path) {
         List<Image> icons = this.primaryStage.getIcons();
         icons.clear();
-        icons.add(this.cachedTaksbarIcons.computeIfAbsent(path, path2 -> new Image(getClass().getClassLoader().getResourceAsStream("icons\\taskbar\\" + path))));
+        icons.add(this.cachedTaksbarIcons.computeIfAbsent(path, path2 -> new Image(getClass().getClassLoader().getResourceAsStream("icons/taskbar/" + path))));
 
         JFXDecorator root = (JFXDecorator) this.primaryStage.getScene().getRoot();
         root.setGraphic(this.cachedImageViews.computeIfAbsent(path, path2 -> {
-            ImageView imageView = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\" + path).toString());
+            ImageView imageView = new ImageView(getClass().getClassLoader().getResource("icons/taskbar/" + path).toString());
             imageView.setFitHeight(25);
             imageView.setFitWidth(25);
             return imageView;

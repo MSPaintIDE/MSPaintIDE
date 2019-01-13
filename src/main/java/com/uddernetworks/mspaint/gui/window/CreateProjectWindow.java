@@ -11,16 +11,6 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import java.awt.Desktop;
-import java.awt.Label;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,7 +21,17 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import javax.swing.JFileChooser;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class CreateProjectWindow extends Stage implements Initializable {
 
@@ -68,7 +68,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
         loader.setController(this);
         Parent root = loader.load();
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\ms-paint-logo-colored.png").toString());
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons/taskbar/ms-paint-logo-colored.png").toString());
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 

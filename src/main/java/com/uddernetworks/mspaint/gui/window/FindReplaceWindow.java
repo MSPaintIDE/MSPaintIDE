@@ -97,7 +97,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
         Parent root = loader.load();
         setResizable(false);
 
-        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons\\taskbar\\ms-paint-logo-colored.png").toString());
+        ImageView icon = new ImageView(getClass().getClassLoader().getResource("icons/taskbar/ms-paint-logo-colored.png").toString());
         icon.setFitHeight(25);
         icon.setFitWidth(25);
 
