@@ -6,8 +6,7 @@ import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
-
-import java.awt.*;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -181,7 +180,7 @@ public class BrainfuckLanguage implements Language {
                     }
                     break;
                 case ']':
-                    if (l == 0) {
+                    if (l != 0) {
                         return "Nothing to match ]";
                     } else {
                         l--;

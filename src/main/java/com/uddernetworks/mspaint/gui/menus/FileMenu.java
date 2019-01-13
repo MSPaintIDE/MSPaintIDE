@@ -9,13 +9,12 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JFileChooser;
 
 public class FileMenu extends MenuBind {
 
@@ -48,7 +47,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.project")
     private void onClickOpenProject() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PPF, JFileChooser.FILES_ONLY, file -> {
             ProjectManager.switchProject(ProjectManager.readProject(file));
             this.mainGUI.refreshProject();
         });

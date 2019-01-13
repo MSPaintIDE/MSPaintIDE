@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.*?>
-<?import com.uddernetworks.mspaint.gui.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXProgressBar?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.uddernetworks.mspaint.gui.MaterialMenu?>
+<?import com.uddernetworks.mspaint.gui.MaterialMenuItem?>
 <?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <AnchorPane styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <VBox styleClass="vbox-theme" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -132,7 +146,7 @@
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Highlighted Out Directory" GridPane.rowIndex="1" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Cache File Directory" GridPane.rowIndex="2" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Class File Output" GridPane.rowIndex="3" />
-                                              <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiled Jar Output" GridPane.rowIndex="4" />
+                                              <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiled Executable Output" GridPane.rowIndex="4" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Library jar(s) path" GridPane.rowIndex="5" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compile other file(s) path" GridPane.rowIndex="6" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiler Output" GridPane.rowIndex="7" />

@@ -12,6 +12,7 @@ import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import java.awt.Desktop;
+import java.awt.Label;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -27,7 +28,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -80,7 +80,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
         scene.getStylesheets().add("style.css");
 
         setScene(scene);
-        //this.mainGUI.getThemeManager().addStage(this);
+        this.mainGUI.getThemeManager().addStage(this);
         show();
 
         setTitle("Welcome to MS Paint IDE");
