@@ -10,6 +10,12 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -21,14 +27,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import javax.swing.JFileChooser;
 
 public class WelcomeWindow extends Stage implements Initializable {
 
@@ -47,7 +46,6 @@ public class WelcomeWindow extends Stage implements Initializable {
     private MainGUI mainGUI;
 
     public WelcomeWindow(MainGUI mainGUI) throws IOException {
-        super();
         this.mainGUI = mainGUI;
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/ProjectManageWindow.fxml"));
         loader.setController(this);
@@ -65,7 +63,7 @@ public class WelcomeWindow extends Stage implements Initializable {
         scene.getStylesheets().add("style.css");
 
         setScene(scene);
-        this.mainGUI.getThemeManager().addStage(this);
+        //this.mainGUI.getThemeManager().addStage(this);
         show();
 
         setTitle("Welcome to MS Paint IDE");
