@@ -132,7 +132,7 @@
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Highlighted Out Directory" GridPane.rowIndex="1" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Cache File Directory" GridPane.rowIndex="2" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Class File Output" GridPane.rowIndex="3" />
-                                              <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiled Jar Output" GridPane.rowIndex="4" />
+                                              <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiled Executable Output" GridPane.rowIndex="4" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Library jar(s) path" GridPane.rowIndex="5" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compile other file(s) path" GridPane.rowIndex="6" />
                                               <Label prefHeight="55.0" prefWidth="236.0" styleClass="theme-text" text="Compiler Output" GridPane.rowIndex="7" />

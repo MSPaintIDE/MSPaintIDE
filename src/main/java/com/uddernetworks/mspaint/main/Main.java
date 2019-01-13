@@ -108,7 +108,7 @@ public class Main {
 
     private boolean optionsNotFilled() {
         PPFProject ppfProject = ProjectManager.getPPFProject();
-        return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || ppfProject.getCompilerOutput() == null || ppfProject.getCompilerOutput() == null;
+        return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || ppfProject.getCompilerOutput() == null;
     }
 
     public int indexAll(boolean useCaches, boolean saveCaches) {
@@ -270,16 +270,17 @@ public class Main {
 
     public void setInputImage(File inputImage) {
         PPFProject ppfProject = ProjectManager.getPPFProject();
-        if (inputImage.equals(ppfProject.getInputLocation())) return;
+        if (Objects.equals(inputImage, ppfProject.getInputLocation())) return;
         ProjectManager.getPPFProject().setInputLocation(inputImage);
 
         File outputParent = inputImage.getParentFile();
 
+        File file = this.currentLanguage.getOutputFileExtension() == null ? null : new File(outputParent, "Output." + this.currentLanguage.getOutputFileExtension());
 
         ppfProject.setHighlightLocation(new File(outputParent, "highlighted"), false);
         ppfProject.setCompilerOutput(new File(outputParent, "compiler.png"), false);
         ppfProject.setAppOutput(new File(outputParent, "program.png"), false);
-        ppfProject.setJarFile(this.currentLanguage.getOutputFileExtension() == null ? null : new File(outputParent, "Output." + this.currentLanguage.getOutputFileExtension()), false);
+        ppfProject.setJarFile(file, false);
         ppfProject.setClassLocation(new File(outputParent, "classes"), false);
 
         ProjectManager.save();

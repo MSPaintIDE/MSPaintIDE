@@ -33,6 +33,8 @@ public class ImageOutputStream extends OutputStream {
     }
 
     public void saveImage() {
+        System.out.println("location = " + location.getName());
+
         BufferedImage image = new BufferedImage(width, minHeight, BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
 
@@ -53,6 +55,8 @@ public class ImageOutputStream extends OutputStream {
         }
 
         int newHeight = linesList.size() * 20;
+
+        System.out.println("newHeight = " + newHeight);
 
         image = new BufferedImage(width, Math.max(newHeight, minHeight), BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();

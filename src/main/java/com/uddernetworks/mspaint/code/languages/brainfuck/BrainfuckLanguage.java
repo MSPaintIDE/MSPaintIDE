@@ -181,7 +181,7 @@ public class BrainfuckLanguage implements Language {
                     }
                     break;
                 case ']':
-                    if (l == 0) {
+                    if (l != 0) {
                         return "Nothing to match ]";
                     } else {
                         l--;

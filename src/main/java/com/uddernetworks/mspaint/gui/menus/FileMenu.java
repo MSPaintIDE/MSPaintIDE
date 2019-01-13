@@ -48,7 +48,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.project")
     private void onClickOpenProject() {
-        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
+        FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PPF, JFileChooser.FILES_ONLY, file -> {
             ProjectManager.switchProject(ProjectManager.readProject(file));
             this.mainGUI.refreshProject();
         });

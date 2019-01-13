@@ -313,49 +313,54 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void registerThings() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
-        loader.setController(this);
-        Parent root = loader.load();
+        if (!this.primaryStage.isShowing()) {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
+            loader.setController(this);
+            Parent root = loader.load();
 
-        JFXDecorator jfxDecorator = new JFXDecorator(this.primaryStage, root, false, true, true);
-        jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
-        jfxDecorator.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
+            JFXDecorator jfxDecorator = new JFXDecorator(this.primaryStage, root, false, true, true);
+            jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
 
-        Scene scene = new Scene(jfxDecorator);
-        scene.getStylesheets().add("style.css");
+            Scene scene = new Scene(jfxDecorator);
+            scene.getStylesheets().add("style.css");
 
-        this.primaryStage.setScene(scene);
+            this.primaryStage.setScene(scene);
 
-        this.themeManager = new ThemeManager();
-        this.themeManager.addStage(this.primaryStage);
+            this.themeManager = new ThemeManager();
+            this.themeManager.addStage(this.primaryStage);
 
-        this.themeManager.loadTheme("Default", "default.css");
-        this.themeManager.loadTheme("Extra Dark", "extra-dark.css");
+            this.themeManager.loadTheme("Default", "default.css");
+            this.themeManager.loadTheme("Extra Dark", "extra-dark.css");
 
-        this.themeManager.init();
+            this.themeManager.init();
 
-        SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
-            String path = "";
-            switch (icon) {
-                case "Colored":
-                    path = "ms-paint-logo-colored.png";
-                    break;
-                case "White":
-                    path = "ms-paint-logo-white.png";
-                    break;
-                case "Black":
-                    path = "ms-paint-logo.png";
-                    break;
-            }
+            SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
+                String path = "";
+                switch (icon) {
+                    case "Colored":
+                        path = "ms-paint-logo-colored.png";
+                        break;
+                    case "White":
+                        path = "ms-paint-logo-white.png";
+                        break;
+                    case "Black":
+                        path = "ms-paint-logo.png";
+                        break;
+                }
 
-            changeImage(path);
-        }, String.class, true);
+                changeImage(path);
+            }, String.class, true);
+        } else {
+            initializeInputTextFields();
+        }
+
+        ((JFXDecorator) this.primaryStage.getScene().getRoot()).setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
         Splash.setStatus("Starting...");
         this.primaryStage.setOnShown(event -> Splash.end());
-        this.primaryStage.show();
+        if (!this.primaryStage.isShowing()) this.primaryStage.show();
     }
 
     public void changeImage(String path) {
@@ -547,11 +552,11 @@ public class MainGUI extends Application implements Initializable {
     private <T> void addOptionalListener(TextField textField, Class<T> clazz, Consumer<T> callback) {
         textField.textProperty().addListener(event -> {
             if (runListeners) {
+                String text = textField.getText();
                 if (clazz.equals(File.class)) {
-                    String text = textField.getText();
-                    callback.accept((T) (text.trim().isEmpty() ? null : new File(text)));
+                    callback.accept((T) (text == null || text.trim().isEmpty() ? null : new File(text)));
                 } else if (clazz.equals(String.class)) {
-                    callback.accept((T) textField.getText().trim());
+                    callback.accept(text == null ? null : (T) textField.getText().trim());
                 } else {
                     System.out.println("Unknown class " + clazz.getCanonicalName());
                 }
@@ -672,8 +677,10 @@ public class MainGUI extends Application implements Initializable {
             createAndSetFolder(cacheFile, parent, "cache");
             createAndSetFolder(classOutput, parent, "out");
 
-            File out = new File(parent, "Output." + this.main.getCurrentLanguage().getOutputFileExtension());
-            compiledJarOutput.setText(out.getAbsolutePath());
+            Language language = this.main.getCurrentLanguage();
+            System.out.println("language = " + language);
+            System.out.println(language.getOutputFileExtension());
+            compiledJarOutput.setText(language.getOutputFileExtension() == null ? null : new File(parent, "Output." + language.getOutputFileExtension()).getAbsolutePath());
 
             Map<String, TextField> imageGen = new HashMap<>();
             imageGen.put("program.png", programOutputValue);
