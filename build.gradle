@@ -45,6 +45,10 @@ jar {
     }
 }
 
+shadowJar {
+    zip64 true
+}
+
 javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
