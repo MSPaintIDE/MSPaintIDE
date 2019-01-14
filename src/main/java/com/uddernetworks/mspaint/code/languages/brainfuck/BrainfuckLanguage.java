@@ -6,7 +6,8 @@ import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
-import java.awt.Color;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -162,28 +163,32 @@ public class BrainfuckLanguage implements Language {
     }
 
     private String check(MultiLineBlock multiLineBlock) {
-        int l = 0;
+        int depth = 0;
+        int extDepth = 0;
         int i = 0;
         while (multiLineBlock.canContinue()) {
             char current = multiLineBlock.getNext();
-            System.out.println("current = " + current);
             switch (current) {
                 case '[':
                     i++;
-                    while (l > 0 || multiLineBlock.getCharAt(i) != ']') {
+                    depth++;
+                    extDepth++;
+                    int tempI = i;
+                    while (depth > 0 || multiLineBlock.getCharAt(i - 1) != ']') {
                         char curr = multiLineBlock.getCharAt(i);
-                        if (curr == '[') l++;
-                        if (curr == ']') l--;
+                        if (curr == '[') depth++;
+                        if (curr == ']') depth--;
                         i++;
 
                         if (i >= multiLineBlock.length()) return "Nothing to match [";
                     }
+                    i = tempI - 1;
                     break;
                 case ']':
-                    if (l != 0) {
+                    if (extDepth == 0) {
                         return "Nothing to match ]";
                     } else {
-                        l--;
+                        extDepth--;
                     }
                     break;
             }

@@ -101,7 +101,7 @@ public class AngrySquiggleHighlighter {
 
         length = getRoundedSquiggleLength(length);
 
-        drawAngrySquiggle(xIndex, yIndex, length);
+        drawAngrySquiggle(xIndex, yIndex + this.squiggleImage.getHeight(), length);
     }
 
     private int getRoundedSquiggleLength(int originalLength) {
