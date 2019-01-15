@@ -57,15 +57,17 @@ public class LetterFileWriter {
     }
 
     private void writeLetterToFile(BufferedImage image, ImageLetter imageLetter) {
-        int color = imageLetter.getData(Color.class).getRGB();
-        boolean[][] data = imageLetter.getValues();
-        if (data == null) return;
+        imageLetter.getData(Color.class).ifPresent(colorData -> {
+            int color = colorData.getRGB();
+            boolean[][] data = imageLetter.getValues();
+            if (data == null) return;
 
-        for (int y = 0; y < imageLetter.getHeight() + 1; y++) {
-            for (int x = 0; x < imageLetter.getWidth(); x++) {
-                if (data[y][x]) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, color);
+            for (int y = 0; y < imageLetter.getHeight() + 1; y++) {
+                for (int x = 0; x < imageLetter.getWidth(); x++) {
+                    if (data[y][x]) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, color);
+                }
             }
-        }
+        });
     }
 
     private void background(Color color) {

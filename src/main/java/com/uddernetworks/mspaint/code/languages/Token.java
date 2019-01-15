@@ -12,11 +12,10 @@
  * limitations under the License.
  */
 
-package com.uddernetworks.mspaint.code.languages.python;
+package com.uddernetworks.mspaint.code.languages;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.Segment;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -136,15 +135,8 @@ public class Token implements Serializable, Comparable {
      * @param doc
      * @return
      */
-    public CharSequence getText(Document doc) {
-        Segment text = new Segment();
-        try {
-            doc.getText(start, length, text);
-        } catch (BadLocationException ex) {
-            Logger.getLogger(Token.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            return text;
-        }
+    public String getText(String source) {
+        return source.substring(start, start + length);
     }
 
     public String getString(Document doc) {

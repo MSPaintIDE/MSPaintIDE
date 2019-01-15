@@ -1,6 +1,5 @@
 /*
  * Copyright 2008 Ayman Al-Sairafi ayman.alsairafi@gmail.com
- * Modifications copyright (C) 2018 Adam Yarris
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +14,16 @@
 
 package com.uddernetworks.mspaint.code.languages.python;
 
-import java.io.Reader;
-import java.io.IOException;
+
+import com.uddernetworks.mspaint.code.languages.Token;
+import com.uddernetworks.mspaint.code.languages.TokenType;
+import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
+import com.uddernetworks.mspaint.code.languages.Lexer;
 
 %%
 
 %public
-%class PythonHighlighter
-%implements ExplicitStateHighlighter
+%class PythonLexer
 %extends DefaultJFlexLexer
 %final
 %unicode
@@ -31,6 +32,13 @@ import java.io.IOException;
 
 
 %{
+    /**
+     * Create an empty lexer, yyrset will be called later to reset and assign
+     * the reader
+     */
+    public PythonLexer() {
+        super();
+    }
 
     @Override
     public int yychar() {
@@ -41,53 +49,6 @@ import java.io.IOException;
     private static final byte BRACKET   = 2;
     private static final byte CURLY     = 3;
 
-//    private static final byte TokenType.OPERATOR = 4; // 0x000000
-//    private static final byte TokenType.DELIMITER = 5; // 0x000000
-//    private static final byte TokenType.KEYWORD = 6; // 0x3333ee
-//    private static final byte TokenType.KEYWORD2 = 7; // 0x3333ee
-//    private static final byte TokenType.TYPE = 8; // 0x000000
-//    private static final byte TokenType.TYPE2 = 9; // 0x000000
-//    private static final byte TokenType.TYPE3 = 10; // 0x000000
-//    private static final byte TokenType.STRING = 11; // 0xcc6600
-//    private static final byte TokenType.STRING2 = 12; // 0xcc6600
-//    private static final byte TokenType.NUMBER = 13; // 0x999933
-//    private static final byte TokenType.REGEX = 14; // 0xcc6600
-//    private static final byte TokenType.IDENTIFIER = 15; // 0x000000
-//    private static final byte TokenType.COMMENT = 16; // 0x339933
-//    private static final byte TokenType.COMMENT2 = 17; // 0x339933
-//    private static final byte TokenType.DEFAULT = 18; // 0x000000
-//    private static final byte TokenType.WARNING = 19; // 0xCC0000
-//    private static final byte TokenType.ERROR = 20; // 0xCC0000
-
-    public int getStyleCount() {
-        return 20;
-    }
-
-    public byte getStartState() {
-    	return YYINITIAL+1;
-    }
-
-    public byte getCurrentState() {
-    	return (byte) (yystate()+1);
-    }
-
-    public void setState(byte newState) {
-    	yybegin(newState-1);
-    }
-
-    public Token getNextToken() throws IOException { // USUALLY public byte getNextToken()
-    	return yylex();
-    }
-
-    public int getTokenLength() {
-    	return yylength();
-    }
-
-    public void setReader(Reader r) {
-    	this.zzReader = r;
-    }
-
-    public PythonHighlighter() {}
 %}
 
 /* main character classes */
@@ -366,7 +327,7 @@ SQStringCharacter = [^\r\n\'\\]
   {LineTerminator}               { yybegin(YYINITIAL);  }
 }
 
-<STRING> {
+<ML_STRING> {
   \"{3}                          {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
@@ -385,7 +346,7 @@ SQStringCharacter = [^\r\n\'\\]
   {LineTerminator}               { tokenLength ++;  }
 }
 
-<STRING> {
+<SQSTRING> {
   "'"                            {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
@@ -402,7 +363,7 @@ SQStringCharacter = [^\r\n\'\\]
   {LineTerminator}               { yybegin(YYINITIAL);  }
 }
 
-<STRING> {
+<SQML_STRING> {
   \'{3}                          {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
@@ -422,5 +383,6 @@ SQStringCharacter = [^\r\n\'\\]
 }
 
 /* error fallback */
-[^]|\n                             {  }
+.|\n                             {  }
 <<EOF>>                          { return null; }
+

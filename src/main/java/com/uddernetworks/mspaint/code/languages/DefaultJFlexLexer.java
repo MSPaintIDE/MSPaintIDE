@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package com.uddernetworks.mspaint.code.languages.python;
+package com.uddernetworks.mspaint.code.languages;
 
 import javax.swing.text.Segment;
 import java.io.CharArrayReader;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Ayman Al-Sairafi
  */
-public abstract class DefaultJFlexLexer {
+public abstract class DefaultJFlexLexer implements Lexer {
 
     protected int tokenStart;
     protected int tokenLength;
@@ -38,12 +38,6 @@ public abstract class DefaultJFlexLexer {
      * Helper method to create and return a new Token from of TokenType
      * tokenStart and tokenLength will be modified to the newStart and
      * newLength params
-     * @param type
-     * @param tStart
-     * @param tLength
-     * @param newStart
-     * @param newLength
-     * @return
      */
     protected Token token(TokenType type, int tStart, int tLength,
                           int newStart, int newLength) {
@@ -55,21 +49,15 @@ public abstract class DefaultJFlexLexer {
     /**
      * Create and return a Token of given type from start with length
      * offset is added to start
-     * @param type
-     * @param start
-     * @param length
-     * @return
      */
     protected Token token(TokenType type, int start, int length) {
         return new Token(type, start + offset, length);
     }
 
     /**
-     * Create and return a Token of given type.  start is obtained from {yychar()}
-     * and length from {yylength()}
+     * Create and return a Token of given type.  start is obtained from {@link DefaultJFlexLexer#yychar()}
+     * and length from {@link DefaultJFlexLexer#yylength()}
      * offset is added to start
-     * @param type
-     * @return
      */
     protected Token token(TokenType type) {
         return new Token(type, yychar() + offset, yylength());
@@ -77,23 +65,19 @@ public abstract class DefaultJFlexLexer {
 
     /**
      * Create and return a Token of given type and pairValue.
-     * start is obtained from {yychar()}
-     * and length from {yylength()}
+     * start is obtained from {@link DefaultJFlexLexer#yychar()}
+     * and length from {@link DefaultJFlexLexer#yylength()}
      * offset is added to start
-     *
-     * @param type
-     * @param pairValue
-     * @return
      */
     protected Token token(TokenType type, int pairValue) {
         return new Token(type, yychar() + offset, yylength(), (byte) pairValue);
     }
 
     /**
-     * The DefaultJFlexLexer simply calls the yylex method of a JFLex compatible
+     * The DefaultJFlexLexer simply calls the yylex method of a JFlex compatible
      * Lexer and adds the tokens obtained to an ArrayList.
      */
-//    @Override
+    @Override
     public void parse(Segment segment, int ofst, List<Token> tokens) {
         try {
             CharArrayReader reader = new CharArrayReader(segment.array, segment.offset, segment.count);
@@ -110,7 +94,6 @@ public abstract class DefaultJFlexLexer {
     /**
      * This will be called to reset the the lexer.
      * This is created automatically by JFlex.
-     * @param reader
      */
     public abstract void yyreset(Reader reader);
 
@@ -137,22 +120,19 @@ public abstract class DefaultJFlexLexer {
     /**
      * Returns the length of the matched text region.
      * This method is automatically implemented by JFlex lexers
-     * @return
      */
     public abstract int yylength();
 
     /**
      * Returns the text matched by the current regular expression.
      * This method is automatically implemented by JFlex lexers
-     * @return
      */
     public abstract String yytext();
 
     /**
      * Return the char number from beginning of input stream.
-     * This is NOT implemented by JFLex, so the code must be
+     * This is NOT implemented by JFlex, so the code must be
      * added to create this and return the private yychar field
-     * @return
      */
     public abstract int yychar();
 }

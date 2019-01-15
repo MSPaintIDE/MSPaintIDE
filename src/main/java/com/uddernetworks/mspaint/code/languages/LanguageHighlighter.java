@@ -1,52 +1,45 @@
 package com.uddernetworks.mspaint.code.languages;
 
-import com.uwyn.jhighlight.highlighter.ExplicitStateHighlighter;
-import com.uwyn.jhighlight.tools.StringUtils;
+import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.character.ImageLetter;
 
-import java.io.*;
+import javax.swing.text.Segment;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public interface LanguageHighlighter {
-    String getCssClass(int style);
-    ExplicitStateHighlighter getHighlighter();
+    DefaultJFlexLexer getHighlighter();
 
-    default String highlight(String text) throws IOException {
-        ExplicitStateHighlighter highlighter = getHighlighter();
+    default void highlight(ScannedImage scannedImage) {
+        String text = scannedImage.getPrettyString();
 
-        InputStream is = new ByteArrayInputStream(text.getBytes());
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader r = new BufferedReader(isr);
+        DefaultJFlexLexer highlighter = getHighlighter();
 
-        StringBuilder builder = new StringBuilder();
-
-        String line;
-        char[] token;
-        int length;
-        int style;
-        String css_class;
-        while ((line = r.readLine()) != null) {
-            line = StringUtils.convertTabsToSpaces(line, 4);
-
-            Reader lineReader = new StringReader(line);
-            highlighter.setReader(lineReader);
-            int index = 0;
-            while (index < line.length()) {
-                style = highlighter.getNextToken();
-                length = highlighter.getTokenLength();
-                token = line.substring(index, index + length).toCharArray();
-
-                for (char ignored : token) {
-                    css_class = getCssClass(style);
-
-                    if (css_class != null) {
-                        builder.append(css_class);
-                    }
-                }
-                index += length;
-            }
-
-            builder.append("\n");
+        List<Token> toks = new ArrayList<>(text.length() / 10);
+        long ts = System.nanoTime();
+        int len = text.length();
+        try {
+            Segment seg = new Segment();
+            seg.array = text.toCharArray();
+            seg.offset = 0;
+            seg.count = text.length();
+            highlighter.parse(seg, 0, toks);
+        } finally {
+            System.out.println(String.format("Parsed %d in %d ms, giving %d tokens\n",
+                    len, (System.nanoTime() - ts) / 1000000, toks.size()));
         }
 
-        return builder.toString();
+        toks.forEach(token -> {
+            TokenType type = token.getTokenType();
+
+            int start = token.start;
+            for (int i = 0; i < token.length; i++) {
+                char cha = text.charAt(start + i);
+                if (cha == '\n') continue;
+                ImageLetter imageLetter = scannedImage.letterAt(start + i);
+                imageLetter.setData(new Color(type.getStyle()));
+            }
+        });
     }
 }

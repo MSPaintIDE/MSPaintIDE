@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://xbib.org/repository"
+        }
+    }
+    dependencies {
+        classpath 'org.xbib.gradle.plugin:gradle-plugin-jflex:1.1.0'
+    }
+}
+
 plugins {
     id 'application'
     id 'idea'
@@ -6,6 +18,7 @@ plugins {
     id "it.tellnet.sass" version "1.2"
     id "com.github.johnrengelman.shadow" version "4.0.2"
     id 'org.openjfx.javafxplugin' version '0.0.6'
+    id 'org.xbib.gradle.plugin.jflex' version '1.1.0'
 }
 
 group = 'com.uddernetworks.mspaint'

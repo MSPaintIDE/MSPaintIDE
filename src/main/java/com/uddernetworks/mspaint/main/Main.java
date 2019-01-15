@@ -16,17 +16,13 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.OCRHandle;
 import com.uddernetworks.newocr.database.DatabaseManager;
 import com.uddernetworks.newocr.database.OCRDatabaseManager;
+import org.apache.batik.transcoder.TranscoderException;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
-import org.apache.batik.transcoder.TranscoderException;
 
 public class Main {
 
@@ -112,7 +108,7 @@ public class Main {
 
     private boolean optionsNotFilled() {
         PPFProject ppfProject = ProjectManager.getPPFProject();
-        return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || ppfProject.getCompilerOutput() == null;
+        return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || (getCurrentLanguage().getOutputFileExtension() != null && ppfProject.getCompilerOutput() == null);
     }
 
     public int indexAll(boolean useCaches, boolean saveCaches) {

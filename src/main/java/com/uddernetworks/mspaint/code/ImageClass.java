@@ -1,6 +1,5 @@
 package com.uddernetworks.mspaint.code;
 
-import com.uddernetworks.mspaint.code.highlighter.LetterFormatter;
 import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.main.*;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
@@ -79,17 +78,9 @@ public class ImageClass {
         long start = System.currentTimeMillis();
 
         LanguageHighlighter highlighter = this.mainGUI.getCurrentLanguage().getLanguageHighlighter();
-        String highlighted = highlighter.highlight(text);
+        highlighter.highlight(scannedImage);
 
         System.out.println(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
-
-        System.out.println(prefix + "Modifying letters...");
-        start = System.currentTimeMillis();
-
-        LetterFormatter letterFormatter = new LetterFormatter(scannedImage);
-        letterFormatter.formatLetters(highlighted);
-
-        System.out.println(prefix + "Finished modifying letters in " + (System.currentTimeMillis() - start) + "ms");
 
         System.out.println(prefix + "Writing highlighted image to file...");
         start = System.currentTimeMillis();
