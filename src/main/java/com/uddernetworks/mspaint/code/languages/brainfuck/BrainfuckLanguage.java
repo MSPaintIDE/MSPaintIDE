@@ -1,9 +1,9 @@
 package com.uddernetworks.mspaint.code.languages.brainfuck;
 
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
-import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 
@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class BrainfuckLanguage implements Language {
-
-    private BrainfuckLanguageHighlighter brainfuckLanguageHighlighter = new BrainfuckLanguageHighlighter();
 
     @Override
     public String getName() {
@@ -46,8 +44,8 @@ public class BrainfuckLanguage implements Language {
     }
 
     @Override
-    public LanguageHighlighter getLanguageHighlighter() {
-        return this.brainfuckLanguageHighlighter;
+    public DefaultJFlexLexer getLanguageHighlighter() {
+        return new BrainfuckLexer();
     }
 
     @Override

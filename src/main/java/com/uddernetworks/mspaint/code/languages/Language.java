@@ -42,10 +42,10 @@ public interface Language {
     boolean meetsRequirements();
 
     /**
-     * Gets the language's LanguageHighlighter for custom highlighting
-     * @return the language's LanguageHighlighter
+     * Gets the language's Lexer for custom highlighting
+     * @return the language's implementation of DefaultJFlexLexer
      */
-    LanguageHighlighter getLanguageHighlighter();
+    DefaultJFlexLexer getLanguageHighlighter();
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.

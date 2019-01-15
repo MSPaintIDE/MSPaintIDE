@@ -1,9 +1,10 @@
 package com.uddernetworks.mspaint.code.languages.python;
 
+import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
-import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 
@@ -12,10 +13,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 public class PythonLanguage implements Language {
-
-    private PythonLanguageHighlighter pythonLanguageHighlighter = new PythonLanguageHighlighter();
 
     @Override
     public String getName() {
@@ -39,12 +41,25 @@ public class PythonLanguage implements Language {
 
     @Override
     public boolean meetsRequirements() {
-        return true;
+        try {
+            var versionPattern = Pattern.compile("Python 3\\.[0-9]\\.[0-9]");
+
+            var future = new CompletableFuture<String>();
+            Commandline.runCommand("py --version", false, null, future::complete);
+            var result = future.get();
+
+            var matcher = versionPattern.matcher(result);
+
+            return matcher.matches();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
-    public LanguageHighlighter getLanguageHighlighter() {
-        return this.pythonLanguageHighlighter;
+    public DefaultJFlexLexer getLanguageHighlighter() {
+        return new PythonLexer();
     }
 
     @Override

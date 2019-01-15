@@ -77,8 +77,7 @@ public class ImageClass {
         System.out.println("\n" + prefix + "Highlighting...");
         long start = System.currentTimeMillis();
 
-        LanguageHighlighter highlighter = this.mainGUI.getCurrentLanguage().getLanguageHighlighter();
-        highlighter.highlight(scannedImage);
+        new LanguageHighlighter().highlight(this.mainGUI.getCurrentLanguage().getLanguageHighlighter(), this.scannedImage);
 
         System.out.println(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 

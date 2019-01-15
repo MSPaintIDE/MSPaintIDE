@@ -8,27 +8,17 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface LanguageHighlighter {
-    DefaultJFlexLexer getHighlighter();
+public class LanguageHighlighter {
 
-    default void highlight(ScannedImage scannedImage) {
+    public void highlight(DefaultJFlexLexer lexer, ScannedImage scannedImage) {
         String text = scannedImage.getPrettyString();
 
-        DefaultJFlexLexer highlighter = getHighlighter();
-
         List<Token> toks = new ArrayList<>(text.length() / 10);
-        long ts = System.nanoTime();
-        int len = text.length();
-        try {
-            Segment seg = new Segment();
-            seg.array = text.toCharArray();
-            seg.offset = 0;
-            seg.count = text.length();
-            highlighter.parse(seg, 0, toks);
-        } finally {
-            System.out.println(String.format("Parsed %d in %d ms, giving %d tokens\n",
-                    len, (System.nanoTime() - ts) / 1000000, toks.size()));
-        }
+
+        Segment seg = new Segment();
+        seg.array = text.toCharArray();
+        seg.count = text.length();
+        lexer.parse(seg, 0, toks);
 
         toks.forEach(token -> {
             TokenType type = token.getTokenType();
@@ -42,4 +32,5 @@ public interface LanguageHighlighter {
             }
         });
     }
+    
 }

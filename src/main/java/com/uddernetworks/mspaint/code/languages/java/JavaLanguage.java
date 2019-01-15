@@ -1,9 +1,9 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
-import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class JavaLanguage implements Language {
 
     private CodeCompiler codeCompiler = new CodeCompiler();
-    private LanguageHighlighter languageHighlighter = new JavaLanguageHighlighter();
 
     @Override
     public String getName() {
@@ -46,8 +45,8 @@ public class JavaLanguage implements Language {
     }
 
     @Override
-    public LanguageHighlighter getLanguageHighlighter() {
-        return this.languageHighlighter;
+    public DefaultJFlexLexer getLanguageHighlighter() {
+        return new JavaLexer();
     }
 
     @Override
