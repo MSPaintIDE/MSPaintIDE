@@ -87,6 +87,12 @@ public class Installer {
             Files.write(shortcutGen, shortcut.getBytes(), StandardOpenOption.CREATE_NEW);
 
 
+            File nativeDirectory = new File(msPaintAppData.getAbsolutePath(), "native");
+            nativeDirectory.mkdirs();
+            Path paintInjectorDll = Paths.get(msPaintAppData.getAbsolutePath(), "native/PaintInjector.dll");
+            Files.copy(getClass().getClassLoader().getResourceAsStream("native/PaintInjector.dll"), paintInjectorDll);
+
+
             Path uninstallPath = Paths.get(msPaintAppData.getAbsolutePath(), "uninstall.vbs");
             Files.copy(getClass().getClassLoader().getResourceAsStream("uninstall.vbs"), uninstallPath);
 
