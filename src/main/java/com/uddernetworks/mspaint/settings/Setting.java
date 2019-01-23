@@ -11,7 +11,7 @@ public enum Setting {
     OPEN_PROJECT("openProject", "", STRING),
     DARK_THEME("darkTheme", true, BOOLEAN),
     DATABASE_USE_INTERNAL("databaseUseInternal", true, BOOLEAN),
-    DATABASE_INTERNAL_LOCATION("databaseInternalLocation", MainGUI.LOCAL_MSPAINT + File.separator + "database", STRING),
+    DATABASE_INTERNAL_LOCATION("databaseInternalLocation", MainGUI.INSTALL_LOCATION + File.separator + "database", STRING),
     DATABASE_URL("databaseURL", "", STRING),
     DATABASE_USER("databaseUser", "", STRING),
     DATABASE_PASS("databasePass", "", STRING),

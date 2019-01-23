@@ -1,0 +1,127 @@
+// Adapted from Santulator in package/build.gradle to work with MS Paint IDE by Adam Yarris
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+/*
+ * Open Source Software published under the Apache Licence, Version 2.0.
+ */
+
+
+apply plugin: 'java'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+ext {
+    publishedVersion = rootProject.version
+    libraryPath = file("${rootProject.buildDir}/libraries")
+    mainJar = rootProject.jar.outputs.files[0].name
+    bundlePath = file("${buildDir}/bundle")
+    extraBundlerArguments = []
+
+    appIcon = file('icons/icon.ico')
+    bundlerScript = file('bin/build-package.bat')
+    generatedInnoSetupFile = file("${buildDir}/resources/main/MSPaintIDE.iss")
+    windowsExecutable = file("${bundlePath}/MSPaintIDE/MSPaintIDE.exe")
+    bundleContent = file("${bundlePath}/MSPaintIDE/*")
+    // Locations for the DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
+    windowsDllDirectory = file('C:\\Windows\\System32')
+    windowsDllMSVCP140 = file("${windowsDllDirectory}/MSVCP140.dll")
+    windowsDllVCRUNTIME140 = file("${windowsDllDirectory}/VCRUNTIME140.dll")
+    if (publishedVersion.endsWith('-SNAPSHOT')) {
+        publishedVersion = '0.0.1'
+    }
+}
+
+task checkBundlingEnvironment {
+    description 'Check the environment for building the installable bundle'
+    doLast {
+        if (project.hasProperty('javafxJmodsPath')) {
+            def modsPath = file("${javafxJmodsPath}")
+
+            if (modsPath.exists() && modsPath.isDirectory()) {
+                if (!modsPath.list({ d, f -> f ==~ /.*.jmod/ } as FilenameFilter)) {
+                    throw new GradleException("JavaFX modules directory '$modsPath' does not contain any '*.jmod' files")
+                }
+            } else {
+                throw new GradleException("JavaFX modules directory '$modsPath' not found")
+            }
+        } else {
+            throw new GradleException("Use -PjavafxJmodsPath=... to specify the directory containing the OpenJFX 11 JMod files")
+        }
+        def javaHome = System.env.JAVA_HOME
+
+        if (javaHome) {
+            def javaExecutable = file("${javaHome}/bin/java.exe")
+            def packagerFile = file("${javaHome}/bin/jpackager.exe")
+            def jmodFile = file("${javaHome}/jmods/jdk.packager.jar")
+
+            if (!javaExecutable.exists()) {
+                throw new GradleException("Unable to find Java executable '${javaExecutable}'")
+            }
+            if (!packagerFile.exists()) {
+                throw new GradleException("Unable to find Java packager executable at '${packagerFile}'")
+            }
+            if (!jmodFile.exists()) {
+                throw new GradleException("Unable to find Java packager module at '${jmodFile}'")
+            }
+            // Check existence of files for DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
+            if (!windowsDllMSVCP140.exists() || !windowsDllVCRUNTIME140.exists()) {
+                throw new GradleException("Unable to find '${windowsDllMSVCP140}' and '${windowsDllVCRUNTIME140}' (see https://github.com/Santulator/Santulator/issues/5)")
+            }
+        } else {
+            throw new GradleException("JAVA_HOME must be set")
+        }
+    }
+}
+
+task createBundle(type: Exec, dependsOn: [processResources, checkBundlingEnvironment]) {
+    description 'Build the installable bundle'
+    commandLine 'cmd', '/c',
+            bundlerScript,
+            "${-> javafxJmodsPath}",
+            libraryPath,
+            bundlePath,
+            mainJar,
+            publishedVersion,
+            appIcon
+}
+
+createBundle.dependsOn ':copyDependencies'
+
+processResources {
+    filesMatching('MSPaintIDE.iss') {
+        filter ReplaceTokens, tokens: [
+                'bundle.version'     : publishedVersion,
+                'executable.location': windowsExecutable.toString(),
+                'bundle.content'     : bundleContent.toString(),
+                'icon.file'          : appIcon.toString()
+        ]
+    }
+}
+
+task completeInnoSetup(dependsOn: processResources) {
+    doLast {
+        copy {
+            from 'icons'
+            into "${bundlePath}/MSPaintIDE"
+            include 'icon.ico'
+        }
+
+        copy {
+            from "${rootProject.projectDir}/native/"
+            into "${bundlePath}/MSPaintIDE/native"
+            include 'PaintInjector.dll'
+        }
+
+        // Copy files for DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
+        copy {
+            from windowsDllMSVCP140
+            from windowsDllVCRUNTIME140
+            into "${bundlePath}/MSPaintIDE"
+        }
+        println("Inno Setup file: ${generatedInnoSetupFile}")
+    }
+}
+
+createBundle.finalizedBy completeInnoSetup

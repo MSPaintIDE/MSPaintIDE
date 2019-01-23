@@ -8,8 +8,10 @@ import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,20 +68,17 @@ public class PythonLanguage implements Language {
     public Map<ImageClass, List<LanguageError>> compileAndExecute(List<ImageClass> imageClasses, File outputFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
         Map<ImageClass, List<LanguageError>> errors = new HashMap<>();
 
-//        PrintStream imageOut = new PrintStream(imageOutputStream);
-//        PrintStream compilerOut = new PrintStream(compilerStream);
-//        compilerStream.changeColor(Color.RED);
-//
-//        for (ImageClass imageClass : imageClasses) {
-//            long start = System.currentTimeMillis();
-//
-//            PrintStream oldPS = System.out;
-//            System.setOut(imageOut);
-//
-//            String code = imageClass.getText();
-//
-//            compilerOut.println("Checking code...");
-//            mainGUI.setStatusText("Checking code...");
+        PrintStream imageOut = new PrintStream(imageOutputStream);
+        PrintStream compilerOut = new PrintStream(compilerStream);
+        compilerStream.changeColor(Color.RED);
+
+        for (ImageClass imageClass : imageClasses) {
+            long start = System.currentTimeMillis();
+
+            PrintStream oldPS = System.out;
+            System.setOut(imageOut);
+
+            String code = imageClass.getText();
 //
 //            MultiLineBlock multiLineBlock = new MultiLineBlock(code);
 //
@@ -96,18 +95,15 @@ public class PythonLanguage implements Language {
 //                return errors;
 //            }
 //
-//            compilerOut.println("Executing...");
-//            mainGUI.setStatusText("Executing...");
-//
-//            start = System.currentTimeMillis();
-//
-//            execute(code);
-//
-//            System.setOut(oldPS);
-//
-//            compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
-//            mainGUI.setStatusText("");
-//        }
+            compilerOut.println("Executing...");
+            mainGUI.setStatusText("Executing...");
+
+
+            System.setOut(oldPS);
+
+            compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
+            mainGUI.setStatusText("");
+        }
 
         return errors;
     }

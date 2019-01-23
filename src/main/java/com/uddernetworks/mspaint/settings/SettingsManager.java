@@ -68,6 +68,7 @@ public class SettingsManager {
         settings.clear();
 
         if (!file.exists()) {
+            file.mkdirs();
             file.createNewFile();
             Properties properties = new Properties();
             Arrays.stream(Setting.values()).forEach(setting -> {

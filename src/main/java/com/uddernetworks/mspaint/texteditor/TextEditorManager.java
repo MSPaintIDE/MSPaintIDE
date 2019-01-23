@@ -60,7 +60,7 @@ public class TextEditorManager {
             mainGUI.setIndeterminate(true);
         }
 
-        File backup = new File(MainGUI.LOCAL_MSPAINT, "opened\\backup");
+        File backup = new File(MainGUI.INSTALL_LOCATION, "opened\\backup");
         backup.mkdirs();
 
         File backupFile = new File(backup, "original_" + this.originalFile.getName());
@@ -163,7 +163,7 @@ public class TextEditorManager {
     }
 
     private File createImageFile() throws IOException, ExecutionException, InterruptedException {
-        File tempImage = new File(MainGUI.LOCAL_MSPAINT, "opened\\" + this.originalFile.getName() + ".png");
+        File tempImage = new File(MainGUI.INSTALL_LOCATION, "opened\\" + this.originalFile.getName() + ".png");
         tempImage.mkdirs();
 
         String text = new String(Files.readAllBytes(this.originalFile.toPath()));

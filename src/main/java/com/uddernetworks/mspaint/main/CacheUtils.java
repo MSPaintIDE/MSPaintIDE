@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class CacheUtils {
 
-    public static final File GLOBAL_CACHE = new File(MainGUI.LOCAL_MSPAINT, "global_cache");
+    public static final File GLOBAL_CACHE = new File(MainGUI.INSTALL_LOCATION, "global_cache");
     private static final PrettyTime prettyTime = new PrettyTime();
 
     /**

@@ -9,12 +9,13 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
+
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import javax.swing.JFileChooser;
 
 public class FileMenu extends MenuBind {
 
@@ -77,7 +78,7 @@ public class FileMenu extends MenuBind {
     private void onClickClearGlobalCaches() {
         System.out.println("Clearing global caches...");
 
-        clearCaches(new File(MainGUI.LOCAL_MSPAINT, "global_cache"));
+        clearCaches(new File(MainGUI.INSTALL_LOCATION, "global_cache"));
 
         System.out.println("Cleared global caches!");
     }

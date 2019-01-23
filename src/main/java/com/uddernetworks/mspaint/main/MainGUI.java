@@ -6,7 +6,6 @@ import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
 import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
 import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
-import com.uddernetworks.mspaint.install.Installer;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -156,11 +155,12 @@ public class MainGUI extends Application implements Initializable {
     private Map<String, Image> cachedTaksbarIcons = new HashMap<>();
     private Map<String, ImageView> cachedImageViews = new HashMap<>();
 
-    public static final File LOCAL_MSPAINT = new File(System.getenv("LocalAppData"), "\\MSPaintIDE");
+    public static File INSTALL_LOCATION;
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
     public MainGUI() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        INSTALL_LOCATION = new File(MainGUI.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         this.main = new Main();
@@ -169,7 +169,7 @@ public class MainGUI extends Application implements Initializable {
         this.gitController = new GitController(this);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException, ReflectiveOperationException, ExecutionException {
+    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         printStreamStringCopy = new PrintStreamStringCopy();
 
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
@@ -183,21 +183,10 @@ public class MainGUI extends Application implements Initializable {
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-            return;
         }
 
-        Installer installer = new Installer();
-
         if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("install")) {
-                installer.install();
-                System.exit(0);
-                return;
-            } else if (args[0].equalsIgnoreCase("uninstall")) {
-                installer.uninstall();
-                System.exit(0);
-                return;
-            } else if (args[0].endsWith(".ppf")) {
+            if (args[0].endsWith(".ppf")) {
                 initialProject = new File(args[0]);
                 if (!initialProject.isFile()) initialProject = null;
             } else {

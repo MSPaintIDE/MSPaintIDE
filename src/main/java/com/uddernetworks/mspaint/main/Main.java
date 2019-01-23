@@ -60,7 +60,7 @@ public class Main {
 
     public void headlessStart() throws IOException {
         Splash.setStatus("Loading settings...");
-        SettingsManager.initialize(new File(MainGUI.LOCAL_MSPAINT, "options.ini"));
+        SettingsManager.initialize(new File(MainGUI.INSTALL_LOCATION, "options.ini"));
 
         Splash.setStatus("Loading database...");
         SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
