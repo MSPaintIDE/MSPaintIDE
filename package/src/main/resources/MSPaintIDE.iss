@@ -5,6 +5,7 @@
 #define MyAppPublisher "Adam Yarris"
 #define MyAppURL "https://ms-paint-i.de/"
 #define MyAppExeName "MSPaintIDE.exe"
+#define InstLogoDir "@icon.directory@\installer"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -25,7 +26,9 @@ OutputBaseFilename=MSPaintIDE-@bundle.version@
 Compression=lzma
 SolidCompression=yes
 ChangesAssociations=yes
-SetupIconFile="@icon.file@"
+SetupIconFile="@icon.directory@\icon.ico"
+UninstallDisplayIcon="{app}\icon.ico"
+WizardSmallImageFile={#InstLogoDir}\small-logo-55.bmp,{#InstLogoDir}\small-logo-64.bmp,{#InstLogoDir}\small-logo-97.bmp,{#InstLogoDir}\small-logo-110.bmp,{#InstLogoDir}\small-logo-120.bmp,{#InstLogoDir}\small-logo-140.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
