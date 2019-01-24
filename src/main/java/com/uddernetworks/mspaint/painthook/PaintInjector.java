@@ -5,7 +5,7 @@ import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
 
 public interface PaintInjector extends Library, StdCallLibrary {
-    PaintInjector INSTANCE = Native.loadLibrary("PaintInjector", PaintInjector.class);
+    PaintInjector INSTANCE = (PaintInjector) Native.loadLibrary("PaintInjector", PaintInjector.class);
 
     void clickBuild(ClickCallback callback);
     void clickRun(ClickCallback callback);

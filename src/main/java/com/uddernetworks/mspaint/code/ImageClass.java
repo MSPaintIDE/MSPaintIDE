@@ -4,12 +4,16 @@ import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.main.*;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.newocr.ScannedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 public class ImageClass {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(ImageClass.class);
 
     private File inputImage;
     private ScannedImage scannedImage;
@@ -47,7 +51,7 @@ public class ImageClass {
 
     public void scan(boolean internal, boolean useCaches, boolean saveCaches) {
         File cacheFile = CacheUtils.getCacheFor(this.inputImage, internal);
-        System.out.println("Scanning image " + inputImage.getName() + "...");
+        LOGGER.info("Scanning image " + inputImage.getName() + "...");
         final String prefix = "[" + inputImage.getName() + "] ";
 
         long start = System.currentTimeMillis();
@@ -64,9 +68,9 @@ public class ImageClass {
 
         text = scannedImage.getPrettyString();
 
-        System.out.println("\n" + prefix + "text =\n" + text);
+        LOGGER.info("\n" + prefix + "text =\n" + text);
 
-        System.out.println(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public void highlight(File highlightImagePath) throws IOException {
@@ -74,21 +78,21 @@ public class ImageClass {
 
         final String prefix = "[" + inputImage.getName() + "] ";
 
-        System.out.println("\n" + prefix + "Highlighting...");
+        LOGGER.info("\n" + prefix + "Highlighting...");
         long start = System.currentTimeMillis();
 
         new LanguageHighlighter().highlight(this.mainGUI.getCurrentLanguage().getLanguageHighlighter(), this.scannedImage);
 
-        System.out.println(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 
-        System.out.println(prefix + "Writing highlighted image to file...");
+        LOGGER.info(prefix + "Writing highlighted image to file...");
         start = System.currentTimeMillis();
 
 
         letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
         letterFileWriter.writeToFile();
 
-        System.out.println(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public BufferedImage getImage() {

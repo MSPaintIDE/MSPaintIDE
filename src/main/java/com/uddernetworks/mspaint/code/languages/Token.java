@@ -14,11 +14,11 @@
 
 package com.uddernetworks.mspaint.code.languages;
 
+import org.slf4j.LoggerFactory;
+
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A Token in a Document.  Tokens do NOT store a reference to the
@@ -132,7 +132,6 @@ public class Token implements Serializable, Comparable {
 
     /**
      * Get the text of the token from this document
-     * @param doc
      * @return
      */
     public String getText(String source) {
@@ -144,7 +143,7 @@ public class Token implements Serializable, Comparable {
         try {
             result = doc.getText(start, length);
         } catch (BadLocationException ex) {
-            Logger.getLogger(Token.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(DefaultJFlexLexer.class.getName()).error("An error occurred while highlighting.", ex);
         } finally {
             return result;
         }

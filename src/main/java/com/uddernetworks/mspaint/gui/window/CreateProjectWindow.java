@@ -110,7 +110,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        File startAt = MainGUI.INSTALL_LOCATION;
+        File startAt = MainGUI.APP_DATA;
         this.languageComboBox.setItems(mainGUI.getLanguages());
 
         finish.setOnAction(event -> {

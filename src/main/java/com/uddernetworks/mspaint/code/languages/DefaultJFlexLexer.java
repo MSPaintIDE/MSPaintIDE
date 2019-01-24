@@ -14,13 +14,13 @@
 
 package com.uddernetworks.mspaint.code.languages;
 
+import org.slf4j.LoggerFactory;
+
 import javax.swing.text.Segment;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This is a default, and abstract implemenatation of a Lexer using JFLex
@@ -87,7 +87,7 @@ public abstract class DefaultJFlexLexer implements Lexer {
                 tokens.add(t);
             }
         } catch (IOException ex) {
-            Logger.getLogger(DefaultJFlexLexer.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(DefaultJFlexLexer.class.getName()).error("An error occurred while highlighting.", ex);
         }
     }
 

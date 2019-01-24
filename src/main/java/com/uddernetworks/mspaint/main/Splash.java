@@ -1,10 +1,15 @@
 package com.uddernetworks.mspaint.main;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Splash {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(Splash.class);
 
     private static AtomicReference<String> status = new AtomicReference<>("");
     private static final AtomicReference<SplashScreen> splash = new AtomicReference<>();
@@ -30,7 +35,7 @@ public class Splash {
             Graphics2D graphics;
 
             if (splash.get() == null || (graphics = splash.get().createGraphics()) == null) {
-                System.out.println("SplashScreen.getSplashScreen() or graphics returned null");
+                LOGGER.error("SplashScreen.getSplashScreen() or graphics returned null");
                 return;
             }
 

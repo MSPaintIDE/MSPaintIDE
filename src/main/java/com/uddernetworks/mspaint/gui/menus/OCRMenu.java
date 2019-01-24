@@ -7,12 +7,16 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.ocr.TrainGenerator;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public class OCRMenu extends MenuBind {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(OCRMenu.class);
 
     public OCRMenu(MainGUI mainGUI) {
         super(mainGUI);
@@ -38,7 +42,7 @@ public class OCRMenu extends MenuBind {
             return;
         }
 
-        System.out.println("Training OCR on image " + file.getAbsolutePath());
+        LOGGER.info("Training OCR on image " + file.getAbsolutePath());
         this.mainGUI.setStatusText("Training OCR...");
         this.mainGUI.setIndeterminate(true);
 
@@ -50,7 +54,7 @@ public class OCRMenu extends MenuBind {
                 e.printStackTrace();
             }
         }).thenRun(() -> {
-            System.out.println("Completed training in " + (System.currentTimeMillis() - start) + "ms");
+            LOGGER.info("Completed training in " + (System.currentTimeMillis() - start) + "ms");
             this.mainGUI.updateLoading(0, 1);
             this.mainGUI.setStatusText(null);
         });
@@ -62,19 +66,19 @@ public class OCRMenu extends MenuBind {
         File file = null;
         if (filePath != null && !filePath.trim().isEmpty()) file = new File(filePath);
         if (file == null) {
-            System.out.println("Invalid/missing file found for the train image.");
+            LOGGER.error("Invalid/missing file found for the train image.");
             return;
         }
 
         if (file.exists()) file.delete();
 
-        System.out.println("Generating OCR training image at " + file.getAbsolutePath());
+        LOGGER.info("Generating OCR training image at " + file.getAbsolutePath());
         this.mainGUI.setStatusText("Generating train image...");
         this.mainGUI.setIndeterminate(true);
 
         long start = System.currentTimeMillis();
         new TrainGenerator().generate(file, () -> {
-            System.out.println("Completed generation in " + (System.currentTimeMillis() - start) + "ms");
+            LOGGER.info("Completed generation in " + (System.currentTimeMillis() - start) + "ms");
             this.mainGUI.updateLoading(0, 1);
             this.mainGUI.setStatusText(null);
         });

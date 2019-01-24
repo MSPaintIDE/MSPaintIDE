@@ -1,5 +1,8 @@
 package com.uddernetworks.mspaint.code.languages;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +10,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LanguageManager {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(LanguageManager.class);
 
     private List<Language> allLanguages = new ArrayList<>();
     private List<Language> enabledLanguages = new ArrayList<>();
@@ -30,11 +35,11 @@ public class LanguageManager {
     public void initializeLanguages() {
         this.enabledLanguages = this.allLanguages.stream()
                 .filter(language -> {
-                    System.out.println("Loading the language \"" + language.getName() + "\"");
+                    LOGGER.info("Loading the language \"" + language.getName() + "\"");
 
                     if (language.meetsRequirements()) return true;
 
-                    System.out.println("Your system does not meet the requirements for " + language.getName());
+                    LOGGER.warn("Your system does not meet the requirements for " + language.getName());
                     return false;
                 })
                 .collect(Collectors.toList());

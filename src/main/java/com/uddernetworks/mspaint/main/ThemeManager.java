@@ -4,6 +4,8 @@ import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,12 +14,14 @@ import java.util.Map;
 
 public class ThemeManager {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
+
     private Map<String, String> themes = new HashMap<>();
     private List<Scene> scenes = new ArrayList<>();
     private String current;
 
     public void loadTheme(String name, String path) {
-        System.out.println("Loading theme \"" + name + "\"");
+        LOGGER.info("Loading theme \"" + name + "\"");
         themes.put(name, "themes/" + path);
     }
 

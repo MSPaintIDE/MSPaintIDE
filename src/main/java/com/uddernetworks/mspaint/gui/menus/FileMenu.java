@@ -9,6 +9,8 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.File;
@@ -18,6 +20,8 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class FileMenu extends MenuBind {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(FileMenu.class);
 
     public FileMenu(MainGUI mainGUI) {
         super(mainGUI);
@@ -67,25 +71,25 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "clear-project-caches")
     private void onClickClearProjectCaches() {
-        System.out.println("Clearing project caches...");
+        LOGGER.info("Clearing project caches...");
 
         clearCaches(ProjectManager.getPPFProject().getObjectLocation());
 
-        System.out.println("Cleared project caches!");
+        LOGGER.info("Cleared project caches!");
     }
 
     @BindItem(label = "clear-global-caches")
     private void onClickClearGlobalCaches() {
-        System.out.println("Clearing global caches...");
+        LOGGER.info("Clearing global caches...");
 
-        clearCaches(new File(MainGUI.INSTALL_LOCATION, "global_cache"));
+        clearCaches(new File(MainGUI.APP_DATA, "global_cache"));
 
-        System.out.println("Cleared global caches!");
+        LOGGER.info("Cleared global caches!");
     }
 
     private void clearCaches(File file) {
         if (file == null) {
-            System.out.println("No cache directory found!");
+            LOGGER.error("No cache directory found!");
             return;
         }
 

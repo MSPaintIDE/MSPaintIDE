@@ -53,3 +53,12 @@ Root: HKLM; Subkey: "Software\Classes\.ppf"; ValueType: string; ValueName: ""; V
 Root: HKLM; Subkey: "Software\Classes\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "MS Paint IDE"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\icon.ico"
 Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "Edit with MS Paint IDE"
+Root: HKCR; Subkey: "*\shell\MSPaintIDE\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\icon.ico"
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: expandsz; ValueName: "Position"; ValueData: "Top"
+
+
+
+

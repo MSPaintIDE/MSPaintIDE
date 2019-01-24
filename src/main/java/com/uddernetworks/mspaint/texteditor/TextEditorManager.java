@@ -10,6 +10,8 @@ import com.uddernetworks.newocr.FontBounds;
 import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.database.DatabaseCharacter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TextEditorManager {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(TextEditorManager.class);
 
     private File originalFile;
     private File imageFile;
@@ -60,7 +64,7 @@ public class TextEditorManager {
             mainGUI.setIndeterminate(true);
         }
 
-        File backup = new File(MainGUI.INSTALL_LOCATION, "opened\\backup");
+        File backup = new File(MainGUI.APP_DATA, "opened\\backup");
         backup.mkdirs();
 
         File backupFile = new File(backup, "original_" + this.originalFile.getName());
@@ -93,7 +97,7 @@ public class TextEditorManager {
                         }
 
                         if (!wk.reset()) {
-                            System.out.println("Key has been unregistered");
+                            LOGGER.info("Key has been unregistered");
                         }
                     }
                 }
@@ -163,11 +167,11 @@ public class TextEditorManager {
     }
 
     private File createImageFile() throws IOException, ExecutionException, InterruptedException {
-        File tempImage = new File(MainGUI.INSTALL_LOCATION, "opened\\" + this.originalFile.getName() + ".png");
+        File tempImage = new File(MainGUI.APP_DATA, "opened\\" + this.originalFile.getName() + ".png");
         tempImage.mkdirs();
 
         String text = new String(Files.readAllBytes(this.originalFile.toPath()));
-        System.out.println("text = " + text);
+        LOGGER.info("text = " + text);
 
         int padding = 12;
 
@@ -193,15 +197,15 @@ public class TextEditorManager {
     }
 
     private void initialProcess() throws IOException, InterruptedException {
-        System.out.println("Processing");
+        LOGGER.info("Processing");
 
         Runtime runtime = Runtime.getRuntime();
         Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");
 
-        System.out.println("Opened MS Paint");
+        LOGGER.info("Opened MS Paint");
         process.waitFor();
 
-        System.out.println("Closed MS Paint!");
+        LOGGER.info("Closed MS Paint!");
 
         stopping.set(true);
         savingThread.interrupt();

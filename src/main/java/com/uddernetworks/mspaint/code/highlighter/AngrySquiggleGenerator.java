@@ -3,10 +3,14 @@ package com.uddernetworks.mspaint.code.highlighter;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 
 public class AngrySquiggleGenerator {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(AngrySquiggleGenerator.class);
 
     private BufferedImage generatedPNG;
 
@@ -21,7 +25,7 @@ public class AngrySquiggleGenerator {
         transcoder.transcode(input, new AngrySquiggleTranscoderOutput());
         this.generatedPNG = transcoder.getImage();
 
-        System.out.println("Generated angry squiggle from SVG. Dimensions: " + this.generatedPNG.getWidth() + " x " + this.generatedPNG.getHeight());
+        LOGGER.info("Generated angry squiggle from SVG. Dimensions: " + this.generatedPNG.getWidth() + " x " + this.generatedPNG.getHeight());
     }
 
     public BufferedImage getGeneratedPNG() {

@@ -4,6 +4,8 @@ import com.uddernetworks.mspaint.code.FileJarrer;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.*;
 import java.awt.*;
@@ -23,6 +25,8 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class CodeCompiler {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(CodeCompiler.class);
+
     private File classOutputFolder;
     private Map<String, ImageClass> imageClassHashMap = new HashMap<>();
     private Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = new HashMap<>();
@@ -35,7 +39,7 @@ public class CodeCompiler {
             String packageName = diagnostic.getSource().getName().substring(1).replace("/", ".");
             packageName = packageName.substring(0, packageName.length() - 5);
 
-            System.out.println("packageName = " + packageName);
+            LOGGER.info("packageName = " + packageName);
 
             ImageClass imageClass = imageClassHashMap.get(packageName);
 
@@ -172,7 +176,7 @@ public class CodeCompiler {
         FileJarrer fileJarrer = new FileJarrer(classOutputFolder, jarFile);
         fileJarrer.jarDirectory();
 
-        System.out.println("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
         if (!errors.isEmpty()) {
             for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {

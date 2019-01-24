@@ -17,6 +17,8 @@ import com.uddernetworks.newocr.OCRHandle;
 import com.uddernetworks.newocr.database.DatabaseManager;
 import com.uddernetworks.newocr.database.OCRDatabaseManager;
 import org.apache.batik.transcoder.TranscoderException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,8 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private File parent;
     private File currentJar;
@@ -60,7 +64,7 @@ public class Main {
 
     public void headlessStart() throws IOException {
         Splash.setStatus("Loading settings...");
-        SettingsManager.initialize(new File(MainGUI.INSTALL_LOCATION, "options.ini"));
+        SettingsManager.initialize(new File(MainGUI.APP_DATA, "options.ini"));
 
         Splash.setStatus("Loading database...");
         SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
@@ -75,7 +79,7 @@ public class Main {
                     File file = location != null && !location.trim().equals("") ? new File(location) : null;
 
                     if (file == null || (!file.isDirectory() && !file.mkdirs())) {
-                        System.out.println("Invalid/unset internal database location");
+                        LOGGER.error("Invalid/unset internal database location");
                         return;
                     }
 
@@ -86,7 +90,7 @@ public class Main {
                     String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
 
                     if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
-                        System.out.println("Couldn't set up database manager, partial/missing credentials in settings.");
+                        LOGGER.error("Couldn't set up database manager, partial/missing credentials in settings.");
                         return;
                     }
 
@@ -113,12 +117,12 @@ public class Main {
 
     public int indexAll(boolean useCaches, boolean saveCaches) {
         if (optionsNotFilled()) {
-            System.err.println("Please select files for all options");
+            LOGGER.error("Please select files for all options");
             mainGUI.setHaveError();
             return -1;
         }
 
-        System.out.println("Scanning all images...");
+        LOGGER.info("Scanning all images...");
         long start = System.currentTimeMillis();
 
         mainGUI.setStatusText(null);
@@ -126,25 +130,25 @@ public class Main {
         File inputImage = ProjectManager.getPPFProject().getInputLocation();
 
         if (inputImage.isDirectory()) {
-            System.out.println("Found directory: " + inputImage.getAbsolutePath());
+            LOGGER.info("Found directory: " + inputImage.getAbsolutePath());
             for (File imageFile : getFilesFromDirectory(inputImage, this.currentLanguage.getFileExtensions(), "png")) {
-                System.out.println("2 Adding non directory: " + imageFile.getAbsolutePath());
+                LOGGER.info("Adding non directory: " + imageFile.getAbsolutePath());
                 imageClasses.add(new ImageClass(imageFile, mainGUI, true, useCaches, saveCaches));
             }
         } else {
-            System.out.println("Adding non directory: " + inputImage.getAbsolutePath());
+            LOGGER.info("Adding non directory: " + inputImage.getAbsolutePath());
             imageClasses.add(new ImageClass(inputImage, mainGUI, true, useCaches, saveCaches));
         }
 
         mainGUI.setStatusText(null);
 
-        System.out.println("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
         return 1;
     }
 
     public void highlightAll() throws IOException {
         if (optionsNotFilled()) {
-            System.err.println("Please select files for all options");
+            LOGGER.error("Please select files for all options");
             mainGUI.setHaveError();
             return;
         }
@@ -154,12 +158,12 @@ public class Main {
         if (highlightedFile != null && !highlightedFile.isDirectory()) highlightedFile.mkdirs();
 
         if (highlightedFile == null || !highlightedFile.isDirectory()) {
-            System.err.println("No highlighted file directory found!");
+            LOGGER.error("No highlighted file directory found!");
             mainGUI.setHaveError();
             return;
         }
 
-        System.out.println("Scanning all images...");
+        LOGGER.info("Scanning all images...");
         mainGUI.setStatusText("Highlighting...");
         mainGUI.setIndeterminate(true);
         long start = System.currentTimeMillis();
@@ -171,7 +175,7 @@ public class Main {
         mainGUI.setIndeterminate(false);
         mainGUI.setStatusText(null);
 
-        System.out.println("Finished highlighting all images in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info("Finished highlighting all images in " + (System.currentTimeMillis() - start) + "ms");
     }
 
 
@@ -179,10 +183,10 @@ public class Main {
         long start = System.currentTimeMillis();
 
         if (getCurrentLanguage().isInterpreted()) {
-            System.out.println("Interpreting...");
+            LOGGER.info("Interpreting...");
             mainGUI.setStatusText("Interpreting...");
         } else {
-            System.out.println("Compiling...");
+            LOGGER.info("Compiling...");
             mainGUI.setStatusText("Compiling...");
         }
 
@@ -208,7 +212,7 @@ public class Main {
         try {
             errors = getCurrentLanguage().compileAndExecute(imageClasses, ProjectManager.getPPFProject().getJarFile(), ProjectManager.getPPFProject().getOtherLocation(), ProjectManager.getPPFProject().getClassLocation(), mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
 
-            System.out.println("Highlighting Angry Squiggles...");
+            LOGGER.info("Highlighting Angry Squiggles...");
             mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
             for (ImageClass imageClass : errors.keySet()) {
@@ -233,9 +237,9 @@ public class Main {
                 append += ". See compiler output image for details";
             }
 
-            System.out.println("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms" + append);
+            LOGGER.info("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms" + append);
 
-            System.out.println("Saving output images...");
+            LOGGER.info("Saving output images...");
             mainGUI.setStatusText("Saving output images...");
 
             imageOutputStream.saveImage();

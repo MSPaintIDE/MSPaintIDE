@@ -32,6 +32,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -52,6 +54,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class MainGUI extends Application implements Initializable {
+
+    private static Logger LOGGER;
 
     @FXML
     private TextField inputName;
@@ -155,12 +159,11 @@ public class MainGUI extends Application implements Initializable {
     private Map<String, Image> cachedTaksbarIcons = new HashMap<>();
     private Map<String, ImageView> cachedImageViews = new HashMap<>();
 
-    public static File INSTALL_LOCATION;
+    public static File APP_DATA = new File(System.getenv("LocalAppData"), "MSPaintIDE");
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
     public MainGUI() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
-        INSTALL_LOCATION = new File(MainGUI.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         this.main = new Main();
@@ -170,6 +173,8 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+        System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
+        LOGGER = LoggerFactory.getLogger(MainGUI.class);
         printStreamStringCopy = new PrintStreamStringCopy();
 
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
@@ -275,7 +280,7 @@ public class MainGUI extends Application implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                System.out.println("No language found with a class of \"" + languageClass + "\"");
+                LOGGER.error("No language found with a class of \"" + languageClass + "\"");
             }
         });
     }
@@ -375,13 +380,13 @@ public class MainGUI extends Application implements Initializable {
             PPFProject ppfProject = ProjectManager.getPPFProject();
             if (getCurrentLanguage() == null) {
                 setHaveError();
-                System.out.println("No language selected!");
+                LOGGER.error("No language selected!");
                 return;
             }
 
             if (!getCurrentLanguage().meetsRequirements()) {
                 setHaveError();
-                System.out.println("You somehow selected a language that your\n" +
+                LOGGER.error("You somehow selected a language that your\n" +
                         "system doesn't have the proper requirements for!");
                 return;
             }
@@ -403,7 +408,7 @@ public class MainGUI extends Application implements Initializable {
             setStatusText("");
             updateLoading(0, 1);
 
-            System.out.println("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
+            LOGGER.info("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -547,7 +552,7 @@ public class MainGUI extends Application implements Initializable {
                 } else if (clazz.equals(String.class)) {
                     callback.accept(text == null ? null : (T) textField.getText().trim());
                 } else {
-                    System.out.println("Unknown class " + clazz.getCanonicalName());
+                    LOGGER.error("Unknown class " + clazz.getCanonicalName());
                 }
 
                 ProjectManager.save();
@@ -645,9 +650,9 @@ public class MainGUI extends Application implements Initializable {
 
         this.gitController.getVersion(gitVersion -> {
             if (gitVersion == null) {
-                System.out.println("Git not found! Git features will not be available.");
+                LOGGER.warn("Git not found! Git features will not be available.");
             } else {
-                System.out.println("Git found! Version: " + gitVersion);
+                LOGGER.info("Git found! Version: " + gitVersion);
                 setGitFeaturesDisabled(false);
             }
         });
@@ -667,8 +672,6 @@ public class MainGUI extends Application implements Initializable {
             createAndSetFolder(classOutput, parent, "out");
 
             Language language = this.main.getCurrentLanguage();
-            System.out.println("language = " + language);
-            System.out.println(language.getOutputFileExtension());
             compiledJarOutput.setText(language.getOutputFileExtension() == null ? null : new File(parent, "Output." + language.getOutputFileExtension()).getAbsolutePath());
 
             Map<String, TextField> imageGen = new HashMap<>();

@@ -6,6 +6,8 @@ import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ModifiedDetector;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -31,6 +33,8 @@ import java.util.stream.Stream;
 
 public class GitController {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(GitController.class);
+
     private MainGUI mainGUI;
     private Gson gson = new Gson();
     private Map<String, BufferedImage> images;
@@ -53,7 +57,7 @@ public class GitController {
         commandOutputModifiers.forEach((functionName, stringStringFunction) -> safeCommand.set(stringStringFunction.apply(safeCommand.get())));
 
         if (showStatus) this.mainGUI.setStatusText("Running command '" + safeCommand.get() + "'");
-        System.out.println((directory != null ? directory.getAbsolutePath() : "") + " > " + safeCommand.get());
+        LOGGER.info((directory != null ? directory.getAbsolutePath() : "") + " > " + safeCommand.get());
         Runnable commandRunnable = () -> {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -148,12 +152,12 @@ public class GitController {
         imageFiles.forEach(file ->
                 moveOrScan(file, null, true, gitIndex, (addingFile, relative) ->
                         runCommand("git add \"" + addingFile.getAbsolutePath().replace("\\", "\\\\") + "\"", false, getGitFolder(), result ->
-                                System.out.println("Finished adding " + relative))));
+                                LOGGER.info("Finished adding " + relative))));
 
         if (!getGitIndexFile().exists()) getGitIndexFile().createNewFile();
         Files.write(getGitIndexFile().toPath(), this.gson.toJson(gitIndex).getBytes());
 
-        System.out.println("Finished adding " + imageFiles.size() + " file" + (imageFiles.size() > 1 ? "s" : ""));
+        LOGGER.info("Finished adding " + imageFiles.size() + " file" + (imageFiles.size() > 1 ? "s" : ""));
     }
 
     private void moveOrScan(File file, File source, boolean addToIndex, GitIndex gitIndex, BiConsumer<File, String> result) {
@@ -219,7 +223,7 @@ public class GitController {
 
     public void setRemoteOrigin(String url) {
         if (url == null || url.isEmpty()) {
-            System.out.println("Error: No URL for remote origin found");
+            LOGGER.error("No URL for remote origin found");
             this.mainGUI.setHaveError();
             return;
         }
@@ -227,9 +231,9 @@ public class GitController {
         runCommand("git remote -v", true, getGitFolder(), result -> {
             Runnable addOrigin = () -> runCommand("git remote add origin " + url, true, false, getGitFolder(), lastResult -> {
                 if (result.contains("remote origin already exists")) {
-                    System.out.println("Couldn't add as a remote origin.");
+                    LOGGER.error("Couldn't add as a remote origin.");
                 } else {
-                    System.out.println("Added " + (this.hideOrigin ? "<hidden>" : url) + " as a remote origin");
+                    LOGGER.info("Added " + (this.hideOrigin ? "<hidden>" : url) + " as a remote origin");
                 }
             });
 
@@ -243,7 +247,7 @@ public class GitController {
 
     public void commit(String message) throws IOException {
         if (message == null || message.isEmpty()) {
-            System.out.println("Error: No commit message found");
+            LOGGER.error("No commit message found");
             this.mainGUI.setHaveError();
             return;
         }
@@ -257,17 +261,17 @@ public class GitController {
 
             if (modifiedDetector.imageChanged()) {
                 moveOrScan(imageFile, sourceFile, false, null, (addingFile, relative) ->
-                        System.out.println("Moved/scanned file " + relative));
+                        LOGGER.info("Moved/scanned file " + relative));
             }
         });
 
         runCommand("git commit -a -m \"" + message + "\"", true, getGitFolder(), result -> {
             if (result.contains("changed")) {
-                System.out.println("Successfully committed");
+                LOGGER.info("Successfully committed");
             } else if (result.contains("nothing added")) {
-                System.out.println("Nothing changed; couldn't commit");
+                LOGGER.info("Nothing changed; couldn't commit");
             } else {
-                System.out.println("Unexpected git command result: \n" + result + "\nIf this looks correct, please make an issue on the MS Paint IDE GitHub: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
+                LOGGER.warn("Unexpected git command result: \n" + result + "\nIf this looks correct, please make an issue on the MS Paint IDE GitHub: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
             }
         });
     }
@@ -279,28 +283,28 @@ public class GitController {
     public void push() {
         runCommand("git remote -v", true, getGitFolder(), result -> {
             if (!result.contains("origin")) {
-                System.out.println("Error: No origin set up, couldn't push");
+                LOGGER.error("No origin set up, couldn't push");
                 return;
             }
 
             runCommand("git push -u origin master", true, getGitFolder(), pushResult -> {
                 if (pushResult.contains("does not appear to be a git repository")) {
-                    System.out.println("Error: No origin set up, couldn't push");
+                    LOGGER.error("No origin set up, couldn't push");
                     return;
                 }
 
                 if (pushResult.contains("unknown revision or path not in the working tree")) {
-                    System.out.println("The branch isn't set up properly, try re-adding your remote origin, making new commits, pushing again, or making an issue here: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
-                    System.out.println("Full command response:\n" + pushResult);
+                    LOGGER.warn("The branch isn't set up properly, try re-adding your remote origin, making new commits, pushing again, or making an issue here: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
+                    LOGGER.warn("Full command response:\n" + pushResult);
                     return;
                 }
 
                 hasUnpushedCommits(stillHasUnpushed -> {
                     if (stillHasUnpushed) {
                         this.mainGUI.setHaveError();
-                        System.out.println("Error: The push did not succeed, did your remote origin contain credentials? If not, please add them");
+                        LOGGER.error("The push did not succeed, did your remote origin contain credentials? If not, please add them");
                     } else {
-                        System.out.println("Pushed commits successfully");
+                        LOGGER.info("Pushed commits successfully");
                     }
                 });
             });

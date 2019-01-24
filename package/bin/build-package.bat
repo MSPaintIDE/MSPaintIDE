@@ -14,7 +14,7 @@ call "%JAVA_HOME%\bin\java.exe" ^
     --module-path "%MODULE_PATH%" ^
     --verbose ^
     --echo-mode ^
-    --add-modules "javafx.controls,javafx.fxml" ^
+    --add-modules "java.base,javafx.controls,javafx.fxml" ^
     --input "%INPUT%" ^
     --output "%OUTPUT%" ^
     --name "MSPaintIDE" ^
