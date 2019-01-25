@@ -78,7 +78,7 @@ public class ImageClass {
 
         final String prefix = "[" + inputImage.getName() + "] ";
 
-        LOGGER.info("\n" + prefix + "Highlighting...");
+        LOGGER.info(prefix + "Highlighting...");
         long start = System.currentTimeMillis();
 
         new LanguageHighlighter().highlight(this.mainGUI.getCurrentLanguage().getLanguageHighlighter(), this.scannedImage);

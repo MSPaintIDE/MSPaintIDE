@@ -27,8 +27,8 @@ public enum TokenType {
     KEYWORD2(0x3333ee, 3), // Other language reserved keywords, like C #defines
     IDENTIFIER(0x000000, 0), // identifiers, variable names, class names
     NUMBER(0x999933, 1),     // numbers in various formats
-    STRING(0xcc6600, 0),     // String
-    STRING2(0xcc6600, 1),    // For highlighting meta chars within a String
+    STRING(0xBC0000, 0),     // String
+    STRING2(0xBC0000, 1),    // For highlighting meta chars within a String
     COMMENT(0x339933, 2),    // comments
     COMMENT2(0x666666, 3),   // special stuff within comments
     REGEX(0xcc6600, 0),      // regular expressions

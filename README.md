@@ -17,146 +17,152 @@
     <a href="https://ms-paint-i.de/">Website</a> |
     <a href="https://discord.gg/RXmPkPJ">Discord</a> |
     <a href="https://www.youtube.com/watch?v=eyH4aXlB1Js">Installation/Demo</a> |
-    <a href="https://github.com/RubbaBoy/NewOCR">Proprietary OCR</a>
+    <a href="https://github.com/RubbaBoy/NewOCR">Custom OCR</a>
   </b>
 </p>
+People joke about what IDE they use often, things like Word, MS Notepad, sometimes even *Eclipse*, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously *Eclipse*.
 
-People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
+Note: This README is relating to the currently unreleased version of MS Paint IDE from git, due to the amounts of changes.
 
-## How it works
-The way the MS Paint IDE works, is it is an application running separate from MS Paint. You input some locations for things like input image, output image location, compile to folder, etc. Once you save your code to MS Paint, you click **Compile/Execute** and the program uses a custom [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) implementation designed specially for MS Paint and code, then syntax highlights it, and then uses Java's JDK to compile the code and execute it. All output from the compiler and application compiled are outputted via images.
+## Table of Contents
 
-## Usage Tutorial
-There is now an installation and demo video, for anything not explained fully here, or just for those who want to see the IDE in action: [https://www.youtube.com/watch?v=eyH4aXlB1Js](https://www.youtube.com/watch?v=eyH4aXlB1Js)
+- [Features](#Features)
+  - [Planned Features](#Planned Features)
+- [Projects](#Projects)
+- [How It Works](#How It Works)
+  - [Context Menu](#Context Menu)
+  - [MS Paint Integration](#MS Paint Integration)
+- [Using](#Using)
+- [Development](#Development)
+- [Donations](#Donations)
+  - [Special Thanks](#special-thanks)
+- [Screenshots](#Screenshots)
+  - [The Main GUI](#The Main GUI)
+  - [External Features](#External Features)
+  - [Compiling](#Compiling)
+  - [Compiling With Errors](#Compiling With Errors)
 
-MS Paint IDE can be used in two different ways. You can either just run the jar (Following the instructions below), or you can run the installer as administrator, which provides a much cleaner way of using the program, and also allows you to right click any text file and edit it with MS Paint.
+# Features
 
-### With the Installer
-The easiest way of using MS Paint IDE is via the installer. All is required for you to do is run the commandprompt as administrator, and run `java -jar MSPaintIDE.jar install` with `MSPaintIDE.jar` pointing to your downloaded MS Paint IDE jar. It will then remove the downloaded file and replace it with a shortcut with an icon. The shortcut is bound to ran with your latest installed JDK on your machine, so running the IDE doesn't require anything but running the shortcut. To uninstall the program, all is needed is to run the uninstaller in `%LocalAppData%\MSPaintIDE`.
+MS Paint IDE has grown an insane amount over the past year, and I plan for it to grow even more in the following year. Currently, these are some of the features present in MS Paint IDE:
 
-### Without the Installer
-First to open the program, if you intend to compile your application, you **must** run the jar from your JDK. This can be done by doing something like `"C:\Program Files\Java\jdk1.8.0_144\bin\java.exe" -jar MSPaintIDE-2.1.1-SNAPSHOT.jar` in your commandline. This should be modified for your location of `java.exe` in your JDK's directory.
+- Can read, parse, and highlight code from purely image files
+- Finding and replacing of text from image files
+- Supports Java, Brainfuck, and Python*, with more planned
+  - Also includes very simple language API to add custom languages
+- Git tools, to create and manage your project in Git from within the IDE
+- Right-click context menu to open and edit ANY text file in an MS Paint instance
+- Integrated buttons within MS Paint (No program modifications) to do basic IDE tasks* <small>[(details)](#MS Paint Integration)</small>
+- Native installer for easy usage
+- IDE theming via CSS files*
 
-### After Initial Installation
-Before you do anything with highlighting, compiling and executing, you must set some paths first. You can manually input them in the text boxes, or click _Change_ and select files, or type in names in the selector. Here is what the following options do and should be set at:
+\* Feature is still under development/unstable
 
-#### Input Image/Image Folder
-The only image (or folder of images) you are saving from MS Paint.
+## Planned Features
 
-#### Highlighted Out Directory
-The path of the directory for input files that will be highlighted to. This should be separate from your input.
+MS Paint IDE has many features, however it will not stop there. Some of these planned features are easier than others to implement, but I understand how much the programming community wants these, so I will try my best.
 
-#### Cache File Directory
-The location of where the .txt documents should be save to as the cache of the image. If the input image hasn't changed since this file has been modified, it will read from this and not the input image. This is to save a lot of time reading text.
+- Gradle/maven support
+- Natural image processing with [NewOCR](https://github.com/RubbaBoy/NewOCR/)
+- Improving [PaintInjector](https://github.com/RubbaBoy/PaintInjector) to provide with an image modification API
+  - Live debugging with line highlights from MS Paint
+  - Autocompletition
+  - Inspections
+- More languages
+- Auto updater/checker
+- Implement [LSP](https://microsoft.github.io/language-server-protocol/)
+- Acquire [JetBrains](https://www.jetbrains.com/)
 
-#### Class File Output
-A folder to put all the compiled files.
+# Projects
 
-#### Compiled Jar Output
-The file which the compiled .jar should be placed.
+The MS Paint IDE project originated from just this repository, however over the past year the project has grown into 5 total repositories. Here is a link and description of each one, along with its creation date and primary language:
 
-#### Library jar(s) path
-The location of any libraries to be compiled in the classpath of your project. This can be a single .jar file, or a directory containing multiple .jars.
+**[MS Paint IDE](https://github.com/RubbaBoy/MSPaintIDE)** [12/9/2017 **Java**] - The main IDE with all the core features
 
-#### Compile other file(s) path
-The location for other files (eg. META-INF, plugin.yml, etc) to be compiled in the jar. This may be one singular file or a directory of files to be placed into the jar.
+**[MS Paint IDE Website](https://github.com/RubbaBoy/MSPaintIDEWebsite)** [4/9/2018 **Dart**] - The previous website wasn't on GitHub, and was a horrible, unreactive mess. This repository was created, so now it's a horrible, _reactive_ mess. It uses the Dart language and AngularDart framework, which are some things I was been playing with prior to making MS Paint IDE.
 
-#### Letter Directory
-The directory of all the letters, this should have come packaged with the release, so select that folder's location.
+**[NewOCR](https://github.com/RubbaBoy/NewOCR)** [9/18/2018 **Java**] - When there was an obvious need to rework the internal OCR of MS Paint IDE at the time, this repository was created originally as a research/test environment. Slowly this grew after much research and testing into its own standalone OCR.
 
-#### Compiler Output
-The image file that will contain all compiler output, like status, times, and errors. If no image is found by this name and location, one will be created.
+**[OpenTitlebarButtons Fork](https://github.com/RubbaBoy/OpenTitlebarButtons)** [1/19/2019 **C#**] - This is a fork of a project by [NickAcPT](https://github.com/NickAcPT), which originally allowed the addition of an extra button on the titlebar of a window. It has been repurposed and heavily refactored to have the ability to add responsive buttons and text to any window, with the intent to be used with MS Paint IDE.
 
-#### Program Output
-The image file that will contain all of the compiled program's output, like status, times, and errors. If no image is found by this name and location, one will be created.
+**[PaintInjector](https://github.com/RubbaBoy/PaintInjector)** [1/19/2019 **C#**] - This project is defendant on OpenTitlebarButtons, in that it adds all the buttons at their given locations to the window, handles some application-specific reactivity, and adds the hooks for the JVM so MS Paint IDE can interact with the generated DLL.
 
-### Git Features
-MS Paint IDE has only the important Git features, allowing you to do anything you would normally do on an IDE.
+# How It Works
 
-#### Create Repo
-The `Create Repo` button simply does `git init` for your project, relative to the input image directory/file.
+MS Paint IDE is an application that runs alongside MS Paint that reads its images you make from MS Paint. It then uses a custom [OCR](https://github.com/RubbaBoy/NewOCR/) to read, parse, highlight, and execute the text. All output files and logs are created as images, to show you the program output, and compilation/interpretation output.
 
-#### Add Files
-Clicking the `Add Files` button will open a dialog for you to select as many files/directories as you want that will be added to the Git repo. If an image file is found, it will be scanned with the OCR, and that scanned version will be added to Git.
+## Context Menu
 
-#### Add Remote
-The `Add Remote` button will add whatever is in the text field to the right of the button as a remote origin.
+The context menu item is a tool that is meant to aid any developer in need of quick modification of text files. When installing and if selected, some registry keys are added to run a headless IDE, that generates an image of the text file you right clicked. MS Paint is then opened from that resulting image and when you save the file it saves it back as text to the original file. Don't worry, a backup of your original text file _is_ saved in the `%LocalAppData%\MSPaintIDE\opened\backup` directory incase anything goes wrong, such as the OCR having problems, if the IDE happened to crash, etc.
 
-The text box must contain an SSH origin containing authentication. A template for what is required is:
-`https://Username:token@github.com/Username/Repo.git`
-Please note the `token` in the template can be an authentication token to your account (Accessed/managed by going to GitHub's `Settings > Developer Settings > Personal access tokens` and generating a token) **or** the password for your account.
+## MS Paint Integration
 
-If you don't want the remote origin to be visible in the text box and in the console output to the right (for use in tutorials or demonstrations) you can click the visibility button to the right in the text field, and it will toggle the visibility for the origin.
+MS Paint IDE has the ability to add buttons for compiling, running, stopping, pushing, pulling, and committing your project from _within_ MS Paint. This is done in a C# DLL compiled from the project [PaintInjector](https://github.com/RubbaBoy/PaintInjector), specifically made for this IDE. All it does is creates a reactive overlay with the parent being MS Paint, with hooks to the Java program to do the specified IDE functions.
 
-#### Commit
-Clicking the `Commit` button will simply make a commit with the message in the text box to the right.
+# Using
 
-#### Push
-The `Push` button will push all unpushed commits to the remote origin.
+Using MS Paint IDE is extremely simple. First, download the .exe installer from the [latest release](https://github.com/RubbaBoy/MSPaintIDE/releases/latest). Go through the installer, and open the program once it's complete.
 
-### File Editing
-**Note: This only works if you used the installer**
+# Development
 
-MS Paint IDE allows you to edit any text file on your system in MS Paint, allowing you to make whole projects just with MS Paint; no need to make your README's in MS Notepad any more!
+For development instructions, see the [packaging readme](https://github.com/RubbaBoy/MSPaintIDE/tree/master/package) _(Coming soon)_. It's a more advanced process than before, due to the installer and Java 11 updates.
 
-To use this feature, right click any file (Preferably a text file) and click `Edit With MS Paint IDE`
+# Donations
 
-![](https://ms-paint-i.de/images/context-menu.png)
+I've been doing mainly this project for over a year now, and even though I'm not making money off of it, I would be extremely appreciative for any contributions to help pay for the domain and the website's VPS. If you donate and want to be mentioned here, just put it in the donation message. Feel free to donate via  [PayPal](https://paypal.me/RubbaBoy).
 
-
-After you click the context menu button, a MS Paint window will pop up with an image version of your file. You may edit this, and upon saving, the program's OCR will convert the image to text, saving it again.
-
-[Here's a video example](https://youtu.be/FZnvNTZr7DQ) of this feature being used from beginning to end.
-
-
-_Note: All options are saved in a file named options.ini in the same directory of your jar, to keep you from re choosing everything every restart_
-
-Once you have all of the options set, you can be free to program in MS Paint, saving to the file you set earlier. The file name must have the extension of what it would normally be with a `.png` at the end of this. Some examples of file names are `Foo.java.png`, `Bar.py.png`, `Fizz.bf.png`, etc. The font must be in font size **16**, with the font family being **Verdana**. If people are super interested in this (Which I doubt, but who knows) I would make it support more fonts, but right now that's not a top priority.
-
-## Screenshots
-
-Light theme variants of the screenshots available on [the website](https://ms-paint-i.de/), change the website theme from light to dark to see both variants.
-
-![](https://ms-paint-i.de/images/screenshot-1-dark.png)
-
-![](https://ms-paint-i.de/images/screenshot-2-dark.png)
-
-![](https://ms-paint-i.de/images/screenshot-3-dark.png)
-
-![](https://ms-paint-i.de/images/screenshot-4-dark.png)
-
-![](https://ms-paint-i.de/images/screenshot-5.png)
-
-![](https://ms-paint-i.de/images/screenshot-6.png)
-
-## Examples of program with errors:
-
-![](https://ms-paint-i.de/images/screenshot-7.png)
-
-![](https://ms-paint-i.de/images/screenshot-8.png)
-
-
-### Donations
-If anyone would like to support me with donations, I would be extremely grateful, and would help support for future suggested projects :) If you donate and would like your name posted here, please PM me!
-
-Thank you to:
+Thank you very much to the current donators:
 
 [@Mr. Midnight](https://www.spigotmc.org/members/11614/)
 
 [@Stef](https://www.spigotmc.org/members/18736/)
 
-[@Meepidy](https://www.spigotmc.org/members/191302/)
-
 [@iCodeHaven](https://www.spigotmc.org/members/482937/)
 
 [@AL1L](https://al1l.com/)
 
-Feel free to donate via [PayPal](https://rubbaboy.fund/)
+<h2 name="special-thanks">Special Thanks To:</h2>
 
-## Special Thanks To:
 ![](https://www.yourkit.com/images/yklogo.png)
 
 YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
 and <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
 innovative and intelligent tools for profiling Java and .NET applications.
+
+
+# Screenshots
+
+## The Main GUI
+The main interface
+![](E:\MSPaintIDE\images\main_gui.png)
+
+Loading while compiling
+![](E:\MSPaintIDE\images\compile_load.png)
+
+The settings window
+![](E:\MSPaintIDE\images\settings_window.png)
+
+The splash screen
+![](E:\MSPaintIDE\images\splashscreen.png)
+
+## External Features
+This is of the context menu, where you can right click any file and it opens MS Paint to edit said text file. For more details, see the [Context Menu](#Context Menu) section.
+![](E:\MSPaintIDE\images\context_menu.png)
+
+These buttons are created using PaintInject, from a DLL that is interfacing with the main IDE. For more details, see the [MS Paint Integration](#MS Paint Integration) section.
+![](E:\MSPaintIDE\images\injection_buttons.png)
+
+## Compiling
+A fully highlighted Java file
+![](E:\MSPaintIDE\images\highlighted.png)
+
+The compiler's output of the above file 
+![](E:\MSPaintIDE\images\compile_results.png)
+
+## Compiling With Errors
+A highlighted Java file with a missing semicolon
+![](E:\MSPaintIDE\images\highlighted_error.png)
+
+The compiler's output of the above file containing an error
+![](E:\MSPaintIDE\images\compile_results_error.png)
