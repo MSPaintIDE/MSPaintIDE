@@ -52,7 +52,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
   - Also includes very simple language API to add custom languages
 - Git tools, to create and manage your project in Git from within the IDE
 - Right-click context menu to open and edit ANY text file in an MS Paint instance
-- Integrated buttons within MS Paint (No program modifications) to do basic IDE tasks* <small>[(details)](#MS Paint Integration)</small>
+- Integrated buttons within MS Paint (No program modifications) to do basic IDE tasks* <small>[(details)](#MS-Paint-Integration)</small>
 - Native installer for easy usage
 - IDE theming via CSS files*
 
@@ -147,10 +147,10 @@ The splash screen
 ![](E:\MSPaintIDE\images\splashscreen.png)
 
 ## External Features
-This is of the context menu, where you can right click any file and it opens MS Paint to edit said text file. For more details, see the [Context Menu](#Context Menu) section.
+This is of the context menu, where you can right click any file and it opens MS Paint to edit said text file. For more details, see the [Context Menu](#Context-Menu) section.
 ![](E:\MSPaintIDE\images\context_menu.png)
 
-These buttons are created using PaintInject, from a DLL that is interfacing with the main IDE. For more details, see the [MS Paint Integration](#MS Paint Integration) section.
+These buttons are created using PaintInject, from a DLL that is interfacing with the main IDE. For more details, see the [MS Paint Integration](#MS-Paint-Integration) section.
 ![](E:\MSPaintIDE\images\injection_buttons.png)
 
 ## Compiling
