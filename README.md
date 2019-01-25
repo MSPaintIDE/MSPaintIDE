@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="http://hits.dwyl.io/RubbaBoy/MSPaintIDE"><img src="http://hits.dwyl.io/RubbaBoy/MSPaintIDE.svg" alt="HitCount"/></a>
-  <a href="https://discord.gg/RXmPkPJ">
+  <a href="https://discord.gg/RXmPkPJ" style="color: transparent">
         <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
             alt="MS Paint IDE's Discord server">
   </a>
@@ -20,7 +20,9 @@
     <a href="https://github.com/RubbaBoy/NewOCR">Custom OCR</a>
   </b>
 </p>
-People joke about what IDE they use often, things like Word, MS Notepad, sometimes even *Eclipse*, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously *Eclipse*.
+
+People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
+
 
 Note: This README is relating to the currently unreleased version of MS Paint IDE from git, due to the amounts of changes.
 
@@ -51,7 +53,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 - Supports Java, Brainfuck, and Python*, with more planned
   - Also includes very simple language API to add custom languages
 - Git tools, to create and manage your project in Git from within the IDE
-- Right-click context menu to open and edit ANY text file in an MS Paint instance
+- Right-click context menu to open and edit ANY text file in an MS Paint instance <small>[(details)](#Context-Menu)</small>
 - Integrated buttons within MS Paint (No program modifications) to do basic IDE tasks* <small>[(details)](#MS-Paint-Integration)</small>
 - Native installer for easy usage
 - IDE theming via CSS files*
@@ -92,11 +94,11 @@ The MS Paint IDE project originated from just this repository, however over the 
 MS Paint IDE is an application that runs alongside MS Paint that reads its images you make from MS Paint. It then uses a custom [OCR](https://github.com/RubbaBoy/NewOCR/) to read, parse, highlight, and execute the text. All output files and logs are created as images, to show you the program output, and compilation/interpretation output.
 
 ## Context Menu
-
+_[Relevant screenshots](#External-Features)_
 The context menu item is a tool that is meant to aid any developer in need of quick modification of text files. When installing and if selected, some registry keys are added to run a headless IDE, that generates an image of the text file you right clicked. MS Paint is then opened from that resulting image and when you save the file it saves it back as text to the original file. Don't worry, a backup of your original text file _is_ saved in the `%LocalAppData%\MSPaintIDE\opened\backup` directory incase anything goes wrong, such as the OCR having problems, if the IDE happened to crash, etc.
 
 ## MS Paint Integration
-
+_[Relevant screenshots](#External-Features)_
 MS Paint IDE has the ability to add buttons for compiling, running, stopping, pushing, pulling, and committing your project from _within_ MS Paint. This is done in a C# DLL compiled from the project [PaintInjector](https://github.com/RubbaBoy/PaintInjector), specifically made for this IDE. All it does is creates a reactive overlay with the parent being MS Paint, with hooks to the Java program to do the specified IDE functions.
 
 # Using

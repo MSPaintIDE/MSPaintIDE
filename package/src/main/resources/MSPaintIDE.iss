@@ -50,6 +50,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "@executable.location@"; DestDir: "{app}"; Flags: ignoreversion
 Source: "@bundle.content@"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "@bundle.readme@"; DestDir: "{app}"; Flags: ignoreversion; Components: readme
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

@@ -19,11 +19,12 @@ ext {
     bundlePath = file("${buildDir}/bundle")
     extraBundlerArguments = []
 
-    appIcon = file('icons/')
+    appIcon = file('src/main/resources/icons/')
     bundlerScript = file('bin/build-package.bat')
     generatedInnoSetupFile = file("${buildDir}/resources/main/MSPaintIDE.iss")
     windowsExecutable = file("${bundlePath}/MSPaintIDE/MSPaintIDE.exe")
     bundleContent = file("${bundlePath}/MSPaintIDE/*")
+    bundleReadme = file("src/main/resources/README.html")
     // Locations for the DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
     windowsDllDirectory = file('C:\\Windows\\System32')
     windowsDllMSVCP140 = file("${windowsDllDirectory}/MSVCP140.dll")
@@ -95,6 +96,7 @@ processResources {
                 'bundle.version'     : publishedVersion,
                 'executable.location': windowsExecutable.toString(),
                 'bundle.content'     : bundleContent.toString(),
+                'bundle.readme'     : bundleReadme.toString(),
                 'icon.directory'          : appIcon.toString()
         ]
     }
@@ -103,8 +105,9 @@ processResources {
 task completeInnoSetup(dependsOn: processResources) {
     doLast {
         copy {
-            from 'icons'
+            from 'src/main/java/resources'
             into "${bundlePath}/MSPaintIDE"
+            exclude 'MSPaintIDE.iss'
         }
 
         copy {
