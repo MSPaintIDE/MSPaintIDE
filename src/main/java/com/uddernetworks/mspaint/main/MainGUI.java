@@ -5,7 +5,7 @@ import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
 import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
-import com.uddernetworks.mspaint.imagestreams.TextPrintStream;
+import com.uddernetworks.mspaint.logging.GUIConsoleAppender;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -41,7 +41,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -153,7 +152,6 @@ public class MainGUI extends Application implements Initializable {
     private GitController gitController;
     private AtomicBoolean initialized = new AtomicBoolean();
     private static File initialProject = null;
-    private static PrintStreamStringCopy printStreamStringCopy;
     private ThemeManager themeManager;
 
     private Map<String, Image> cachedTaksbarIcons = new HashMap<>();
@@ -175,7 +173,6 @@ public class MainGUI extends Application implements Initializable {
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
-        printStreamStringCopy = new PrintStreamStringCopy();
 
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
@@ -595,16 +592,7 @@ public class MainGUI extends Application implements Initializable {
             setHaveError();
         });
 
-        String previous = printStreamStringCopy.getPrevious();
-
-        TextPrintStream textPrintStream = new TextPrintStream(output, System.out);
-        PrintStream textOut = new PrintStream(textPrintStream);
-
-        textOut.println(previous);
-        textPrintStream.setPrintOriginal(true);
-
-        System.setOut(textOut);
-        System.setErr(textOut);
+        GUIConsoleAppender.activate(output);
 
         invertColors.setOnAction(event -> {
             SettingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);

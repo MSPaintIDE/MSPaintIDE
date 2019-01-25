@@ -26,7 +26,7 @@ public class ThemeManager {
     }
 
     public void init() {
-        SettingsManager.onChangeSetting(Setting.EXTRA_THEME, this::selectTheme, String.class, true);
+        SettingsManager.onChangeSetting(Setting.EXTRA_THEME, theme -> selectTheme(this.current = theme), String.class, true);
     }
 
     public List<String> getAllThemes() {
@@ -47,8 +47,7 @@ public class ThemeManager {
     public void selectTheme(String name) {
         if (!this.themes.containsKey(name)) return;
         this.scenes.stream().map(Scene::getStylesheets).forEach(sheets -> {
-            if (this.current != null) sheets.remove(current);
-            this.current = name;
+            if (this.current != null) sheets.remove(this.themes.get(current));
             sheets.add(this.themes.get(name));
         });
     }

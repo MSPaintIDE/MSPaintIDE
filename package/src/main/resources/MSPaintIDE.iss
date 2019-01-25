@@ -14,7 +14,7 @@
 AppId={{DDC394B2-1233-4E42-BBD5-8AB3D51AFCD0}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName="{#MyAppName} v{#MyAppVersion}"
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -29,6 +29,17 @@ ChangesAssociations=yes
 SetupIconFile="@icon.directory@\icon.ico"
 UninstallDisplayIcon="{app}\icon.ico"
 WizardSmallImageFile={#InstLogoDir}\small-logo-55.bmp,{#InstLogoDir}\small-logo-64.bmp,{#InstLogoDir}\small-logo-97.bmp,{#InstLogoDir}\small-logo-110.bmp,{#InstLogoDir}\small-logo-120.bmp,{#InstLogoDir}\small-logo-140.bmp
+
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "compact"; Description: "Compact installation"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
+
+[Components]
+Name: "program"; Description: "MS Paint IDE"; Types: full compact custom; Flags: fixed
+Name: "context_menu"; Description: "Context menu"; Types: full
+Name: "ppf_file"; Description: ".ppf file extension"; Types: full
+Name: "readme"; Description: "Readme"; Types: full
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -48,17 +59,16 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[UninstallDelete]
+Type: filesandordirs; Name: "{localappdata}\MSPaintIDE"
+
 [Registry]
-Root: HKLM; Subkey: "Software\Classes\.ppf"; ValueType: string; ValueName: ""; ValueData: "MSPaintIDE"; Flags: uninsdeletevalue
-Root: HKLM; Subkey: "Software\Classes\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "MS Paint IDE"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\icon.ico"
-Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKLM; Subkey: "Software\Classes\.ppf"; ValueType: string; ValueName: ""; ValueData: "MSPaintIDE"; Flags: uninsdeletevalue; Components: ppf_file
+Root: HKLM; Subkey: "Software\Classes\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "MS Paint IDE"; Flags: uninsdeletekey; Components: ppf_file
+Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\icon.ico"; Components: ppf_file
+Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Components: ppf_file
 
-Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "Edit with MS Paint IDE"
-Root: HKCR; Subkey: "*\shell\MSPaintIDE\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
-Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\icon.ico"
-Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: expandsz; ValueName: "Position"; ValueData: "Top"
-
-
-
-
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "Edit with MS Paint IDE"; Components: context_menu
+Root: HKCR; Subkey: "*\shell\MSPaintIDE\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Components: context_menu
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\icon.ico"; Components: context_menu
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: expandsz; ValueName: "Position"; ValueData: "Top"; Components: context_menu
