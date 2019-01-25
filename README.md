@@ -135,34 +135,35 @@ innovative and intelligent tools for profiling Java and .NET applications.
 
 ## The Main GUI
 The main interface
-![](E:\MSPaintIDE\images\main_gui.png)
+![](images/main_gui.png)
 
 Loading while compiling
-![](E:\MSPaintIDE\images\compile_load.png)
+![](images/compile_load.png)
 
 The settings window
-![](E:\MSPaintIDE\images\settings_window.png)
+![](images/settings_window.png)
 
 The splash screen
-![](E:\MSPaintIDE\images\splashscreen.png)
+![](images/splashscreen.png)
 
 ## External Features
 This is of the context menu, where you can right click any file and it opens MS Paint to edit said text file. For more details, see the [Context Menu](#Context-Menu) section.
-![](E:\MSPaintIDE\images\context_menu.png)
+
+![](images/context_menu.png)
 
 These buttons are created using PaintInject, from a DLL that is interfacing with the main IDE. For more details, see the [MS Paint Integration](#MS-Paint-Integration) section.
-![](E:\MSPaintIDE\images\injection_buttons.png)
+![](images/injection_buttons.png)
 
 ## Compiling
 A fully highlighted Java file
-![](E:\MSPaintIDE\images\highlighted.png)
+![](images/highlighted.png)
 
 The compiler's output of the above file 
-![](E:\MSPaintIDE\images\compile_results.png)
+![](images/compile_results.png)
 
 ## Compiling With Errors
 A highlighted Java file with a missing semicolon
-![](E:\MSPaintIDE\images\highlighted_error.png)
+![](images/highlighted_error.png)
 
 The compiler's output of the above file containing an error
-![](E:\MSPaintIDE\images\compile_results_error.png)
+![](images/compile_results_error.png)
