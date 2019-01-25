@@ -27,20 +27,20 @@ Note: This README is relating to the currently unreleased version of MS Paint ID
 ## Table of Contents
 
 - [Features](#Features)
-  - [Planned Features](#Planned Features)
+  - [Planned Features](#Planned-Features)
 - [Projects](#Projects)
-- [How It Works](#How It Works)
-  - [Context Menu](#Context Menu)
-  - [MS Paint Integration](#MS Paint Integration)
+- [How It Works](#How-It-Works)
+  - [Context Menu](#Context-Menu)
+  - [MS Paint Integration](#MS-Paint-Integration)
 - [Using](#Using)
 - [Development](#Development)
 - [Donations](#Donations)
   - [Special Thanks](#special-thanks)
 - [Screenshots](#Screenshots)
-  - [The Main GUI](#The Main GUI)
-  - [External Features](#External Features)
+  - [The Main GUI](#The-Main-GUI)
+  - [External Features](#External-Features)
   - [Compiling](#Compiling)
-  - [Compiling With Errors](#Compiling With Errors)
+  - [Compiling With Errors](#Compiling-With-Errors)
 
 # Features
 
