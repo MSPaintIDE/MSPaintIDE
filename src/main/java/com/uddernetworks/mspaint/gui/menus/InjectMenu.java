@@ -28,9 +28,9 @@ public class InjectMenu extends MenuBind {
     @BindItem(label = "process-id")
     public void onClickProcessId() throws IOException {
         new UserInputWindow(this.mainGUI, "The MS Paint Process ID to add buttons to", "Process ID", true, true, processId -> {
+            if (processId == null) return;
             var id = Integer.parseInt(processId);
-            System.out.println("Injecting into process " + id);
-//            PaintInjector.INSTANCE.initializeButtons(id);
+            PaintInjector.INSTANCE.initializeButtonsByID(id);
         });
     }
 }

@@ -8,9 +8,8 @@ import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.code.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
-import com.uddernetworks.mspaint.gui.window.UserInputWindow;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
-import com.uddernetworks.mspaint.painthook.PaintInjector;
+import com.uddernetworks.mspaint.painthook.InjectionManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -63,44 +62,7 @@ public class Main {
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
 
-        var pInject = PaintInjector.INSTANCE;
-
-        pInject.clickBuild(() -> {
-            LOGGER.info("Building...");
-            if (this.mainGUI.getCurrentLanguage().isInterpreted()) {
-                this.mainGUI.setHaveError();
-                LOGGER.error("The selected language does not support building.");
-                return;
-            }
-
-            this.mainGUI.fullCompile(false);
-        });
-
-        pInject.clickRun(() -> {
-
-        });
-
-        pInject.clickStop(() -> {
-
-        });
-
-        pInject.clickCommit(() -> {
-            new UserInputWindow(this.mainGUI, "Your commit message", "Commit message", true, commitMessage -> {
-                try {
-                    this.mainGUI.getGitController().commit(commitMessage);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        });
-
-        pInject.clickPush(() -> {
-            this.mainGUI.getGitController().push();
-        });
-
-        pInject.clickPull(() -> {
-
-        });
+        new InjectionManager(mainGUI, this).createHooks();
     }
 
     public void headlessStart() throws IOException {
