@@ -60,6 +60,6 @@ public class Splash {
     }
 
     public static void end() {
-        if (splash.get() != null) splash.get().close();
+        if (splash.get() != null && splash.get().isVisible()) splash.get().close();
     }
 }

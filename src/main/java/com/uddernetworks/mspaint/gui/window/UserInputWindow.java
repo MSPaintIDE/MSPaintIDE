@@ -43,14 +43,20 @@ public class UserInputWindow extends Stage implements Initializable {
     private String prompt;
     private String initial;
     private boolean placeholder;
+    private boolean number;
     private Consumer<String> onOkay;
 
     public UserInputWindow(MainGUI mainGUI, String prompt, String initial, boolean placeholder, Consumer<String> onOkay) throws IOException {
+        this(mainGUI, prompt, initial, placeholder, false, onOkay);
+    }
+
+    public UserInputWindow(MainGUI mainGUI, String prompt, String initial, boolean placeholder, boolean number, Consumer<String> onOkay) throws IOException {
         super();
         this.mainGUI = mainGUI;
         this.prompt = prompt;
         this.initial = initial;
         this.placeholder = placeholder;
+        this.number = number;
         this.onOkay = onOkay;
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/UserInput.fxml"));
         loader.setController(this);
@@ -104,6 +110,14 @@ public class UserInputWindow extends Stage implements Initializable {
             this.userInput.setPromptText(this.initial);
         } else {
             this.userInput.setText(this.initial);
+        }
+
+        if (number) {
+            this.userInput.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*")) {
+                    this.userInput.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            });
         }
 
         cancel.setOnAction(event -> {

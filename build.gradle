@@ -82,6 +82,10 @@ dependencies {
 }
 
 run {
+    environment = [
+            "PaintInjector": "${rootProject.projectDir}\\native",
+            "NativePath": "${rootProject.projectDir}\\native"
+    ]
     jvmArgs.add("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}")
 }
 

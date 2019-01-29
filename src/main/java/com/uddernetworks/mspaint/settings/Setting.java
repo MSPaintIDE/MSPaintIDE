@@ -21,7 +21,9 @@ public enum Setting {
     TRAIN_LOWER_BOUND("trainGenLowerBound", 20, INT),
     TRAIN_UPPER_BOUND("trainGenUpperBound", 90, INT),
     TASKBAR_ICON("taskbarIcon", "Colored", STRING),
-    EXTRA_THEME("extraTheme", "Default", STRING);
+    EXTRA_THEME("extraTheme", "Default", STRING),
+    INJECT_AUTO_NEW("injectAutoNew", true, BOOLEAN),
+    INJECT_AUTO_OPEN("injectAutoOpen", true, BOOLEAN);
 
     private final String name;
     private Object def;

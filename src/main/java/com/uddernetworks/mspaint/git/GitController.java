@@ -295,7 +295,8 @@ public class GitController {
 
                 if (pushResult.contains("unknown revision or path not in the working tree")) {
                     LOGGER.warn("The branch isn't set up properly, try re-adding your remote origin, making new commits, pushing again, or making an issue here: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
-                    LOGGER.warn("Full command response:\n" + pushResult);
+                    LOGGER.warn("Full command response:");
+                    LOGGER.warn(pushResult);
                     return;
                 }
 

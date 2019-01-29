@@ -162,6 +162,7 @@ public class MainGUI extends Application implements Initializable {
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
     public MainGUI() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        System.setProperty("jna.debug_load", "true");
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         this.main = new Main();

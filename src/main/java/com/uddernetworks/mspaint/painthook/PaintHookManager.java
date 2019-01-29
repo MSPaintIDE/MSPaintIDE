@@ -11,9 +11,6 @@ public class PaintHookManager {
     interface Test extends Library {}
 
     public void startHook() throws InterruptedException {
-//        System.setProperty("jna.library.path", "");
-
-
         PaintInjector.INSTANCE.initializeButtons();
 
         PaintInjector.INSTANCE.clickPull(() -> {
