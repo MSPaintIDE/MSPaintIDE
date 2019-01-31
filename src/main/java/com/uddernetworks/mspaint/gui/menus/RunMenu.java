@@ -20,6 +20,12 @@ public class RunMenu extends MenuBind {
         this.mainGUI.fullCompile(true);
     }
 
+    @BindItem(label = "stop")
+    public void onClickStop() {
+        LOGGER.info("Stopping...");
+        this.mainGUI.fullCompile(true);
+    }
+
     @BindItem(label = "build")
     public void onClickBuild() {
         LOGGER.info("Building...");

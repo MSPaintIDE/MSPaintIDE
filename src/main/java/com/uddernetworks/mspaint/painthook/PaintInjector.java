@@ -34,7 +34,7 @@ public interface PaintInjector extends Library, StdCallLibrary {
                 LOGGER.info("Loaded PaintInjector.dll");
                 return library;
             } catch (UnsatisfiedLinkError e) {
-                LOGGER.error("Error loading PaintInjector.jar ir library", e);
+                LOGGER.error("Error loading PaintInjector.jar or library", e);
                 return null;
             }
         }

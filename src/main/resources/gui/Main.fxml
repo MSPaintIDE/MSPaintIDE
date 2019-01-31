@@ -53,6 +53,7 @@
                 <MaterialMenu bindClass="RunMenu" text="Run">
                   <items>
                     <MaterialMenuItem clickLabel="run" text="Run" />
+                    <MaterialMenuItem clickLabel="stop" text="Stop" />
                     <MaterialMenuItem clickLabel="build" text="Build" />
                   </items>
                 </MaterialMenu>

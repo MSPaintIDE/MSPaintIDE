@@ -96,8 +96,9 @@ public class CodeCompiler {
         task.call();
     }
 
-    private void runIt(String classPackage, String className) {
+    private void runIt(List<URLClassLoader> classLoaders, File classOutputFolder, String classPackage, String className) {
         try {
+            System.out.println("Running main in " + classPackage + " in " + className);
             classLoaders.add(new URLClassLoader(new URL[]{classOutputFolder.toURI().toURL()}));
 
             Class<?> thisClass = classLoaders.get(classLoaders.size() - 1).loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
@@ -195,8 +196,14 @@ public class CodeCompiler {
         mainGUI.setStatusText("Executing...");
         start = System.currentTimeMillis();
 
+//        var runningCodeManager = mainGUI.getMain().getRunningCodeManager();
+//        runningCodeManager.runCode(new JavaRunningCode(() -> {
+//
+//        }));
+        System.out.println("namePackages = " + namePackages);
         for (String className : namePackages.keySet()) {
-            runIt(namePackages.get(className), className);
+            System.out.println("className = " + className);
+            runIt(classLoaders, classOutputFolder, namePackages.get(className), className);
         }
 
         System.setOut(oldPS);

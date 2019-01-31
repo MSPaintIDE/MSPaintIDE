@@ -1,6 +1,8 @@
 package com.uddernetworks.mspaint.main;
 
+import com.uddernetworks.mspaint.code.GeneralRunningCodeManager;
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.RunningCodeManager;
 import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
@@ -41,6 +43,7 @@ public class Main {
     private LanguageManager languageManager = new LanguageManager();
     private Language currentLanguage;
     private DatabaseManager databaseManager;
+    private RunningCodeManager runningCodeManager;
     private OCRHandle ocrHandle;
     private boolean usingInternal;
 
@@ -61,6 +64,8 @@ public class Main {
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
+
+        this.runningCodeManager = new GeneralRunningCodeManager(this);
 
         new InjectionManager(mainGUI, this).createHooks();
     }
@@ -305,5 +310,9 @@ public class Main {
     public OCRHandle getOCRHandle() {
         if (this.ocrHandle == null) this.ocrHandle = new OCRHandle(this.databaseManager);
         return ocrHandle;
+    }
+
+    public RunningCodeManager getRunningCodeManager() {
+        return runningCodeManager;
     }
 }
