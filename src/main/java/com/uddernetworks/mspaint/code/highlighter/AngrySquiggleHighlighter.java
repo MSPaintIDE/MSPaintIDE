@@ -3,8 +3,8 @@ package com.uddernetworks.mspaint.code.highlighter;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.main.Main;
-import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
 import org.apache.batik.transcoder.TranscoderException;
 
@@ -62,7 +62,8 @@ public class AngrySquiggleHighlighter {
     }
 
 
-    private void getLineAndLength(int lineNumber, int columnNumber) throws IOException, TranscoderException, ExecutionException, InterruptedException {
+    private void getLineAndLength(int lineNumber, int columnNumber) throws IOException, TranscoderException {
+        var actions = this.main.getOCRManager().getActions();
         int xIndex;
         int yIndex;
         int length;
@@ -77,13 +78,14 @@ public class AngrySquiggleHighlighter {
 
             length = last.getX() + last.getWidth() - first.getX();
 
-            fontSize = this.main.getOCRHandle().getFontSize(first).get();
+            // TODO: May need conversion?
+            fontSize = (int) actions.getFontSize(first).getAsDouble();
         } else {
             ImageLetter columnLetter = line.get(columnNumber - 1); // Need to get BEFORE
             calcXY = columnLetter;
             length = columnLetter.getWidth();
 
-            fontSize = this.main.getOCRHandle().getFontSize(columnLetter).get();
+            fontSize = (int) actions.getFontSize(columnLetter).getAsDouble();
         }
 
         xIndex = calcXY.getX() + calcXY.getWidth();

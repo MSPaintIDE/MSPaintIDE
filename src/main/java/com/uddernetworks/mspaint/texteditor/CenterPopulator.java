@@ -1,17 +1,16 @@
 package com.uddernetworks.mspaint.texteditor;
 
-import com.uddernetworks.newocr.OCRHandle;
-import com.uddernetworks.newocr.SearchImage;
+import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.newocr.character.SearchCharacter;
-import com.uddernetworks.newocr.utils.IntPair;
+import com.uddernetworks.newocr.detection.SearchImage;
+import com.uddernetworks.newocr.recognition.OCRScan;
 import com.uddernetworks.newocr.utils.OCRUtils;
 import it.unimi.dsi.fastutil.chars.Char2IntMap;
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.RenderingHints;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,15 +18,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CenterPopulator {
 
     private Char2IntMap def = new Char2IntOpenHashMap();
-    
+
     private Int2ObjectMap<Char2IntMap> centers = new Int2ObjectOpenHashMap<>();
 
+    private Main main;
+
+    public CenterPopulator(Main main) {
+        this.main = main;
+    }
+
     // Code loosely adapted from com.uddernetworks.newocr.OCRHandle.java
-    // TODO: Clean this up a ton
+    // TODO: Clean this up a ton :(
     public void generateCenters(int fontSize) {
+        var activeFont = this.main.getOCRManager().getActiveFont();
         var currentCenters = new Char2IntOpenHashMap();
         centers.put(fontSize, currentCenters);
-        
+
         var input = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         var graphics = input.createGraphics();
 
@@ -36,13 +42,11 @@ public class CenterPopulator {
         var rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setRenderingHints(rht);
 
-        var font = new Font("Verdana", Font.PLAIN, fontSize);
+        var font = new Font(activeFont.getFontName(), Font.PLAIN, fontSize);
         graphics.setFont(font);
 
-        var drawString = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghjiklmnopqrstuvwxyz{|}~";
+        input = new BufferedImage(graphics.getFontMetrics().stringWidth(OCRScan.RAW_STRING) + 50, fontSize * 2, BufferedImage.TYPE_INT_ARGB);;
 
-        input = new BufferedImage(graphics.getFontMetrics().stringWidth(drawString) + 50, fontSize * 2, BufferedImage.TYPE_INT_ARGB);;
-        
         graphics = input.createGraphics();
         graphics.setRenderingHints(rht);
         graphics.setFont(font);
@@ -50,7 +54,7 @@ public class CenterPopulator {
 
         clearImage(input);
 
-        graphics.drawString(drawString, 10, fontSize);
+        graphics.drawString(OCRScan.RAW_STRING, 10, fontSize);
 
         OCRUtils.filter(input);
 
@@ -59,28 +63,20 @@ public class CenterPopulator {
 
         OCRUtils.toGrid(input, values);
 
-        var lineBound = OCRHandle.getLineBoundsForTesting(values).get(0);
         var searchImage = new SearchImage(values);
-        var coordinates = new ArrayList<IntPair>();
+        var lineBound = activeFont.getActions().getLineBoundsForTraining(searchImage).get(0);
 
         // Goes through coordinates of image and adds any connecting pixels to `coordinates`
-        for (int y = input.getHeight(); 0 <= --y; ) {
-            for (int x = 0; x < input.getWidth(); x++) {
-                OCRHandle.getLetterFrom(searchImage, x, y, coordinates, searchCharacters);
-            }
-        }
-
-        // Gets all characters found at the line bounds from the searchCharacters (Collected from the double for loops)
-        var line = OCRUtils.findCharactersAtLine(lineBound.getKey(), lineBound.getValue(), searchCharacters);
+        activeFont.getActions().getLetters(searchImage, searchCharacters);
 
         var currentLetter = new AtomicInteger();
-        
-        line.forEach(searchCharacter -> {
+
+        searchCharacters.forEach(searchCharacter -> {
             var halfOfLineHeight = ((double) lineBound.getValue() - (double) lineBound.getKey()) / 2;
             var middleToTopChar = (double) searchCharacter.getY() - (double) lineBound.getKey();
             var topOfLetterToCenter = halfOfLineHeight - middleToTopChar;
 
-            currentCenters.put(drawString.charAt(currentLetter.getAndIncrement()), (int) topOfLetterToCenter);
+            currentCenters.put(OCRScan.RAW_STRING.charAt(currentLetter.getAndIncrement()), (int) topOfLetterToCenter);
         });
     }
 

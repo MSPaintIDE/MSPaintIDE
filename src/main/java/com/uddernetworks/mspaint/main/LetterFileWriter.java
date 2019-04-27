@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
-import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -62,7 +62,7 @@ public class LetterFileWriter {
             boolean[][] data = imageLetter.getValues();
             if (data == null) return;
 
-            for (int y = 0; y < imageLetter.getHeight() + 1; y++) {
+            for (int y = 0; y < imageLetter.getHeight(); y++) {
                 for (int x = 0; x < imageLetter.getWidth(); x++) {
                     if (data[y][x]) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, color);
                 }

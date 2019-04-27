@@ -6,10 +6,10 @@ import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
 import com.uddernetworks.mspaint.texteditor.LetterGenerator;
-import com.uddernetworks.mspaint.texteditor.TextEditorManager;
-import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
-import com.uddernetworks.newocr.database.DatabaseCharacter;
+import com.uddernetworks.newocr.recognition.ScannedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 public class ReplaceManager {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ReplaceManager.class);
 
     private MainGUI mainGUI;
 
@@ -33,22 +34,19 @@ public class ReplaceManager {
         ScannedImage scannedImage = searchResult.getScannedImage();
         LetterGenerator letterGenerator = new LetterGenerator();
         double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class) * 1.3333333D;
-        List<DatabaseCharacter> databaseCharacters = this.mainGUI.getMain().getDatabaseManager().getAllCharacterSegments(TextEditorManager.matchNearestFontSize((int) size)).get();
-        DatabaseCharacter space = databaseCharacters
-                .stream()
-                .filter(databaseCharacter -> databaseCharacter.getLetter() == ' ')
-                .findFirst()
-                .orElse(null);
+        var spaceOptional = this.mainGUI.getMain().getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
 
-        if (space == null) {
-            System.err.println("Couldn't find space for size: " + size);
+        if (spaceOptional.isEmpty()) {
+            LOGGER.error("Couldn't find space for size: " + size);
             return;
         }
+
+        var space = spaceOptional.get();
 
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3);
 
-        CenterPopulator centerPopulator = new CenterPopulator();
+        CenterPopulator centerPopulator = new CenterPopulator(this.mainGUI.getMain());
         centerPopulator.generateCenters((int) size);
 
         int foundPos = searchResult.getFoundPosition();
@@ -82,7 +80,7 @@ public class ReplaceManager {
                 boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
                 int center = centerPopulator.getCenter(cha, (int) size);
 
-                ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, -1D, null);
+                ImageLetter letter = new ImageLetter(cha, 0, x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, 0D, 0D, 0D);
                 letter.setValues(letterGrid);
                 letter.setData(Color.BLACK);
                 adding.add(letter);

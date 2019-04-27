@@ -11,14 +11,12 @@ import com.uddernetworks.mspaint.code.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.ocr.OCRManager;
 import com.uddernetworks.mspaint.painthook.InjectionManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import com.uddernetworks.newocr.OCRHandle;
-import com.uddernetworks.newocr.database.DatabaseManager;
-import com.uddernetworks.newocr.database.OCRDatabaseManager;
 import org.apache.batik.transcoder.TranscoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,16 +40,15 @@ public class Main {
 
     private LanguageManager languageManager = new LanguageManager();
     private Language currentLanguage;
-    private DatabaseManager databaseManager;
     private RunningCodeManager runningCodeManager;
-    private OCRHandle ocrHandle;
-    private boolean usingInternal;
+
+    private OCRManager ocrManager;
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         headlessStart();
         this.mainGUI = mainGUI;
-        currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-        parent = currentJar.getParentFile();
+        this.currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+        this.parent = currentJar.getParentFile();
 
         this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
         this.mainGUI.updateTheme();
@@ -75,39 +72,15 @@ public class Main {
         SettingsManager.initialize(new File(MainGUI.APP_DATA, "options.ini"));
 
         Splash.setStatus("Loading database...");
-        SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
-            try {
-                if (useInternal == this.usingInternal) return;
-                this.usingInternal = useInternal;
+        this.ocrManager = new OCRManager(this);
+        SettingsManager.onChangeSetting(Setting.ACTIVE_FONT, font -> {
+            System.out.println();
 
-                if (this.databaseManager != null) this.databaseManager.shutdown();
+//            System.out.println(ConfigFactory.load("fonts/Default").getConfig("language").entrySet());
 
-                if (useInternal) {
-                    String location = SettingsManager.getSetting(Setting.DATABASE_INTERNAL_LOCATION, String.class);
-                    File file = location != null && !location.trim().equals("") ? new File(location) : null;
-
-                    if (file == null || (!file.isDirectory() && !file.mkdirs())) {
-                        LOGGER.error("Invalid/unset internal database location");
-                        return;
-                    }
-
-                    this.databaseManager = new OCRDatabaseManager(new File(file, "ocr_db"));
-                } else {
-                    String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
-                    String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
-                    String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
-
-                    if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
-                        LOGGER.error("Couldn't set up database manager, partial/missing credentials in settings.");
-                        return;
-                    }
-
-                    this.databaseManager = new OCRDatabaseManager(url, user, pass);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }, Boolean.class, true);
+            System.out.println("ALSO: " + SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
+            this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
+        }, String.class, true);
     }
 
     public void setCurrentLanguage(Language language) {
@@ -299,17 +272,12 @@ public class Main {
         this.mainGUI.initializeInputTextFields();
     }
 
+    public OCRManager getOCRManager() {
+        return ocrManager;
+    }
+
     public LanguageManager getLanguageManager() {
         return this.languageManager;
-    }
-
-    public DatabaseManager getDatabaseManager() {
-        return databaseManager;
-    }
-
-    public OCRHandle getOCRHandle() {
-        if (this.ocrHandle == null) this.ocrHandle = new OCRHandle(this.databaseManager);
-        return ocrHandle;
     }
 
     public RunningCodeManager getRunningCodeManager() {

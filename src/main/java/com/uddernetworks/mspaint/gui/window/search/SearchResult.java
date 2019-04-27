@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.gui.window.search;
 
-import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 
 import java.io.File;
 import java.util.List;

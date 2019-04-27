@@ -4,7 +4,7 @@ import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 
 import java.awt.*;
 import java.io.File;

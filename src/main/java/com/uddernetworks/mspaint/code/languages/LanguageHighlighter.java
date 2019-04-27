@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.code.languages;
 
-import com.uddernetworks.newocr.ScannedImage;
-import com.uddernetworks.newocr.character.ImageLetter;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 
 import javax.swing.text.Segment;
 import java.awt.*;
@@ -27,10 +26,9 @@ public class LanguageHighlighter {
             for (int i = 0; i < token.length; i++) {
                 char cha = text.charAt(start + i);
                 if (cha == '\n') continue;
-                ImageLetter imageLetter = scannedImage.letterAt(start + i);
-                imageLetter.setData(new Color(type.getStyle()));
+                scannedImage.letterAt(start + i).ifPresent(imageLetter -> imageLetter.setData(new Color(type.getStyle())));
             }
         });
     }
-    
+
 }

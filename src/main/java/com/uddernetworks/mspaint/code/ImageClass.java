@@ -3,7 +3,7 @@ package com.uddernetworks.mspaint.code;
 import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.main.*;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
-import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

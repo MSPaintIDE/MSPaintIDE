@@ -36,6 +36,9 @@ tasks.withType(JavaCompile) {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 sass {
@@ -66,7 +69,7 @@ dependencies {
 
     compile group: 'com.jfoenix', name: 'jfoenix', version:'9.0.8'
     compile group: 'com.google.code.gson', name: 'gson', version:'2.8.5'
-    compile 'com.uddernetworks.newocr:NewOCR:1.2.1'
+    compile 'com.uddernetworks.newocr:NewOCR:2.0.0-SNAPSHOT'
     compile group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version: '1.10'
     compile 'org.ocpsoft.prettytime:prettytime:4.0.2.Final'
     compile group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
@@ -83,10 +86,10 @@ dependencies {
 }
 
 run {
-    environment = [
+    environment.putAll([
             "PaintInjector": "${rootProject.projectDir}\\native",
-            "NativePath": "${rootProject.projectDir}\\native"
-    ]
+            "NativePath": "${rootProject.projectDir}\\native",
+    ])
     jvmArgs.add("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}")
 }
 

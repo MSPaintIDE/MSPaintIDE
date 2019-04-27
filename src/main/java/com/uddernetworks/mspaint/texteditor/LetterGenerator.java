@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.texteditor;
 
-import com.uddernetworks.newocr.database.DatabaseCharacter;
+import com.uddernetworks.newocr.character.DatabaseCharacter;
 import com.uddernetworks.newocr.utils.OCRUtils;
 
 import java.awt.*;

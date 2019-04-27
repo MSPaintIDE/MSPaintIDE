@@ -1,5 +1,8 @@
 package com.uddernetworks.mspaint.imagestreams;
 
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,6 +20,7 @@ public class ImageOutputStream extends OutputStream {
     private int width;
     private int minHeight;
     private Color color;
+    private Color background;
 
     public ImageOutputStream(File location, int width) {
         this.location = location;
@@ -25,6 +29,7 @@ public class ImageOutputStream extends OutputStream {
         this.minHeight = 200;
 
         this.color = Color.BLACK;
+        this.background = Color.WHITE;
     }
 
     @Override
@@ -41,7 +46,7 @@ public class ImageOutputStream extends OutputStream {
         RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setRenderingHints(rht);
 
-        Font fontt = new Font("Verdana", Font.PLAIN, 16);
+        Font fontt = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 16);
         graphics.setFont(fontt);
 
         List<String> linesList = new ArrayList<>();
@@ -54,14 +59,17 @@ public class ImageOutputStream extends OutputStream {
 
         int newHeight = linesList.size() * 20;
 
-        image = new BufferedImage(width, Math.max(newHeight, minHeight), BufferedImage.TYPE_INT_ARGB);
+        var height = Math.max(newHeight, minHeight);
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
 
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setRenderingHints(rh);
 
-        Font font = new Font("Verdana", Font.PLAIN, 16);
+        Font font = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 16);
         graphics.setFont(font);
+        graphics.setPaint(this.background);
+        graphics.fillRect(0, 0, this.width, height);
         graphics.setPaint(this.color);
 
         for (int i = 0; i < linesList.size(); i++) {
@@ -77,6 +85,10 @@ public class ImageOutputStream extends OutputStream {
 
     public void changeColor(Color color) {
         this.color = color;
+    }
+
+    public void changeBackground(Color background) {
+        this.background = background;
     }
 
     private String breakStringUp(String message) {

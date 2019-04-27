@@ -6,10 +6,9 @@ import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import com.uddernetworks.newocr.FontBounds;
-import com.uddernetworks.newocr.ScannedImage;
 import com.uddernetworks.newocr.character.ImageLetter;
-import com.uddernetworks.newocr.database.DatabaseCharacter;
+import com.uddernetworks.newocr.recognition.DefaultScannedImage;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,13 +34,6 @@ public class TextEditorManager {
     private Main headlessMain;
     private Thread savingThread;
     private final AtomicBoolean stopping = new AtomicBoolean(false);
-
-    private static final FontBounds[] FONT_BOUNDS = {
-            new FontBounds(0, 12),
-            new FontBounds(13, 20),
-            new FontBounds(21, 30),
-            new FontBounds(31, 100),
-    };
 
     // Doesn't actually manage text files, used for generation
     public TextEditorManager(Main main) {
@@ -109,26 +100,23 @@ public class TextEditorManager {
     }
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
-        ScannedImage scannedImage = new ScannedImage(this.originalFile, this.imageClass.getImage());
+        ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, this.imageClass.getImage());
         LetterGenerator letterGenerator = new LetterGenerator();
 
         double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class) * 1.3333333D;
-        List<DatabaseCharacter> databaseCharacters = this.headlessMain.getDatabaseManager().getAllCharacterSegments(matchNearestFontSize((int) size)).get();
-        DatabaseCharacter space = databaseCharacters
-                .stream()
-                .filter(databaseCharacter -> databaseCharacter.getLetter() == ' ')
-                .findFirst()
-                .orElse(null);
+        var spaceOptional = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
 
-        if (space == null) {
-            System.err.println("Couldn't find space for size: " + size);
+        if (spaceOptional.isEmpty()) {
+            LOGGER.error("Couldn't find space for size: " + size);
             return null;
         }
+
+        var space = spaceOptional.get();
 
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
 
-        CenterPopulator centerPopulator = new CenterPopulator();
+        CenterPopulator centerPopulator = new CenterPopulator(this.headlessMain);
         centerPopulator.generateCenters((int) size);
 
         int x = 0;
@@ -145,7 +133,7 @@ public class TextEditorManager {
                 boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
                 int center = (int) ((size/ 2D) - centerPopulator.getCenter(cha, (int) size));
 
-                ImageLetter letter = new ImageLetter(new DatabaseCharacter(cha), x, y + center, letterGrid[0].length, letterGrid.length, -1D, null);
+                ImageLetter letter = new ImageLetter(cha, 0, x, y + center, letterGrid[0].length, letterGrid.length, 0D, 0D, 0D);
                 letter.setValues(letterGrid);
                 letter.setData(Color.BLACK);
                 line.add(letter);
@@ -160,10 +148,6 @@ public class TextEditorManager {
         }
 
         return scannedImage;
-    }
-
-    public static FontBounds matchNearestFontSize(int fontSize) {
-        return Arrays.stream(FONT_BOUNDS).filter(fontBounds -> fontBounds.isInbetween(fontSize)).findFirst().get();
     }
 
     private File createImageFile() throws IOException, ExecutionException, InterruptedException {

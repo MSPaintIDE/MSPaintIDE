@@ -1,0 +1,25 @@
+# Gradle files
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# IDE Generated Files
+.idea/
+build/
+out/
+target/
+**.iml
+**.ppf
+
+# Training temp files
+**/resources/training_**.png
+database/
+
+# Misc.
+**.class
+training.png
+training_**.png
+train_**.png
+tmp/
+/src/main/resources/style.css

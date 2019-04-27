@@ -9,8 +9,7 @@ import com.uddernetworks.mspaint.main.CacheUtils;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import com.uddernetworks.newocr.OCRHandle;
-import com.uddernetworks.newocr.ScannedImage;
+import com.uddernetworks.newocr.recognition.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -112,11 +111,11 @@ public class InspectWindow extends Stage implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        var ocrManager = this.mainGUI.getMain().getOCRManager();
         String name = this.inspecting.getName();
-        OCRHandle ocrHandle = this.mainGUI.getMain().getOCRHandle();
-        ScannedImage scannedImage = ocrHandle.scanImage(this.inspecting);
-        int ptSize = scannedImage.getFirstFontSize(this.mainGUI.getMain().getOCRHandle());
-        int pxSize = ConversionUtils.pointToPixel(ptSize);
+        ScannedImage scannedImage = ocrManager.getScan().scanImage(this.inspecting).stripLeadingSpaces();
+        int pxSize = (int) ocrManager.getActions().getFontSize(scannedImage.letterAt(0).get()).getAsDouble();
+        int ptSize = ConversionUtils.pixelToPoint(pxSize);
 
         String nameNoExtension = name.substring(0, name.length() - 4);
         int periodIndex = nameNoExtension.lastIndexOf('.');

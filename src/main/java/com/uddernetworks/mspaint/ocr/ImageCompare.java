@@ -6,8 +6,9 @@ import com.google.gson.InstanceCreator;
 import com.google.gson.JsonParseException;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.newocr.ScannedImage;
-import com.uddernetworks.newocr.utils.OCRUtils;
+import com.uddernetworks.newocr.recognition.ScannedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 public class ImageCompare {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(ImageCompare.class);
 
     public ScannedImage getText(File inputImage, File cacheFile, MainGUI mainGUI, Main main, boolean readFromCache, boolean saveCaches) {
         ScannedImage scannedImage;
@@ -35,7 +38,7 @@ public class ImageCompare {
 
                 if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(true);
 
-                scannedImage = main.getOCRHandle().scanImage(inputImage);
+                scannedImage = main.getOCRManager().getActiveFont().getScan().scanImage(inputImage);
 
                 if (saveCaches) {
                     if (!MainGUI.HEADLESS) {
@@ -55,7 +58,7 @@ public class ImageCompare {
                     scannedImage = gsonBuilder.create().fromJson(new String(Files.readAllBytes(cacheFile.toPath())), ScannedImage.class);
                 } catch (JsonParseException e) {
                     if (!MainGUI.HEADLESS) mainGUI.setHaveError();
-                    System.err.println("There was a problem reading the cache for " + inputImage.getName() + "! Try resetting caches.");
+                    LOGGER.error("There was a problem reading the cache for " + inputImage.getName() + "! Try resetting caches.");
                     scannedImage = null;
                 }
             }

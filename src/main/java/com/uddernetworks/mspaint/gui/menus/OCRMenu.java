@@ -4,7 +4,6 @@ import com.uddernetworks.mspaint.gui.BindItem;
 import com.uddernetworks.mspaint.gui.MenuBind;
 import com.uddernetworks.mspaint.gui.window.SettingsWindow;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.ocr.TrainGenerator;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import org.slf4j.Logger;
@@ -47,17 +46,20 @@ public class OCRMenu extends MenuBind {
         this.mainGUI.setIndeterminate(true);
 
         final long start = System.currentTimeMillis();
+        var fontData = this.mainGUI.getMain().getOCRManager().getActiveFont();
         CompletableFuture.runAsync(() -> {
-            try {
-                this.mainGUI.getMain().getOCRHandle().trainImage(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            fontData.getTrain().trainImage(file);
         }).thenRun(() -> {
             LOGGER.info("Completed training in " + (System.currentTimeMillis() - start) + "ms");
             this.mainGUI.updateLoading(0, 1);
             this.mainGUI.setStatusText(null);
-        });
+        }).thenRunAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).thenRun(fontData::updateMergeRules);
     }
 
     @BindItem(label = "generate")
@@ -77,7 +79,11 @@ public class OCRMenu extends MenuBind {
         this.mainGUI.setIndeterminate(true);
 
         long start = System.currentTimeMillis();
-        new TrainGenerator().generate(file, () -> {
+
+        var finalFile = file;
+        CompletableFuture.runAsync(() -> {
+            this.mainGUI.getMain().getOCRManager().getActiveFont().getTrainGenerator().generateTrainingImage(finalFile);
+        }).thenRun(() -> {
             LOGGER.info("Completed generation in " + (System.currentTimeMillis() - start) + "ms");
             this.mainGUI.updateLoading(0, 1);
             this.mainGUI.setStatusText(null);
