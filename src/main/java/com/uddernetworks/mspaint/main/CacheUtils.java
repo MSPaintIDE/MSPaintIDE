@@ -1,9 +1,12 @@
 package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.project.ProjectManager;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -24,7 +27,15 @@ public class CacheUtils {
         String name = file.getName();
         String nameStripped = name.substring(0, name.length() - 4);
         File parent = internal ? ProjectManager.getPPFProject().getObjectLocation() : GLOBAL_CACHE;
-        return new File(parent, nameStripped + "_cache.json");
+        return new File(parent, getMD5(file) + "_" + nameStripped + "_cache.json");
+    }
+
+    private static String getMD5(File file) {
+        try {
+            return DigestUtils.md5Hex(new FileInputStream(file));
+        } catch (IOException e) {
+            return file.getAbsolutePath().replace(File.separator, "_");
+        }
     }
 
     /**

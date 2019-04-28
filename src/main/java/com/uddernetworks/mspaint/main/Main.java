@@ -17,6 +17,7 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.mspaint.texteditor.CenterPopulator;
 import org.apache.batik.transcoder.TranscoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +42,9 @@ public class Main {
     private LanguageManager languageManager = new LanguageManager();
     private Language currentLanguage;
     private RunningCodeManager runningCodeManager;
-
     private OCRManager ocrManager;
+
+    private CenterPopulator centerPopulator;
 
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         headlessStart();
@@ -70,6 +72,7 @@ public class Main {
     public void headlessStart() throws IOException {
         Splash.setStatus("Loading settings...");
         SettingsManager.initialize(new File(MainGUI.APP_DATA, "options.ini"));
+        this.centerPopulator = new CenterPopulator(this);
 
         Splash.setStatus("Loading database...");
         this.ocrManager = new OCRManager(this);
@@ -114,11 +117,11 @@ public class Main {
             LOGGER.info("Found directory: " + inputImage.getAbsolutePath());
             for (File imageFile : getFilesFromDirectory(inputImage, this.currentLanguage.getFileExtensions(), "png")) {
                 LOGGER.info("Adding non directory: " + imageFile.getAbsolutePath());
-                imageClasses.add(new ImageClass(imageFile, mainGUI, true, useCaches, saveCaches));
+                imageClasses.add(new ImageClass(imageFile, mainGUI));
             }
         } else {
             LOGGER.info("Adding non directory: " + inputImage.getAbsolutePath());
-            imageClasses.add(new ImageClass(inputImage, mainGUI, true, useCaches, saveCaches));
+            imageClasses.add(new ImageClass(inputImage, mainGUI));
         }
 
         mainGUI.setStatusText(null);
@@ -282,5 +285,9 @@ public class Main {
 
     public RunningCodeManager getRunningCodeManager() {
         return runningCodeManager;
+    }
+
+    public CenterPopulator getCenterPopulator() {
+        return centerPopulator;
     }
 }

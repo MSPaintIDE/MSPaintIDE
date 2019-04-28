@@ -31,7 +31,8 @@ public class SearchManager {
     public List<SearchResult> searchDirectory(File directory, String text, String extension, boolean ignoreCase) {
         if (!directory.isDirectory()) return Collections.emptyList();
         return Main.getFilesFromDirectory(directory, extension)
-                .parallelStream()
+//                .parallelStream()
+                .stream()
                 .map(file -> searchFile(file, text, ignoreCase))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
@@ -39,9 +40,8 @@ public class SearchManager {
 
     public List<SearchResult> searchFile(File file, String text, boolean ignoreCase) {
         if (!file.isFile()) return Collections.emptyList();
-        File cacheFile = new File(MainGUI.APP_DATA, "global_cache\\" + file.getName().substring(0, file.getName().length() - 4) + "_cache.json");
 
-        ScannedImage scannedImage = imageCompare.getText(file, cacheFile, this.mainGUI, this.mainGUI.getMain(), true, true);
+        var scannedImage = imageCompare.getText(file, this.mainGUI, this.mainGUI.getMain());
         AtomicInteger lineNumber = new AtomicInteger(0);
         return scannedImage.getGrid().values()
                 .stream()

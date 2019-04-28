@@ -64,7 +64,7 @@ public class TextEditorManager {
 
         this.imageFile = createImageFile();
 
-        this.imageClass = new ImageClass(this.imageFile, mainGUI, this.headlessMain, false, true, true);
+        this.imageClass = new ImageClass(this.imageFile, mainGUI, this.headlessMain);
 
         (this.savingThread = new Thread(() -> {
             try {
@@ -99,7 +99,8 @@ public class TextEditorManager {
         if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
     }
 
-    public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
+    public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException, IOException {
+        var ocrManager = this.headlessMain.getOCRManager();
         ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, this.imageClass.getImage());
         LetterGenerator letterGenerator = new LetterGenerator();
 
@@ -116,7 +117,7 @@ public class TextEditorManager {
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
 
-        CenterPopulator centerPopulator = new CenterPopulator(this.headlessMain);
+        var centerPopulator = this.headlessMain.getCenterPopulator();
         centerPopulator.generateCenters((int) size);
 
         int x = 0;
@@ -130,7 +131,7 @@ public class TextEditorManager {
                     continue;
                 }
 
-                boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, space);
+                boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, ocrManager.getActiveFont(), space);
                 int center = (int) ((size/ 2D) - centerPopulator.getCenter(cha, (int) size));
 
                 ImageLetter letter = new ImageLetter(cha, 0, x, y + center, letterGrid[0].length, letterGrid.length, 0D, 0D, 0D);

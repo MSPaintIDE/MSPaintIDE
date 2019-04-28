@@ -1,75 +1,43 @@
 package com.uddernetworks.mspaint.ocr;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.JsonParseException;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.newocr.recognition.ScannedImage;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.AbstractMap;
-import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public class ImageCompare {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ImageCompare.class);
+    private CountDownLatch latch = new CountDownLatch(1);
 
-    public ScannedImage getText(File inputImage, File cacheFile, MainGUI mainGUI, Main main, boolean readFromCache, boolean saveCaches) {
-        ScannedImage scannedImage;
-
+    private static String getMD5(File file) {
         try {
-            if (readFromCache && cacheFile != null && !cacheFile.isFile()) {
-                try {
-                    cacheFile.getParentFile().mkdirs();
-                    readFromCache = !cacheFile.createNewFile();
-                } catch (IOException ignored) {
-                    readFromCache = false;
-                }
-            }
-
-            if (!readFromCache) {
-                if (!MainGUI.HEADLESS) mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
-
-                if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(true);
-
-                scannedImage = main.getOCRManager().getActiveFont().getScan().scanImage(inputImage);
-
-                if (saveCaches) {
-                    if (!MainGUI.HEADLESS) {
-                        mainGUI.setStatusText("Saving to cache file...");
-                    }
-
-                    Files.write(cacheFile.toPath(), new Gson().toJson(scannedImage).getBytes());
-                }
-
-                if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
-            } else {
-                try {
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-
-                    gsonBuilder.registerTypeAdapter(Map.Entry.class, (InstanceCreator<Map.Entry>) type -> new AbstractMap.SimpleEntry<>(null, null));
-
-                    scannedImage = gsonBuilder.create().fromJson(new String(Files.readAllBytes(cacheFile.toPath())), ScannedImage.class);
-                } catch (JsonParseException e) {
-                    if (!MainGUI.HEADLESS) mainGUI.setHaveError();
-                    LOGGER.error("There was a problem reading the cache for " + inputImage.getName() + "! Try resetting caches.");
-                    scannedImage = null;
-                }
-            }
-
-            return scannedImage;
-
+            return DigestUtils.md5Hex(new FileInputStream(file));
         } catch (IOException e) {
-            e.printStackTrace();
+            return file.getAbsolutePath().replace(File.separator, "_");
         }
-
-        return null;
     }
 
+    public ScannedImage getText(File inputImage, MainGUI mainGUI, Main main) {
+        try {
+            if (!MainGUI.HEADLESS) {
+                mainGUI.setStatusText("Scanning image " + inputImage.getName() + "...");
+                mainGUI.setIndeterminate(true);
+            }
+
+            return main.getOCRManager().getActiveFont().getScan().scanImage(inputImage);
+        } finally {
+            if (!MainGUI.HEADLESS) {
+                mainGUI.setStatusText("");
+                mainGUI.setIndeterminate(false);
+            }
+        }
+    }
 }

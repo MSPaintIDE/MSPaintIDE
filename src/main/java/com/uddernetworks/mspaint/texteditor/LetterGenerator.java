@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.texteditor;
 
+import com.uddernetworks.mspaint.ocr.FontData;
 import com.uddernetworks.newocr.character.DatabaseCharacter;
 import com.uddernetworks.newocr.utils.OCRUtils;
 
@@ -19,7 +20,7 @@ public class LetterGenerator {
 
         clearImage();
 
-        RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         graphics.setRenderingHints(rht);
     }
 
@@ -65,10 +66,10 @@ public class LetterGenerator {
         return output;
     }
 
-    public boolean[][] generateCharacter(char character, int size, DatabaseCharacter space) {
+    public boolean[][] generateCharacter(char character, int size, FontData activeFont, DatabaseCharacter space) {
         clearImage();
         if (size != lastSize) {
-            Font font = new Font("Verdana", Font.PLAIN, size);
+            Font font = new Font(activeFont.getFontName(), Font.PLAIN, size);
             graphics.setFont(font);
             graphics.setColor(Color.BLACK);
         }

@@ -242,7 +242,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
 
             executorService.execute(() -> {
                 this.searchResults.getSelectionModel().getSelectedItems()
-                        .parallelStream()
+//                        .parallelStream()
                         .forEach(searchResult -> {
                             ReplaceManager replaceManager = new ReplaceManager(this.mainGUI);
                             try {

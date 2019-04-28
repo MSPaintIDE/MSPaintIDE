@@ -43,10 +43,10 @@ public class ImageOutputStream extends OutputStream {
 
         String message = string.toString();
 
-        RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         graphics.setRenderingHints(rht);
 
-        Font fontt = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 16);
+        Font fontt = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 24);
         graphics.setFont(fontt);
 
         List<String> linesList = new ArrayList<>();
@@ -63,10 +63,10 @@ public class ImageOutputStream extends OutputStream {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
 
-        RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         graphics.setRenderingHints(rh);
 
-        Font font = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 16);
+        Font font = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 24);
         graphics.setFont(font);
         graphics.setPaint(this.background);
         graphics.fillRect(0, 0, this.width, height);

@@ -29,6 +29,7 @@ public interface PaintInjector extends Library, StdCallLibrary {
                     return null;
                 }
 
+                System.setProperty("jna.tmpdir", "E:\\MSPaintIDE\\tmp");
                 System.setProperty("jna.library.path", paintInjectorPath);
                 var library = (PaintInjector) Native.loadLibrary("PaintInjector", PaintInjector.class);
                 LOGGER.info("Loaded PaintInjector.dll");
