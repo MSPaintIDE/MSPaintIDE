@@ -4,13 +4,10 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -20,8 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
@@ -84,21 +80,7 @@ public class UserInputWindow extends Stage implements Initializable {
         setTitle("Welcome to MS Paint IDE");
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
-        Map<String, String> changeDark = new HashMap<>();
-        changeDark.put("gridpane-theme", "gridpane-theme-dark");
-        changeDark.put("theme-text", "dark-text");
-
-        SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
-                changeDark.forEach((key, value) -> root.lookupAll("." + key)
-                        .stream()
-                        .map(Node::getStyleClass)
-                        .forEach(styles -> {
-                            if (newValue) {
-                                styles.add(value);
-                            } else {
-                                styles.remove(value);
-                            }
-                        })), boolean.class, true);
+        this.mainGUI.getThemeManager().onDarkThemeChange(root, Collections.emptyMap());
     }
 
     @FXML

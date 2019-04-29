@@ -99,7 +99,7 @@ public class Main {
         return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || (getCurrentLanguage().getOutputFileExtension() != null && ppfProject.getCompilerOutput() == null);
     }
 
-    public int indexAll(boolean useCaches, boolean saveCaches) {
+    public int indexAll() {
         if (optionsNotFilled()) {
             LOGGER.error("Please select files for all options");
             mainGUI.setHaveError();

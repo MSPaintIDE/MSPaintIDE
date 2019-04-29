@@ -37,7 +37,8 @@
       <JFXScrollPane fx:id="scrollPane" layoutY="175.0" prefHeight="275.0" prefWidth="600.0" styleClass="result-pane">
          <children>
             <JFXListView id="searchResults" fx:id="searchResults" layoutX="1.0" prefHeight="250.0" prefWidth="600.0" styleClass="gridpane-theme" />
-         </children></JFXScrollPane>
+         </children>
+      </JFXScrollPane>
       <Label fx:id="resultText" layoutX="10.0" layoutY="125.0" prefWidth="580.0" styleClass="theme-text" textFill="#575757" />
       <JFXButton fx:id="action" buttonType="RAISED" layoutX="380.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" styleClass="primary-button" text="Replace" />
       <JFXButton fx:id="cancel" layoutX="490.0" layoutY="460.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" style="-fx-font-size:14px;" styleClass="theme-text" text="Cancel" />

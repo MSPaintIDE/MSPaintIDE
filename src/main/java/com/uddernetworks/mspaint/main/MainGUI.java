@@ -125,10 +125,6 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXCheckBox execute;
     @FXML
-    private JFXCheckBox useCaches;
-    @FXML
-    private JFXCheckBox saveCaches;
-    @FXML
     private JFXButton invertColors;
     @FXML
     private JFXButton remoteOriginVisibility;
@@ -393,7 +389,7 @@ public class MainGUI extends Application implements Initializable {
             progress.getStyleClass().remove("progressError");
 
             long start = System.currentTimeMillis();
-            if (main.indexAll(ppfProject.isUseCaches(), ppfProject.isSaveCaches()) == -1) return;
+            if (main.indexAll() == -1) return;
 
             if (ppfProject.isSyntaxHighlight()) {
                 main.highlightAll();
@@ -462,8 +458,6 @@ public class MainGUI extends Application implements Initializable {
         syntaxHighlight.setSelected(ProjectManager.getPPFProject().isSyntaxHighlight());
         compile.setSelected(ProjectManager.getPPFProject().isCompile());
         execute.setSelected(ProjectManager.getPPFProject().isExecute());
-        useCaches.setSelected(ProjectManager.getPPFProject().isUseCaches());
-        saveCaches.setSelected(ProjectManager.getPPFProject().isSaveCaches());
     }
 
     private String getAbsolutePath(File file) {
@@ -799,8 +793,6 @@ public class MainGUI extends Application implements Initializable {
         addOptionalListener(syntaxHighlight, ProjectManager.getPPFProject()::setSyntaxHighlight);
         addOptionalListener(compile, ProjectManager.getPPFProject()::setCompile);
         addOptionalListener(execute, ProjectManager.getPPFProject()::setExecute);
-        addOptionalListener(useCaches, ProjectManager.getPPFProject()::setUseCaches);
-        addOptionalListener(saveCaches, ProjectManager.getPPFProject()::setSaveCaches);
     }
 
     private void createAndSetFolder(TextField textField, File parent, String folder) {

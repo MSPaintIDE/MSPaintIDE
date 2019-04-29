@@ -2,6 +2,8 @@ package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -50,5 +52,23 @@ public class ThemeManager {
             if (this.current != null) sheets.remove(this.themes.get(current));
             sheets.add(this.themes.get(name));
         });
+    }
+
+    public void onDarkThemeChange(Parent root, Map<String, String> classToDark) {
+        var initialMap = new HashMap<>(Map.of(
+                ".gridpane-theme", "gridpane-theme-dark",
+                ".theme-text", "dark-text"));
+        initialMap.putAll(classToDark);
+        SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
+                initialMap.forEach((key, value) -> root.lookupAll(key)
+                        .stream()
+                        .map(Node::getStyleClass)
+                        .forEach(styles -> {
+                            if (newValue) {
+                                styles.add(value);
+                            } else {
+                                styles.remove(value);
+                            }
+                        })), boolean.class, true);
     }
 }

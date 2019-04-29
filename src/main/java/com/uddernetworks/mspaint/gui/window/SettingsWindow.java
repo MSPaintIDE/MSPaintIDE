@@ -2,6 +2,8 @@ package com.uddernetworks.mspaint.gui.window;
 
 import com.jfoenix.controls.JFXDecorator;
 import com.uddernetworks.mspaint.gui.SettingItem;
+import com.uddernetworks.mspaint.gui.fonts.DefaultSettingItem;
+import com.uddernetworks.mspaint.gui.fonts.OCRSettingItem;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
@@ -21,7 +23,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,10 +46,10 @@ public class SettingsWindow extends Stage implements Initializable {
 
     public SettingsWindow(MainGUI mainGUI, String startPath) throws IOException {
         this(mainGUI, Arrays.asList(
-                new SettingItem("Appearance", "file/Appearance.fxml"),
-                new SettingItem("OCR", "file/OCR.fxml"),
-                new SettingItem("Image Generation", "file/ImageGeneration.fxml"),
-                new SettingItem("Injection", "file/Injection.fxml")
+                new DefaultSettingItem("Appearance", "file/Appearance.fxml"),
+                new OCRSettingItem("OCR", "file/OCR.fxml", mainGUI), // searchResults
+                new DefaultSettingItem("Image Generation", "file/ImageGeneration.fxml"),
+                new DefaultSettingItem("Injection", "file/Injection.fxml")
         ), startPath);
     }
 
@@ -75,14 +80,13 @@ public class SettingsWindow extends Stage implements Initializable {
         setTitle("Settings");
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
-        Map<String, String> changeDark = new HashMap<>();
-        changeDark.put("gridpane-theme", "gridpane-theme-dark");
-        changeDark.put("theme-text", "dark-text");
-        changeDark.put("search-label", "dark");
-        changeDark.put("found-context", "dark");
-        changeDark.put("language-selection", "language-selection-dark");
-
-        toggleStuff = newValue -> changeDark.forEach((key, value) -> root.lookupAll("." + key)
+        toggleStuff = newValue -> Map.of(
+                "gridpane-theme", "gridpane-theme-dark",
+                "theme-text", "dark-text",
+                "search-label", "dark",
+                "found-context", "dark",
+                "language-selection", "language-selection-dark"
+        ).forEach((key, value) -> root.lookupAll("." + key)
                 .stream()
                 .map(Node::getStyleClass)
                 .forEach(styles -> {
@@ -111,7 +115,7 @@ public class SettingsWindow extends Stage implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         TreeItem<SettingItem> root;
-        tree.setRoot(root = new TreeItem<>(new SettingItem()));
+        tree.setRoot(root = new TreeItem<>(new DefaultSettingItem()));
         tree.setShowRoot(false);
 
         List<TreeItem<SettingItem>> children = root.getChildren();

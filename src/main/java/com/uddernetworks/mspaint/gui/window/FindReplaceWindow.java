@@ -8,14 +8,11 @@ import com.uddernetworks.mspaint.gui.window.search.SearchResult;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -115,22 +112,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
         setTitle("Find" + (replace ? "/Replace" : ""));
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
-        Map<String, String> changeDark = new HashMap<>();
-        changeDark.put(".gridpane-theme", "gridpane-theme-dark");
-        changeDark.put(".theme-text", "dark-text");
-        changeDark.put("#searchResults", "dark");
-
-        SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
-                changeDark.forEach((key, value) -> root.lookupAll(key)
-                        .stream()
-                        .map(Node::getStyleClass)
-                        .forEach(styles -> {
-                            if (newValue) {
-                                styles.add(value);
-                            } else {
-                                styles.remove(value);
-                            }
-                        })), boolean.class, true);
+        this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of("#searchResults", "dark"));
     }
 
     private void setError(String error) {
@@ -173,7 +155,7 @@ public class FindReplaceWindow extends Stage implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.searchResults.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        searchResults.setCellFactory(t -> new SearchListCell());
+        searchResults.setCellFactory(t -> new SearchListCell(this.mainGUI));
 
         CompletableFuture.runAsync(() -> {
             try {

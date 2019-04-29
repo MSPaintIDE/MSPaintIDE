@@ -233,25 +233,6 @@ public class PPFProject {
         this.execute = execute;
     }
 
-
-    public boolean isUseCaches() {
-        return useCaches;
-    }
-
-    public void setUseCaches(boolean useCaches) {
-        this.useCaches = useCaches;
-    }
-
-
-    public boolean isSaveCaches() {
-        return saveCaches;
-    }
-
-    public void setSaveCaches(boolean saveCaches) {
-        this.saveCaches = saveCaches;
-    }
-
-
     @Override
     public String toString() {
         return this.name;

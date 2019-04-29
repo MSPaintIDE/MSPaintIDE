@@ -7,15 +7,12 @@ import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.main.CacheUtils;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -26,8 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 public class InspectWindow extends Stage implements Initializable {
@@ -90,21 +86,7 @@ public class InspectWindow extends Stage implements Initializable {
         setTitle("Inspecting " + this.inspecting.getName());
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
-        Map<String, String> changeDark = new HashMap<>();
-        changeDark.put("gridpane-theme", "gridpane-theme-dark");
-        changeDark.put("theme-text", "dark-text");
-
-        SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
-                changeDark.forEach((key, value) -> root.lookupAll("." + key)
-                        .stream()
-                        .map(Node::getStyleClass)
-                        .forEach(styles -> {
-                            if (newValue) {
-                                styles.add(value);
-                            } else {
-                                styles.remove(value);
-                            }
-                        })), boolean.class, true);
+        this.mainGUI.getThemeManager().onDarkThemeChange(root, Collections.emptyMap());
     }
 
 

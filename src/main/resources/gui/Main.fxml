@@ -7,7 +7,7 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
-<AnchorPane styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <VBox styleClass="vbox-theme" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -271,16 +271,6 @@
                                               </JFXButton>
                                               <JFXProgressBar fx:id="progress" layoutX="10.0" layoutY="170.0" prefHeight="18.0" prefWidth="480.0" progress="0.0" styleClass="jfx-progress-bar" />
                                               <Label fx:id="statusText" layoutX="170.0" layoutY="131.0" maxWidth="330.0" prefHeight="17.0" prefWidth="275.0" styleClass="theme-text" />
-                                              <JFXCheckBox fx:id="useCaches" layoutX="14.0" layoutY="57.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Use Caches">
-                                                  <cursor>
-                                                      <Cursor fx:constant="HAND" />
-                                                  </cursor>
-                                              </JFXCheckBox>
-                                              <JFXCheckBox fx:id="saveCaches" layoutX="205.0" layoutY="57.0" mnemonicParsing="false" style="-jfx-checked-color: -primary-button-color;" styleClass="theme-text" text="Save Caches">
-                                                  <cursor>
-                                                      <Cursor fx:constant="HAND" />
-                                                  </cursor>
-                                              </JFXCheckBox>
                                               <JFXButton fx:id="invertColors" layoutX="450.0" layoutY="125.0" prefHeight="30" prefWidth="30.0" style="-fx-text-fill: WHITE;" styleClass="invert-colors">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />

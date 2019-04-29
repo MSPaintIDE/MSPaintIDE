@@ -1,12 +1,12 @@
 package com.uddernetworks.mspaint.gui.window.search;
 
+import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.character.ImageLetter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.AnchorPane;
@@ -14,7 +14,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +35,11 @@ public class SearchListCell extends ListCell<SearchResult> {
     private Text beforeText = new Text();
     private Text highlightedText = new Text();
     private Text afterText = new Text();
+    private MainGUI mainGUI;
+
+    public SearchListCell(MainGUI mainGUI) {
+        this.mainGUI = mainGUI;
+    }
 
     @Override
     public void updateItem(SearchResult searchResult, boolean empty) {
@@ -60,23 +64,10 @@ public class SearchListCell extends ListCell<SearchResult> {
                 flowText.getChildren().add(highlightedText);
                 flowText.getChildren().add(afterText);
 
-                Map<String, String> changeDark = new HashMap<>();
-                changeDark.put("gridpane-theme", "gridpane-theme-dark");
-                changeDark.put("theme-text", "dark-text");
-                changeDark.put("search-label", "dark");
-                changeDark.put("found-context", "dark");
-
-                SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
-                        changeDark.forEach((key, value) -> anchor.lookupAll("." + key)
-                                .stream()
-                                .map(Node::getStyleClass)
-                                .forEach(styles -> {
-                                    if (newValue) {
-                                        styles.add(value);
-                                    } else {
-                                        styles.remove(value);
-                                    }
-                                })), boolean.class, true);
+                this.mainGUI.getThemeManager().onDarkThemeChange(anchor, Map.of(
+                        ".search-label", "dark",
+                        ".found-context", "dark"
+                ));
             }
 
             lineNumber.setAlignment(Pos.TOP_RIGHT);

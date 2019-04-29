@@ -4,8 +4,6 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.DefaultScannedImage;
 import com.uddernetworks.newocr.recognition.ScannedImage;
@@ -104,7 +102,8 @@ public class TextEditorManager {
         ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, this.imageClass.getImage());
         LetterGenerator letterGenerator = new LetterGenerator();
 
-        double size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class) * 1.3333333D;
+        var size = ocrManager.getFontSize(scannedImage);
+
         var spaceOptional = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
 
         if (spaceOptional.isEmpty()) {

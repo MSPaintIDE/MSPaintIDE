@@ -8,14 +8,11 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -26,7 +23,6 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -70,22 +66,10 @@ public class WelcomeWindow extends Stage implements Initializable {
         setTitle("Welcome to MS Paint IDE");
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
-        Map<String, String> changeDark = new HashMap<>();
-        changeDark.put("gridpane-theme", "gridpane-theme-dark");
-        changeDark.put("logo-image", "dark");
-        changeDark.put("recent-projects", "recent-projects-dark");
-
-        SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
-                changeDark.forEach((key, value) -> root.lookupAll("." + key)
-                        .stream()
-                        .map(Node::getStyleClass)
-                        .forEach(styles -> {
-                            if (newValue) {
-                                styles.add(value);
-                            } else {
-                                styles.remove(value);
-                            }
-                        })), boolean.class, true);
+        this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of(
+                ".logo-image", "dark",
+                ".recent-projects", "recent-projects-dark"
+        ));
     }
 
     @FXML
