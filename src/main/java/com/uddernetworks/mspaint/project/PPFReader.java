@@ -3,8 +3,8 @@ package com.uddernetworks.mspaint.project;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PPFReader {
@@ -12,12 +12,15 @@ public class PPFReader {
     public static void main(String[] args) throws IllegalAccessException {
         PPFReader ppfReader = new PPFReader();
 
-        PPFProject ppfProject = ppfReader.read(new File("main.ppf"));
+        PPFProject ppfProject = ppfReader.read(new File("mainn.ppf"));
 
-        for (Field declaredField : ppfProject.getClass().getDeclaredFields()) {
-            declaredField.setAccessible(true);
-            System.out.println(declaredField.getName() + " = " + declaredField.get(ppfProject));
-        }
+        System.out.println("ppfProject = " + Arrays.toString(ppfProject.getArray()));
+
+//        for (Field declaredField : ppfProject.getClass().getDeclaredFields()) {
+//            if (!declaredField.getName().equals("array")) continue;
+//            declaredField.setAccessible(true);
+//            System.out.println(declaredField.getName() + " = " + declaredField.get(ppfProject));
+//        }
     }
 
     public PPFProject read(File file) {

@@ -49,10 +49,7 @@ public class PPFProject {
     private boolean execute;            // If the IDE should execute the code
 
     @PPFSetting
-    private boolean useCaches;          // If caches should be used
-
-    @PPFSetting
-    private boolean saveCaches;         // If caches should be saved
+    private String[] array;
 
     public PPFProject(File file) {
         this.file = file;
@@ -231,6 +228,14 @@ public class PPFProject {
 
     public void setExecute(boolean execute) {
         this.execute = execute;
+    }
+
+    public String[] getArray() {
+        return array;
+    }
+
+    public void setArray(String[] array) {
+        this.array = array;
     }
 
     @Override

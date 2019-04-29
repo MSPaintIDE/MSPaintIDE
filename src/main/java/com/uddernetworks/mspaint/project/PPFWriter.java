@@ -10,15 +10,17 @@ import java.util.List;
 public class PPFWriter {
 
     public static void main(String[] args) {
-        PPFProject ppfProject = new PPFProject(new File("main.ppf"));
-        ppfProject.setInputLocation(new File("MSPaintIDE\\input"));
-        ppfProject.setHighlightLocation(new File("MSPaintIDE\\highlight"));
-        ppfProject.setClassLocation(new File("MSPaintIDE\\class"));
-        ppfProject.setJarFile(new File("MSPaintIDE\\jar.jar"));
-        ppfProject.setLibraryLocation(new File("MSPaintIDE\\library"));
-        ppfProject.setOtherLocation(new File("MSPaintIDE\\other"));
-        ppfProject.setCompilerOutput(new File("MSPaintIDE\\compiler.png"));
-        ppfProject.setAppOutput(new File("MSPaintIDE\\app.png"));
+        PPFProject ppfProject = new PPFProject(new File("mainn.ppf"));
+//        ppfProject.setInputLocation(new File("MSPaintIDE\\input"));
+//        ppfProject.setHighlightLocation(new File("MSPaintIDE\\highlight"));
+//        ppfProject.setClassLocation(new File("MSPaintIDE\\class"));
+//        ppfProject.setJarFile(new File("MSPaintIDE\\jar.jar"));
+//        ppfProject.setLibraryLocation(new File("MSPaintIDE\\library"));
+//        ppfProject.setOtherLocation(new File("MSPaintIDE\\other"));
+//        ppfProject.setCompilerOutput(new File("MSPaintIDE\\compiler.png"));
+//        ppfProject.setAppOutput(new File("MSPaintIDE\\app.png"));
+
+        ppfProject.setArray(new String[]{"one", "two", "three", "four", "five"});
 
         PPFWriter ppfWriter = new PPFWriter();
         ppfWriter.write(ppfProject);

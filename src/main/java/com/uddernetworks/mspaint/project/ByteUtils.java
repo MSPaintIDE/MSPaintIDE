@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ByteUtils {
-    public static  byte[] byteListToArray(List<Byte> byteList) {
+    public static byte[] byteListToArray(List<Byte> byteList) {
         byte[] byteArray = new byte[byteList.size()];
         for (int i = 0; i < byteList.size(); i++) byteArray[i] = byteList.get(i);
         return byteArray;
