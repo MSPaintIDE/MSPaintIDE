@@ -66,6 +66,8 @@ public class WelcomeWindow extends Stage implements Initializable {
         setTitle("Welcome to MS Paint IDE");
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
+        System.out.println("mainGUI = " + mainGUI);
+        System.out.println("mainGUI.getThemeManager() = " + mainGUI.getThemeManager());
         this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of(
                 ".logo-image", "dark",
                 ".recent-projects", "recent-projects-dark"

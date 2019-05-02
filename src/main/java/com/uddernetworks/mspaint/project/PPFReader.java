@@ -3,8 +3,8 @@ package com.uddernetworks.mspaint.project;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PPFReader {
@@ -14,13 +14,11 @@ public class PPFReader {
 
         PPFProject ppfProject = ppfReader.read(new File("mainn.ppf"));
 
-        System.out.println("ppfProject = " + Arrays.toString(ppfProject.getArray()));
-
-//        for (Field declaredField : ppfProject.getClass().getDeclaredFields()) {
-//            if (!declaredField.getName().equals("array")) continue;
-//            declaredField.setAccessible(true);
-//            System.out.println(declaredField.getName() + " = " + declaredField.get(ppfProject));
-//        }
+        for (Field declaredField : ppfProject.getClass().getDeclaredFields()) {
+            if (!declaredField.getName().equals("map")) continue;
+            declaredField.setAccessible(true);
+            System.out.println(declaredField.getName() + " = " + declaredField.get(ppfProject));
+        }
     }
 
     public PPFProject read(File file) {

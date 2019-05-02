@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ThemeManager {
 
@@ -54,13 +55,19 @@ public class ThemeManager {
         });
     }
 
-    public void onDarkThemeChange(Parent root, Map<String, String> classToDark) {
+    public ThemeChanger onDarkThemeChange(Parent root, Map<String, String> classToDark) {
         var initialMap = new HashMap<>(Map.of(
                 ".gridpane-theme", "gridpane-theme-dark",
                 ".theme-text", "dark-text"));
         initialMap.putAll(classToDark);
-        SettingsManager.onChangeSetting(Setting.DARK_THEME, newValue ->
-                initialMap.forEach((key, value) -> root.lookupAll(key)
+        return new ThemeChanger(root, initialMap);
+    }
+
+    public class ThemeChanger {
+        private Parent root;
+        private Map<String, String> classToDark;
+        private Consumer<Boolean> onChange = newValue ->
+                classToDark.forEach((key, value) -> root.lookupAll(key)
                         .stream()
                         .map(Node::getStyleClass)
                         .forEach(styles -> {
@@ -69,6 +76,20 @@ public class ThemeManager {
                             } else {
                                 styles.remove(value);
                             }
-                        })), boolean.class, true);
+                        }));
+
+        public ThemeChanger(Parent root, Map<String, String> classToDark) {
+            this.root = root;
+            this.classToDark = classToDark;
+            init();
+        }
+
+        private void init() {
+            SettingsManager.onChangeSetting(Setting.DARK_THEME, onChange, boolean.class, true);
+        }
+
+        public void update() {
+            onChange.accept(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
+        }
     }
 }

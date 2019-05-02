@@ -1,38 +1,52 @@
 package com.uddernetworks.mspaint.project;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public enum BinaryIdentifier {
-    INPUT_LOCATION(5, "inputLocation"),
-    HIGHLIGHT_LOCATION(6, "highlightLocation"),
-    OBJECT_LOCATION(7, "objectLocation"),
-    CLASS_LOCATION(8, "classLocation"),
-    JAR_FILE(9, "jarFile"),
-    LIBRARY_LOCATION(10, "libraryLocation"),
-    OTHER_LOCATION(11, "otherLocation"),
-    COMPILER_OUTPUT(12, "compilerOutput"),
-    APP_OUTPUT(13, "appOutput"),
-    NAME(14, "name"),
-    LANGUAGE(15, "language"),
-    SYNTAX_HIGHLIGHT(16, "syntaxHighlight"),
-    COMPILE(17, "compile"),
-    EXECUTE(18, "execute"),
-    ARRAY(23, "array");
+//    INPUT_LOCATION(5, "inputLocation"),
+//    HIGHLIGHT_LOCATION(6, "highlightLocation"),
+//    OBJECT_LOCATION(7, "objectLocation"),
+//    CLASS_LOCATION(8, "classLocation"),
+//    JAR_FILE(9, "jarFile"),
+//    LIBRARY_LOCATION(10, "libraryLocation"),
+//    OTHER_LOCATION(11, "otherLocation"),
+//    COMPILER_OUTPUT(12, "compilerOutput"),
+//    APP_OUTPUT(13, "appOutput"),
+//    NAME(14, "name"),
+//    LANGUAGE(15, "language"),
+//    SYNTAX_HIGHLIGHT(16, "syntaxHighlight"),
+//    COMPILE(17, "compile"),
+//    EXECUTE(18, "execute"),
+//    ACTIVE_FONT_NAME(19, "activeFont"),
+//    FONT_NAMES(20, "fontNames"),
+//    FONT_PATHS(24, "fontPaths");
+    MAP(1, "map");
+
+    private static Logger LOGGER = LoggerFactory.getLogger(BinaryIdentifier.class);
 
     public static final byte START_VALUE = 2;
     public static final byte END_VALUE = 3;
     public static final byte START_ARRAY = 21;
     public static final byte BREAK_ARRAY = 22;
     public static final byte END_ARRAY = 23;
+    public static final byte START_MAP = 24;
+    public static final byte BREAK_KV = 25;
+    public static final byte BREAK_MAP = 26;
+    public static final byte END_MAP = 27;
 
     private byte binary;
     private Field field;
     private String typeName;
-    private boolean array;
+    private Special special = Special.NORMAL;
+    private List<Type> types = new ArrayList<>();
 
     BinaryIdentifier(int binary, String field) {
         this.binary = (byte) binary;
@@ -40,8 +54,16 @@ public enum BinaryIdentifier {
         try {
             this.field = PPFProject.class.getDeclaredField(field);
             this.field.setAccessible(true);
-            this.array = this.field.getType().isArray();
-            this.typeName = this.field.getType().getName().replaceAll("^.*\\.", "");
+            this.typeName = this.field.getType().getName().replaceAll("^.*\\.", "").replace(";", "");
+
+            var pt = (ParameterizedType) this.field.getGenericType();
+            types.addAll(Arrays.asList(pt.getActualTypeArguments()));
+
+            if (this.field.getType().isArray()) {
+                this.special = Special.ARRAY;
+            } else if (this.typeName.equals("Map")) {
+                this.special = Special.MAP;
+            }
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -57,38 +79,74 @@ public enum BinaryIdentifier {
 
     public void setValue(byte[] bytes, PPFProject ppfProject) {
         try {
-            if (this.array) {
-                var array = new ArrayList<>();
-                if (bytes[0] == START_ARRAY) {
-                    var buffer = new ArrayList<Byte>();
-                    for (int i = 1; i < bytes.length; i++) {
-                        var curr = bytes[i];
-                        if (curr == BREAK_ARRAY) {
-                            array.add(processSetBytes(ByteUtils.byteListToArray(buffer)));
-                            buffer.clear();
-                            continue;
+            switch (special) {
+                case ARRAY:
+                    var array = new ArrayList<>();
+                    if (bytes[0] == START_ARRAY) {
+                        var buffer = new ArrayList<Byte>();
+                        for (int i = 1; i < bytes.length; i++) {
+                            var curr = bytes[i];
+                            if (curr == BREAK_ARRAY) {
+                                array.add(processSetBytes(ByteUtils.byteListToArray(buffer)));
+                                buffer.clear();
+                                continue;
+                            }
+
+                            buffer.add(curr);
                         }
 
-                        buffer.add(curr);
+                        if (!buffer.isEmpty()) {
+                            array.add(processSetBytes(ByteUtils.byteListToArray(buffer)));
+                        }
                     }
 
-                    if (buffer.isEmpty()) {
-                        array.add(processSetBytes(ByteUtils.byteListToArray(buffer)));
+                    var baseClass = Class.forName(this.field.getType().getCanonicalName().replace("[", "").replace("]", ""));
+
+                    var arr = Array.newInstance(baseClass, array.size());
+                    for (int i = 0; i < array.size(); i++) {
+                        Array.set(arr, i, array.get(i));
                     }
-                } else {
-                    System.out.println("Labeled as array but contains no ARRAY_START byte!");
-                }
 
-                var baseClass = Class.forName(this.field.getType().getCanonicalName().replace("[", "").replace("]", ""));
+                    field.set(ppfProject, arr);
+                    break;
+                case MAP:
+                    var keyClass = Class.forName(types.get(0).getTypeName());
+                    var valueClass = Class.forName(types.get(1).getTypeName());
 
-                var arr = Array.newInstance(baseClass, array.size());
-                for (int i = 0; i < array.size(); i++) {
-                    Array.set(arr, i, array.get(i));
-                }
+                    var map = new HashMap<>();
+                    if (bytes[0] == START_MAP) {
+                        var buffer = new ArrayList<Byte>();
+                        var readingKey = true;
+                        Object key = null;
 
-                field.set(ppfProject, arr);
-            } else {
-                field.set(ppfProject, processSetBytes(bytes));
+                        for (int i = 1; i < bytes.length; i++) {
+                            var curr = bytes[i];
+                            if (curr == BREAK_KV) {
+                                key = processSetBytes(ByteUtils.byteListToArray(buffer), keyClass.getSimpleName());
+                                readingKey = false;
+
+                                buffer.clear();
+                            } else if (curr == BREAK_MAP) {
+                                map.put(key, processSetBytes(ByteUtils.byteListToArray(buffer), valueClass.getSimpleName()));
+                                key = null;
+                                readingKey = true;
+
+                                buffer.clear();
+                            } else if (curr != END_MAP){
+                                buffer.add(curr);
+                            }
+                        }
+
+                        if (!buffer.isEmpty() && !readingKey) {
+                            map.put(key, processSetBytes(ByteUtils.byteListToArray(buffer), valueClass.getSimpleName()));
+                        }
+                    }
+
+                    field.set(ppfProject, map);
+                    break;
+                case NORMAL:
+                    field.set(ppfProject, processSetBytes(bytes));
+                    break;
             }
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
@@ -96,8 +154,12 @@ public enum BinaryIdentifier {
     }
 
     private Object processSetBytes(byte[] bytes) {
+        return processSetBytes(bytes, this.typeName);
+    }
+
+    private Object processSetBytes(byte[] bytes, String type) {
         String string = new String(bytes);
-        switch (typeName.replace(";", "")) {
+        switch (type) {
             case "File":
                 return new File(string);
             case "String":
@@ -109,7 +171,7 @@ public enum BinaryIdentifier {
             case "double":
                 return (double) bytes[0];
             default:
-                System.err.println("Not sure what to do with data value: " + string + " of class: " + typeName);
+                System.err.println("[Process] Not sure what to do with data value: " + string + " of class: " + typeName);
                 break;
         }
 
@@ -119,19 +181,35 @@ public enum BinaryIdentifier {
     public byte[] getValue(PPFProject ppfProject) {
         try {
             if (field.get(ppfProject) == null) return new byte[0];
-            if (this.array) {
-                Object[] list = (Object[]) field.get(ppfProject);
-                var bytes = new ArrayList<Byte>();
-                bytes.add(START_ARRAY);
-                Arrays.stream(list).forEach(element -> {
-                    bytes.addAll(ByteUtils.byteArrayToList(processGetBytes(element)));
-                    bytes.add(BREAK_ARRAY);
-                });
-                bytes.remove(bytes.size() - 1);
-                bytes.add(END_ARRAY);
-                return ByteUtils.byteListToArray(bytes);
-            } else {
-                return processGetBytes(field.get(ppfProject));
+            var bytes = new ArrayList<Byte>();
+            switch (special) {
+                case ARRAY:
+                    Object[] list = (Object[]) field.get(ppfProject);
+                    bytes.add(START_ARRAY);
+                    Arrays.stream(list).forEach(element -> {
+                        bytes.addAll(ByteUtils.byteArrayToList(processGetBytes(element)));
+                        bytes.add(BREAK_ARRAY);
+                    });
+                    bytes.remove(bytes.size() - 1);
+                    bytes.add(END_ARRAY);
+                    return ByteUtils.byteListToArray(bytes);
+                case MAP:
+                    var map = (Map<Object, Object>) field.get(ppfProject);
+                    var keyClass = Class.forName(types.get(0).getTypeName());
+                    var valueClass = Class.forName(types.get(1).getTypeName());
+
+                    bytes.add(START_MAP);
+                    map.forEach((key, value) -> {
+                        bytes.addAll(ByteUtils.byteArrayToList(processGetBytes(key, keyClass.getSimpleName())));
+                        bytes.add(BREAK_KV);
+                        bytes.addAll(ByteUtils.byteArrayToList(processGetBytes(value, valueClass.getSimpleName())));
+                        bytes.add(BREAK_MAP);
+                    });
+                    bytes.remove(bytes.size() - 1);
+                    bytes.add(END_MAP);
+                    return ByteUtils.byteListToArray(bytes);
+                case NORMAL:
+                    return processGetBytes(field.get(ppfProject));
             }
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
@@ -141,8 +219,12 @@ public enum BinaryIdentifier {
     }
 
     private byte[] processGetBytes(Object object) {
+        return processGetBytes(object, this.typeName);
+    }
+
+    private byte[] processGetBytes(Object object, String type) {
         if (object == null) return new byte[0];
-        switch (typeName.replace(";", "")) {
+        switch (type) {
             case "File":
                 return ((File) object).getAbsolutePath().getBytes();
             case "String":
@@ -154,7 +236,7 @@ public enum BinaryIdentifier {
             case "double":
                 return new byte[]{new Double((Double) object).byteValue()};
             default:
-                System.err.println("Not sure what to do with field: " + field.getName() + " of class: " + typeName);
+                System.err.println("[Get] Not sure what to do with field: " + field.getName() + " of class: " + typeName);
                 break;
         }
 
@@ -169,7 +251,7 @@ public enum BinaryIdentifier {
         return Arrays.stream(values()).filter(binaryIdentifier -> binaryIdentifier.binary == binary).findFirst().orElse(null);
     }
 
-    public boolean isArray() {
-        return array;
+    enum Special {
+        NORMAL, ARRAY, MAP
     }
 }

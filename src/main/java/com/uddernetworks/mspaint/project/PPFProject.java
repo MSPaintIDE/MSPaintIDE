@@ -1,55 +1,68 @@
 package com.uddernetworks.mspaint.project;
 
 import java.io.File;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PPFProject {
 
     private File file;
 
     @PPFSetting
+    public Map<String, String> map = new HashMap<>();
+
+//    @PPFSetting
     private File inputLocation;         // Input file/image folder
 
-    @PPFSetting
+//    @PPFSetting
     private File highlightLocation;     // Highlight output file/folder
 
-    @PPFSetting
+//    @PPFSetting
     private File objectLocation;        // Folder for cached files
 
-    @PPFSetting
+//    @PPFSetting
     private File classLocation;         // Output .class file folder
 
-    @PPFSetting
+//    @PPFSetting
     private File jarFile;               // Output .jar file
 
-    @PPFSetting
+//    @PPFSetting
     private File libraryLocation;       // Library .jar/folder
 
-    @PPFSetting
+//    @PPFSetting
     private File otherLocation;         // File/folder for other packaged files
 
-    @PPFSetting
+//    @PPFSetting
     private File compilerOutput;        // Compiler output image file
 
-    @PPFSetting
+//    @PPFSetting
     private File appOutput;             // Application output image file
 
-    @PPFSetting
+//    @PPFSetting
     private String language;            // The language used in the project
 
-    @PPFSetting
+//    @PPFSetting
     private String name;                // The name of the project
 
-    @PPFSetting
+//    @PPFSetting
     private boolean syntaxHighlight;    // If the IDE should highlight the code
 
-    @PPFSetting
+//    @PPFSetting
     private boolean compile;            // If the IDE should compile the code
 
-    @PPFSetting
+//    @PPFSetting
     private boolean execute;            // If the IDE should execute the code
 
-    @PPFSetting
-    private String[] array;
+//    @PPFSetting
+    private int activeFont;
+
+//    @PPFSetting
+    private Map<Integer, String> fontNames = Collections.emptyMap();
+
+//    @PPFSetting
+    private Map<Integer, String> fontPaths = Collections.emptyMap();
 
     public PPFProject(File file) {
         this.file = file;
@@ -58,8 +71,6 @@ public class PPFProject {
     public File getFile() {
         return file;
     }
-
-
 
     public File getInputLocation() {
         return inputLocation;
@@ -230,16 +241,66 @@ public class PPFProject {
         this.execute = execute;
     }
 
-    public String[] getArray() {
-        return array;
+    public int getActiveFont() {
+        return activeFont;
     }
 
-    public void setArray(String[] array) {
-        this.array = array;
+    public void setActiveFont(int activeFont) {
+        this.activeFont = activeFont;
+    }
+
+    public Map<Integer, String> getFontNames() {
+        return fontNames;
+    }
+
+    public Map<Integer, String> getFontPaths() {
+        return fontPaths;
+    }
+
+    public Map<String, String> getAllFonts() {
+        var map = new HashMap<String, String>();
+        for (int i = 0; i < this.fontNames.size(); i++) {
+            map.put(this.fontNames.get(i), this.fontPaths.get(i));
+        }
+        return map;
+    }
+
+    public Map.Entry<String, String> getFont(int index) {
+        return new AbstractMap.SimpleEntry<>(this.fontNames.get(index), this.fontPaths.get(index));
+    }
+
+    public int getFontsAmount() {
+        return this.fontNames.size();
+    }
+
+    public void modifyFontName(int index, String name) {
+        this.fontNames.put(index, name);
+    }
+
+    public void modifyFontPath(int index, String path) {
+        this.fontPaths.put(index, path);
+    }
+
+    public void modifyFont(int index, String name, String path) {
+        this.fontNames.put(index,  name);
+        this.fontPaths.put(index,  path);
+    }
+
+    public int addFont(String name, String path) {
+        var index = this.fontNames.size();
+        this.fontNames.put(index, name);
+        this.fontPaths.put(index, path);
+        return index;
+    }
+
+    public void removeFont(int id) {
+        this.fontNames.remove(id);
+        this.fontPaths.remove(id);
     }
 
     @Override
     public String toString() {
-        return this.name;
+//        return this.name;
+        return "t";
     }
 }

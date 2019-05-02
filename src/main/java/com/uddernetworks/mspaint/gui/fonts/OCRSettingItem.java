@@ -3,6 +3,9 @@ package com.uddernetworks.mspaint.gui.fonts;
 import com.jfoenix.controls.JFXListView;
 import com.uddernetworks.mspaint.gui.SettingItem;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ThemeManager;
+import com.uddernetworks.mspaint.project.PPFProject;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class OCRSettingItem extends Stage implements SettingItem, Initializable {
 
@@ -27,6 +31,7 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
     private String name;
     private String file;
     private MainGUI mainGUI;
+    private ThemeManager.ThemeChanger themeChanger;
 
     public OCRSettingItem() {}
 
@@ -45,7 +50,10 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
 
         if (!(node instanceof Pane)) throw new LoadException("Root element of " + this.file + " not a pane!");
 
-        this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of("#fontSelect", "dark"));
+        this.themeChanger = this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of(
+                "#fontSelect", "dark",
+                ".remove-entry", "remove-entry-white"
+        ));
 
         return (Pane) node;
     }
@@ -55,7 +63,27 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
         var group = new ToggleGroup();
         var list = new ArrayList<FontCell>();
         fontSelect.setCellFactory(t -> {
-            var cell = new FontCell(this.mainGUI, group);
+            var cell = new FontCell(this.mainGUI, group, currCell -> {
+                currCell.getName().textProperty().addListener(((observable, oldValue, newValue) -> {
+                    getAndSaveProject(project -> {
+                        project.modifyFontName(currCell.getItem().getIndex(), newValue);
+                    });
+                }));
+
+                currCell.getPath().textProperty().addListener(((observable, oldValue, newValue) -> {
+                    getAndSaveProject(project -> {
+                        project.modifyFontPath(currCell.getItem().getIndex(), newValue);
+                    });
+                }));
+
+                currCell.getRemoveEntry().setOnAction(event -> {
+                    getAndSaveProject(project -> {
+                        project.removeFont(currCell.getItem().getIndex());
+                    });
+                });
+            });
+
+            this.themeChanger.update();
             list.add(cell);
             return cell;
         });
@@ -69,6 +97,11 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
                 oldCell.getItem().setSelected(false);
             }
 
+            var newFont = cell.getItem();
+
+            var currProject = ProjectManager.getPPFProject();
+            currProject.setActiveFont(newFont.getIndex());
+
             System.out.println("=============");
             list.forEach(fontCell -> {
                 if (fontCell.getItem() == null) return;
@@ -80,9 +113,17 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
 
         fontSelect.setSelectionModel(new EmptySelection());
 
-        for (int i = 1; i <= 5; i++) {
-            fontSelect.getItems().add(new OCRFont("Name " + i, "path/to/this/shit " + i));
+        var currProject = ProjectManager.getPPFProject();
+        for (int i = 0; i < currProject.getFontsAmount(); i++) {
+            var font = currProject.getFont(i);
+            fontSelect.getItems().add(new OCRFont(i, font.getKey(), font.getValue()));
         }
+    }
+
+    private void getAndSaveProject(Consumer<PPFProject> projectConsumer) {
+        var currProject = ProjectManager.getPPFProject();
+        projectConsumer.accept(currProject);
+        ProjectManager.save();
     }
 
     @Override

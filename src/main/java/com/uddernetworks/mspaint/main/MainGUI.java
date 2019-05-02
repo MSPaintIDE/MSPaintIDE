@@ -314,7 +314,7 @@ public class MainGUI extends Application implements Initializable {
 
             this.primaryStage.setScene(scene);
 
-            this.themeManager = new ThemeManager();
+            getThemeManager();
             this.themeManager.addStage(this.primaryStage);
 
             this.themeManager.loadTheme("Default", "default.css");
@@ -806,6 +806,7 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public ThemeManager getThemeManager() {
+        if (this.themeManager == null) this.themeManager = new ThemeManager();
         return themeManager;
     }
 }

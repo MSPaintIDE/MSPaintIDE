@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.gui.fonts;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -11,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.function.Consumer;
 
 public class FontCell extends ListCell<OCRFont> {
 
@@ -26,13 +28,18 @@ public class FontCell extends ListCell<OCRFont> {
     @FXML
     private JFXTextField path;
 
+    @FXML
+    private JFXButton removeEntry;
+
     private FXMLLoader fxmlLoader;
     private MainGUI mainGUI;
     private ToggleGroup group;
+    private Consumer<FontCell> onInit;
 
-    public FontCell(MainGUI mainGUI, ToggleGroup group) {
+    public FontCell(MainGUI mainGUI, ToggleGroup group, Consumer<FontCell> onInit) {
         this.mainGUI = mainGUI;
         this.group = group;
+        this.onInit = onInit;
     }
 
     @Override
@@ -58,6 +65,8 @@ public class FontCell extends ListCell<OCRFont> {
                 using.setUserData(this);
 
                 this.mainGUI.getThemeManager().onDarkThemeChange(anchor, Collections.emptyMap());
+
+                this.onInit.accept(this);
             }
 
             name.setText(item.getName());
@@ -65,4 +74,15 @@ public class FontCell extends ListCell<OCRFont> {
         }
     }
 
+    public JFXTextField getName() {
+        return name;
+    }
+
+    public JFXTextField getPath() {
+        return path;
+    }
+
+    public JFXButton getRemoveEntry() {
+        return removeEntry;
+    }
 }

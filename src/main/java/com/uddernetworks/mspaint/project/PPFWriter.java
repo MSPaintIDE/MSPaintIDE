@@ -20,7 +20,9 @@ public class PPFWriter {
 //        ppfProject.setCompilerOutput(new File("MSPaintIDE\\compiler.png"));
 //        ppfProject.setAppOutput(new File("MSPaintIDE\\app.png"));
 
-        ppfProject.setArray(new String[]{"one", "two", "three", "four", "five"});
+        ppfProject.map.put("Name 1", "path 1");
+        ppfProject.map.put("Name 2", "path 2");
+        ppfProject.map.put("Name 3", "path 3");
 
         PPFWriter ppfWriter = new PPFWriter();
         ppfWriter.write(ppfProject);
@@ -31,6 +33,7 @@ public class PPFWriter {
         Arrays.stream(ppfProject.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(PPFSetting.class))
                 .forEach(field -> {
+                    System.out.println("Has annotation: " + Arrays.toString(field.getAnnotations()));
             BinaryIdentifier binaryIdentifier = BinaryIdentifier.fromField(field);
             if (binaryIdentifier == null) {
                 System.err.println("No binary identifier for: " + field.getName());

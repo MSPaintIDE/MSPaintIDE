@@ -1,32 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXRadioButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ListCell?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <fx:root prefHeight="30.0" prefWidth="200.0" type="javafx.scene.control.ListCell" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
-      <AnchorPane maxHeight="30.0" minHeight="30.0" prefHeight="30.0" fx:id="anchor" >
+      <AnchorPane fx:id="anchor" maxHeight="30.0" minHeight="30.0" prefHeight="30.0">
          <children>
             <JFXRadioButton fx:id="using" minHeight="30.0" text=" ">
                <toggleGroup>
                   <ToggleGroup fx:id="fonts" />
                </toggleGroup>
             </JFXRadioButton>
-            <HBox layoutX="16.0" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="300.0">
+            <HBox layoutX="16.0" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <JFXTextField fx:id="name" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" HBox.hgrow="SOMETIMES" styleClass="theme-text">
+                  <JFXTextField fx:id="name" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" styleClass="theme-text" HBox.hgrow="SOMETIMES">
                      <HBox.margin>
                         <Insets left="10.0" right="5.0" />
                      </HBox.margin>
                   </JFXTextField>
-                  <JFXTextField fx:id="path" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" HBox.hgrow="SOMETIMES" styleClass="theme-text">
+                  <JFXTextField fx:id="path" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" styleClass="theme-text" HBox.hgrow="SOMETIMES">
                      <HBox.margin>
                         <Insets left="5.0" right="10.0" />
                      </HBox.margin>
                   </JFXTextField>
+                  <JFXButton fx:id="removeEntry" alignment="CENTER_RIGHT" contentDisplay="RIGHT" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" prefHeight="30" prefWidth="30.0" style="-fx-text-fill: WHITE;" styleClass="remove-entry">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </JFXButton>
                </children>
             </HBox>
          </children>
