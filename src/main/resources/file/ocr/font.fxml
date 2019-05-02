@@ -8,23 +8,32 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
-<fx:root prefHeight="30.0" prefWidth="200.0" type="javafx.scene.control.ListCell" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<?import java.lang.String?>
+<fx:root prefHeight="45.0" prefWidth="200.0" type="javafx.scene.control.ListCell" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
-      <AnchorPane fx:id="anchor" maxHeight="30.0" minHeight="30.0" prefHeight="30.0">
+      <AnchorPane fx:id="anchor" maxHeight="30.0" prefHeight="30.0">
          <children>
-            <JFXRadioButton fx:id="using" minHeight="30.0" text=" ">
+            <JFXRadioButton fx:id="using" text=" " AnchorPane.topAnchor="6.0">
                <toggleGroup>
                   <ToggleGroup fx:id="fonts" />
                </toggleGroup>
             </JFXRadioButton>
             <HBox layoutX="16.0" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <JFXTextField fx:id="name" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" styleClass="theme-text" HBox.hgrow="SOMETIMES">
+                  <JFXTextField fx:id="name" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" HBox.hgrow="SOMETIMES">
+                     <styleClass>
+                        <String fx:value="theme-text" />
+                        <String fx:value="no-line" />
+                     </styleClass>
                      <HBox.margin>
                         <Insets left="10.0" right="5.0" />
                      </HBox.margin>
                   </JFXTextField>
-                  <JFXTextField fx:id="path" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" styleClass="theme-text" HBox.hgrow="SOMETIMES">
+                  <JFXTextField fx:id="path" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" HBox.hgrow="SOMETIMES">
+                     <styleClass>
+                        <String fx:value="theme-text" />
+                        <String fx:value="no-line" />
+                     </styleClass>
                      <HBox.margin>
                         <Insets left="5.0" right="10.0" />
                      </HBox.margin>
@@ -39,4 +48,7 @@
          </children>
       </AnchorPane>
    </graphic>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
 </fx:root>

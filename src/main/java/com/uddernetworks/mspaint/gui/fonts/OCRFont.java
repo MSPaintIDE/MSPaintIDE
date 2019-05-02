@@ -3,14 +3,18 @@ package com.uddernetworks.mspaint.gui.fonts;
 public class OCRFont {
 
     private boolean selected;
-    private int index;
     private String name;
     private String path;
 
-    public OCRFont(int index, String name, String path) {
-        this.index = index;
+    public OCRFont(String name, String path) {
         this.name = name;
         this.path = path;
+    }
+
+    public OCRFont(String name, String path, boolean selected) {
+        this.name = name;
+        this.path = path;
+        this.selected = selected;
     }
 
     public boolean isSelected() {
@@ -19,10 +23,6 @@ public class OCRFont {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }
-
-    public int getIndex() {
-        return index;
     }
 
     public String getName() {

@@ -11,24 +11,22 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 public enum BinaryIdentifier {
-//    INPUT_LOCATION(5, "inputLocation"),
-//    HIGHLIGHT_LOCATION(6, "highlightLocation"),
-//    OBJECT_LOCATION(7, "objectLocation"),
-//    CLASS_LOCATION(8, "classLocation"),
-//    JAR_FILE(9, "jarFile"),
-//    LIBRARY_LOCATION(10, "libraryLocation"),
-//    OTHER_LOCATION(11, "otherLocation"),
-//    COMPILER_OUTPUT(12, "compilerOutput"),
-//    APP_OUTPUT(13, "appOutput"),
-//    NAME(14, "name"),
-//    LANGUAGE(15, "language"),
-//    SYNTAX_HIGHLIGHT(16, "syntaxHighlight"),
-//    COMPILE(17, "compile"),
-//    EXECUTE(18, "execute"),
-//    ACTIVE_FONT_NAME(19, "activeFont"),
-//    FONT_NAMES(20, "fontNames"),
-//    FONT_PATHS(24, "fontPaths");
-    MAP(1, "map");
+    INPUT_LOCATION(5, "inputLocation"),
+    HIGHLIGHT_LOCATION(6, "highlightLocation"),
+    OBJECT_LOCATION(7, "objectLocation"),
+    CLASS_LOCATION(8, "classLocation"),
+    JAR_FILE(9, "jarFile"),
+    LIBRARY_LOCATION(10, "libraryLocation"),
+    OTHER_LOCATION(11, "otherLocation"),
+    COMPILER_OUTPUT(12, "compilerOutput"),
+    APP_OUTPUT(13, "appOutput"),
+    NAME(14, "name"),
+    LANGUAGE(15, "language"),
+    SYNTAX_HIGHLIGHT(16, "syntaxHighlight"),
+    COMPILE(17, "compile"),
+    EXECUTE(18, "execute"),
+    ACTIVE_FONT_NAME(19, "activeFont"),
+    FONTS(20, "fonts");
 
     private static Logger LOGGER = LoggerFactory.getLogger(BinaryIdentifier.class);
 
@@ -56,8 +54,10 @@ public enum BinaryIdentifier {
             this.field.setAccessible(true);
             this.typeName = this.field.getType().getName().replaceAll("^.*\\.", "").replace(";", "");
 
-            var pt = (ParameterizedType) this.field.getGenericType();
-            types.addAll(Arrays.asList(pt.getActualTypeArguments()));
+            var genericType = this.field.getGenericType();
+            if (genericType instanceof ParameterizedType) {
+                types.addAll(Arrays.asList(((ParameterizedType) genericType).getActualTypeArguments()));
+            }
 
             if (this.field.getType().isArray()) {
                 this.special = Special.ARRAY;

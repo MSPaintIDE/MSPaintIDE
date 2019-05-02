@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ThemeManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListCell;
@@ -12,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class FontCell extends ListCell<OCRFont> {
@@ -34,11 +36,13 @@ public class FontCell extends ListCell<OCRFont> {
     private FXMLLoader fxmlLoader;
     private MainGUI mainGUI;
     private ToggleGroup group;
+    private ThemeManager.ThemeChanger themeChanger;
     private Consumer<FontCell> onInit;
 
-    public FontCell(MainGUI mainGUI, ToggleGroup group, Consumer<FontCell> onInit) {
+    public FontCell(MainGUI mainGUI, ToggleGroup group, ThemeManager.ThemeChanger themeChanger, Consumer<FontCell> onInit) {
         this.mainGUI = mainGUI;
         this.group = group;
+        this.themeChanger = themeChanger;
         this.onInit = onInit;
     }
 
@@ -46,8 +50,10 @@ public class FontCell extends ListCell<OCRFont> {
     protected void updateItem(OCRFont item, boolean empty) {
         super.updateItem(item, empty);
 
-        if(empty || item == null) {
-
+        if (empty || item == null) {
+            setText(null);
+            setGraphic(null);
+            this.themeChanger.update(100, TimeUnit.MILLISECONDS);
         } else {
             if (fxmlLoader == null) {
                 setItem(item);
@@ -71,6 +77,9 @@ public class FontCell extends ListCell<OCRFont> {
 
             name.setText(item.getName());
             path.setText(item.getPath());
+
+            setText(null);
+            setGraphic(anchor);
         }
     }
 
@@ -84,5 +93,9 @@ public class FontCell extends ListCell<OCRFont> {
 
     public JFXButton getRemoveEntry() {
         return removeEntry;
+    }
+
+    public JFXRadioButton getRadio() {
+        return this.using;
     }
 }

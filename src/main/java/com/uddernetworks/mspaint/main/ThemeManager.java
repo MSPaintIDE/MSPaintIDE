@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ThemeManager {
@@ -86,6 +89,10 @@ public class ThemeManager {
 
         private void init() {
             SettingsManager.onChangeSetting(Setting.DARK_THEME, onChange, boolean.class, true);
+        }
+
+        public void update(long delay, TimeUnit unit) {
+            CompletableFuture.delayedExecutor(delay, unit).execute(() -> Platform.runLater(this::update));
         }
 
         public void update() {
