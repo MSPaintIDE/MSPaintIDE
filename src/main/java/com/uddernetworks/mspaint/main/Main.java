@@ -79,7 +79,7 @@ public class Main {
         SettingsManager.onChangeSetting(Setting.ACTIVE_FONT, font -> {
             System.out.println();
 
-//            System.out.println(ConfigFactory.load("fonts/Default").getConfig("language").entrySet());
+//            System.out.println(ConfigFactory.load("kvselection/Default").getConfig("language").entrySet());
 
             System.out.println("ALSO: " + SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
             this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));

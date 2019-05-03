@@ -22,7 +22,7 @@ plugins {
 }
 
 group = 'com.uddernetworks.mspaint'
-version = '2.2.0-SNAPSHOT'
+version = '3.0.0-SNAPSHOT'
 
 description = "Programming in MS Paint"
 

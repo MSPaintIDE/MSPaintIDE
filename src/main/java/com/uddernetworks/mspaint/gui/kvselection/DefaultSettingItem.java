@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.gui.fonts;
+package com.uddernetworks.mspaint.gui.kvselection;
 
 import com.uddernetworks.mspaint.gui.SettingItem;
 import javafx.fxml.FXMLLoader;

@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.gui.fonts;
+package com.uddernetworks.mspaint.gui.kvselection;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.collections.ObservableList;
@@ -6,7 +6,7 @@ import javafx.scene.control.MultipleSelectionModel;
 
 import java.util.ArrayList;
 
-public class EmptySelection extends MultipleSelectionModel<OCRFont> {
+public class EmptySelection extends MultipleSelectionModel<KVData> {
 
     @Override
     public ObservableList<Integer> getSelectedIndices() {
@@ -14,7 +14,7 @@ public class EmptySelection extends MultipleSelectionModel<OCRFont> {
     }
 
     @Override
-    public ObservableList<OCRFont> getSelectedItems() {
+    public ObservableList<KVData> getSelectedItems() {
         return null;
     }
 
@@ -49,7 +49,7 @@ public class EmptySelection extends MultipleSelectionModel<OCRFont> {
     }
 
     @Override
-    public void select(OCRFont obj) {
+    public void select(KVData obj) {
 
     }
 

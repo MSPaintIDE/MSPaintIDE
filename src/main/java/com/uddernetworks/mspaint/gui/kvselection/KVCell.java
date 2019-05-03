@@ -1,21 +1,21 @@
-package com.uddernetworks.mspaint.gui.fonts;
+package com.uddernetworks.mspaint.gui.kvselection;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXRadioButton;
 import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ThemeManager;
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class FontCell extends ListCell<OCRFont> {
+public class KVCell extends ListCell<KVData> {
 
     @FXML
     private AnchorPane anchor;
@@ -35,26 +35,34 @@ public class FontCell extends ListCell<OCRFont> {
     private FXMLLoader fxmlLoader;
     private MainGUI mainGUI;
     private ThemeManager.ThemeChanger themeChanger;
-    private Consumer<FontCell> onInit;
+    private final String keyPlaceholder;
+    private final String valuePlaceholder;
+    private Consumer<KVCell> onInit;
 
-    public FontCell(MainGUI mainGUI, ThemeManager.ThemeChanger themeChanger, Consumer<FontCell> onInit) {
+    public KVCell(MainGUI mainGUI, ThemeManager.ThemeChanger themeChanger, String keyPlaceholder, String valuePlaceholder, Consumer<KVCell> onInit) {
         this.mainGUI = mainGUI;
         this.themeChanger = themeChanger;
+        this.keyPlaceholder = keyPlaceholder;
+        this.valuePlaceholder = valuePlaceholder;
         this.onInit = onInit;
+
+        getStyleClass().add("gridpane-theme");
+        if (SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class)) {
+            getStyleClass().add("gridpane-theme-dark");
+        }
     }
 
     @Override
-    protected void updateItem(OCRFont item, boolean empty) {
+    protected void updateItem(KVData item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty || item == null) {
             setText(null);
             setGraphic(null);
-            this.themeChanger.update(100, TimeUnit.MILLISECONDS);
         } else {
             if (fxmlLoader == null) {
                 setItem(item);
-                fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("file/ocr/font.fxml"));
+                fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("file/ocr/kvRow.fxml"));
                 fxmlLoader.setRoot(this);
                 fxmlLoader.setController(this);
 
@@ -64,15 +72,15 @@ public class FontCell extends ListCell<OCRFont> {
                     e.printStackTrace();
                 }
 
-//                using.setToggleGroup(group);
                 using.setUserData(this);
-
-                this.mainGUI.getThemeManager().onDarkThemeChange(anchor, Collections.emptyMap());
 
                 this.onInit.accept(this);
             }
 
             using.setSelected(getItem().isSelected());
+
+            name.setPromptText(this.keyPlaceholder);
+            path.setPromptText(this.valuePlaceholder);
 
             name.setText(item.getName());
             path.setText(item.getPath());
@@ -80,6 +88,8 @@ public class FontCell extends ListCell<OCRFont> {
             setText(null);
             setGraphic(anchor);
         }
+
+        this.themeChanger.update();
     }
 
     public JFXTextField getName() {

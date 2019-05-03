@@ -2,8 +2,8 @@ package com.uddernetworks.mspaint.gui.window;
 
 import com.jfoenix.controls.JFXDecorator;
 import com.uddernetworks.mspaint.gui.SettingItem;
-import com.uddernetworks.mspaint.gui.fonts.DefaultSettingItem;
-import com.uddernetworks.mspaint.gui.fonts.OCRSettingItem;
+import com.uddernetworks.mspaint.gui.kvselection.DefaultSettingItem;
+import com.uddernetworks.mspaint.gui.kvselection.OCRSettingItem;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;

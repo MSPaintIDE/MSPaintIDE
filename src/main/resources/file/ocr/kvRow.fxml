@@ -5,19 +5,14 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ListCell?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
-<fx:root prefHeight="45.0" prefWidth="200.0" type="javafx.scene.control.ListCell" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="45.0" prefWidth="200.0" type="javafx.scene.control.ListCell" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" styleClass="gridpane-theme">
    <graphic>
       <AnchorPane fx:id="anchor" maxHeight="30.0" prefHeight="30.0">
          <children>
-            <JFXRadioButton fx:id="using" text=" " AnchorPane.topAnchor="6.0">
-               <toggleGroup>
-                  <ToggleGroup fx:id="fonts" />
-               </toggleGroup>
-            </JFXRadioButton>
+            <JFXRadioButton fx:id="using" text=" " AnchorPane.topAnchor="6.0"/>
             <HBox layoutX="16.0" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <JFXTextField fx:id="name" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" HBox.hgrow="SOMETIMES">

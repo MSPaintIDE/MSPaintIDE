@@ -1,5 +1,8 @@
 package com.uddernetworks.mspaint.project;
 
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
+
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -240,6 +243,9 @@ public class PPFProject {
 
     public void setActiveFont(String activeFont) {
         this.activeFont = activeFont;
+
+        SettingsManager.setSetting(Setting.ACTIVE_FONT_CONFIG, getFont(activeFont).getValue());
+        SettingsManager.setSetting(Setting.ACTIVE_FONT, activeFont);
     }
 
     public Map<String, String> getFonts() {

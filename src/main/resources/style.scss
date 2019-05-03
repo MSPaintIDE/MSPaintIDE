@@ -112,7 +112,7 @@ JFXButton {
 }
 
 .gridpane-theme-dark {
-    -fx-background-color: -left-background-dark;
+    -fx-background-color: -left-background-dark !important;
     -fx-text-fill: white;
     -fx-border-style: none;
 }

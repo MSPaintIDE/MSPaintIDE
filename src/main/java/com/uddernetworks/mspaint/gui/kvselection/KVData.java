@@ -1,17 +1,17 @@
-package com.uddernetworks.mspaint.gui.fonts;
+package com.uddernetworks.mspaint.gui.kvselection;
 
-public class OCRFont {
+public class KVData {
 
     private boolean selected;
     private String name;
     private String path;
 
-    public OCRFont(String name, String path) {
+    public KVData(String name, String path) {
         this.name = name;
         this.path = path;
     }
 
-    public OCRFont(String name, String path, boolean selected) {
+    public KVData(String name, String path, boolean selected) {
         this.name = name;
         this.path = path;
         this.selected = selected;

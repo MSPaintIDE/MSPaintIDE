@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXListView?>
-<?import com.jfoenix.controls.JFXScrollPane?>
 <?import com.uddernetworks.mspaint.gui.elements.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.String?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="525.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
@@ -36,34 +33,7 @@
             </children>
         </SettingsGroup>
 
-        <SettingsGroup prefWidth="710.0" styleClass="gridpane-theme" title="Fonts">
-            <children>
-                <VBox prefWidth="100.0">
-                    <children>
-                        <JFXScrollPane fx:id="scrollPane" minHeight="200.0" prefHeight="200.0">
-                            <children>
-                                <JFXListView id="fontSelect" fx:id="fontSelect" styleClass="gridpane-theme" />
-                            </children>
-                            <styleClass>
-                                <String fx:value="result-pane" />
-                                <String fx:value="gridpane-theme" />
-                            </styleClass>
-                        </JFXScrollPane>
-                    </children>
-                    <padding>
-                        <Insets bottom="5.0" left="10.0" right="10.0" top="15.0" />
-                    </padding>
-                </VBox>
-            </children>
-        </SettingsGroup>
-      <AnchorPane maxHeight="15.0" maxWidth="710.0" minHeight="15.0" prefHeight="15.0" prefWidth="710.0">
-         <children>
-             <Hyperlink fx:id="addFontText" contentDisplay="CENTER" layoutX="223.0" layoutY="-40.0" maxHeight="20.0" maxWidth="710.0" minHeight="20.0" prefHeight="20.0" styleClass="add-font-text" text="Add Font" textAlignment="CENTER" textFill="#006aff" />
-         </children>
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-      </AnchorPane>
+        <SettingKV fx:id="fontKV" title="Fonts" addText="Add Font"/>
 
         <SettingsGroup prefWidth="710.0" styleClass="gridpane-theme" title="Database">
             <children>
