@@ -92,7 +92,9 @@ run {
             "PaintInjector": "${rootProject.projectDir}\\native",
             "NativePath": "${rootProject.projectDir}\\native",
     ])
-    jvmArgs.push("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString())
+    jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString());
+    jvmArgs("--illegal-access=deny")
+    jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
 }
 
 task preLaunch << {

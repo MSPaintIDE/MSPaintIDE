@@ -648,7 +648,7 @@ public class MainGUI extends Application implements Initializable {
             createAndSetFolder(inputName, parent, "src");
             runListeners = true;
 
-            ProjectManager.getPPFProject().setInputLocation(new File(inputName.getText()));
+            project.setInputLocation(new File(inputName.getText()));
 
             createAndSetFolder(highlightedImage, parent, "highlighted");
             createAndSetFolder(cacheFile, parent, "cache");
@@ -673,7 +673,15 @@ public class MainGUI extends Application implements Initializable {
                 }
             });
 
-
+            if (project.getActiveFont() == null) {
+                project.addFont("Comic Sans MS", "fonts/ComicSans");
+                project.addFont("Monospaced.plain", "fonts/Monospaced.plain");
+                project.addFont("Verdana", "fonts/Verdana");
+                project.addFont("Courier New", "fonts/CourierNew");
+                project.addFont("Consolas", "fonts/Consolas");
+                project.addFont("Calibri", "fonts/Calibri");
+                project.setActiveFont("Comic Sans MS");
+            }
 
             ProjectManager.save();
         });

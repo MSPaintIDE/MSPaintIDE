@@ -8,7 +8,6 @@ import com.uddernetworks.mspaint.main.ThemeManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
@@ -35,13 +34,11 @@ public class FontCell extends ListCell<OCRFont> {
 
     private FXMLLoader fxmlLoader;
     private MainGUI mainGUI;
-    private ToggleGroup group;
     private ThemeManager.ThemeChanger themeChanger;
     private Consumer<FontCell> onInit;
 
-    public FontCell(MainGUI mainGUI, ToggleGroup group, ThemeManager.ThemeChanger themeChanger, Consumer<FontCell> onInit) {
+    public FontCell(MainGUI mainGUI, ThemeManager.ThemeChanger themeChanger, Consumer<FontCell> onInit) {
         this.mainGUI = mainGUI;
-        this.group = group;
         this.themeChanger = themeChanger;
         this.onInit = onInit;
     }
@@ -67,13 +64,15 @@ public class FontCell extends ListCell<OCRFont> {
                     e.printStackTrace();
                 }
 
-                using.setToggleGroup(group);
+//                using.setToggleGroup(group);
                 using.setUserData(this);
 
                 this.mainGUI.getThemeManager().onDarkThemeChange(anchor, Collections.emptyMap());
 
                 this.onInit.accept(this);
             }
+
+            using.setSelected(getItem().isSelected());
 
             name.setText(item.getName());
             path.setText(item.getPath());
