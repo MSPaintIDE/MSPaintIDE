@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class SettingsManager {
 
     private static File file;
     private static Map<Setting, Object> settings = new HashMap<>();
     private static Map<Setting, List<Consumer>> onChangeSettings = new HashMap<>();
+
+    // Everything
 
     public static Object getSetting(Setting setting) {
         return getSetting(setting, (Object) null);
@@ -30,6 +33,41 @@ public class SettingsManager {
     public static <T> T getSetting(Setting setting, Class<T> type, T def) {
         return type.cast(settings.getOrDefault(setting, def));
     }
+
+
+    // Lists
+    public static List getSettingList(Setting setting) {
+        return (List) settings.get(setting);
+    }
+
+    public static <T> List<T> getSettingList(Setting setting, Class<T> type) {
+        return (List<T>) settings.get(setting);
+    }
+
+    public static <T> List<T> getSettingList(Setting setting, T def) {
+        return (List<T>) settings.getOrDefault(setting, def);
+    }
+
+
+
+    // Maps
+    public static Map getSettingMap(Setting setting) {
+        return (Map) settings.get(setting);
+    }
+
+    public static <T> Map<T, T> getSettingMap(Setting setting, Class<T> kvType) {
+        return (Map<T, T>) settings.get(setting);
+    }
+
+    public static <K, V> Map<K, V> getSettingMap(Setting setting, Class<K> keyType, Class<V> valueType) {
+        return (Map<K, V>) settings.get(setting);
+    }
+
+    public static <K, V> Map<K, V> getSettingMap(Setting setting, Class<K> keyType, Class<V> valueType, V def) {
+        return (Map<K, V>) settings.getOrDefault(setting, def);
+    }
+
+
 
     public static void setSetting(Setting setting, Object value) {
         settings.put(setting, value);
@@ -55,7 +93,19 @@ public class SettingsManager {
     public static void save() {
         Properties properties = new Properties();
 
-        settings.forEach((key, value) -> properties.setProperty(key.getName(), value == null ? "" : value.toString()));
+        settings.forEach((key, value) -> {
+            if (value instanceof List) {
+                properties.setProperty(key.getName(), String.join(",", (List) value));
+            } else if (value instanceof Map) {
+                var adding = ((Map<Object, Object>) value).entrySet()
+                        .stream()
+                        .map(entry -> entry.getKey() + "|" + entry.getValue())
+                        .collect(Collectors.joining(","));
+                properties.setProperty(key.getName(), adding);
+            } else {
+                properties.setProperty(key.getName(), value == null ? "" : value.toString());
+            }
+        });
 
         try {
             properties.store(new FileOutputStream(file), "MS Paint IDE Global Settings");
@@ -104,6 +154,16 @@ public class SettingsManager {
                             break;
                         case BOOLEAN:
                             settings.put(setting, string.equalsIgnoreCase("true"));
+                            break;
+                        case STRING_LIST:
+                            settings.put(setting, List.of(string.split(",")));
+                            break;
+                        case STRING_STRING_MAP:
+                            if (!string.contains("|")) break;
+                            settings.put(setting, Arrays.stream(string.split(",")).map(inner -> {
+                                var kv = inner.split("\\|");
+                                return new AbstractMap.SimpleEntry<>(kv[0], kv[1]);
+                            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                             break;
                     }
                 });

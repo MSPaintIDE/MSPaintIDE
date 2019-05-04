@@ -8,7 +8,6 @@ import com.uddernetworks.mspaint.gui.kvselection.KVData;
 import com.uddernetworks.mspaint.gui.kvselection.OldNewChange;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ThemeManager;
-import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -40,7 +39,7 @@ public class SettingKV extends VBox {
     private SettingsGroup group = new SettingsGroup();
     private VBox vbox = new VBox();
     private JFXScrollPane scrollPane = new JFXScrollPane();
-    private JFXListView<KVData> fontSelect = new JFXListView<>();
+    private JFXListView<KVData> itemSelect = new JFXListView<>();
 
     private AnchorPane linkHolder = new AnchorPane();
     private Hyperlink addFontText = new Hyperlink();
@@ -49,6 +48,7 @@ public class SettingKV extends VBox {
     private Function<List<KVData>, Optional<KVData>> kvDataFunction;
     private Consumer<KVCell> kvRemoveConsumer;
     private Consumer<KVData> kvActiveConsumer;
+    private Supplier<List<KVData>> initialConsumer;
 
     public SettingKV() {
         getStyleClass().add("gridpane-theme");
@@ -67,9 +67,9 @@ public class SettingKV extends VBox {
         scrollPane.getStyleClass().add("result-pane");
         scrollPane.getStyleClass().add("gridpane-theme");
 
-        fontSelect.getStyleClass().add("gridpane-theme");
+        itemSelect.getStyleClass().add("gridpane-theme");
 
-        scrollPane.getChildren().add(fontSelect);
+        scrollPane.getChildren().add(itemSelect);
         vbox.getChildren().add(scrollPane);
         group.setContent(vbox);
 
@@ -118,15 +118,19 @@ public class SettingKV extends VBox {
         this.kvActiveConsumer = kvActiveConsumer;
     }
 
+    public void generateInital(Supplier<List<KVData>> initialConsumer) {
+        this.initialConsumer = initialConsumer;
+    }
+
     private ThemeManager.ThemeChanger themeChanger;
 
-    public void initLogic(MainGUI mainGUI, Supplier<ThemeManager.ThemeChanger> themeChangerSupplier) {
+    public void initLogic(MainGUI mainGUI) {
         var list = new ArrayList<KVCell>();
 
-        fontSelect.setCellFactory(t -> {
+        itemSelect.setCellFactory(t -> {
             if (this.themeChanger == null) {
                 this.themeChanger = mainGUI.getThemeManager().onDarkThemeChange(this, Map.of(
-                        "#fontSelect", "dark",
+                        "#itemSelect", "dark",
                         ".remove-entry", "remove-entry-white"
                 ));
             }
@@ -134,24 +138,26 @@ public class SettingKV extends VBox {
             var cell = new KVCell(mainGUI, themeChanger, getKeyPlaceholder(), getValuePlaceholder(), currCell -> {
                 currCell.getName().textProperty().addListener(((observable, oldValue, newValue) -> {
                     this.keyChange.onChange(currCell, oldValue, newValue);
+                    currCell.getItem().setName(newValue);
                 }));
 
                 currCell.getPath().textProperty().addListener(((observable, oldValue, newValue) -> {
                     this.valueChange.onChange(currCell, oldValue, newValue);
+                    currCell.getItem().setPath(newValue);
                 }));
 
                 currCell.getRemoveEntry().setOnAction(event -> {
                     var currItem = currCell.getItem();
                     if (currItem == null) return;
                     if (currItem.isSelected()) {
-                        if (fontSelect.getItems().size() == 1) return;
+                        if (itemSelect.getItems().size() == 1) return;
                         list.stream()
                                 .map(Cell::getItem)
                                 .limit(1)
                                 .findFirst()
                                 .ifPresent(newActive -> {
                                     this.kvActiveConsumer.accept(newActive);
-                                    fontSelect.getItems()
+                                    itemSelect.getItems()
                                             .stream()
                                             .filter(font -> font.equals(newActive))
                                             .findFirst()
@@ -160,7 +166,7 @@ public class SettingKV extends VBox {
                     }
 
                     this.kvRemoveConsumer.accept(currCell);
-                    fontSelect.getItems().remove(currItem);
+                    itemSelect.getItems().remove(currItem);
                     list.remove(currCell);
 
                     updateRadio(list);
@@ -177,18 +183,17 @@ public class SettingKV extends VBox {
         });
 
         this.addFontText.setOnAction(event -> {
-            var adding = this.kvDataFunction.apply(fontSelect.getItems());
+            var adding = this.kvDataFunction.apply(itemSelect.getItems());
             if (adding.isEmpty()) return;
-            fontSelect.getItems().add(adding.get());
+            itemSelect.getItems().add(adding.get());
             updateRadio(list);
         });
 
-        fontSelect.setFocusTraversable(false);
+        itemSelect.setFocusTraversable(false);
 
-        fontSelect.setSelectionModel(new EmptySelection());
+        itemSelect.setSelectionModel(new EmptySelection());
 
-        var currProject = ProjectManager.getPPFProject();
-        currProject.getFonts().forEach((name, path) -> fontSelect.getItems().add(new KVData(name, path, currProject.getActiveFont().equals(name))));
+        itemSelect.getItems().addAll(initialConsumer.get());
     }
 
     private void updateRadio(List<KVCell> list) {

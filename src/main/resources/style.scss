@@ -17,6 +17,11 @@
 
     -hover-color: #dadada; // darken(-left-background, 10%);
     -hover-color-dark: #5b5b5b; // lighten(-left-background-dark, 10%);
+
+    -text-color: #000;
+    -text-color-dark: #fff;
+    -text-color-console: #000;
+    -text-color-dark-console: #fff;
 }
 
 .primary-button {
@@ -113,7 +118,7 @@ JFXButton {
 
 .gridpane-theme-dark {
     -fx-background-color: -left-background-dark !important;
-    -fx-text-fill: white;
+    -fx-text-fill: -text-color-dark;
     -fx-border-style: none;
 }
 
@@ -134,19 +139,19 @@ JFXButton {
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
     -fx-background: -right-background;
     -fx-background-color: -right-background;
-    -fx-text-fill: black;
+    -fx-text-fill: -text-color;
 }
 
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell,
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell {
-    -fx-text-fill: white;
+    -fx-text-fill: -text-color;
 }
 
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
     -fx-background: -right-background-dark;
     -fx-background-color: -right-background-dark;
-    -fx-text-fill: white;
+    -fx-text-fill: -text-color;
 }
 
 .split-pane.gridpane-theme-dark > .split-pane-divider {
@@ -156,7 +161,7 @@ JFXButton {
 .output-theme-dark {
     -fx-background-color: -right-background-dark;
     -fx-border-color: -right-background-dark !important;
-    -fx-text-fill: white;
+    -fx-text-fill: -text-color-dark-console;
 
     .content {
         -fx-background-color: -right-background-dark;
@@ -196,11 +201,11 @@ JFXButton {
 
 .search-label {
     -fx-background-color: -left-background;
-    -fx-text-fill: black;
+    -fx-text-fill: -text-color;
 
     &.dark {
         -fx-background-color: -left-background-dark;
-        -fx-text-fill: white;
+        -fx-text-fill: -text-color-dark;
     }
 }
 
@@ -214,13 +219,13 @@ JFXButton {
 }
 
 .found-context.dark {
-    -fx-fill: white;
+    -fx-fill: -text-color-dark;
 }
 
 .dark-text {
-    -fx-text-fill: white !important;
-    -fx-prompt-text-fill: WHITE !important;
-    -jfx-unfocus-color: WHITE !important;
+    -fx-text-fill: -text-color-dark !important;
+    -fx-prompt-text-fill: -text-color-dark !important;
+    -jfx-unfocus-color: -text-color-dark !important;
 }
 
 .check-box {
@@ -229,7 +234,7 @@ JFXButton {
 
 .language-selection {
     .list-cell {
-        -fx-text-fill: black;
+        -fx-text-fill: -text-color;
         -fx-cursor: hand;
     }
 
@@ -241,12 +246,12 @@ JFXButton {
 .language-selection-dark {
     -fx-background-color: -left-background-dark;
     -fx-border-color: -left-background-dark;
-    -fx-text-fill: white;
+    -fx-text-fill: -text-color-dark;
 
     .list-cell {
         -fx-background-color: -right-background-dark;
         -fx-border-color: -right-background-dark;
-        -fx-text-fill: white;
+        -fx-text-fill: -text-color-dark;
     }
 
     .list-view {
@@ -290,7 +295,7 @@ JFXButton {
         -fx-background-insets: 0;
 
         .label {
-            -fx-text-fill: black;
+            -fx-text-fill: -text-color;
         }
     }
 
@@ -315,7 +320,7 @@ JFXButton {
             -fx-background-color: -left-background-dark;
 
             .label {
-                -fx-text-fill: white;
+                -fx-text-fill: -text-color-dark;
             }
         }
 
@@ -377,7 +382,7 @@ $pseudos: hover, focused, showing;
     &, & .list-cell {
         -fx-background-color: -left-background-dark;
         -fx-border-color: -left-background-dark;
-        -fx-text-fill: white;
+        -fx-text-fill: -text-color-dark;
     }
 
     .list-cell {

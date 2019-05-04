@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -46,9 +47,13 @@ public class Main {
 
     private CenterPopulator centerPopulator;
 
+    private Method addURL;
+    private List<String> added = new ArrayList<>();
+
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         headlessStart();
         this.mainGUI = mainGUI;
+        addPath(MainGUI.APP_DATA.getAbsolutePath());
         this.currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
         this.parent = currentJar.getParentFile();
 
@@ -70,6 +75,7 @@ public class Main {
     }
 
     public void headlessStart() throws IOException {
+        LOGGER.info("Loading settings");
         Splash.setStatus("Loading settings...");
         SettingsManager.initialize(new File(MainGUI.APP_DATA, "options.ini"));
         this.centerPopulator = new CenterPopulator(this);
@@ -77,11 +83,6 @@ public class Main {
         Splash.setStatus("Loading database...");
         this.ocrManager = new OCRManager(this);
         SettingsManager.onChangeSetting(Setting.ACTIVE_FONT, font -> {
-            System.out.println();
-
-//            System.out.println(ConfigFactory.load("kvselection/Default").getConfig("language").entrySet());
-
-            System.out.println("ALSO: " + SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
             this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
         }, String.class, true);
     }
@@ -273,6 +274,21 @@ public class Main {
 
         ProjectManager.save();
         this.mainGUI.initializeInputTextFields();
+    }
+
+    public void addPath(String path) {
+        try {
+            if (this.added.contains(path)) return;
+            if (this.addURL == null) {
+                this.addURL = ClassLoader.getSystemClassLoader().getClass().getDeclaredMethod("appendToClassPathForInstrumentation", String.class);
+                this.addURL.setAccessible(true);
+            }
+
+            this.addURL.invoke(ClassLoader.getSystemClassLoader(), path);
+            this.added.add(path);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
     }
 
     public OCRManager getOCRManager() {

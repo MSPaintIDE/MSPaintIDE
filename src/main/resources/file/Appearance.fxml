@@ -2,11 +2,12 @@
 
 <?import com.uddernetworks.mspaint.gui.elements.SettingCheckBox?>
 <?import com.uddernetworks.mspaint.gui.elements.SettingComboBox?>
+<?import com.uddernetworks.mspaint.gui.elements.SettingKV?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<?import java.lang.*?>
+<?import java.lang.String?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="525.0" prefHeight="525.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <SettingCheckBox text="Dark Theme" setting="DARK_THEME"/>
@@ -35,14 +36,7 @@
                </VBox.margin>
             </Label>
 
-            <SettingComboBox layoutX="10.0" layoutY="84.0" prefHeight="30.0" prefWidth="150.0" styleClass="language-selection" setting="EXTRA_THEME">
-               <options>
-                   <FXCollections fx:factory="observableArrayList">
-                       <String fx:value="Default"/>
-                       <String fx:value="Extra Dark"/>
-                   </FXCollections>
-               </options>
-            </SettingComboBox>
+             <SettingKV fx:id="themeSetting" layoutX="10.0" layoutY="84.0" title="Themes" addText="Add Theme" keyPlaceholder="Name" valuePlaceholder="themes/default.css"/>
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="15.0"/>

@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.main.MainGUI;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
 
 import static com.uddernetworks.mspaint.settings.SettingType.*;
 
@@ -23,7 +24,8 @@ public enum Setting {
     TRAIN_LOWER_BOUND("trainGenLowerBound", 30, INT),
     TRAIN_UPPER_BOUND("trainGenUpperBound", 90, INT),
     TASKBAR_ICON("taskbarIcon", "Colored", STRING),
-    EXTRA_THEME("extraTheme", "Default", STRING),
+    ACTIVE_THEME_NAME("activeTheme", "Default", STRING),
+    THEMES("themes", Map.of("Default", "themes/default.css", "Extra Dark", "themes/extra-dark.css"), STRING_STRING_MAP),
     INJECT_AUTO_NEW("injectAutoNew", true, BOOLEAN),
     INJECT_AUTO_OPEN("injectAutoOpen", true, BOOLEAN);
 

@@ -12,4 +12,9 @@
 
     -hover-color: #dadada;
     -hover-color-dark: #5b5b5b;
+
+    -text-color: #000;
+    -text-color-dark: #fff;
+    -text-color-console: #000;
+    -text-color-dark-console: #fff;
 }

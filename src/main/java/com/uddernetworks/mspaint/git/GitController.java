@@ -131,11 +131,11 @@ public class GitController {
             this.mainGUI.setStatusText(null);
 
             if (result.contains("Initialized")) {
-                System.out.println("Created a local git repository.");
+                LOGGER.info("Created a local git repository.");
             } else {
                 this.mainGUI.setHaveError();
 
-                System.out.println("Unexpected git command result: \n" + result + "\nIf this looks correct, please make an issue on the MS Paint IDE GitHub: https://github.com/RubbaBoy/MSPaintIDE/issues/new");
+                LOGGER.error("Unexpected git command result: \n" + result + "\nIf this looks correct, please make an issue on the MS Paint IDE GitHub: https://github.com/MSPaintIDE/MSPaintIDE/issues/new");
             }
         });
     }

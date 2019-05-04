@@ -317,8 +317,8 @@ public class MainGUI extends Application implements Initializable {
             getThemeManager();
             this.themeManager.addStage(this.primaryStage);
 
-            this.themeManager.loadTheme("Default", "default.css");
-            this.themeManager.loadTheme("Extra Dark", "extra-dark.css");
+            // Built-in themes
+            SettingsManager.getSettingMap(Setting.THEMES, String.class).forEach(this.themeManager::loadTheme);
 
             this.themeManager.init();
 
@@ -681,6 +681,13 @@ public class MainGUI extends Application implements Initializable {
                 project.addFont("Consolas", "fonts/Consolas");
                 project.addFont("Calibri", "fonts/Calibri");
                 project.setActiveFont("Comic Sans MS");
+            }
+
+            if (SettingsManager.getSettingMap(Setting.THEMES).isEmpty()) {
+                SettingsManager.setSetting(Setting.THEMES, Map.of(
+                        "Default", "themes/default.css",
+                        "Extra Dark", "themes/extra-dark.css"
+                ));
             }
 
             ProjectManager.save();

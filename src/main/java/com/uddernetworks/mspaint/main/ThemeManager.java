@@ -24,38 +24,45 @@ public class ThemeManager {
 
     private Map<String, String> themes = new HashMap<>();
     private List<Scene> scenes = new ArrayList<>();
-    private String current;
+    private String activeName;
 
     public void loadTheme(String name, String path) {
         LOGGER.info("Loading theme \"" + name + "\"");
-        themes.put(name, "themes/" + path);
+        themes.put(name, path);
     }
 
     public void init() {
-        SettingsManager.onChangeSetting(Setting.EXTRA_THEME, theme -> selectTheme(this.current = theme), String.class, true);
+        SettingsManager.onChangeSetting(Setting.ACTIVE_THEME_NAME, theme -> selectThemeName(this.activeName = theme), String.class, true);
     }
 
-    public List<String> getAllThemes() {
-        return new ArrayList<>(this.themes.keySet());
+    public Map<String, String> getAllThemes() {
+        return this.themes;
     }
 
     public void addStage(Stage stage) {
         Scene scene = stage.getScene();
         stage.setOnCloseRequest(event -> removeScene(scene));
         if (!this.scenes.contains(scene)) this.scenes.add(scene);
-        selectTheme(this.current);
+        selectThemeName(this.activeName);
     }
 
     public void removeScene(Scene scene) {
         this.scenes.remove(scene);
     }
 
-    public void selectTheme(String name) {
+    public void selectThemeName(String name) {
         if (!this.themes.containsKey(name)) return;
         this.scenes.stream().map(Scene::getStylesheets).forEach(sheets -> {
-            if (this.current != null) sheets.remove(this.themes.get(current));
+            if (this.activeName != null) sheets.remove(activeName);
             sheets.add(this.themes.get(name));
+            saveSettings();
         });
+    }
+
+    public void removeThemeName(String name) {
+        if (!this.themes.containsKey(name)) return;
+        this.themes.remove(name);
+        this.scenes.stream().map(Scene::getStylesheets).forEach(sheets -> sheets.remove(this.themes.get(name)));
     }
 
     public ThemeChanger onDarkThemeChange(Parent root, Map<String, String> classToDark) {
@@ -64,6 +71,25 @@ public class ThemeManager {
                 ".theme-text", "dark-text"));
         initialMap.putAll(classToDark);
         return new ThemeChanger(root, initialMap);
+    }
+
+    public String getActiveTheme() {
+        return this.activeName;
+    }
+
+    public void modifyThemeName(String name, String newName) {
+        var value = this.themes.remove(name);
+        this.themes.put(newName, value);
+        saveSettings();
+    }
+
+    public void modifyThemePath(String name, String path) {
+        this.themes.replace(name, path);
+        saveSettings();
+    }
+
+    public void saveSettings() {
+        SettingsManager.setSetting(Setting.THEMES, this.themes);
     }
 
     public class ThemeChanger {
