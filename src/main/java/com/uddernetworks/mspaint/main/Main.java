@@ -17,6 +17,8 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.mspaint.splash.Splash;
+import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
 import org.apache.batik.transcoder.TranscoderException;
 import org.slf4j.Logger;
@@ -33,8 +35,7 @@ public class Main {
 
     private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    private File parent;
-    private File currentJar;
+    private static File currentJar;
 
     private MainGUI mainGUI;
 
@@ -53,14 +54,24 @@ public class Main {
     public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
         headlessStart();
         this.mainGUI = mainGUI;
+
+//        try {
+//            updateEnv("PaintInjector", new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation()
+//                    .toURI()).getParent(), "native").getAbsolutePath());
+//            updateEnv("NativePath", new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation()
+//                    .toURI()).getParent(), "native").getAbsolutePath());
+//        } catch (ReflectiveOperationException e) {
+//            e.printStackTrace();
+//        }
+
         addPath(MainGUI.APP_DATA.getAbsolutePath());
-        this.currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-        this.parent = currentJar.getParentFile();
+        new File(MainGUI.APP_DATA, "fonts").mkdirs();
+        new File(MainGUI.APP_DATA, "themes").mkdirs();
 
         this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
         this.mainGUI.updateTheme();
 
-        Splash.setStatus("Adding languages...");
+        Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
         languageManager.addLanguage(new JavaLanguage());
         languageManager.addLanguage(new BrainfuckLanguage());
@@ -76,11 +87,11 @@ public class Main {
 
     public void headlessStart() throws IOException {
         LOGGER.info("Loading settings");
-        Splash.setStatus("Loading settings...");
+        Splash.setStatus(SplashMessage.SETTINGS);
         SettingsManager.initialize(new File(MainGUI.APP_DATA, "options.ini"));
         this.centerPopulator = new CenterPopulator(this);
 
-        Splash.setStatus("Loading database...");
+        Splash.setStatus(SplashMessage.DATABASE);
         this.ocrManager = new OCRManager(this);
         SettingsManager.onChangeSetting(Setting.ACTIVE_FONT, font -> {
             this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
@@ -289,6 +300,16 @@ public class Main {
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Optional<File> getCurrentJar() {
+        if (currentJar != null) return Optional.of(currentJar);
+        try {
+            return Optional.of((currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     public OCRManager getOCRManager() {

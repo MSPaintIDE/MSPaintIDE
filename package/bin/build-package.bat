@@ -20,6 +20,6 @@ call "%JAVA_HOME%\bin\java.exe" ^
     --name "MSPaintIDE" ^
     --main-jar "%JAR%" ^
     --version "%VERSION%" ^
-    --jvm-args "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --illegal-access=deny" ^
+    --jvm-args "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --illegal-access=deny" ^
     --icon "%APP_ICON%" ^
     --class "com.uddernetworks.mspaint.main.JFXWorkaround"

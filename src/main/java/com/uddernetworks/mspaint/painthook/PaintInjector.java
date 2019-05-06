@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.painthook;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.win32.StdCallLibrary;
+import com.uddernetworks.mspaint.main.Main;
 import org.apache.log4j.Logger;
 
 public interface PaintInjector extends Library, StdCallLibrary {
@@ -23,14 +24,8 @@ public interface PaintInjector extends Library, StdCallLibrary {
     class InitInjector {
         static PaintInjector init() {
             try {
-                var paintInjectorPath = System.getenv("PaintInjector");
-                if (paintInjectorPath == null) {
-                    LOGGER.error("Couldn't find system environment variable 'PaintInjector' specifying where PaintInjector.dll is.", new Exception());
-                    return null;
-                }
-
-                System.setProperty("jna.tmpdir", "E:\\MSPaintIDE\\tmp");
-                System.setProperty("jna.library.path", paintInjectorPath);
+                System.setProperty("jna.tmpdir", System.getProperty("java.io.tmpdir"));
+                Main.getCurrentJar().ifPresent(file -> System.setProperty("jna.library.path", file.getParentFile().getParentFile().getAbsolutePath() + "\\native"));
                 var library = (PaintInjector) Native.loadLibrary("PaintInjector", PaintInjector.class);
                 LOGGER.info("Loaded PaintInjector.dll");
                 return library;

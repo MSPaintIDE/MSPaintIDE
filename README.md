@@ -4,9 +4,9 @@
         <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
             alt="MS Paint IDE's Discord server">
   </a>
-  <img src="https://img.shields.io/github/stars/RubbaBoy/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
-  <a href="https://github.com/RubbaBoy/MSPaintIDE/issues"><img src="https://img.shields.io/github/issues/RubbaBoy/MSPaintIDE.svg" alt="GitHub issues"/></a>
-  <a href="https://github.com/RubbaBoy/MSPaintIDE/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/RubbaBoy/MSPaintIDE.svg" alt="GitHub issues"/></a>
+  <img src="https://img.shields.io/github/stars/MSPaintIDE/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
+  <a href="https://github.com/RubbaBoy/MSPaintIDE/issues"><img src="https://img.shields.io/github/issues/MSPaintIDE/MSPaintIDE.svg" alt="GitHub issues"/></a>
+  <a href="https://github.com/RubbaBoy/MSPaintIDE/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/MSPaintIDE/MSPaintIDE.svg" alt="GitHub issues"/></a>
 </h1>
 <h1 align="center">
     <img src="https://ms-paint-i.de/images/Logo-Header.png">
@@ -17,7 +17,7 @@
     <a href="https://ms-paint-i.de/">Website</a> |
     <a href="https://discord.gg/RXmPkPJ">Discord</a> |
     <a href="https://www.youtube.com/watch?v=eyH4aXlB1Js">Installation/Demo</a> |
-    <a href="https://github.com/RubbaBoy/NewOCR">Custom OCR</a>
+    <a href="https://github.com/MSPaintIDE/NewOCR">Custom OCR</a>
   </b>
 </p>
 

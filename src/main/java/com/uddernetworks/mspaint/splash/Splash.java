@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.main;
+package com.uddernetworks.mspaint.splash;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,7 @@ public class Splash {
 
     private static Logger LOGGER = LoggerFactory.getLogger(Splash.class);
 
-    private static AtomicReference<String> status = new AtomicReference<>("");
+    private static AtomicReference<SplashMessage> status = new AtomicReference<>(SplashMessage.BLANK);
     private static final AtomicReference<SplashScreen> splash = new AtomicReference<>();
     private static final double totalStatuses = 4;
     private static AtomicReference<Double> statusAt = new AtomicReference<>(-1D);
@@ -21,7 +21,7 @@ public class Splash {
         graphics.setComposite(AlphaComposite.Clear);
         graphics.fillRect(0,0,1000,600);
         graphics.setPaintMode();
-        graphics.drawString(status.get(), 62, 526 + 12);
+        graphics.drawImage(status.get().getImage(), null, 62, 526);
     }
 
     private void setProgress(Graphics2D graphics, double percentage) {
@@ -39,9 +39,6 @@ public class Splash {
                 return;
             }
 
-            Font font = new Font("Verdana", Font.BOLD, (int) (12D * 1.3333D));
-            graphics.setFont(font);
-
             while (SplashScreen.getSplashScreen().isVisible()) {
                 renderSplashFrame(graphics);
                 setProgress(graphics, statusAt.get() / totalStatuses);
@@ -53,7 +50,7 @@ public class Splash {
         });
     }
 
-    public static void setStatus(String status) {
+    public static void setStatus(SplashMessage status) {
         SplashScreen splash = Splash.splash.get();
         statusAt.getAndUpdate(num -> num + 1);
         if (splash != null) Splash.status.set(status);

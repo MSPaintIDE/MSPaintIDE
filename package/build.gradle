@@ -116,6 +116,17 @@ task completeInnoSetup(dependsOn: processResources) {
             include 'PaintInjector.dll'
         }
 
+        copy {
+            from "${rootProject.projectDir}/src/main/resources/splash/"
+            into "${bundlePath}/MSPaintIDE/app"
+            include 'splash-full.png'
+        }
+
+        copy {
+            from "${rootProject.projectDir}/splash"
+            into "${bundlePath}/MSPaintIDE/splash"
+        }
+
         // Copy files for DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
         copy {
             from windowsDllMSVCP140
@@ -126,4 +137,13 @@ task completeInnoSetup(dependsOn: processResources) {
     }
 }
 
+task replaceCfg << {
+    ant.replaceregexp(match: 'app.name=', replace: 'app.splash=splash-full.png\napp.name=') {
+        fileset(dir: "${bundlePath}/MSPaintIDE/app", includes: 'MSPaintIDE.cfg')
+    }
+}
+
+clean.finalizedBy ':generateSplashMessages'
+
 createBundle.finalizedBy completeInnoSetup
+completeInnoSetup.finalizedBy replaceCfg

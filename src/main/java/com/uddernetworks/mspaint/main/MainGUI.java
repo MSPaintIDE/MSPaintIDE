@@ -10,6 +10,8 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.mspaint.splash.Splash;
+import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -346,7 +348,7 @@ public class MainGUI extends Application implements Initializable {
 
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
-        Splash.setStatus("Starting...");
+        Splash.setStatus(SplashMessage.STARTING);
         this.primaryStage.setOnShown(event -> Splash.end());
         if (!this.primaryStage.isShowing()) this.primaryStage.show();
     }
@@ -564,7 +566,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Splash.setStatus("Loading GUI...");
+        Splash.setStatus(SplashMessage.GUI);
 
         initializeInputTextFields();
         setGitFeaturesDisabled(true);

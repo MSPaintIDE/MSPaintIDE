@@ -22,7 +22,7 @@ plugins {
 }
 
 group = 'com.uddernetworks.mspaint'
-version = '3.0.0-SNAPSHOT'
+version = '2.2.0-SNAPSHOT'
 
 description = "Programming in MS Paint"
 
@@ -92,7 +92,7 @@ run {
             "PaintInjector": "${rootProject.projectDir}\\native",
             "NativePath": "${rootProject.projectDir}\\native",
     ])
-    jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString());
+    jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString())
     jvmArgs("--illegal-access=deny")
     jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
 }
@@ -109,7 +109,13 @@ task replaceStuff << {
     }
 }
 
+task generateSplashMessages(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    main = "com.uddernetworks.mspaint.splash.SplashGen"
+}
+
 preLaunch.finalizedBy replaceStuff
+replaceStuff.finalizedBy generateSplashMessages
 
 task copyDependencies(type: Copy) {
     from configurations.runtime - configurations.javafxCompile

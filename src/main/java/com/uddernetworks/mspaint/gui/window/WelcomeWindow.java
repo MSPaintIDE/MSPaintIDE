@@ -53,6 +53,7 @@ public class WelcomeWindow extends Stage implements Initializable {
         icon.setFitWidth(25);
 
         JFXDecorator jfxDecorator = new JFXDecorator(this, root, false, true, true);
+        jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
         jfxDecorator.setGraphic(icon);
         jfxDecorator.setTitle("Welcome to MS Paint IDE");
 
