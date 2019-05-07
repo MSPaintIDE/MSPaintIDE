@@ -18,6 +18,7 @@ database/
 
 # Misc.
 **.class
+**.log
 training.png
 training_**.png
 train_**.png

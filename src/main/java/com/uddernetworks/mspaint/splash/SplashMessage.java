@@ -8,7 +8,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public enum SplashMessage {
     BLANK("", "blank.png"),
@@ -41,11 +40,12 @@ public enum SplashMessage {
         if (this.image != null) return this.image;
 
         try {
-            var currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-            var imageLocation = new File(currentJar.getParentFile().getParentFile(), "splash\\" + imagePath);
+            var parentOptional = Main.getJarParent();
+            if (parentOptional.isEmpty()) return null;
+            var imageLocation = new File(parentOptional.get(), "splash\\" + imagePath);
             imageLocation.mkdirs();
             this.image = ImageIO.read(imageLocation);
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Error reading image", e);
         }
 

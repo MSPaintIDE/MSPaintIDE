@@ -312,6 +312,23 @@ public class Main {
         return Optional.empty();
     }
 
+    public static Optional<File> getJarParent() {
+        try {
+            var currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            var numBack = currentJar.getParentFile().getName().equals("app") ? 2 : 4;
+            return Optional.of(getParentsBack(currentJar, numBack));
+        } catch (URISyntaxException e) {
+            LOGGER.error("Error getting URI of file", e);
+        }
+
+        return Optional.empty();
+    }
+
+    public static File getParentsBack(File base, int back) {
+        for (int i = 0; i < back; i++) base = base.getParentFile();
+        return base;
+    }
+
     public OCRManager getOCRManager() {
         return ocrManager;
     }

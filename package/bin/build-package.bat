@@ -22,4 +22,7 @@ call "%JAVA_HOME%\bin\java.exe" ^
     --version "%VERSION%" ^
     --jvm-args "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --illegal-access=deny" ^
     --icon "%APP_ICON%" ^
-    --class "com.uddernetworks.mspaint.main.JFXWorkaround"
+    --class "com.uddernetworks.mspaint.main.JFXWorkaround" ^
+    --copyright "Copyright © 2019 Adam Yarris" ^
+    --description "MS Paint IDE" ^
+    --vendor "Adam Yarris" ^

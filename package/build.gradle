@@ -29,9 +29,6 @@ ext {
     windowsDllDirectory = file('C:\\Windows\\System32')
     windowsDllMSVCP140 = file("${windowsDllDirectory}/MSVCP140.dll")
     windowsDllVCRUNTIME140 = file("${windowsDllDirectory}/VCRUNTIME140.dll")
-    if (publishedVersion.endsWith('-SNAPSHOT')) {
-        publishedVersion = '0.0.1'
-    }
 }
 
 task checkBundlingEnvironment {
