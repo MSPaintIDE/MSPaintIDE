@@ -8,6 +8,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ProjectManager {
@@ -17,6 +18,7 @@ public class ProjectManager {
     private static PPFWriter ppfWriter = new PPFWriter();
     private static PPFReader ppfReader = new PPFReader();
     private static List<PPFProject> recentProjects = new ArrayList<>();
+    private static Consumer<PPFProject> projectConsumer;
 
     public static void closeCurrentProject() {
         if (ppfProject != null) save();
@@ -42,7 +44,10 @@ public class ProjectManager {
                     .filter(File::exists)
                     .map(ppfReader::read)
                     .collect(Collectors.toList());
-            if (open.get() && !recentProjects.isEmpty()) ppfProject = recentProjects.get(0);
+            if (open.get() && !recentProjects.isEmpty()) {
+                ppfProject = recentProjects.get(0);
+                projectConsumer.accept(ppfProject);
+            }
             return recentProjects;
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,13 +88,21 @@ public class ProjectManager {
     }
 
     public static PPFProject readProject(File file) {
+        System.out.println("Reading 222");
         return (ppfProject = ppfReader.read(file));
     }
 
     public static void switchProject(PPFProject ppfProject) {
+        System.out.println("Switching project");
         setCurrentProject(ppfProject);
         save();
         addRecent(ppfProject);
         writeRecent();
+
+        projectConsumer.accept(ppfProject);
+    }
+
+    public static void switchProjectConsumer(Consumer<PPFProject> projectConsumer) {
+        ProjectManager.projectConsumer = projectConsumer;
     }
 }

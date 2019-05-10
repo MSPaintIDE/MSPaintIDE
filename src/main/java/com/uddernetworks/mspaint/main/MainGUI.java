@@ -43,6 +43,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -170,8 +171,32 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            System.out.println("Exception on " + t.getName());
+            System.out.println(e.getLocalizedMessage());
+            System.out.println(e.getMessage());
+            for (var stackTraceElement : e.getStackTrace()) {
+                System.out.println(stackTraceElement.toString());
+            }
+            e.printStackTrace(System.out);
+            e.printStackTrace();
+        });
+
+
+        var fiule = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\shit.txt");
+        fiule.createNewFile();
+        PrintStream o = new PrintStream(fiule);
+        System.setOut(o);
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
+
+        System.out.println("111 java.library.path = ");
+        System.out.println(System.getProperty("java.library.path"));
+
+        System.setProperty("java.library.path", System.getProperty("java.library.path") + ";" + System.getenv("PATH"));
+
+        System.out.println("222 java.library.path = ");
+        System.out.println(System.getProperty("java.library.path"));
 
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
@@ -185,6 +210,8 @@ public class MainGUI extends Application implements Initializable {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         }
+
+//        new Splash();
 
         if (args.length == 1) {
             if (args[0].endsWith(".ppf")) {
@@ -257,6 +284,7 @@ public class MainGUI extends Application implements Initializable {
 
         ProjectManager.getRecent();
 
+        System.out.println("Reading 111 " + initialProject);
         if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this);
@@ -349,8 +377,16 @@ public class MainGUI extends Application implements Initializable {
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
         Splash.setStatus(SplashMessage.STARTING);
-        this.primaryStage.setOnShown(event -> Splash.end());
-        if (!this.primaryStage.isShowing()) this.primaryStage.show();
+        LOGGER.info("Starting");
+//        this.primaryStage.setOnShown(event -> Splash.end());
+        this.primaryStage.setOnShown(event -> {
+            System.out.println("EVENT!");
+        });
+        LOGGER.info("222");
+        System.out.println("Showing it: " + !this.primaryStage.isShowing());
+//        if (!this.primaryStage.isShowing()) this.primaryStage.show();
+        this.primaryStage.show();
+        LOGGER.info("333");
     }
 
     public void changeImage(String path) {
@@ -690,6 +726,11 @@ public class MainGUI extends Application implements Initializable {
                         "Default", "themes/default.css",
                         "Extra Dark", "themes/extra-dark.css"
                 ));
+            }
+
+            var trainImage = SettingsManager.getSetting(Setting.TRAIN_IMAGE);
+            if (trainImage == null || ((String) trainImage).trim().equals("")) {
+                SettingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParent() + "\\train.png");
             }
 
             ProjectManager.save();

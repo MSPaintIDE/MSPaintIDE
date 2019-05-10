@@ -52,7 +52,9 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "open.project")
     private void onClickOpenProject() {
+        System.out.println("OPen!");
         FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), ProjectFileFilter.PPF, JFileChooser.FILES_ONLY, file -> {
+            System.out.println("Clicked");
             ProjectManager.switchProject(ProjectManager.readProject(file));
             this.mainGUI.refreshProject();
         });

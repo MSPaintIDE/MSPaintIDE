@@ -4,6 +4,10 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
 import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ReflectionUtils;
+import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.DefaultScannedImage;
 import com.uddernetworks.newocr.recognition.ScannedImage;
@@ -14,10 +18,14 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,6 +68,58 @@ public class TextEditorManager {
         backupFile.createNewFile();
         Files.copy(this.originalFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
+        System.out.println("Main: " + Thread.currentThread());
+        Thread thread = Thread.currentThread();
+
+        var file2 = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\threrads\\shit.txt");
+        file2.createNewFile();
+
+        var num = new AtomicInteger();
+        var threadd = new Thread(() -> {
+            while (true) {
+                System.out.println("Here!");
+
+                System.out.println("Printing stack trace:");
+
+
+                try {
+                    ReflectionUtils.printThreadInfo(new PrintWriter(file2), "" + num.getAndIncrement());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        System.getProperties().forEach((key, val) -> {
+            System.out.println(key + " = " + val);
+        });
+
+        System.getProperty("file.encoding","UTF-8");
+        System.getProperty("sun.jnu.encoding","UTF-8");
+        System.getProperty("file.encoding","UTF-8");
+        threadd.setName("Printer");
+        threadd.start();
+//        System.out.println("Right here UPDATED:");
+//        GraphicsEnvironment ge =
+//                GraphicsEnvironment.getLocalGraphicsEnvironment();
+//        Font ni = null;
+//        try {
+//            ni = Font.createFont(Font.TRUETYPE_FONT, new File("C:\\Program Files (x86)\\MS Paint IDE\\runtime\\lib\\fonts\\comic.ttf"));
+//        } catch (FontFormatException e) {
+//            e.printStackTrace();
+//        }
+//        ge.registerFont(ni);
+//
+//        var metrics = Toolkit.getDefaultToolkit().getFontMetrics(new Font("Verdana", Font.PLAIN, 36));
+//        System.out.println("REALLLL metrics = " + metrics);
+//        System.out.println("Done!");
+
         this.imageFile = createImageFile();
 
         this.imageClass = new ImageClass(this.imageFile, mainGUI, this.headlessMain);
@@ -81,7 +141,7 @@ public class TextEditorManager {
 
                         if (found && (System.currentTimeMillis() - last) > 250) {
                             this.imageClass.scan();
-                            Files.write(this.originalFile.toPath(), this.imageClass.getText().getBytes());
+                            Files.write(this.originalFile.toPath(), this.imageClass.getTrimmedText().getBytes());
                             last = System.currentTimeMillis();
                         }
 
@@ -97,14 +157,49 @@ public class TextEditorManager {
         if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
     }
 
+    private static HashMap<Font, FontMetrics> fontmetrics = new HashMap<Font, FontMetrics>();
+
+
+    public static FontMetrics getFontMetrics(Font font)
+    {
+        if (fontmetrics.containsKey(font))
+        {
+            return fontmetrics.get(font);
+        }
+        FontMetrics fm = createFontMetrics(font);
+        fontmetrics.put(font, fm);
+        return fm;
+    }
+
+    private static FontMetrics createFontMetrics(Font font)
+    {
+        System.out.println("About");
+        BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+        System.out.println("222");
+        Graphics g = bi.getGraphics();
+        System.out.println("333");
+        FontMetrics fm = g.getFontMetrics(font);
+        System.out.println("444");
+        g.dispose();
+        System.out.println("555");
+
+        bi = null;
+        return fm;
+    }
+
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException, IOException {
         var ocrManager = this.headlessMain.getOCRManager();
-        ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, this.imageClass.getImage());
+        System.out.println("imageClass = " + imageClass);
+        ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null);
         LetterGenerator letterGenerator = new LetterGenerator();
 
-        var size = ocrManager.getFontSize(scannedImage);
+        var size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
 
-        var spaceOptional = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
+        var data = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
+        System.out.println("data = " + data);
+
+        // Gets the space DatabaseCharacter used for the current font size from the database
+        var spaceOptional = data.stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
 
         if (spaceOptional.isEmpty()) {
             LOGGER.error("Couldn't find space for size: " + size);
@@ -117,7 +212,15 @@ public class TextEditorManager {
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
 
         var centerPopulator = this.headlessMain.getCenterPopulator();
-        centerPopulator.generateCenters((int) size);
+        System.out.println("BEFORE");
+        CompletableFuture.runAsync(() -> {
+            try {
+                centerPopulator.generateCenters((int) size);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).get();
+        System.out.println("DONE!!!");
 
         int x = 0;
         int y = 0;
@@ -132,7 +235,9 @@ public class TextEditorManager {
 
                 boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, ocrManager.getActiveFont(), space);
                 int center = (int) ((size/ 2D) - centerPopulator.getCenter(cha, (int) size));
+//                int center = centerPopulator.getCenter(cha, size);
 
+                System.out.println("center = " + center + " (Size = " + size + ")");
                 ImageLetter letter = new ImageLetter(cha, 0, x, y + center, letterGrid[0].length, letterGrid.length, 0D, 0D, 0D);
                 letter.setValues(letterGrid);
                 letter.setData(Color.BLACK);
@@ -157,7 +262,7 @@ public class TextEditorManager {
         String text = new String(Files.readAllBytes(this.originalFile.toPath()));
         LOGGER.info("text = " + text);
 
-        int padding = 12;
+        int padding = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
 
         BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < image.getWidth(); x++) {
@@ -182,6 +287,8 @@ public class TextEditorManager {
 
     private void initialProcess() throws IOException, InterruptedException {
         LOGGER.info("Processing");
+
+        CompletableFuture.runAsync(Splash::end);
 
         Runtime runtime = Runtime.getRuntime();
         Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");

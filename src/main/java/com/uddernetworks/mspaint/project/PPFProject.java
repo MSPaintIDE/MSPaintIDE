@@ -1,12 +1,10 @@
 package com.uddernetworks.mspaint.project;
 
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
-
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class PPFProject {
 
@@ -59,6 +57,8 @@ public class PPFProject {
 
     @PPFSetting
     public Map<String, String> fonts = new HashMap<>();
+
+    private BiConsumer<String, String> fontUpdate;
 
     public PPFProject(File file) {
         this.file = file;
@@ -241,11 +241,24 @@ public class PPFProject {
         return activeFont;
     }
 
+    public String getActiveFontConfig() {
+        return getFont(activeFont).getValue();
+    }
+
     public void setActiveFont(String activeFont) {
         this.activeFont = activeFont;
 
-        SettingsManager.setSetting(Setting.ACTIVE_FONT_CONFIG, getFont(activeFont).getValue());
-        SettingsManager.setSetting(Setting.ACTIVE_FONT, activeFont);
+        this.fontUpdate.accept(activeFont, getFont(activeFont).getValue());
+    }
+
+    public void onFontUpdate(BiConsumer<String, String> fontUpdate) {
+        this.fontUpdate = fontUpdate;
+    }
+
+    public void onFontUpdate(BiConsumer<String, String> fontUpdate, boolean initial) {
+        onFontUpdate(fontUpdate);
+        if (!initial) return;
+        setActiveFont(getActiveFont());
     }
 
     public Map<String, String> getFonts() {

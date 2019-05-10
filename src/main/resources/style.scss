@@ -133,6 +133,7 @@ JFXButton {
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell > *,
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell > * {
     -fx-cursor: hand;
+    -fx-text-fill: -text-color;
 }
 
 .tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
@@ -144,14 +145,14 @@ JFXButton {
 
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell,
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell {
-    -fx-text-fill: -text-color;
+    -fx-text-fill: -text-color-dark;
 }
 
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
 .gridpane-theme-dark.tree-view > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected:hover {
     -fx-background: -right-background-dark;
     -fx-background-color: -right-background-dark;
-    -fx-text-fill: -text-color;
+    -fx-text-fill: -text-color-dark;
 }
 
 .split-pane.gridpane-theme-dark > .split-pane-divider {

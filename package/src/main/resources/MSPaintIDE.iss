@@ -71,5 +71,5 @@ Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\shell\open\command"; ValueType:
 
 Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "Edit with MS Paint IDE"; Components: context_menu
 Root: HKCR; Subkey: "*\shell\MSPaintIDE\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Components: context_menu
-Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\icon.ico"; Components: context_menu
+Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\MSPaintIDE.ico"; Components: context_menu
 Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: expandsz; ValueName: "Position"; ValueData: "Top"; Components: context_menu

@@ -5,37 +5,44 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class FileDirectoryChooser {
 
-    private static CustomChooser fileChooser;
+    private static final AtomicReference<CustomChooser> fileChooser = new AtomicReference<>();
 
     // This is a horrible way of doing this, before anyone yells at me, the standard JavaFX file chooser
     // doesn't allow file and directory selection in the same window
     public static void openMultiFileChoser(File selectedFile, FileFilter fileFilter, int type, Consumer<File[]> onSelected) {
-        if (fileChooser != null) {
-            fileChooser.hide();
+        if (fileChooser.get() != null) {
+            fileChooser.get().hide();
         }
 
         CompletableFuture.runAsync(() -> {
-            fileChooser = new CustomChooser(type, selectedFile, fileFilter, true);
+            fileChooser.set(new CustomChooser(type, selectedFile, fileFilter, true));
 
-            fileChooser.onApproveMultiple(onSelected);
+            fileChooser.get().onApproveMultiple(onSelected);
         });
     }
 
     // This is a horrible way of doing this, before anyone yells at me, the standard JavaFX file chooser
     // doesn't allow file and directory selection in the same window
     public static void openFileChooser(File selectedFile, FileFilter fileFilter, int type, Consumer<File> onSelected) {
-        if (fileChooser != null) {
-            fileChooser.hide();
+        System.out.println("FileDirectoryChooser.openFileChooser");
+        if (fileChooser.get() != null) {
+            fileChooser.get().hide();
         }
 
         CompletableFuture.runAsync(() -> {
-            fileChooser = new CustomChooser(type, selectedFile, fileFilter);
+            System.out.println("Async");
+            try {
+                fileChooser.set(new CustomChooser(type, selectedFile, fileFilter));
 
-            fileChooser.onApproveSingle(onSelected);
+                fileChooser.get().onApproveSingle(onSelected);
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+            }
         });
     }
 
@@ -61,6 +68,7 @@ public class FileDirectoryChooser {
 
         protected JDialog createDialog(Component parent) throws HeadlessException {
             this.dialog = super.createDialog(parent);
+            System.out.println("Creating bullshit");
 
             setFileSelectionMode(this.type);
             setSelectedFile(this.selectedFile);
