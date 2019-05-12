@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class Main {
 
@@ -49,6 +50,7 @@ public class Main {
 
     private Method addURL;
     private List<String> added = new ArrayList<>();
+    private Consumer<PPFProject> projectConsumer;
 
     public void start(MainGUI mainGUI) throws IOException {
         headlessStart();
@@ -83,9 +85,18 @@ public class Main {
 
         Splash.setStatus(SplashMessage.DATABASE);
         this.ocrManager = new OCRManager(this);
-        SettingsManager.onChangeSetting(Setting.ACTIVE_FONT, font -> {
-            this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.ACTIVE_FONT_CONFIG, String.class));
-        }, String.class, true);
+
+        if (MainGUI.HEADLESS) {
+            SettingsManager.onChangeSetting(Setting.HEADLESS_FONT, font -> {
+                this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG, String.class));
+            }, String.class, true);
+        } else {
+            ProjectManager.switchProjectConsumer(project -> {
+                project.onFontUpdate((name, path) -> {
+                    this.ocrManager.setActiveFont(name, path);
+                }, true);
+            });
+        }
     }
 
     public void setCurrentLanguage(Language language) {
@@ -191,8 +202,8 @@ public class Main {
             }
         }
 
-        ImageOutputStream imageOutputStream = new ImageOutputStream(ProjectManager.getPPFProject().getAppOutput(), 500);
-        ImageOutputStream compilerOutputStream = new ImageOutputStream(ProjectManager.getPPFProject().getCompilerOutput(), 500);
+        ImageOutputStream imageOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getAppOutput(), 500);
+        ImageOutputStream compilerOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getCompilerOutput(), 500);
         Map<ImageClass, List<LanguageError>> errors = null;
 
         try {
@@ -333,5 +344,13 @@ public class Main {
 
     public CenterPopulator getCenterPopulator() {
         return centerPopulator;
+    }
+
+    public String getFontName() {
+        return MainGUI.HEADLESS ? SettingsManager.getSetting(Setting.HEADLESS_FONT, String.class) : ProjectManager.getPPFProject().getActiveFont();
+    }
+
+    public String getFontConfig() {
+        return MainGUI.HEADLESS ? SettingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG, String.class) : ProjectManager.getPPFProject().getActiveFontConfig();
     }
 }

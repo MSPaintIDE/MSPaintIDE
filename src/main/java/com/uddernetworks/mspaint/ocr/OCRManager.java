@@ -36,6 +36,7 @@ public class OCRManager {
     }
 
     public void setActiveFont(String name, String config) {
+        System.out.println("3245345 name = " + name);
         if (!this.fontDataMap.containsKey(name)) {
             LOGGER.info("Loading initial font data for " + name + " at " + config);
             (this.activeFont = new FontData(this, name, config)).initialize();

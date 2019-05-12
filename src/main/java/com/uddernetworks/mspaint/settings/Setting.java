@@ -16,9 +16,9 @@ public enum Setting {
     DATABASE_URL("databaseURL", "", STRING),
     DATABASE_USER("databaseUser", "", STRING),
     DATABASE_PASS("databasePass", "", STRING),
-    ACTIVE_FONT("activeFont", "Comic Sans MS", STRING),
-    ACTIVE_FONT_CONFIG("activeFont","fonts/ComicSans", STRING),
-    TRAIN_IMAGE("trainImage", "", STRING),
+    HEADLESS_FONT("headlessFontName", "Comic Sans MS", STRING),
+    HEADLESS_FONT_CONFIG("headlessFontPath","fonts/ComicSans", STRING),
+    TRAIN_IMAGE("trainImage", "/train.png", STRING),
     OCR_DEBUG("ocrDebug", false, BOOLEAN),
     EDIT_FILE_SIZE("editFileFontSize", 36, INT), // The font size that files are generated in
     TRAIN_LOWER_BOUND("trainGenLowerBound", 30, INT),

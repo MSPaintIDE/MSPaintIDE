@@ -20,6 +20,7 @@ public class ImageClass {
     private File inputImage;
     private ScannedImage scannedImage;
     private String text;
+    private String trimmedText;
     private LetterFileWriter letterFileWriter;
     private File highlightedFile;
     private MainGUI mainGUI;
@@ -50,6 +51,7 @@ public class ImageClass {
         scannedImage = imageCompare.getText(inputImage, mainGUI, this.headlessMain);
 
         text = scannedImage.getPrettyString();
+        trimmedText = scannedImage.stripLeadingSpaces().getPrettyString();
 
         LOGGER.info("\n" + prefix + "text =\n" + text);
 
@@ -88,6 +90,10 @@ public class ImageClass {
 
     public String getText() {
         return text;
+    }
+
+    public String getTrimmedText() {
+        return trimmedText;
     }
 
     public File getInputImage() {

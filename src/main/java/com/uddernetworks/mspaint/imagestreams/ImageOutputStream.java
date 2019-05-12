@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.imagestreams;
 
-import com.uddernetworks.mspaint.settings.Setting;
-import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.mspaint.main.Main;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,6 +14,7 @@ import java.util.List;
 
 public class ImageOutputStream extends OutputStream {
     private StringBuilder string = new StringBuilder();
+    private Main main;
     private File location;
     private Graphics2D graphics;
     private int width;
@@ -22,7 +22,8 @@ public class ImageOutputStream extends OutputStream {
     private Color color;
     private Color background;
 
-    public ImageOutputStream(File location, int width) {
+    public ImageOutputStream(Main main, File location, int width) {
+        this.main = main;
         this.location = location;
 
         this.width = width;
@@ -46,8 +47,8 @@ public class ImageOutputStream extends OutputStream {
         RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         graphics.setRenderingHints(rht);
 
-        Font fontt = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 24);
-        graphics.setFont(fontt);
+        Font font = new Font(this.main.getFontName(), Font.PLAIN, 24);
+        graphics.setFont(font);
 
         List<String> linesList = new ArrayList<>();
 
@@ -66,7 +67,6 @@ public class ImageOutputStream extends OutputStream {
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
         graphics.setRenderingHints(rh);
 
-        Font font = new Font(SettingsManager.getSetting(Setting.ACTIVE_FONT, String.class), Font.PLAIN, 24);
         graphics.setFont(font);
         graphics.setPaint(this.background);
         graphics.fillRect(0, 0, this.width, height);
@@ -92,7 +92,9 @@ public class ImageOutputStream extends OutputStream {
     }
 
     private String breakStringUp(String message) {
+        System.out.println("Breaking!");
         FontMetrics fontMetrics = graphics.getFontMetrics();
+        System.out.println("fontMetrics = " + fontMetrics);
 
         String[] words = message.split(" ");
 
@@ -121,6 +123,7 @@ public class ImageOutputStream extends OutputStream {
     }
 
     private String breakWordUp(String word) {
+        System.out.println("Breaking 2");
         FontMetrics fontMetrics = graphics.getFontMetrics();
 
         char[] chars = word.toCharArray();

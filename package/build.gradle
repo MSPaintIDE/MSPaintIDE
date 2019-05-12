@@ -6,6 +6,16 @@ import org.apache.tools.ant.filters.ReplaceTokens
  * Open Source Software published under the Apache Licence, Version 2.0.
  */
 
+/*
+ * Compile jar and installer:
+ *  createBundle -PjavafxJmodsPath="C:\javafx-jmods-11"
+ * 
+ * Compile JUST jar and no inno compile:
+ *  createBundle -x package:innoCompile -PjavafxJmodsPath="C:\javafx-jmods-11"
+ * 
+ * Run in IDE:
+ *  preLaunch run
+ */
 
 apply plugin: 'java'
 
@@ -130,7 +140,26 @@ task completeInnoSetup(dependsOn: processResources) {
             from windowsDllVCRUNTIME140
             into "${bundlePath}/MSPaintIDE"
         }
-        println("Inno Setup file: ${generatedInnoSetupFile}")
+        println "Inno Setup file: ${generatedInnoSetupFile}"
+    }
+}
+
+task innoCompile(type: Exec) {
+    executable 'C:\\Program Files (x86)\\Inno Setup 5\\compil32.exe'
+    args "/cc", "\"${generatedInnoSetupFile}\""
+    doLast {
+        task copyOutput(dependsOn: processResources) {
+            doLast {
+                copy {
+                    from "${buildDir}\\resources\\main\\Output"
+                    into "${buildDir}"
+                    include "MSPaintIDE-${publishedVersion}.exe"
+                }
+            }
+        }
+
+        copyOutput.execute()
+        println "Installation file: ${buildDir}\\MSPaintIDE-${publishedVersion}.exe"
     }
 }
 
@@ -142,5 +171,7 @@ task replaceCfg << {
 
 clean.finalizedBy ':generateSplashMessages'
 
+createBundle.dependsOn clean
 createBundle.finalizedBy completeInnoSetup
 completeInnoSetup.finalizedBy replaceCfg
+replaceCfg.finalizedBy innoCompile

@@ -44,6 +44,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -192,6 +194,14 @@ public class MainGUI extends Application implements Initializable {
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
 
+        System.out.println("111 java.library.path = ");
+        System.out.println(System.getProperty("java.library.path"));
+
+        System.setProperty("java.library.path", System.getProperty("java.library.path") + ";" + System.getenv("PATH"));
+
+        System.out.println("222 java.library.path = ");
+        System.out.println(System.getProperty("java.library.path"));
+
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
             frame.setSize(700, 200);
@@ -204,6 +214,8 @@ public class MainGUI extends Application implements Initializable {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         }
+
+//        new Splash();
 
         if (args.length == 1) {
             if (args[0].endsWith(".ppf")) {
@@ -276,6 +288,7 @@ public class MainGUI extends Application implements Initializable {
 
         ProjectManager.getRecent();
 
+        System.out.println("Reading 111 " + initialProject);
         if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this);
@@ -727,6 +740,11 @@ public class MainGUI extends Application implements Initializable {
                         "Default", "themes/default.css",
                         "Extra Dark", "themes/extra-dark.css"
                 ));
+            }
+
+            var trainImage = SettingsManager.getSetting(Setting.TRAIN_IMAGE);
+            if (trainImage == null || ((String) trainImage).trim().equals("")) {
+                SettingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParent() + "\\train.png");
             }
 
             ProjectManager.save();

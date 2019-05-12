@@ -31,6 +31,7 @@ sourceCompatibility = 11
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
     options.compilerArgs << '--add-exports=java.management/sun.management=ALL-UNNAMED'
+    options.compilerArgs << '--add-exports=java.desktop/sun.font=ALL-UNNAMED'
 }
 
 repositories {
@@ -95,6 +96,7 @@ run {
     jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString())
     jvmArgs("--illegal-access=deny")
     jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
+//    args = ['E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\Test.txt']
 }
 
 task preLaunch << {
