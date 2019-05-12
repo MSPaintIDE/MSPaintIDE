@@ -43,7 +43,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -159,7 +159,7 @@ public class MainGUI extends Application implements Initializable {
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
-    public MainGUI() throws IOException, URISyntaxException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+    public MainGUI() throws IOException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         System.setProperty("jna.debug_load", "true");
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -170,6 +170,25 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+        // See com.sun.glass.ui.Application#checkEventThread() javadoc
+//        System.setProperty("glass.disableThreadChecks", "true");
+
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            System.out.println("Exception on " + t.getName());
+            System.out.println(e.getLocalizedMessage());
+            System.out.println(e.getMessage());
+            for (var stackTraceElement : e.getStackTrace()) {
+                System.out.println(stackTraceElement.toString());
+            }
+            e.printStackTrace(System.out);
+            e.printStackTrace();
+        });
+
+
+        var fiule = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\shit.txt");
+        fiule.createNewFile();
+        PrintStream o = new PrintStream(fiule);
+        System.setOut(o);
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
 
@@ -302,46 +321,60 @@ public class MainGUI extends Application implements Initializable {
         Platform.runLater(() -> progress.setProgress(indeterminate ? -1 : 1));
     }
 
+    private boolean registeredBefore = false;
+
     public void registerThings() throws IOException {
-        if (!this.primaryStage.isShowing()) {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
-            loader.setController(this);
-            Parent root = loader.load();
+        System.out.println("MainGUI.registerThings");
 
-            JFXDecorator jfxDecorator = new JFXDecorator(this.primaryStage, root, false, true, true);
-            jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
-
-            Scene scene = new Scene(jfxDecorator);
-            scene.getStylesheets().add("style.css");
-
-            this.primaryStage.setScene(scene);
-
-            getThemeManager();
-            this.themeManager.addStage(this.primaryStage);
-
-            // Built-in themes
-            SettingsManager.getSettingMap(Setting.THEMES, String.class).forEach(this.themeManager::loadTheme);
-
-            this.themeManager.init();
-
-            SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
-                String path = "";
-                switch (icon) {
-                    case "Colored":
-                        path = "ms-paint-logo-colored.png";
-                        break;
-                    case "White":
-                        path = "ms-paint-logo-white.png";
-                        break;
-                    case "Black":
-                        path = "ms-paint-logo.png";
-                        break;
-                }
-
-                changeImage(path);
-            }, String.class, true);
+        if (this.registeredBefore) {
+            System.out.println("Already registered, so just showing...");
+            this.primaryStage.show();
         } else {
-            initializeInputTextFields();
+            System.out.println("Else!");
+            this.registeredBefore = true;
+            if (!this.primaryStage.isShowing()) {
+                System.out.println("Not showing now");
+
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
+                loader.setController(this);
+                Parent root = loader.load();
+
+                JFXDecorator jfxDecorator = new JFXDecorator(this.primaryStage, root, false, true, true);
+                jfxDecorator.setOnCloseButtonAction(() -> System.exit(0));
+
+                Scene scene = new Scene(jfxDecorator);
+                scene.getStylesheets().add("style.css");
+
+                this.primaryStage.setScene(scene);
+
+                getThemeManager();
+                this.themeManager.addStage(this.primaryStage);
+
+                // Built-in themes
+                SettingsManager.getSettingMap(Setting.THEMES, String.class).forEach(this.themeManager::loadTheme);
+
+                this.themeManager.init();
+
+                SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
+                    String path = "";
+                    switch (icon) {
+                        case "Colored":
+                            path = "ms-paint-logo-colored.png";
+                            break;
+                        case "White":
+                            path = "ms-paint-logo-white.png";
+                            break;
+                        case "Black":
+                            path = "ms-paint-logo.png";
+                            break;
+                    }
+
+                    changeImage(path);
+                }, String.class, true);
+            } else {
+                System.out.println("Already showing, initting fields");
+                initializeInputTextFields();
+            }
         }
 
         ((JFXDecorator) this.primaryStage.getScene().getRoot()).setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
@@ -350,7 +383,11 @@ public class MainGUI extends Application implements Initializable {
 
         Splash.setStatus(SplashMessage.STARTING);
         this.primaryStage.setOnShown(event -> Splash.end());
-        if (!this.primaryStage.isShowing()) this.primaryStage.show();
+        System.out.println("Here!");
+        if (!this.primaryStage.isShowing()) {
+            System.out.println("#show!");
+            this.primaryStage.show();
+        }
     }
 
     public void changeImage(String path) {
@@ -697,9 +734,10 @@ public class MainGUI extends Application implements Initializable {
 
         createRepo.setOnAction(event -> this.gitController.gitInit(ProjectManager.getPPFProject().getInputLocation()));
 
-        addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileChoser(ProjectManager.getPPFProject().getInputLocation(), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
+        addFiles.setOnAction(event -> FileDirectoryChooser.openMultiFileSelector(chooser ->
+                chooser.setInitialDirectory(ProjectManager.getPPFProject().getInputLocation().getParentFile()), files -> {
             try {
-                this.gitController.addFiles(files);
+                this.gitController.addFiles(files.toArray(File[]::new));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -721,7 +759,10 @@ public class MainGUI extends Application implements Initializable {
 
         changeInputImage.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getInputLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getInputLocation();
-            FileDirectoryChooser.openFileChooser(selected, ProjectFileFilter.PNG, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            // TODO: FILES_AND_DIRECTORIES
+
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 inputName.setText(file.getAbsolutePath());
                 main.setInputImage(file);
             });
@@ -731,7 +772,9 @@ public class MainGUI extends Application implements Initializable {
 
         changeHighlightImage.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getHighlightLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getHighlightLocation();
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 highlightedImage.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setHighlightLocation(file);
             });
@@ -741,7 +784,9 @@ public class MainGUI extends Application implements Initializable {
 
         changeCacheFile.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getObjectLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getObjectLocation();
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 cacheFile.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setObjectLocation(file);
             });
@@ -751,7 +796,9 @@ public class MainGUI extends Application implements Initializable {
 
         changeClassOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getClassLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getClassLocation();
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.DIRECTORIES_ONLY, file -> {
+
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 classOutput.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setClassLocation(file);
             });
@@ -760,8 +807,11 @@ public class MainGUI extends Application implements Initializable {
         addOptionalListener(compiledJarOutput, File.class, ProjectManager.getPPFProject()::setJarFile);
 
         changeCompiledJar.setOnAction(event -> {
+            // TODO: What the fuck is this expression
             File selected = ProjectManager.getPPFProject().getJarFile() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getJarFile();
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_ONLY, file -> {
+
+            FileDirectoryChooser.openFileSelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 compiledJarOutput.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setJarFile(file);
             });
@@ -771,7 +821,10 @@ public class MainGUI extends Application implements Initializable {
 
         changeLibraries.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getLibraryLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getLibraryLocation();
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            // TODO: FILES_AND_DIRECTORIES
+
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 libraryFile.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setLibraryLocation(file);
             });
@@ -781,7 +834,10 @@ public class MainGUI extends Application implements Initializable {
 
         changeOtherFiles.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getOtherLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getOtherLocation();
-            FileDirectoryChooser.openFileChooser(selected, null, JFileChooser.FILES_AND_DIRECTORIES, file -> {
+            // TODO: FILES_AND_DIRECTORIES
+
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
                 otherFiles.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setOtherLocation(file);
             });
@@ -791,7 +847,11 @@ public class MainGUI extends Application implements Initializable {
 
         compilerOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getCompilerOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getCompilerOutput();
-            FileDirectoryChooser.openFileChooser(selected, ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
+
+            FileDirectoryChooser.openFileSaver(chooser -> {
+                chooser.setInitialDirectory(selected.getParentFile());
+                chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
+            }, file -> {
                 compilerOutputValue.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setCompilerOutput(file);
             });
@@ -801,7 +861,11 @@ public class MainGUI extends Application implements Initializable {
 
         programOutput.setOnAction(event -> {
             File selected = ProjectManager.getPPFProject().getAppOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getAppOutput();
-            FileDirectoryChooser.openFileChooser(selected, ProjectFileFilter.PNG, JFileChooser.FILES_ONLY, file -> {
+
+            FileDirectoryChooser.openFileSaver(chooser -> {
+                chooser.setInitialDirectory(selected.getParentFile());
+                chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
+            }, file -> {
                 programOutputValue.setText(file.getAbsolutePath());
                 ProjectManager.getPPFProject().setAppOutput(file);
             });

@@ -8,7 +8,7 @@ import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.project.ProjectManager;
 
-import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 
 public class GitMenu extends MenuBind {
@@ -27,9 +27,10 @@ public class GitMenu extends MenuBind {
 
     @BindItem(label = "add-files")
     public void onClickAddFiles() {
-        FileDirectoryChooser.openMultiFileChoser(ProjectManager.getPPFProject().getInputLocation(), null, JFileChooser.FILES_AND_DIRECTORIES, files -> {
+        FileDirectoryChooser.openMultiFileSelector(chooser ->
+                chooser.setInitialDirectory(ProjectManager.getPPFProject().getInputLocation().getParentFile()), files -> {
             try {
-                this.gitController.addFiles(files);
+                this.gitController.addFiles(files.toArray(File[]::new));
             } catch (IOException e) {
                 e.printStackTrace();
             }

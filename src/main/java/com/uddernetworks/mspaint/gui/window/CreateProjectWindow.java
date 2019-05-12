@@ -20,7 +20,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -120,9 +119,9 @@ public class CreateProjectWindow extends Stage implements Initializable {
         });
 
         browse.setOnAction(event -> {
-            FileDirectoryChooser.openFileChooser(startAt, null, JFileChooser.DIRECTORIES_ONLY, file -> {
-                projectLocation.setText(file.getAbsolutePath());
-            });
+            FileDirectoryChooser.openDirectorySelector(chooser ->
+                    chooser.setInitialDirectory(startAt), file ->
+                    projectLocation.setText(file.getAbsolutePath()));
         });
 
         cancel.setOnAction(event -> close());

@@ -19,7 +19,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -76,6 +75,7 @@ public class WelcomeWindow extends Stage implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("Init");
         recentProjects.setItems(FXCollections.observableList(ProjectManager.getRecent()));
 
         recentProjects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -97,8 +97,14 @@ public class WelcomeWindow extends Stage implements Initializable {
         });
 
         openProject.setOnAction(event -> {
-            File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile() : new File("");
-            FileDirectoryChooser.openFileChooser(openAt, ProjectFileFilter.PPF, JFileChooser.FILES_ONLY, file -> {
+            System.out.println("Open project click!");
+            File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile().getParentFile() : new File(System.getProperty("user.home", "C:\\"));
+
+            System.out.println(openAt.getAbsolutePath());
+            FileDirectoryChooser.openFileSelector(chooser -> {
+                chooser.setInitialDirectory(openAt);
+                chooser.setSelectedExtensionFilter(ProjectFileFilter.PPF);
+            }, file -> {
                 ProjectManager.switchProject(ProjectManager.readProject(file));
                 this.mainGUI.refreshProject();
                 Platform.runLater(this::close);

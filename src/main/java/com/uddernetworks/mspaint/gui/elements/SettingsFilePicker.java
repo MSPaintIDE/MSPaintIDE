@@ -21,7 +21,7 @@ public class SettingsFilePicker extends HBox {
     private JFXTextField textField = new JFXTextField();
 
     public enum ChooseOptions {
-        FILES_ONLY (0), DIRECTORIES_ONLY(1), FILES_AND_DIRECTORIES(2);
+        FILES_ONLY(0), DIRECTORIES_ONLY(1), SAVE_FILE(2);
 
         private int id;
 
@@ -55,9 +55,22 @@ public class SettingsFilePicker extends HBox {
         browse.setOnAction(event -> {
             File openAt = new File(textField.getText().trim());
             if (!openAt.exists()) openAt = new File("");
-            FileDirectoryChooser.openFileChooser(openAt, null, getOptions().getId(), file -> {
-                textField.setText(file.getAbsolutePath());
-            });
+
+            File finalOpenAt = openAt;
+
+            if (getOptions() == ChooseOptions.FILES_ONLY) {
+                FileDirectoryChooser.openFileSelector(chooser ->
+                        chooser.setInitialDirectory(finalOpenAt), file ->
+                        textField.setText(file.getAbsolutePath()));
+            } else if (getOptions() == ChooseOptions.DIRECTORIES_ONLY) {
+                FileDirectoryChooser.openDirectorySelector(chooser ->
+                        chooser.setInitialDirectory(finalOpenAt), file ->
+                        textField.setText(file.getAbsolutePath()));
+            } else if (getOptions() == ChooseOptions.SAVE_FILE) {
+                FileDirectoryChooser.openFileSaver(chooser ->
+                        chooser.setInitialDirectory(finalOpenAt), file ->
+                        textField.setText(file.getAbsolutePath()));
+            }
         });
 
         textField.textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue)));

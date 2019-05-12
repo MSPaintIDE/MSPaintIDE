@@ -22,7 +22,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -33,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 public class FindReplaceWindow extends Stage implements Initializable {
 
@@ -253,9 +253,15 @@ public class FindReplaceWindow extends Stage implements Initializable {
             if (inProject.isSelected()) return;
             boolean selectingFile = inFile.isSelected();
 
-            FileDirectoryChooser.openFileChooser(ProjectManager.getPPFProject().getFile(), null, selectingFile ? JFileChooser.FILES_ONLY : JFileChooser.DIRECTORIES_ONLY, file -> {
+            Consumer<File> onSelected = file -> Platform.runLater(() -> {
                 directoryPath.setText(file.getAbsolutePath());
             });
+
+            if (selectingFile) {
+                FileDirectoryChooser.openFileSelector(chooser -> chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile()), onSelected);
+            } else {
+                FileDirectoryChooser.openDirectorySelector(chooser -> chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile()), onSelected);
+            }
         });
 
         Arrays.asList(inFile, inProject, inDirectory).forEach(radio ->

@@ -1,94 +1,50 @@
 package com.uddernetworks.mspaint.main;
 
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.awt.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class FileDirectoryChooser {
 
-    private static CustomChooser fileChooser;
-
-    // This is a horrible way of doing this, before anyone yells at me, the standard JavaFX file chooser
-    // doesn't allow file and directory selection in the same window
-    public static void openMultiFileChoser(File selectedFile, FileFilter fileFilter, int type, Consumer<File[]> onSelected) {
-        if (fileChooser != null) {
-            fileChooser.hide();
-        }
-
-        CompletableFuture.runAsync(() -> {
-            fileChooser = new CustomChooser(type, selectedFile, fileFilter, true);
-
-            fileChooser.onApproveMultiple(onSelected);
-        });
+    public static void openFileSelector(Consumer<FileChooser> chooserModifier, Consumer<File> onSelected) {
+        System.out.println("Async 1");
+//        CompletableFuture.runAsync(() -> {
+            try {
+                System.out.println("Async 2");
+                var fileChooser = new FileChooser();
+                chooserModifier.accept(fileChooser);
+                System.out.println("Asynbc!");
+                var selected = fileChooser.showOpenDialog(null);
+                if (selected != null) onSelected.accept(selected);
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+            }
+//        });
     }
 
-    // This is a horrible way of doing this, before anyone yells at me, the standard JavaFX file chooser
-    // doesn't allow file and directory selection in the same window
-    public static void openFileChooser(File selectedFile, FileFilter fileFilter, int type, Consumer<File> onSelected) {
-        if (fileChooser != null) {
-            fileChooser.hide();
-        }
-
-        CompletableFuture.runAsync(() -> {
-            fileChooser = new CustomChooser(type, selectedFile, fileFilter);
-
-            fileChooser.onApproveSingle(onSelected);
-        });
+    public static void openMultiFileSelector(Consumer<FileChooser> chooserModifier, Consumer<List<File>> onSelected) {
+        System.out.println("FileDirectoryChooser.openMultiFileSelector");
+        var fileChooser = new FileChooser();
+        chooserModifier.accept(fileChooser);
+        CompletableFuture.runAsync(() -> onSelected.accept(fileChooser.showOpenMultipleDialog(null)));
     }
 
-    static class CustomChooser extends JFileChooser {
+    public static void openFileSaver(Consumer<FileChooser> chooserModifier, Consumer<File> onSave) {
+        System.out.println("FileDirectoryChooser.openFileSaver");
+        var fileChooser = new FileChooser();
+        chooserModifier.accept(fileChooser);
+        CompletableFuture.runAsync(() -> onSave.accept(fileChooser.showSaveDialog(null)));
+    }
 
-        private final int type;
-        private final File selectedFile;
-        private final FileFilter fileFilter;
-        private boolean multiSelection;
-
-        private JDialog dialog;
-
-        public CustomChooser(int type, File selectedFile, FileFilter fileFilter) {
-            this(type, selectedFile, fileFilter, false);
-        }
-
-        public CustomChooser(int type, File selectedFile, FileFilter fileFilter, boolean multiSelection) {
-            this.type = type;
-            this.selectedFile = selectedFile;
-            this.fileFilter = fileFilter;
-            this.multiSelection = multiSelection;
-        }
-
-        protected JDialog createDialog(Component parent) throws HeadlessException {
-            this.dialog = super.createDialog(parent);
-
-            setFileSelectionMode(this.type);
-            setSelectedFile(this.selectedFile);
-            setFileFilter(this.fileFilter);
-            setMultiSelectionEnabled(this.multiSelection);
-            setDialogType(JFileChooser.OPEN_DIALOG);
-
-            this.dialog.toFront();
-            return this.dialog;
-        }
-
-        @Override
-        public void hide() {
-            super.hide();
-            if (this.dialog != null) this.dialog.hide();
-        }
-
-        public void onApproveSingle(Consumer<File> callback) {
-            if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                callback.accept(getSelectedFile());
-            }
-        }
-
-        public void onApproveMultiple(Consumer<File[]> callback) {
-            if (showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                callback.accept(getSelectedFiles());
-            }
-        }
+    public static void openDirectorySelector(Consumer<DirectoryChooser> chooserModifier, Consumer<File> onSelected) {
+        System.out.println("FileDirectoryChooser.openDirectorySelector");
+        var fileChooser = new DirectoryChooser();
+        chooserModifier.accept(fileChooser);
+        CompletableFuture.runAsync(() -> onSelected.accept(fileChooser.showDialog(null)));
     }
 
 }

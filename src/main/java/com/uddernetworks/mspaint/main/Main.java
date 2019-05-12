@@ -12,7 +12,6 @@ import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.OCRManager;
-import com.uddernetworks.mspaint.painthook.InjectionManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -51,18 +50,9 @@ public class Main {
     private Method addURL;
     private List<String> added = new ArrayList<>();
 
-    public void start(MainGUI mainGUI) throws IOException, URISyntaxException {
+    public void start(MainGUI mainGUI) throws IOException {
         headlessStart();
         this.mainGUI = mainGUI;
-
-//        try {
-//            updateEnv("PaintInjector", new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation()
-//                    .toURI()).getParent(), "native").getAbsolutePath());
-//            updateEnv("NativePath", new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation()
-//                    .toURI()).getParent(), "native").getAbsolutePath());
-//        } catch (ReflectiveOperationException e) {
-//            e.printStackTrace();
-//        }
 
         addPath(MainGUI.APP_DATA.getAbsolutePath());
         new File(MainGUI.APP_DATA, "fonts").mkdirs();
@@ -82,7 +72,7 @@ public class Main {
 
         this.runningCodeManager = new GeneralRunningCodeManager(this);
 
-        new InjectionManager(mainGUI, this).createHooks();
+//        new InjectionManager(mainGUI, this).createHooks();
     }
 
     public void headlessStart() throws IOException {

@@ -1,10 +1,9 @@
 package com.uddernetworks.mspaint.main;
 
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javafx.stage.FileChooser;
 
 public class ProjectFileFilter {
-    public static final FileFilter PNG = new FileNameExtensionFilter("Image file", "png");
-    public static final FileFilter JAR = new FileNameExtensionFilter("JAR Archive", "jar");
-    public static final FileFilter PPF = new FileNameExtensionFilter("Paint Project File", "ppf");
+    public static final FileChooser.ExtensionFilter PNG = new FileChooser.ExtensionFilter("Image file", "*.png");
+    public static final FileChooser.ExtensionFilter JAR = new FileChooser.ExtensionFilter("JAR Archive", "*.jar");
+    public static final FileChooser.ExtensionFilter PPF = new FileChooser.ExtensionFilter("Paint Project File", "*.ppf");
 }
