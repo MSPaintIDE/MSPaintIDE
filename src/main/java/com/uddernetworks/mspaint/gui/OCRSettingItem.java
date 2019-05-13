@@ -65,7 +65,7 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
             var currProject = ProjectManager.getPPFProject();
             return currProject.getFonts().entrySet()
                     .stream()
-                    .map((entry) -> new KVData(entry.getKey(), entry.getValue(), currProject.getActiveFont().equals(name)))
+                    .map((entry) -> new KVData(entry.getKey(), entry.getValue(), currProject.getActiveFont().equals(entry.getKey())))
                     .collect(Collectors.toList());
         });
 

@@ -37,14 +37,21 @@ public class FileDirectoryChooser {
         System.out.println("FileDirectoryChooser.openFileSaver");
         var fileChooser = new FileChooser();
         chooserModifier.accept(fileChooser);
-        CompletableFuture.runAsync(() -> onSave.accept(fileChooser.showSaveDialog(null)));
+//        CompletableFuture.runAsync(() -> onSave.accept(fileChooser.showSaveDialog(null)));
+        onSave.accept(fileChooser.showSaveDialog(null));
     }
 
     public static void openDirectorySelector(Consumer<DirectoryChooser> chooserModifier, Consumer<File> onSelected) {
         System.out.println("FileDirectoryChooser.openDirectorySelector");
         var fileChooser = new DirectoryChooser();
         chooserModifier.accept(fileChooser);
-        CompletableFuture.runAsync(() -> onSelected.accept(fileChooser.showDialog(null)));
+//        CompletableFuture.runAsync(() -> onSelected.accept(fileChooser.showDialog(null)));
+        onSelected.accept(fileChooser.showDialog(null));
+    }
+
+    public static File givenOrParentDir(File file) {
+        if (file.isDirectory()) return file;
+        return file.getParentFile();
     }
 
 }

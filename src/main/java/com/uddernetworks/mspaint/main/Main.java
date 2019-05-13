@@ -12,6 +12,7 @@ import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.OCRManager;
+import com.uddernetworks.mspaint.painthook.InjectionManager;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -74,17 +75,30 @@ public class Main {
 
         this.runningCodeManager = new GeneralRunningCodeManager(this);
 
-//        new InjectionManager(mainGUI, this).createHooks();
+        new InjectionManager(mainGUI, this).createHooks();
     }
 
     public void headlessStart() throws IOException {
         LOGGER.info("Loading settings");
         Splash.setStatus(SplashMessage.SETTINGS);
-        SettingsManager.initialize(new File(MainGUI.APP_DATA, "options.ini"));
+        var optionsFile = new File(MainGUI.APP_DATA, "options.ini");
+        var initializeSettings = !optionsFile.exists();
+        SettingsManager.initialize(optionsFile);
         this.centerPopulator = new CenterPopulator(this);
 
         Splash.setStatus(SplashMessage.DATABASE);
         this.ocrManager = new OCRManager(this);
+
+        if (initializeSettings) {
+            SettingsManager.setSetting(Setting.THEMES, Map.of(
+                    "Default", "themes/default.css",
+                    "Extra Dark", "themes/extra-dark.css"
+            ));
+
+            if (!MainGUI.HEADLESS && ProjectManager.getPPFProject() != null) {
+                SettingsManager.setSetting(Setting.TRAIN_IMAGE, ProjectManager.getPPFProject().getFile().getParentFile().getAbsolutePath() + "\\train.png");
+            }
+        }
 
         if (MainGUI.HEADLESS) {
             SettingsManager.onChangeSetting(Setting.HEADLESS_FONT, font -> {
@@ -92,9 +106,10 @@ public class Main {
             }, String.class, true);
         } else {
             ProjectManager.switchProjectConsumer(project -> {
-                project.onFontUpdate((name, path) -> {
-                    this.ocrManager.setActiveFont(name, path);
-                }, true);
+                System.out.println("Active font: " + project.getActiveFont() + " (" + project.getActiveFont().trim().equals("") + ")");
+                System.out.println("Active font: " + project.getActiveFontConfig() + " (" + project.getActiveFontConfig().trim().equals("") + ")");
+                if (project.getActiveFont() == null) project.setActiveFont(SettingsManager.getSetting(Setting.HEADLESS_FONT, String.class));
+                project.onFontUpdate((name, path) -> this.ocrManager.setActiveFont(name, path), true);
             });
         }
     }

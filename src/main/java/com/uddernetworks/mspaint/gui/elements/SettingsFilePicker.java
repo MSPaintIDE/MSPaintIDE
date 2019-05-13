@@ -54,9 +54,12 @@ public class SettingsFilePicker extends HBox {
 
         browse.setOnAction(event -> {
             File openAt = new File(textField.getText().trim());
-            if (!openAt.exists()) openAt = new File("");
+            if (!openAt.exists()) openAt = new File(System.getProperty("user.home", "C:\\"));
 
-            File finalOpenAt = openAt;
+            File finalOpenAt = FileDirectoryChooser.givenOrParentDir(openAt);
+
+            System.out.println("finalOpenAt = " + finalOpenAt.getAbsolutePath());
+            System.out.println(getOptions());
 
             if (getOptions() == ChooseOptions.FILES_ONLY) {
                 FileDirectoryChooser.openFileSelector(chooser ->

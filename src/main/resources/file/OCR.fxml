@@ -20,7 +20,7 @@
                                 <Insets top="15.0" />
                             </VBox.margin>
                         </Label>
-                        <SettingsFilePicker options="FILES_ONLY" setting="TRAIN_IMAGE" />
+                        <SettingsFilePicker options="SAVE_FILE" setting="TRAIN_IMAGE" />
 
                         <SettingNumberField label="Generated image lower font size bound" setting="TRAIN_LOWER_BOUND" />
 

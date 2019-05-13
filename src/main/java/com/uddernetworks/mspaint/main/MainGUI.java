@@ -44,8 +44,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -188,6 +186,7 @@ public class MainGUI extends Application implements Initializable {
 
 
         var fiule = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\shit.txt");
+        fiule.mkdirs();
         fiule.createNewFile();
         PrintStream o = new PrintStream(fiule);
         System.setOut(o);
@@ -634,8 +633,7 @@ public class MainGUI extends Application implements Initializable {
                 .forEach(materialMenu -> materialMenu.initialize(this));
 
         Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
-            System.err.println("Error happened! Thread " + thread + " exception: " + exception.getLocalizedMessage());
-            exception.printStackTrace();
+            LOGGER.error("Error happened on thread " + thread.getName(), exception);
             setHaveError();
         });
 
@@ -744,7 +742,7 @@ public class MainGUI extends Application implements Initializable {
 
             var trainImage = SettingsManager.getSetting(Setting.TRAIN_IMAGE);
             if (trainImage == null || ((String) trainImage).trim().equals("")) {
-                SettingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParent() + "\\train.png");
+                SettingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParentFile().getAbsolutePath() + "\\train.png");
             }
 
             ProjectManager.save();
