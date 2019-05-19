@@ -8,10 +8,10 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 /*
  * Compile jar and installer:
- *  createBundle -PjavafxJmodsPath="C:\javafx-jmods-11"
+ *  createBundle -PjavafxJmodsPath="C:\javafx-jmods-12.0.1"
  * 
  * Compile JUST jar and no inno compile:
- *  createBundle -x package:innoCompile -PjavafxJmodsPath="C:\javafx-jmods-11"
+ *  createBundle -x package:innoCompile -PjavafxJmodsPath="C:\javafx-jmods-12.0.1"
  * 
  * Run in IDE:
  *  preLaunch run
@@ -19,8 +19,8 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 12
+targetCompatibility = 12
 
 ext {
     publishedVersion = rootProject.version

@@ -77,11 +77,11 @@ public class ReplaceManager {
             if (cha == ' ') {
                 addBy = (int) Math.floor(spaceRatio * size) - characterBetweenSpace;
             } else {
-                boolean[][] letterGrid = letterGenerator.generateCharacter(cha, (int) size, ocrManager.getActiveFont(), space);
+                var letterGrid = letterGenerator.generateCharacter(cha, (int) size, ocrManager.getActiveFont(), space);
                 int center = centerPopulator.getCenter(cha, (int) size);
 
                 ImageLetter letter = new ImageLetter(cha, 0, x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, 0D, 0D, 0D);
-                letter.setValues(letterGrid);
+                letter.setValues(LetterGenerator.doubleToBooleanGrid(letterGrid));
                 letter.setData(Color.BLACK);
                 adding.add(letter);
 

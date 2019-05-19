@@ -76,39 +76,43 @@ public class WelcomeWindow extends Stage implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Init");
-        recentProjects.setItems(FXCollections.observableList(ProjectManager.getRecent()));
+        try {
+            recentProjects.setItems(FXCollections.observableList(ProjectManager.getRecent()));
 
-        recentProjects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            ProjectManager.switchProject(newValue);
-            this.mainGUI.refreshProject();
-            Platform.runLater(this::close);
-        });
-
-        createProject.setOnAction(event -> {
-            try {
-                new CreateProjectWindow(this.mainGUI);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        importProject.setOnAction(event -> {
-            // TODO: Not sure how to import projects/what to import from
-        });
-
-        openProject.setOnAction(event -> {
-            System.out.println("Open project click!");
-            File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile().getParentFile() : new File(System.getProperty("user.home", "C:\\"));
-
-            System.out.println(openAt.getAbsolutePath());
-            FileDirectoryChooser.openFileSelector(chooser -> {
-                chooser.setInitialDirectory(openAt);
-                chooser.setSelectedExtensionFilter(ProjectFileFilter.PPF);
-            }, file -> {
-                ProjectManager.switchProject(ProjectManager.readProject(file));
+            recentProjects.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                ProjectManager.switchProject(newValue);
                 this.mainGUI.refreshProject();
                 Platform.runLater(this::close);
             });
-        });
+
+            createProject.setOnAction(event -> {
+                try {
+                    new CreateProjectWindow(this.mainGUI);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            importProject.setOnAction(event -> {
+                // TODO: Not sure how to import projects/what to import from
+            });
+
+            openProject.setOnAction(event -> {
+                System.out.println("Open project click!");
+                File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile().getParentFile() : new File(System.getProperty("user.home", "C:\\"));
+
+                System.out.println(openAt.getAbsolutePath());
+                FileDirectoryChooser.openFileSelector(chooser -> {
+                    chooser.setInitialDirectory(openAt);
+                    chooser.setSelectedExtensionFilter(ProjectFileFilter.PPF);
+                }, file -> {
+                    ProjectManager.switchProject(ProjectManager.readProject(file));
+                    this.mainGUI.refreshProject();
+                    Platform.runLater(this::close);
+                });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

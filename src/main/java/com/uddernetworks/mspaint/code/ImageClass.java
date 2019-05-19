@@ -37,23 +37,25 @@ public class ImageClass {
     }
 
     public void scan() {
-        LOGGER.info("Scanning image " + inputImage.getName() + "...");
-        final String prefix = "[" + inputImage.getName() + "] ";
+        LOGGER.info("Scanning image " + this.inputImage.getName() + "...");
+        final String prefix = "[" + this.inputImage.getName() + "] ";
 
         long start = System.currentTimeMillis();
 
         ImageCompare imageCompare = new ImageCompare();
 
         if (this.headlessMain == null) {
-            this.headlessMain = mainGUI.getMain();
+            this.headlessMain = this.mainGUI.getMain();
         }
 
-        scannedImage = imageCompare.getText(inputImage, mainGUI, this.headlessMain);
+        System.out.println("Getting text at " + System.currentTimeMillis() +  "(" + this.inputImage.getAbsolutePath() + ")");
 
-        text = scannedImage.getPrettyString();
-        trimmedText = scannedImage.stripLeadingSpaces().getPrettyString();
+        this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.headlessMain);
 
-        LOGGER.info("\n" + prefix + "text =\n" + text);
+        this.text = this.scannedImage.getPrettyString();
+        this.trimmedText = this.scannedImage.stripLeadingSpaces().getPrettyString();
+
+        LOGGER.info("\n" + prefix + "text =\n" + this.text);
 
         LOGGER.info(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
     }

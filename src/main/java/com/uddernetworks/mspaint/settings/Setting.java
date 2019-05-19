@@ -20,7 +20,7 @@ public enum Setting {
     HEADLESS_FONT_CONFIG("headlessFontPath","fonts/ComicSans", STRING),
     TRAIN_IMAGE("trainImage", "/train.png", STRING),
     OCR_DEBUG("ocrDebug", false, BOOLEAN),
-    EDIT_FILE_SIZE("editFileFontSize", 36, INT), // The font size that files are generated in
+    EDIT_FILE_SIZE("editFileFontSize", 48, INT), // The font size that files are generated in
     TRAIN_LOWER_BOUND("trainGenLowerBound", 30, INT),
     TRAIN_UPPER_BOUND("trainGenUpperBound", 90, INT),
     TASKBAR_ICON("taskbarIcon", "Colored", STRING),

@@ -44,8 +44,7 @@ public class ImageOutputStream extends OutputStream {
 
         String message = string.toString();
 
-        RenderingHints rht = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        graphics.setRenderingHints(rht);
+        graphics.setRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
 
         Font font = new Font(this.main.getFontName(), Font.PLAIN, 24);
         graphics.setFont(font);
@@ -64,8 +63,7 @@ public class ImageOutputStream extends OutputStream {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
 
-        RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-        graphics.setRenderingHints(rh);
+        graphics.setRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
 
         graphics.setFont(font);
         graphics.setPaint(this.background);

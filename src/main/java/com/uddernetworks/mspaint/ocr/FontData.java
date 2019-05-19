@@ -86,8 +86,8 @@ public class FontData {
         this.similarityManager = new DefaultSimilarityManager();
         this.mergenceManager = new DefaultMergenceManager(this.databaseManager, similarityManager);
 
-        this.configuration = new HOCONFontConfiguration(this.configPath, this.ocrManager.getReflectionCacher());
-        this.configuration.fetchAndApplySimilarities(similarityManager);
+        this.configuration = new HOCONFontConfiguration(this.configPath, this.ocrManager.getReflectionCacher(), this.similarityManager);
+        this.configuration.fetchAndApplySimilarities();
 
         updateMergeRules();
 
