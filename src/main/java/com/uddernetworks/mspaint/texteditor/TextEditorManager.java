@@ -10,6 +10,7 @@ import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.DefaultScannedImage;
 import com.uddernetworks.newocr.recognition.ScannedImage;
+import com.uddernetworks.newocr.train.ImageReadMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,8 @@ public class TextEditorManager {
         this.imageFile = createImageFile();
 
         this.imageClass = new ImageClass(this.imageFile, mainGUI, this.headlessMain);
+        var options = this.headlessMain.getOCRManager().getActions().getOptions();
+        options.setImageReadMethod(ImageReadMethod.IMAGEIO_STREAM);
 
         (this.savingThread = new Thread(() -> {
             try {
@@ -107,14 +110,12 @@ public class TextEditorManager {
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
         var ocrManager = this.headlessMain.getOCRManager();
-        System.out.println("imageClass = " + imageClass);
         ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null);
         LetterGenerator letterGenerator = new LetterGenerator();
 
         var size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
 
         var data = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
-        System.out.println("data = " + data);
 
         // Gets the space DatabaseCharacter used for the current font size from the database
         var spaceOptional = data.stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
@@ -130,13 +131,11 @@ public class TextEditorManager {
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
 
         var centerPopulator = this.headlessMain.getCenterPopulator();
-        System.out.println("BEFORE");
         try {
             centerPopulator.generateCenters(size);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("DONE!!!");
 
         int x = 0;
         int y = 0;
