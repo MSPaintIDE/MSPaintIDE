@@ -10,53 +10,22 @@ public class PPFProject {
 
     private File file;
 
-    @PPFSetting
     private File inputLocation;         // Input file/image folder
-
-    @PPFSetting
     private File highlightLocation;     // Highlight output file/folder
-
-    @PPFSetting
-    private File objectLocation;        // Folder for cached files
-
-    @PPFSetting
-    private File classLocation;         // Output .class file folder
-
-    @PPFSetting
-    private File jarFile;               // Output .jar file
-
-    @PPFSetting
-    private File libraryLocation;       // Library .jar/folder
-
-    @PPFSetting
-    private File otherLocation;         // File/folder for other packaged files
-
-    @PPFSetting
+//    private File classLocation;         // Output .class file folder
+//    private File jarFile;               // Output .jar file
+//    private File libraryLocation;       // Library .jar/folder
+//    private File otherLocation;         // File/folder for other packaged files
     private File compilerOutput;        // Compiler output image file
-
-    @PPFSetting
     private File appOutput;             // Application output image file
-
-    @PPFSetting
     private String language;            // The language used in the project
-
-    @PPFSetting
     private String name;                // The name of the project
-
-    @PPFSetting
     private boolean syntaxHighlight;    // If the IDE should highlight the code
-
-    @PPFSetting
     private boolean compile;            // If the IDE should compile the code
-
-    @PPFSetting
     private boolean execute;            // If the IDE should execute the code
-
-    @PPFSetting
     private String activeFont;
-
-    @PPFSetting
-    public Map<String, String> fonts = new HashMap<>();
+    private Map<String, String> fonts = new HashMap<>();
+    public Map<String, Map<String, Object>> languageSettings = new HashMap<>();
 
     private BiConsumer<String, String> fontUpdate;
 
@@ -92,72 +61,6 @@ public class PPFProject {
     public void setHighlightLocation(File highlightLocation, boolean override) {
         if (this.highlightLocation == null || override) this.highlightLocation = highlightLocation;
     }
-
-
-    public File getObjectLocation() {
-        return objectLocation;
-    }
-
-    public void setObjectLocation(File objectLocation) {
-        setObjectLocation(objectLocation, true);
-    }
-
-    public void setObjectLocation(File objectLocation, boolean override) {
-        if (this.objectLocation == null || override) this.objectLocation = objectLocation;
-    }
-
-
-    public File getClassLocation() {
-        return classLocation;
-    }
-
-    public void setClassLocation(File classLocation) {
-        this.classLocation = classLocation;
-    }
-
-    public void setClassLocation(File classLocation, boolean override) {
-        if (this.classLocation == null || override) this.classLocation = classLocation;
-    }
-
-
-    public File getJarFile() {
-        return jarFile;
-    }
-
-    public void setJarFile(File jarFile) {
-        setJarFile(jarFile, true);
-    }
-
-    public void setJarFile(File jarFile, boolean override) {
-        if (this.jarFile == null || override) this.jarFile = jarFile;
-    }
-
-
-    public File getLibraryLocation() {
-        return libraryLocation;
-    }
-
-    public void setLibraryLocation(File libraryLocation) {
-        setLibraryLocation(libraryLocation, true);
-    }
-
-    public void setLibraryLocation(File libraryLocation, boolean override) {
-        if (this.libraryLocation == null || override) this.libraryLocation = libraryLocation;
-    }
-
-
-    public File getOtherLocation() {
-        return otherLocation;
-    }
-
-    public void setOtherLocation(File otherLocation) {
-        setOtherLocation(otherLocation, true);
-    }
-
-    public void setOtherLocation(File otherLocation, boolean override) {
-        if (this.otherLocation == null || override) this.otherLocation = otherLocation;
-    }
-
 
     public File getCompilerOutput() {
         return compilerOutput;
@@ -293,6 +196,18 @@ public class PPFProject {
 
     public void removeFont(String name) {
         this.fonts.remove(name);
+    }
+
+    public Map<String, Object> getLanguageSetting(String language) {
+        return languageSettings.get(language);
+    }
+
+    public void setLanguageSetting(String language, Map<String, Object> map) {
+        setLanguageSetting(language, map, true);
+    }
+
+    public void setLanguageSetting(String language, Map<String, Object> map, boolean override) {
+        if (!this.languageSettings.containsKey(language) || override) this.languageSettings.put(language, map);
     }
 
     @Override

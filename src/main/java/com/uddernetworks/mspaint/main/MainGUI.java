@@ -304,6 +304,8 @@ public class MainGUI extends Application implements Initializable {
                 registerThings();
                 primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
                 setSelectedLanguage(Class.forName(languageClass));
+                var language = this.main.getLanguageManager();
+                language.reloadAllLanguages();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -362,12 +364,14 @@ public class MainGUI extends Application implements Initializable {
                 getThemeManager();
                 this.themeManager.addStage(this.primaryStage);
 
+                var settingsManager = SettingsManager.getInstance();
+
                 // Built-in themes
-                SettingsManager.getSettingMap(Setting.THEMES, String.class).forEach(this.themeManager::loadTheme);
+                settingsManager.<String, String>getSettingMap(Setting.THEMES).forEach(this.themeManager::loadTheme);
 
                 this.themeManager.init();
 
-                SettingsManager.onChangeSetting(Setting.TASKBAR_ICON, icon -> {
+                settingsManager.<String>onChangeSetting(Setting.TASKBAR_ICON, icon -> {
                     String path = "";
                     switch (icon) {
                         case "Colored":
@@ -382,7 +386,7 @@ public class MainGUI extends Application implements Initializable {
                     }
 
                     changeImage(path);
-                }, String.class, true);
+                }, true);
             } else {
                 System.out.println("Already showing, initting fields");
                 initializeInputTextFields();
@@ -498,11 +502,11 @@ public class MainGUI extends Application implements Initializable {
         PPFProject ppfProject = ProjectManager.getPPFProject();
         inputName.setText(getAbsolutePath(ppfProject.getInputLocation()));
         highlightedImage.setText(getAbsolutePath(ppfProject.getHighlightLocation()));
-        cacheFile.setText(getAbsolutePath(ppfProject.getObjectLocation()));
-        compiledJarOutput.setText(getAbsolutePath(ppfProject.getJarFile()));
-        libraryFile.setText(getAbsolutePath(ppfProject.getLibraryLocation()));
-        otherFiles.setText(getAbsolutePath(ppfProject.getOtherLocation()));
-        classOutput.setText(getAbsolutePath(ppfProject.getClassLocation()));
+//        cacheFile.setText(getAbsolutePath(ppfProject.getObjectLocation()));
+//        compiledJarOutput.setText(getAbsolutePath(ppfProject.getJarFile()));
+//        libraryFile.setText(getAbsolutePath(ppfProject.getLibraryLocation()));
+//        otherFiles.setText(getAbsolutePath(ppfProject.getOtherLocation()));
+//        classOutput.setText(getAbsolutePath(ppfProject.getClassLocation()));
         compilerOutputValue.setText(getAbsolutePath(ppfProject.getCompilerOutput()));
         programOutputValue.setText(getAbsolutePath(ppfProject.getAppOutput()));
 
@@ -615,6 +619,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        var settingsManager = SettingsManager.getInstance();
         Splash.setStatus(SplashMessage.GUI);
 
         initializeInputTextFields();
@@ -640,7 +645,7 @@ public class MainGUI extends Application implements Initializable {
         GUIConsoleAppender.activate(output);
 
         invertColors.setOnAction(event -> {
-            SettingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);
+            settingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);
             updateTheme();
         });
 
@@ -733,16 +738,16 @@ public class MainGUI extends Application implements Initializable {
                 project.setActiveFont("Comic Sans MS");
             }
 
-            if (SettingsManager.getSettingMap(Setting.THEMES).isEmpty()) {
-                SettingsManager.setSetting(Setting.THEMES, Map.of(
+            if (settingsManager.getSettingMap(Setting.THEMES).isEmpty()) {
+                settingsManager.setSetting(Setting.THEMES, Map.of(
                         "Default", "themes/default.css",
                         "Extra Dark", "themes/extra-dark.css"
                 ));
             }
 
-            var trainImage = SettingsManager.getSetting(Setting.TRAIN_IMAGE);
+            var trainImage = settingsManager.getSetting(Setting.TRAIN_IMAGE);
             if (trainImage == null || ((String) trainImage).trim().equals("")) {
-                SettingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParentFile().getAbsolutePath() + "\\train.png");
+                settingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParentFile().getAbsolutePath() + "\\train.png");
             }
 
             ProjectManager.save();

@@ -92,7 +92,7 @@ public class SearchListCell extends ListCell<SearchResult> {
             fileName.setText(searchResult.getFile().getName());
             lineNumber.setText(searchResult.getLineNumber() + "\n");
 
-            if (SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class)) {
+            if (SettingsManager.getInstance().getSetting(Setting.DARK_THEME)) {
                 beforeText.getStyleClass().add("dark");
                 highlightedText.getStyleClass().add("dark");
                 afterText.getStyleClass().add("dark");

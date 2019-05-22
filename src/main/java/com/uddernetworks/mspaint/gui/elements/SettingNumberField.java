@@ -35,7 +35,7 @@ public class SettingNumberField extends HBox {
         getChildren().add(label);
         getChildren().add(spacer);
         getChildren().add(numberField);
-        numberField.textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue.isEmpty() ? 0 : Integer.valueOf(newValue))));
+        numberField.textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.getInstance().setSetting(settingProperty.get(), newValue.isEmpty() ? 0 : Integer.valueOf(newValue))));
     }
 
     public ObjectProperty<Setting> settingProperty() {
@@ -48,7 +48,7 @@ public class SettingNumberField extends HBox {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        numberField.setText(SettingsManager.getSetting(setting, Integer.class, 0).toString());
+        numberField.setText(SettingsManager.getInstance().getSetting(setting, 0).toString());
     }
 
     public StringProperty labelProperty() {

@@ -48,7 +48,8 @@ public class FontData {
     }
 
     public void initialize() {
-        SettingsManager.onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
+        var settingsManager = SettingsManager.getInstance();
+        settingsManager.<Boolean>onChangeSetting(Setting.DATABASE_USE_INTERNAL, useInternal -> {
             if (!this.equals(this.ocrManager.getActiveFont())) return;
             try {
                 if (useInternal == this.usingInternal) return;
@@ -57,7 +58,7 @@ public class FontData {
                 if (this.databaseManager != null) this.databaseManager.shutdown(TimeUnit.SECONDS, 1);
 
                 if (useInternal) {
-                    String location = SettingsManager.getSetting(Setting.DATABASE_INTERNAL_LOCATION, String.class);
+                    String location = settingsManager.getSetting(Setting.DATABASE_INTERNAL_LOCATION);
                     File file = location != null && !location.trim().equals("") ? new File(location) : null;
 
                     if (file == null || (!file.isDirectory() && !file.mkdirs())) {
@@ -67,9 +68,9 @@ public class FontData {
 
                     this.databaseManager = new OCRDatabaseManager(new File(file, "ocr_db_" + this.fontName.replaceAll("[^a-zA-Z\\d\\s:]", "_")));
                 } else {
-                    String url = SettingsManager.getSetting(Setting.DATABASE_URL, String.class);
-                    String user = SettingsManager.getSetting(Setting.DATABASE_USER, String.class);
-                    String pass = SettingsManager.getSetting(Setting.DATABASE_PASS, String.class);
+                    String url = settingsManager.getSetting(Setting.DATABASE_URL);
+                    String user = settingsManager.getSetting(Setting.DATABASE_USER);
+                    String pass = settingsManager.getSetting(Setting.DATABASE_PASS);
 
                     if (url == null || user == null || pass == null || url.isEmpty() || user.isEmpty() || pass.isEmpty()) {
                         LOGGER.error("Couldn't set up database manager, partial/missing credentials in settings.");
@@ -81,7 +82,7 @@ public class FontData {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }, Boolean.class, true);
+        }, true);
 
         this.similarityManager = new DefaultSimilarityManager();
         this.mergenceManager = new DefaultMergenceManager(this.databaseManager, similarityManager);
@@ -94,8 +95,8 @@ public class FontData {
         var options = this.configuration.fetchOptions();
         var generatorOptions = new TrainGeneratorOptions()
                 .setFontFamily(this.fontName)
-                .setMinFontSize(SettingsManager.getSetting(Setting.TRAIN_LOWER_BOUND, Integer.class))
-                .setMaxFontSize(SettingsManager.getSetting(Setting.TRAIN_UPPER_BOUND, Integer.class));
+                .setMinFontSize(settingsManager.getSetting(Setting.TRAIN_LOWER_BOUND))
+                .setMaxFontSize(settingsManager.getSetting(Setting.TRAIN_UPPER_BOUND));
 
         this.actions = new OCRActions(this.databaseManager, options);
         this.scan = new OCRScan(databaseManager, similarityManager, mergenceManager, this.actions);

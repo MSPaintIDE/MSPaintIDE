@@ -98,7 +98,7 @@ public class SettingsWindow extends Stage implements Initializable {
                     }
                 }));
 
-        SettingsManager.onChangeSetting(Setting.DARK_THEME, toggleStuff, boolean.class, true);
+        SettingsManager.getInstance().onChangeSetting(Setting.DARK_THEME, toggleStuff, true);
 
         List<TreeItem<SettingItem>> children = tree.getRoot().getChildren();
 
@@ -128,7 +128,7 @@ public class SettingsWindow extends Stage implements Initializable {
 
             try {
                 this.content.setContent(newValue.getValue().getPane());
-                toggleStuff.accept(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
+                toggleStuff.accept(SettingsManager.getInstance().getSetting(Setting.DARK_THEME));
             } catch (IOException e) {
                 e.printStackTrace();
             }

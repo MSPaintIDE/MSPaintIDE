@@ -19,7 +19,5 @@
         <JFXTextField fx:id="fontSize" editable="false" layoutX="170.0" layoutY="156.0" prefWidth="320.0" styleClass="theme-text" />
       <Label layoutX="10.0" layoutY="195.0" prefWidth="150.0" styleClass="theme-text" text="Lines of code" />
       <JFXTextField fx:id="lines" editable="false" layoutX="170.0" layoutY="191.0" prefWidth="320.0" styleClass="theme-text" />
-      <Label layoutX="10.0" layoutY="230.0" prefWidth="150.0" styleClass="theme-text" text="Last cached" />
-      <JFXTextField fx:id="lastCached" editable="false" layoutX="170.0" layoutY="226.0" prefWidth="320.0" styleClass="theme-text" />
     </children>
 </AnchorPane>

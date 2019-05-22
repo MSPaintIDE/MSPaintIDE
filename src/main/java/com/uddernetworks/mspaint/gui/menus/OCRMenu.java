@@ -28,7 +28,7 @@ public class OCRMenu extends MenuBind {
 
     @BindItem(label = "train")
     public void onClickTrain() {
-        String filePath = SettingsManager.getSetting(Setting.TRAIN_IMAGE, String.class);
+        String filePath = SettingsManager.getInstance().getSetting(Setting.TRAIN_IMAGE);
         if (filePath == null || filePath.trim().isEmpty()) {
             System.err.println("No training file path found, can't train the OCR.");
             return;
@@ -65,7 +65,7 @@ public class OCRMenu extends MenuBind {
 
     @BindItem(label = "generate")
     public void onClickGenerate() {
-        String filePath = SettingsManager.getSetting(Setting.TRAIN_IMAGE, String.class);
+        String filePath = SettingsManager.getInstance().getSetting(Setting.TRAIN_IMAGE);
         File file = null;
         if (filePath != null && !filePath.trim().isEmpty()) file = new File(filePath);
         if (file == null) {

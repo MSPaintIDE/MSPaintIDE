@@ -5,7 +5,6 @@ import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
-import com.uddernetworks.mspaint.main.CacheUtils;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
@@ -45,9 +44,6 @@ public class InspectWindow extends Stage implements Initializable {
 
     @FXML
     private JFXTextField lines;
-
-    @FXML
-    private JFXTextField lastCached;
 
     @FXML
     private JFXButton cancel;
@@ -117,7 +113,6 @@ public class InspectWindow extends Stage implements Initializable {
         fontSize.setText(ptSize + "pt / " + pxSize + "px");
         imageLanguage.setText(language);
         lines.setText(String.valueOf(scannedImage.getLineCount()));
-        lastCached.setText(CacheUtils.getLastCachedFormatted(this.inspecting));
 
         cancel.setOnAction(event -> Platform.runLater(this::close));
         okay.setOnAction(event -> Platform.runLater(this::close));

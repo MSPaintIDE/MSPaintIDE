@@ -196,10 +196,10 @@ public class CodeCompiler {
         mainGUI.setStatusText("Executing...");
         start = System.currentTimeMillis();
 
-//        var runningCodeManager = mainGUI.getMain().getRunningCodeManager();
-//        runningCodeManager.runCode(new JavaRunningCode(() -> {
-//
-//        }));
+        var runningCodeManager = mainGUI.getMain().getRunningCodeManager();
+        runningCodeManager.runCode(new JavaRunningCode(() -> {
+
+        }));
         System.out.println("namePackages = " + namePackages);
         for (String className : namePackages.keySet()) {
             System.out.println("className = " + className);

@@ -11,7 +11,7 @@ public class SettingTextField extends JFXTextField {
 
     public SettingTextField() {
         getStyleClass().add("theme-text");
-        textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue)));
+        textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.getInstance().setSetting(settingProperty.get(), newValue)));
     }
 
     public ObjectProperty<Setting> settingProperty() {
@@ -24,6 +24,6 @@ public class SettingTextField extends JFXTextField {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        setText(SettingsManager.getSetting(setting, String.class, ""));
+        setText(SettingsManager.getInstance().getSetting(setting, ""));
     }
 }

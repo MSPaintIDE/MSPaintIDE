@@ -52,4 +52,8 @@ public class LanguageManager {
                                 extension.equalsIgnoreCase(fileExtension)))
                 .findFirst();
     }
+
+    public void reloadAllLanguages() {
+        this.enabledLanguages.stream().map(Language::getLanguageSettings).forEach(LanguageSettings::reload);
+    }
 }

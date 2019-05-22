@@ -113,7 +113,7 @@ public class TextEditorManager {
         ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null);
         LetterGenerator letterGenerator = new LetterGenerator();
 
-        var size = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
+        int size = SettingsManager.getInstance().getSetting(Setting.EDIT_FILE_SIZE);
 
         var data = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
 
@@ -176,7 +176,7 @@ public class TextEditorManager {
         String text = new String(Files.readAllBytes(this.originalFile.toPath()));
         LOGGER.info("text = " + text);
 
-        int padding = SettingsManager.getSetting(Setting.EDIT_FILE_SIZE, Integer.class);
+        int padding = SettingsManager.getInstance().getSetting(Setting.EDIT_FILE_SIZE);
 
         BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < image.getWidth(); x++) {

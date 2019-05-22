@@ -76,7 +76,7 @@ public class SettingsFilePicker extends HBox {
             }
         });
 
-        textField.textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue)));
+        textField.textProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.getInstance().setSetting(settingProperty.get(), newValue)));
     }
 
     private Node getHSpacer(double width) {
@@ -96,7 +96,7 @@ public class SettingsFilePicker extends HBox {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        textField.setText(SettingsManager.getSetting(setting, String.class, ""));
+        textField.setText(SettingsManager.getInstance().getSetting(setting, ""));
     }
 
     public ObjectProperty<ChooseOptions> optionsProperty() {

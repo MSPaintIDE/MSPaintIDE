@@ -16,7 +16,7 @@ public class SettingComboBox extends JFXComboBox<String> {
         getStyleClass().add("theme-text");
 
         getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            SettingsManager.setSetting(settingProperty.get(), newValue);
+            SettingsManager.getInstance().setSetting(settingProperty.get(), newValue);
         });
     }
 
@@ -31,7 +31,7 @@ public class SettingComboBox extends JFXComboBox<String> {
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
 
-        getSelectionModel().select(SettingsManager.getSetting(getSetting(), String.class, "?"));
+        getSelectionModel().select(SettingsManager.getInstance().getSetting(getSetting(), "?"));
     }
 
     public ObjectProperty<ObservableList<String>> optionsProperty() {

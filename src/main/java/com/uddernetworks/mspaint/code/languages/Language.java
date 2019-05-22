@@ -12,12 +12,14 @@ import java.util.Map;
 public interface Language {
     /**
      * Gets the name of the Language, e.g. "Java", "Python".
+     *
      * @return the name of the language
      */
     String getName();
 
     /**
      * Gets the file extensions to be used by files that will be parsed by the language. This does not include the period, examples include "java", "py".
+     *
      * @return the file extensions used
      */
     String[] getFileExtensions();
@@ -25,27 +27,38 @@ public interface Language {
     /**
      * Gets the extension of the compiled/packaged output file that is generated from the source code. An example of an output of this method is "jar" for Java.
      * The method may return null if the language does not support output/packaged files.
+     *
      * @return the extension of the output file
      */
     String getOutputFileExtension();
 
     /**
      * Gets if the language is interpreted (Compared to being compiled).
+     *
      * @return if the language is interpreted
      */
     boolean isInterpreted();
 
     /**
      * Gets if the language has the correct software/libraries needed to compile/interpret and execute the language on the system.
+     *
      * @return if the system meets the requirements to use the language
      */
     boolean meetsRequirements();
 
     /**
      * Gets the language's Lexer for custom highlighting
+     *
      * @return the language's implementation of DefaultJFlexLexer
      */
     DefaultJFlexLexer getLanguageHighlighter();
+
+    /**
+     * Gets the
+     *
+     * @return
+     */
+    LanguageSettings getLanguageSettings();
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.

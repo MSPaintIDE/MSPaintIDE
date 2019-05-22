@@ -61,7 +61,7 @@ public class Main {
         new File(MainGUI.APP_DATA, "fonts").mkdirs();
         new File(MainGUI.APP_DATA, "themes").mkdirs();
 
-        this.mainGUI.setDarkTheme(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
+        this.mainGUI.setDarkTheme(SettingsManager.getInstance().getSetting(Setting.DARK_THEME));
         this.mainGUI.updateTheme();
 
         Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
@@ -83,32 +83,33 @@ public class Main {
         Splash.setStatus(SplashMessage.SETTINGS);
         var optionsFile = new File(MainGUI.APP_DATA, "options.ini");
         var initializeSettings = !optionsFile.exists();
-        SettingsManager.initialize(optionsFile);
+        var settingsManager = SettingsManager.getInstance();
+        settingsManager.initialize(optionsFile);
         this.centerPopulator = new CenterPopulator(this);
 
         Splash.setStatus(SplashMessage.DATABASE);
         this.ocrManager = new OCRManager(this);
 
         if (initializeSettings) {
-            SettingsManager.setSetting(Setting.THEMES, Map.of(
+            settingsManager.setSetting(Setting.THEMES, Map.of(
                     "Default", "themes/default.css",
                     "Extra Dark", "themes/extra-dark.css"
             ));
 
             if (!MainGUI.HEADLESS && ProjectManager.getPPFProject() != null) {
-                SettingsManager.setSetting(Setting.TRAIN_IMAGE, ProjectManager.getPPFProject().getFile().getParentFile().getAbsolutePath() + "\\train.png");
+                settingsManager.setSetting(Setting.TRAIN_IMAGE, ProjectManager.getPPFProject().getFile().getParentFile().getAbsolutePath() + "\\train.png");
             }
         }
 
         if (MainGUI.HEADLESS) {
-            SettingsManager.onChangeSetting(Setting.HEADLESS_FONT, font -> {
-                this.ocrManager.setActiveFont(font, SettingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG, String.class));
-            }, String.class, true);
+            settingsManager.<String>onChangeSetting(Setting.HEADLESS_FONT, font -> {
+                this.ocrManager.setActiveFont(font, settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG));
+            }, true);
         } else {
             ProjectManager.switchProjectConsumer(project -> {
                 System.out.println("Active font: " + project.getActiveFont() + " (" + project.getActiveFont().trim().equals("") + ")");
                 System.out.println("Active font: " + project.getActiveFontConfig() + " (" + project.getActiveFontConfig().trim().equals("") + ")");
-                if (project.getActiveFont() == null) project.setActiveFont(SettingsManager.getSetting(Setting.HEADLESS_FONT, String.class));
+                if (project.getActiveFont() == null) project.setActiveFont(settingsManager.getSetting(Setting.HEADLESS_FONT));
                 project.onFontUpdate((name, path) -> this.ocrManager.setActiveFont(name, path), true);
             });
         }
@@ -362,10 +363,10 @@ public class Main {
     }
 
     public String getFontName() {
-        return MainGUI.HEADLESS ? SettingsManager.getSetting(Setting.HEADLESS_FONT, String.class) : ProjectManager.getPPFProject().getActiveFont();
+        return MainGUI.HEADLESS ? SettingsManager.getInstance().getSetting(Setting.HEADLESS_FONT) : ProjectManager.getPPFProject().getActiveFont();
     }
 
     public String getFontConfig() {
-        return MainGUI.HEADLESS ? SettingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG, String.class) : ProjectManager.getPPFProject().getActiveFontConfig();
+        return MainGUI.HEADLESS ? SettingsManager.getInstance().getSetting(Setting.HEADLESS_FONT_CONFIG) : ProjectManager.getPPFProject().getActiveFontConfig();
     }
 }

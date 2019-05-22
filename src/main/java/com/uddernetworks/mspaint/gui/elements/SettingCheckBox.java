@@ -21,7 +21,7 @@ public class SettingCheckBox extends JFXCheckBox {
         styles.put("checkedColor", "-jfx-checked-color:  -primary-button-color;");
         computeStyles();
         getStyleClass().add("theme-text");
-        selectedProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.setSetting(settingProperty.get(), newValue)));
+        selectedProperty().addListener(((observable, oldValue, newValue) -> SettingsManager.getInstance().setSetting(settingProperty.get(), newValue)));
     }
 
     private void computeStyles() {
@@ -42,7 +42,7 @@ public class SettingCheckBox extends JFXCheckBox {
 
     public void setSetting(Setting setting) {
         settingProperty().set(setting);
-        setSelected(SettingsManager.getSetting(setting, Boolean.class, false));
+        setSelected(SettingsManager.getInstance().getSetting(setting, false));
     }
 
 

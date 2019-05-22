@@ -1,22 +1,28 @@
 package com.uddernetworks.mspaint.project;
 
-import java.io.File;
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ProjectManager {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ProjectManager.class);
+
     private static Path recent = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE\\recent").toPath();
     private static PPFProject ppfProject;
-    private static PPFWriter ppfWriter = new PPFWriter();
-    private static PPFReader ppfReader = new PPFReader();
+    private static Gson gson = new GsonBuilder().serializeNulls().create();
     private static List<PPFProject> recentProjects = new ArrayList<>();
     private static Consumer<PPFProject> projectConsumer;
 
@@ -42,7 +48,17 @@ public class ProjectManager {
                     })
                     .map(File::new)
                     .filter(File::exists)
-                    .map(ppfReader::read)
+                    .map(file -> {
+                        try {
+                            return Optional.of(gson.fromJson(new FileReader(file), PPFProject.class));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        return Optional.ofNullable((PPFProject) null);
+                    })
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .collect(Collectors.toList());
             if (open.get() && !recentProjects.isEmpty()) {
                 ppfProject = recentProjects.get(0);
@@ -84,12 +100,21 @@ public class ProjectManager {
     }
 
     public static void save() {
-        ppfWriter.write(ppfProject);
+        try {
+            gson.toJson(ppfProject, new FileWriter(ppfProject.getFile()));
+        } catch (IOException e) {
+            LOGGER.error("Exception saving the PPFProject", e);
+        }
     }
 
     public static PPFProject readProject(File file) {
         System.out.println("Reading 222");
-        return (ppfProject = ppfReader.read(file));
+        try {
+            return (ppfProject = gson.fromJson(new FileReader(file), PPFProject.class));
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Exception reading the PPFProject", e);
+            return ppfProject;
+        }
     }
 
     public static void switchProject(PPFProject ppfProject) {

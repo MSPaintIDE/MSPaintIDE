@@ -11,19 +11,12 @@ import java.util.function.Consumer;
 public class FileDirectoryChooser {
 
     public static void openFileSelector(Consumer<FileChooser> chooserModifier, Consumer<File> onSelected) {
-        System.out.println("Async 1");
-//        CompletableFuture.runAsync(() -> {
-            try {
-                System.out.println("Async 2");
-                var fileChooser = new FileChooser();
-                chooserModifier.accept(fileChooser);
-                System.out.println("Asynbc!");
-                var selected = fileChooser.showOpenDialog(null);
-                if (selected != null) onSelected.accept(selected);
-            } catch (Exception e) {
-                e.printStackTrace(System.out);
-            }
-//        });
+        CompletableFuture.runAsync(() -> {
+            var fileChooser = new FileChooser();
+            chooserModifier.accept(fileChooser);
+            var selected = fileChooser.showOpenDialog(null);
+            if (selected != null) onSelected.accept(selected);
+        });
     }
 
     public static void openMultiFileSelector(Consumer<FileChooser> chooserModifier, Consumer<List<File>> onSelected) {

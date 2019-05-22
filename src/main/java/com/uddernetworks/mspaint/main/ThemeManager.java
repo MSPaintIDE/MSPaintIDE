@@ -32,7 +32,7 @@ public class ThemeManager {
     }
 
     public void init() {
-        SettingsManager.onChangeSetting(Setting.ACTIVE_THEME_NAME, theme -> selectThemeName(this.activeName = theme), String.class, true);
+        SettingsManager.getInstance().<String>onChangeSetting(Setting.ACTIVE_THEME_NAME, theme -> selectThemeName(this.activeName = theme), true);
     }
 
     public Map<String, String> getAllThemes() {
@@ -89,7 +89,7 @@ public class ThemeManager {
     }
 
     public void saveSettings() {
-        SettingsManager.setSetting(Setting.THEMES, this.themes);
+        SettingsManager.getInstance().setSetting(Setting.THEMES, this.themes);
     }
 
     public class ThemeChanger {
@@ -114,7 +114,7 @@ public class ThemeManager {
         }
 
         private void init() {
-            SettingsManager.onChangeSetting(Setting.DARK_THEME, onChange, boolean.class, true);
+            SettingsManager.getInstance().onChangeSetting(Setting.DARK_THEME, onChange, true);
         }
 
         public void update(long delay, TimeUnit unit) {
@@ -122,7 +122,7 @@ public class ThemeManager {
         }
 
         public void update() {
-            onChange.accept(SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class));
+            onChange.accept(SettingsManager.getInstance().getSetting(Setting.DARK_THEME));
         }
     }
 }

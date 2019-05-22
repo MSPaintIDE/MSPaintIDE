@@ -47,7 +47,7 @@ public class KVCell extends ListCell<KVData> {
         this.onInit = onInit;
 
         getStyleClass().add("gridpane-theme");
-        if (SettingsManager.getSetting(Setting.DARK_THEME, Boolean.class)) {
+        if (SettingsManager.getInstance().getSetting(Setting.DARK_THEME)) {
             getStyleClass().add("gridpane-theme-dark");
         }
     }
