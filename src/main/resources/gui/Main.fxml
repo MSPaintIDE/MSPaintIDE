@@ -117,7 +117,7 @@
                                       <RowConstraints maxHeight="238.0" minHeight="10.0" prefHeight="238.0" vgrow="SOMETIMES" />
                                   </rowConstraints>
                                   <children>
-                                      <GridPane prefHeight="539.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
+                                      <GridPane fx:id="langSettingsGrid" prefHeight="539.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
                                           <columnConstraints>
                                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="162.0" />
                                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="9999999.0" minWidth="10.0" prefWidth="219.0" />

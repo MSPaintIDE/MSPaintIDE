@@ -22,13 +22,13 @@ public class GitMenu extends MenuBind {
 
     @BindItem(label = "create-repo")
     public void onClickCreateRepo() {
-        this.gitController.gitInit(ProjectManager.getPPFProject().getInputLocation());
+        this.gitController.gitInit(ProjectManager.getPPFProject().getFile());
     }
 
     @BindItem(label = "add-files")
     public void onClickAddFiles() {
         FileDirectoryChooser.openMultiFileSelector(chooser ->
-                chooser.setInitialDirectory(ProjectManager.getPPFProject().getInputLocation().getParentFile()), files -> {
+                chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile()), files -> {
             try {
                 this.gitController.addFiles(files.toArray(File[]::new));
             } catch (IOException e) {

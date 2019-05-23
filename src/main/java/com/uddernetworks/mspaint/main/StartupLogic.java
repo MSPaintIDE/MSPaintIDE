@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.main;
 
 import com.uddernetworks.mspaint.code.GeneralRunningCodeManager;
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.RunningCodeManager;
 import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
@@ -30,20 +31,17 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
-public class Main {
+public class StartupLogic {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(StartupLogic.class);
 
     private static File currentJar;
 
     private MainGUI mainGUI;
 
-    private List<ImageClass> imageClasses = new ArrayList<>();
-
     private LanguageManager languageManager = new LanguageManager();
-    private Language currentLanguage;
+    private Language<?> currentLanguage;
     private RunningCodeManager runningCodeManager;
     private OCRManager ocrManager;
 
@@ -51,7 +49,6 @@ public class Main {
 
     private Method addURL;
     private List<String> added = new ArrayList<>();
-    private Consumer<PPFProject> projectConsumer;
 
     public void start(MainGUI mainGUI) throws IOException {
         headlessStart();
@@ -66,7 +63,7 @@ public class Main {
 
         Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
-        languageManager.addLanguage(new JavaLanguage());
+        languageManager.addLanguage(new JavaLanguage(this));
         languageManager.addLanguage(new BrainfuckLanguage());
         languageManager.addLanguage(new PythonLanguage());
 
@@ -115,88 +112,19 @@ public class Main {
         }
     }
 
-    public void setCurrentLanguage(Language language) {
+    public <T> void setCurrentLanguage(Language<T> language) {
         this.currentLanguage = language;
     }
 
-    public Language getCurrentLanguage() {
+    public  Language<?> getCurrentLanguage() {
         return this.currentLanguage;
     }
 
-    private boolean optionsNotFilled() {
-        var ppfProject = ProjectManager.getPPFProject();
-        var lang = getCurrentLanguage();
-        return ppfProject.getInputLocation() == null || !lang.getLanguageSettings().requiredFilled() || (getCurrentLanguage().getOutputFileExtension() != null && ppfProject.getCompilerOutput() == null);
-    }
-
-    public int indexAll() {
-        if (optionsNotFilled()) {
-            LOGGER.error("Please select files for all options");
-            mainGUI.setHaveError();
-            return -1;
-        }
-
-        LOGGER.info("Scanning all images...");
+    // TODO: Move to different class?
+    public void compile(List<ImageClass> imageClasses, OverrideExecute overrideExecute) throws IOException {
         long start = System.currentTimeMillis();
 
-        mainGUI.setStatusText(null);
-
-        File inputImage = ProjectManager.getPPFProject().getInputLocation();
-
-        if (inputImage.isDirectory()) {
-            LOGGER.info("Found directory: " + inputImage.getAbsolutePath());
-            for (File imageFile : getFilesFromDirectory(inputImage, this.currentLanguage.getFileExtensions(), "png")) {
-                LOGGER.info("Adding non directory: " + imageFile.getAbsolutePath());
-                imageClasses.add(new ImageClass(imageFile, mainGUI));
-            }
-        } else {
-            LOGGER.info("Adding non directory: " + inputImage.getAbsolutePath());
-            imageClasses.add(new ImageClass(inputImage, mainGUI));
-        }
-
-        mainGUI.setStatusText(null);
-
-        LOGGER.info("Finished scanning all images in " + (System.currentTimeMillis() - start) + "ms");
-        return 1;
-    }
-
-    public void highlightAll() throws IOException {
-        if (optionsNotFilled()) {
-            LOGGER.error("Please select files for all options");
-            mainGUI.setHaveError();
-            return;
-        }
-
-        File highlightedFile = ProjectManager.getPPFProject().getHighlightLocation();
-
-        if (highlightedFile != null && !highlightedFile.isDirectory()) highlightedFile.mkdirs();
-
-        if (highlightedFile == null || !highlightedFile.isDirectory()) {
-            LOGGER.error("No highlighted file directory found!");
-            mainGUI.setHaveError();
-            return;
-        }
-
-        LOGGER.info("Scanning all images...");
-        mainGUI.setStatusText("Highlighting...");
-        mainGUI.setIndeterminate(true);
-        long start = System.currentTimeMillis();
-
-        for (ImageClass imageClass : imageClasses) {
-            imageClass.highlight(highlightedFile);
-        }
-
-        mainGUI.setIndeterminate(false);
-        mainGUI.setStatusText(null);
-
-        LOGGER.info("Finished highlighting all images in " + (System.currentTimeMillis() - start) + "ms");
-    }
-
-
-    public void compile(boolean execute) throws IOException {
-        long start = System.currentTimeMillis();
-
-        if (getCurrentLanguage().isInterpreted()) {
+        if (this.currentLanguage.isInterpreted()) {
             LOGGER.info("Interpreting...");
             mainGUI.setStatusText("Interpreting...");
         } else {
@@ -204,48 +132,36 @@ public class Main {
             mainGUI.setStatusText("Compiling...");
         }
 
-        File libraryFile = ProjectManager.getPPFProject().getLibraryLocation();
-
         mainGUI.setIndeterminate(true);
 
-        List<File> libFiles = new ArrayList<>();
-        if (libraryFile != null) {
-            if (libraryFile.isFile()) {
-                if (libraryFile.getName().endsWith(".jar")) {
-                    libFiles.add(libraryFile);
-                }
-            } else {
-                libFiles.addAll(getFilesFromDirectory(libraryFile, "jar"));
-            }
-        }
-
-        ImageOutputStream imageOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getAppOutput(), 500);
-        ImageOutputStream compilerOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getCompilerOutput(), 500);
+        var imageOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getAppOutput(), 500);
+        var compilerOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getCompilerOutput(), 500);
         Map<ImageClass, List<LanguageError>> errors = null;
 
         try {
-            errors = getCurrentLanguage().compileAndExecute(imageClasses, ProjectManager.getPPFProject().getJarFile(), ProjectManager.getPPFProject().getOtherLocation(), ProjectManager.getPPFProject().getClassLocation(), mainGUI, imageOutputStream, compilerOutputStream, libFiles, execute);
+            errors = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, overrideExecute);
 
             LOGGER.info("Highlighting Angry Squiggles...");
             mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
             for (ImageClass imageClass : errors.keySet()) {
-                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getMain(), imageClass, 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
+                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
                 highlighter.highlightAngrySquiggles();
             }
 
         } catch (TranscoderException | ExecutionException | InterruptedException e) {
             e.printStackTrace();
         } finally {
-            Optional<Map.Entry<ImageClass, List<LanguageError>>> firstEntry = errors != null ? errors.entrySet().stream().findFirst() : Optional.empty();
+            Optional<Map.Entry<ImageClass, List<LanguageError>>> firstEntryOptional = errors != null ? errors.entrySet().stream().findFirst() : Optional.empty();
             String append = "";
-            if (firstEntry.isPresent()) {
+            if (firstEntryOptional.isPresent()) {
+                var firstEntry = firstEntryOptional.get();
                 append += " With ";
-                List<LanguageError> languageErrors = firstEntry.get().getValue();
+                List<LanguageError> languageErrors = firstEntry.getValue();
                 if (languageErrors.size() > 1) {
                     append += languageErrors.size() + " errors";
                 } else {
-                    append += "an error (" + languageErrors.get(0).getMessage() + " in " + firstEntry.get().getKey().getInputImage().getPath() + ")";
+                    append += "an error (" + languageErrors.get(0).getMessage() + " in " + firstEntry.getKey().getInputImage().getPath() + ")";
                 }
 
                 append += ". See compiler output image for details";
@@ -261,29 +177,6 @@ public class Main {
 
             mainGUI.setStatusText(null);
         }
-
-        imageClasses.clear();
-    }
-
-    public static List<File> getFilesFromDirectory(File directory, String extension) {
-        return getFilesFromDirectory(directory, new String[] {extension});
-    }
-
-    public static List<File> getFilesFromDirectory(File directory, String[] extensions) {
-        List<File> ret = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                ret.addAll(getFilesFromDirectory(file, extensions));
-            } else {
-                if (extensions == null || Arrays.stream(extensions).anyMatch(extension -> file.getName().endsWith("." + extension))) ret.add(file);
-            }
-        }
-
-        return ret;
-    }
-
-    public List<File> getFilesFromDirectory(File directory, String[] extensions, String postExtension) {
-        return getFilesFromDirectory(directory, Arrays.stream(extensions).map(string -> string + "." + postExtension).toArray(String[]::new));
     }
 
     public void setInputImage(File inputImage) {
@@ -298,8 +191,8 @@ public class Main {
         ppfProject.setHighlightLocation(new File(outputParent, "highlighted"), false);
         ppfProject.setCompilerOutput(new File(outputParent, "compiler.png"), false);
         ppfProject.setAppOutput(new File(outputParent, "program.png"), false);
-        ppfProject.setJarFile(file, false);
-        ppfProject.setClassLocation(new File(outputParent, "classes"), false);
+//        ppfProject.setJarFile(file, false);
+//        ppfProject.setClassLocation(new File(outputParent, "classes"), false);
 
         ProjectManager.save();
         this.mainGUI.initializeInputTextFields();
@@ -323,7 +216,7 @@ public class Main {
     public static Optional<File> getCurrentJar() {
         if (currentJar != null) return Optional.of(currentJar);
         try {
-            return Optional.of((currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())));
+            return Optional.of((currentJar = new File(StartupLogic.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -332,7 +225,7 @@ public class Main {
 
     public static Optional<File> getJarParent() {
         try {
-            var currentJar = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+            var currentJar = new File(StartupLogic.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
             var numBack = currentJar.getParentFile().getName().equals("app") ? 2 : 4;
             return Optional.of(getParentsBack(currentJar, numBack));
         } catch (URISyntaxException e) {
@@ -345,6 +238,10 @@ public class Main {
     public static File getParentsBack(File base, int back) {
         for (int i = 0; i < back; i++) base = base.getParentFile();
         return base;
+    }
+
+    public MainGUI getMainGUI() {
+        return mainGUI;
     }
 
     public OCRManager getOCRManager() {

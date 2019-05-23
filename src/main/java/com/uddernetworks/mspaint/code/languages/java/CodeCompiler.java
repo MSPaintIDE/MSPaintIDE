@@ -196,7 +196,7 @@ public class CodeCompiler {
         mainGUI.setStatusText("Executing...");
         start = System.currentTimeMillis();
 
-        var runningCodeManager = mainGUI.getMain().getRunningCodeManager();
+        var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new JavaRunningCode(() -> {
 
         }));

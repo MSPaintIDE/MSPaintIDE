@@ -2,8 +2,8 @@ package com.uddernetworks.mspaint.texteditor;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
-import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.splash.Splash;
@@ -34,13 +34,13 @@ public class TextEditorManager {
     private File originalFile;
     private File imageFile;
     private ImageClass imageClass;
-    private Main headlessMain;
+    private StartupLogic startupLogic;
     private Thread savingThread;
     private final AtomicBoolean stopping = new AtomicBoolean(false);
 
     // Doesn't actually manage text files, used for generation
-    public TextEditorManager(Main main) {
-        this.headlessMain = main;
+    public TextEditorManager(StartupLogic startupLogic) {
+        this.startupLogic = startupLogic;
     }
 
     public TextEditorManager(String file) throws IOException, InterruptedException, ExecutionException {
@@ -51,10 +51,10 @@ public class TextEditorManager {
         this.originalFile = file.getAbsoluteFile();
 
         if (MainGUI.HEADLESS) {
-            this.headlessMain = new Main();
-            this.headlessMain.headlessStart();
+            this.startupLogic = new StartupLogic();
+            this.startupLogic.headlessStart();
         } else {
-            this.headlessMain = mainGUI.getMain();
+            this.startupLogic = mainGUI.getStartupLogic();
             mainGUI.setIndeterminate(true);
         }
 
@@ -65,12 +65,12 @@ public class TextEditorManager {
         backupFile.createNewFile();
         Files.copy(this.originalFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        System.out.println("Main: " + Thread.currentThread());
+        System.out.println("StartupLogic: " + Thread.currentThread());
 
         this.imageFile = createImageFile();
 
-        this.imageClass = new ImageClass(this.imageFile, mainGUI, this.headlessMain);
-        var options = this.headlessMain.getOCRManager().getActions().getOptions();
+        this.imageClass = new ImageClass(this.imageFile, mainGUI, this.startupLogic);
+        var options = this.startupLogic.getOCRManager().getActions().getOptions();
         options.setImageReadMethod(ImageReadMethod.IMAGEIO_STREAM);
 
         (this.savingThread = new Thread(() -> {
@@ -109,13 +109,13 @@ public class TextEditorManager {
     }
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
-        var ocrManager = this.headlessMain.getOCRManager();
+        var ocrManager = this.startupLogic.getOCRManager();
         ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null);
         LetterGenerator letterGenerator = new LetterGenerator();
 
         int size = SettingsManager.getInstance().getSetting(Setting.EDIT_FILE_SIZE);
 
-        var data = this.headlessMain.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
+        var data = this.startupLogic.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
 
         // Gets the space DatabaseCharacter used for the current font size from the database
         var spaceOptional = data.stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
@@ -130,7 +130,7 @@ public class TextEditorManager {
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
 
-        var centerPopulator = this.headlessMain.getCenterPopulator();
+        var centerPopulator = this.startupLogic.getCenterPopulator();
         try {
             centerPopulator.generateCenters(size);
         } catch (IOException e) {

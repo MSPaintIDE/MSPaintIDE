@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.splash;
 
-import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public enum SplashMessage {
         if (this.image != null) return this.image;
 
         try {
-            var parentOptional = Main.getJarParent();
+            var parentOptional = StartupLogic.getJarParent();
             if (parentOptional.isEmpty()) return null;
             var imageLocation = new File(parentOptional.get(), "splash\\" + imagePath);
             imageLocation.mkdirs();

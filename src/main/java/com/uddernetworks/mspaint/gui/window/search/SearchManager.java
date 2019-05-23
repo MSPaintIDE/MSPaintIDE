@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.gui.window.search;
 
-import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.newocr.recognition.ScannedImage;
@@ -30,7 +30,7 @@ public class SearchManager {
 
     public List<SearchResult> searchDirectory(File directory, String text, String extension, boolean ignoreCase) {
         if (!directory.isDirectory()) return Collections.emptyList();
-        return Main.getFilesFromDirectory(directory, extension)
+        return StartupLogic.getFilesFromDirectory(directory, extension)
 //                .parallelStream()
                 .stream()
                 .map(file -> searchFile(file, text, ignoreCase))
@@ -41,7 +41,7 @@ public class SearchManager {
     public List<SearchResult> searchFile(File file, String text, boolean ignoreCase) {
         if (!file.isFile()) return Collections.emptyList();
 
-        var scannedImage = imageCompare.getText(file, this.mainGUI, this.mainGUI.getMain());
+        var scannedImage = imageCompare.getText(file, this.mainGUI, this.mainGUI.getStartupLogic());
         AtomicInteger lineNumber = new AtomicInteger(0);
         return scannedImage.getGrid().values()
                 .stream()

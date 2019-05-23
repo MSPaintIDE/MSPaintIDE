@@ -89,7 +89,7 @@ public class InspectWindow extends Stage implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        var ocrManager = this.mainGUI.getMain().getOCRManager();
+        var ocrManager = this.mainGUI.getStartupLogic().getOCRManager();
         String name = this.inspecting.getName();
         ScannedImage scannedImage = ocrManager.getScan().scanImage(this.inspecting).stripLeadingSpaces();
         int pxSize = (int) ocrManager.getActions().getFontSize(scannedImage.letterAt(0).get()).getAsDouble();
@@ -99,7 +99,7 @@ public class InspectWindow extends Stage implements Initializable {
         int periodIndex = nameNoExtension.lastIndexOf('.');
         nameNoExtension = periodIndex == -1 ? "" : nameNoExtension.substring(periodIndex + 1);
 
-        LanguageManager languageManager = this.mainGUI.getMain().getLanguageManager();
+        LanguageManager languageManager = this.mainGUI.getStartupLogic().getLanguageManager();
         String language = languageManager.getLanguageFromFileExtension(nameNoExtension)
                 .map(Language::getName)
                 .orElse("Unknown");

@@ -3,8 +3,12 @@ package com.uddernetworks.mspaint.code.languages.java;
 import java.util.Arrays;
 
 public enum JavaOptions {
+    INPUT_DIRECTORY("inputDirectory", true),
+    HIGHLIGHT_DIRECTORY("highlightDirectory", true),
     MAIN("classLocation", true),
     JAR("jarFile", true),
+    CLASS_OUTPUT("classOutput", true),
+    EXECUTE("execute", true),
     LIBRARY_LOCATION("libraryLocation", false),
     OTHER_LOCATION("otherLocation", false);
 

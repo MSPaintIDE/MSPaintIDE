@@ -1,8 +1,9 @@
 package com.uddernetworks.mspaint.painthook;
 
+import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.gui.window.UserInputWindow;
-import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class InjectionManager {
 
     private static Logger LOGGER = Logger.getLogger(InjectionManager.class);
     private MainGUI mainGUI;
-    private Main main;
+    private StartupLogic startupLogic;
     private PaintInjector pInject;
 
     private Executor executor = Executors.newCachedThreadPool();
@@ -45,9 +46,9 @@ public class InjectionManager {
         }
     }
 
-    public InjectionManager(MainGUI mainGUI, Main main) {
+    public InjectionManager(MainGUI mainGUI, StartupLogic startupLogic) {
         this.mainGUI = mainGUI;
-        this.main = main;
+        this.startupLogic = startupLogic;
         this.pInject = PaintInjector.INSTANCE;
     }
 
@@ -76,7 +77,7 @@ public class InjectionManager {
                 LOGGER.error("The selected language does not support building.");
                 return;
             }
-            this.mainGUI.fullCompile(false);
+            this.mainGUI.fullCompile(OverrideExecute.DONT_EXECUTE);
         } catch (Exception e) {
             e.printStackTrace();
         }

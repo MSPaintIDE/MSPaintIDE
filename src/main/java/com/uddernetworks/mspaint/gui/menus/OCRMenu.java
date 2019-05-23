@@ -46,7 +46,7 @@ public class OCRMenu extends MenuBind {
         this.mainGUI.setIndeterminate(true);
 
         final long start = System.currentTimeMillis();
-        var fontData = this.mainGUI.getMain().getOCRManager().getActiveFont();
+        var fontData = this.mainGUI.getStartupLogic().getOCRManager().getActiveFont();
         System.out.println("fontData = " + fontData);
         CompletableFuture.runAsync(() -> {
             fontData.getTrain().trainImage(file);
@@ -83,7 +83,7 @@ public class OCRMenu extends MenuBind {
 
         var finalFile = file;
         CompletableFuture.runAsync(() -> {
-            this.mainGUI.getMain().getOCRManager().getActiveFont().getTrainGenerator().generateTrainingImage(finalFile);
+            this.mainGUI.getStartupLogic().getOCRManager().getActiveFont().getTrainGenerator().generateTrainingImage(finalFile);
         }).thenRun(() -> {
             LOGGER.info("Completed generation in " + (System.currentTimeMillis() - start) + "ms");
             this.mainGUI.updateLoading(0, 1);

@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.texteditor;
 
-import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.ocr.FontData;
 import com.uddernetworks.newocr.detection.SearchImage;
 import com.uddernetworks.newocr.recognition.Actions;
@@ -27,16 +27,16 @@ public class CenterPopulator {
 
     private Map<FontData, Int2ObjectMap<Char2IntMap>> centers = new HashMap<>();
 
-    private Main main;
+    private StartupLogic startupLogic;
 
-    public CenterPopulator(Main main) {
-        this.main = main;
+    public CenterPopulator(StartupLogic startupLogic) {
+        this.startupLogic = startupLogic;
     }
 
     // Code loosely adapted from com.uddernetworks.newocr.OCRHandle.java
     // TODO: Clean this up a ton :(
     public void generateCenters(int fontSize) throws IOException {
-        var activeFont = this.main.getOCRManager().getActiveFont();
+        var activeFont = this.startupLogic.getOCRManager().getActiveFont();
 
         if (centers.containsKey(activeFont) && centers.get(activeFont).containsKey(fontSize)) return;
 
@@ -118,7 +118,7 @@ public class CenterPopulator {
     }
 
     public int getCenter(char cha, int fontSize) {
-        var activeFont = this.main.getOCRManager().getActiveFont();
+        var activeFont = this.startupLogic.getOCRManager().getActiveFont();
         if (!centers.containsKey(activeFont)) return 0;
         return centers.get(activeFont).getOrDefault(fontSize, def).getOrDefault(cha, 0);
     }

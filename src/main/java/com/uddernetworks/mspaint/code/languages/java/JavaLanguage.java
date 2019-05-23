@@ -1,25 +1,39 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.util.IDEFileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class JavaLanguage implements Language<JavaOptions> {
+public class JavaLanguage extends Language<JavaOptions> {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
     private CodeCompiler codeCompiler = new CodeCompiler();
     private JavaSettings settings = new JavaSettings();
+
+    public JavaLanguage(StartupLogic startupLogic) {
+        super(startupLogic);
+    }
+
+    @Override
+    public Logger getLogger() {
+        return LOGGER;
+    }
 
     @Override
     public String getName() {
@@ -34,6 +48,11 @@ public class JavaLanguage implements Language<JavaOptions> {
     @Override
     public String getOutputFileExtension() {
         return "jar";
+    }
+
+    @Override
+    public File getInputLocation() {
+        return getLanguageSettings().getSetting(JavaOptions.INPUT_DIRECTORY);
     }
 
     @Override
@@ -57,8 +76,53 @@ public class JavaLanguage implements Language<JavaOptions> {
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(List<ImageClass> imageClasses, File outputFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
-        return this.codeCompiler.compileAndExecute(imageClasses, outputFile, otherFiles, classOutputFolder, mainGUI, imageOutputStream, compilerStream, libs, execute)
+    public void highlightAll(List<ImageClass> imageClasses) throws IOException {
+        highlightAll(JavaOptions.HIGHLIGHT_DIRECTORY, imageClasses);
+    }
+
+    @Override
+    public Optional<List<ImageClass>> indexFiles() {
+        return indexFiles(JavaOptions.INPUT_DIRECTORY);
+    }
+
+    @Override
+    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
+        var imageClassesOptional = indexFiles();
+        if (imageClassesOptional.isEmpty()) {
+            LOGGER.error("Error while finding ImageClasses, aborting...");
+            return Collections.emptyMap();
+        }
+
+        return compileAndExecute(mainGUI, imageClassesOptional.get(), imageOutputStream, compilerStream);
+    }
+
+    @Override
+    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
+        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, OverrideExecute.DEFAULT);
+    }
+
+    @Override
+    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException {
+        var jarFile = this.settings.<File>getSetting(JavaOptions.JAR);
+        var libDirectory = this.settings.<File>getSetting(JavaOptions.LIBRARY_LOCATION);
+        var otherFiles = this.settings.<File>getSetting(JavaOptions.OTHER_LOCATION);
+        var classOutput = this.settings.<File>getSetting(JavaOptions.CLASS_OUTPUT);
+        var execute = switch (executeOverride) {
+            case EXECUTE -> true;
+            case DONT_EXECUTE -> false;
+            default -> this.settings.<Boolean>getSetting(JavaOptions.EXECUTE);
+        };
+
+        var libFiles = new ArrayList<File>();
+        if (libDirectory != null) {
+            if (libDirectory.isFile()) {
+                if (libDirectory.getName().endsWith(".jar")) libFiles.add(libDirectory);
+            } else {
+                libFiles.addAll(IDEFileUtils.getFilesFromDirectory(libDirectory, "jar"));
+            }
+        }
+
+        return this.codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute)
                 .entrySet()
                 .stream()
                 .map(t -> new AbstractMap.SimpleEntry<ImageClass, List<LanguageError>>(t.getKey(), t.getValue().stream().map(JavaError::new).collect(Collectors.toList())))

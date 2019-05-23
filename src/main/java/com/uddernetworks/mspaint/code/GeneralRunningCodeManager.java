@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.code;
 
-import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.StartupLogic;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -10,10 +10,10 @@ public class GeneralRunningCodeManager implements RunningCodeManager {
 
     private final AtomicReference<RunningCode> currentlyRunning = new AtomicReference<>();
     private Executor executor = Executors.newCachedThreadPool();
-    private Main main;
+    private StartupLogic startupLogic;
 
-    public GeneralRunningCodeManager(Main main) {
-        this.main = main;
+    public GeneralRunningCodeManager(StartupLogic startupLogic) {
+        this.startupLogic = startupLogic;
     }
 
     @Override

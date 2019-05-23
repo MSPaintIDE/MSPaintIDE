@@ -2,10 +2,10 @@ package com.uddernetworks.mspaint.git;
 
 import com.google.gson.Gson;
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ModifiedDetector;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.util.IDEFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +98,7 @@ public class GitController {
 
     private File getGitFolder() {
         if (gitFolder != null) return gitFolder;
-        File directory = ProjectManager.getPPFProject().getInputLocation().getParentFile();
+        File directory = ProjectManager.getPPFProject().getFile().getParentFile();
         return gitFolder = new File(directory, "git");
     }
 
@@ -123,7 +123,6 @@ public class GitController {
     public void gitInit(File directory) {
         this.mainGUI.setIndeterminate(true);
         this.mainGUI.setStatusText("Creating local git repository");
-        directory = directory.getParentFile();
         File gitFolder = new File(directory, "git");
         gitFolder.mkdirs();
         runCommand("git init", true, false, gitFolder, result -> { //  & git init
@@ -142,10 +141,9 @@ public class GitController {
 
     public void addFiles(File[] files) throws IOException {
         GitIndex gitIndex = getGitIndex();
-        Main main = this.mainGUI.getMain();
 
         List<File> imageFiles = Arrays.stream(files).flatMap(file -> {
-            if (file.isDirectory()) return main.getFilesFromDirectory(file, (String[]) null).stream();
+            if (file.isDirectory()) return IDEFileUtils.getFilesFromDirectory(file, (String[]) null).stream();
             return Stream.of(file);
         }).collect(Collectors.toList());
 
@@ -197,13 +195,7 @@ public class GitController {
     }
 
     private String getRelativeClass(File file) {
-        File inputImage = ProjectManager.getPPFProject().getInputLocation();
-        if (inputImage.isFile()) {
-            new Exception("Tried to get relative class not in the input image path!").printStackTrace();
-            return "";
-        }
-
-        return inputImage.getParentFile().toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
+        return this.mainGUI.getCurrentLanguage().getInputLocation().getParentFile().toURI().relativize(file.toURI()).getPath().replace("/", File.separator);
     }
 
     private Pattern hideOriginPattern = Pattern.compile("add origin(.*)");

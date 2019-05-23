@@ -2,7 +2,7 @@ package com.uddernetworks.mspaint.code.highlighter;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
-import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 public class AngrySquiggleHighlighter {
 
-    private Main main;
+    private StartupLogic startupLogic;
     private ImageClass imageClass;
     private BufferedImage image;
     private int extraSquigglePadding;
@@ -27,8 +27,8 @@ public class AngrySquiggleHighlighter {
     private List<LanguageError> errors;
     private BufferedImage squiggleImage; // The highlighter will use the size of the first character to calculate the persistent angry squiggle image
 
-    public AngrySquiggleHighlighter(Main main, ImageClass imageClass, int extraSquigglePadding, File highlightedFile, ScannedImage scannedImage, List<LanguageError> errors) throws IOException, TranscoderException {
-        this.main = main;
+    public AngrySquiggleHighlighter(StartupLogic startupLogic, ImageClass imageClass, int extraSquigglePadding, File highlightedFile, ScannedImage scannedImage, List<LanguageError> errors) throws IOException, TranscoderException {
+        this.startupLogic = startupLogic;
         this.imageClass = imageClass;
         this.image = imageClass.getImage();
         this.extraSquigglePadding = extraSquigglePadding;
@@ -63,7 +63,7 @@ public class AngrySquiggleHighlighter {
 
 
     private void getLineAndLength(int lineNumber, int columnNumber) throws IOException, TranscoderException {
-        var actions = this.main.getOCRManager().getActions();
+        var actions = this.startupLogic.getOCRManager().getActions();
         int xIndex;
         int yIndex;
         int length;

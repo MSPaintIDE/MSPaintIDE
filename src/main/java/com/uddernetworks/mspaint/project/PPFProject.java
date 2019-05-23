@@ -10,8 +10,8 @@ public class PPFProject {
 
     private File file;
 
-    private File inputLocation;         // Input file/image folder
-    private File highlightLocation;     // Highlight output file/folder
+//    private File inputLocation;         // Input file/image folder
+//    private File highlightLocation;     // Highlight output file/folder
 //    private File classLocation;         // Output .class file folder
 //    private File jarFile;               // Output .jar file
 //    private File libraryLocation;       // Library .jar/folder
@@ -20,9 +20,9 @@ public class PPFProject {
     private File appOutput;             // Application output image file
     private String language;            // The language used in the project
     private String name;                // The name of the project
-    private boolean syntaxHighlight;    // If the IDE should highlight the code
-    private boolean compile;            // If the IDE should compile the code
-    private boolean execute;            // If the IDE should execute the code
+    private boolean syntaxHighlight;    // If the IDE should highlight the code TODO: Should this be a language option, accessible in Language?
+//    private boolean compile;            // If the IDE should compile the code
+//    private boolean execute;            // If the IDE should execute the code
     private String activeFont;
     private Map<String, String> fonts = new HashMap<>();
     public Map<String, Map<String, Object>> languageSettings = new HashMap<>();
@@ -35,31 +35,6 @@ public class PPFProject {
 
     public File getFile() {
         return file;
-    }
-
-    public File getInputLocation() {
-        return inputLocation;
-    }
-
-    public void setInputLocation(File inputLocation) {
-        setInputLocation(inputLocation, true);
-    }
-
-    public void setInputLocation(File inputLocation, boolean override) {
-        if (this.inputLocation == null || override) this.inputLocation = inputLocation;
-    }
-
-
-    public File getHighlightLocation() {
-        return highlightLocation;
-    }
-
-    public void setHighlightLocation(File highlightLocation) {
-        setHighlightLocation(highlightLocation, true);
-    }
-
-    public void setHighlightLocation(File highlightLocation, boolean override) {
-        if (this.highlightLocation == null || override) this.highlightLocation = highlightLocation;
     }
 
     public File getCompilerOutput() {
@@ -120,24 +95,6 @@ public class PPFProject {
 
     public void setSyntaxHighlight(boolean syntaxHighlight) {
         this.syntaxHighlight = syntaxHighlight;
-    }
-
-
-    public boolean isCompile() {
-        return compile;
-    }
-
-    public void setCompile(boolean compile) {
-        this.compile = compile;
-    }
-
-
-    public boolean isExecute() {
-        return execute;
-    }
-
-    public void setExecute(boolean execute) {
-        this.execute = execute;
     }
 
     public String getActiveFont() {

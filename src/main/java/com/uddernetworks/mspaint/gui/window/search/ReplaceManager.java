@@ -28,13 +28,13 @@ public class ReplaceManager {
     }
 
     public void replaceText(SearchResult searchResult, String text) throws IOException, ExecutionException, InterruptedException {
-        var ocrManager = this.mainGUI.getMain().getOCRManager();
+        var ocrManager = this.mainGUI.getStartupLogic().getOCRManager();
         ScannedImage scannedImage = searchResult.getScannedImage();
 
         var size = ocrManager.getFontSize(scannedImage);
 
         LetterGenerator letterGenerator = new LetterGenerator();
-        var spaceOptional = this.mainGUI.getMain().getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
+        var spaceOptional = this.mainGUI.getStartupLogic().getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
 
         if (spaceOptional.isEmpty()) {
             LOGGER.error("Couldn't find space for size: " + size);
@@ -46,7 +46,7 @@ public class ReplaceManager {
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3);
 
-        var centerPopulator = this.mainGUI.getMain().getCenterPopulator();
+        var centerPopulator = this.mainGUI.getStartupLogic().getCenterPopulator();
         centerPopulator.generateCenters((int) size);
 
         int foundPos = searchResult.getFoundPosition();

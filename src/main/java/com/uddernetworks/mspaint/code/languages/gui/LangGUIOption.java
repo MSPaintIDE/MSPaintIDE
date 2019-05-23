@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.code.languages.gui;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 
 import java.util.function.Consumer;
 
@@ -14,6 +15,18 @@ public interface LangGUIOption {
      * @return The name displayed
      */
     String getName();
+
+    /**
+     * Gets the {@link Control} of the {@link LangGUIOption#getName()} method to be placed directly in the GUI.
+     *
+     * @return The {@link Control} of the name
+     */
+    default Control getTextControl() {
+        var textField = new Label();
+        textField.setText(getName());
+        textField.getStyleClass().add("theme-text");
+        return textField;
+    }
 
     /**
      * Gets the displayed element in the second column, for examaple for a simple string option,

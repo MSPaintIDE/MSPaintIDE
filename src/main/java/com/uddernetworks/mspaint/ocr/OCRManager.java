@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.ocr;
 
-import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.newocr.configuration.ConfigReflectionCacher;
 import com.uddernetworks.newocr.configuration.ReflectionCacher;
 import com.uddernetworks.newocr.recognition.Actions;
@@ -27,12 +27,12 @@ public class OCRManager {
     private Map<String, FontData> fontDataMap;
 
     private FontData activeFont;
-    private Main main;
+    private StartupLogic startupLogic;
 
-    public OCRManager(Main main) {
+    public OCRManager(StartupLogic startupLogic) {
         this.reflectionCacher = new ConfigReflectionCacher();
         this.fontDataMap = new HashMap<>();
-        this.main = main;
+        this.startupLogic = startupLogic;
     }
 
     public void setActiveFont(String name, String config) {

@@ -2,8 +2,8 @@ package com.uddernetworks.mspaint.code;
 
 import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
-import com.uddernetworks.mspaint.main.Main;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 import org.slf4j.Logger;
@@ -24,16 +24,16 @@ public class ImageClass {
     private LetterFileWriter letterFileWriter;
     private File highlightedFile;
     private MainGUI mainGUI;
-    private Main headlessMain;
+    private StartupLogic startupLogic;
 
     public ImageClass(File inputImage, MainGUI mainGUI) {
         this(inputImage, mainGUI, null);
     }
 
-    public ImageClass(File inputImage, MainGUI mainGUI, Main headlessMain) {
+    public ImageClass(File inputImage, MainGUI mainGUI, StartupLogic startupLogic) {
         this.inputImage = inputImage;
         this.mainGUI = mainGUI;
-        this.headlessMain = headlessMain;
+        this.startupLogic = startupLogic;
     }
 
     public void scan() {
@@ -44,13 +44,13 @@ public class ImageClass {
 
         ImageCompare imageCompare = new ImageCompare();
 
-        if (this.headlessMain == null) {
-            this.headlessMain = this.mainGUI.getMain();
+        if (this.startupLogic == null) {
+            this.startupLogic = this.mainGUI.getStartupLogic();
         }
 
         System.out.println("Getting text at " + System.currentTimeMillis() +  "(" + this.inputImage.getAbsolutePath() + ")");
 
-        this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.headlessMain);
+        this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.startupLogic);
 
         this.text = this.scannedImage.getPrettyString();
         this.trimmedText = this.scannedImage.stripLeadingSpaces().getPrettyString();
@@ -110,7 +110,7 @@ public class ImageClass {
         return mainGUI;
     }
 
-    public Main getHeadlessMain() {
-        return headlessMain;
+    public StartupLogic getStartupLogic() {
+        return startupLogic;
     }
 }

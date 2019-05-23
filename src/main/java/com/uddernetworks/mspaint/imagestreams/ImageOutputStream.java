@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.imagestreams;
 
-import com.uddernetworks.mspaint.main.Main;
+import com.uddernetworks.mspaint.main.StartupLogic;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ImageOutputStream extends OutputStream {
     private StringBuilder string = new StringBuilder();
-    private Main main;
+    private StartupLogic startupLogic;
     private File location;
     private Graphics2D graphics;
     private int width;
@@ -22,8 +22,8 @@ public class ImageOutputStream extends OutputStream {
     private Color color;
     private Color background;
 
-    public ImageOutputStream(Main main, File location, int width) {
-        this.main = main;
+    public ImageOutputStream(StartupLogic startupLogic, File location, int width) {
+        this.startupLogic = startupLogic;
         this.location = location;
 
         this.width = width;
@@ -46,7 +46,7 @@ public class ImageOutputStream extends OutputStream {
 
         graphics.setRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
 
-        Font font = new Font(this.main.getFontName(), Font.PLAIN, 24);
+        Font font = new Font(this.startupLogic.getFontName(), Font.PLAIN, 24);
         graphics.setFont(font);
 
         List<String> linesList = new ArrayList<>();

@@ -4,9 +4,7 @@ import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -43,6 +41,10 @@ public abstract class LanguageSettings<G> extends SettingsAccessor<G> {
 
     public boolean requiredFilled() {
         return this.optionMap.keySet().stream().allMatch(this::isSet);
+    }
+
+    public List<LangGUIOption> getOptions() {
+        return new ArrayList<>(optionMap.values());
     }
 
     @Override
