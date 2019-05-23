@@ -124,8 +124,9 @@ public class Main {
     }
 
     private boolean optionsNotFilled() {
-        PPFProject ppfProject = ProjectManager.getPPFProject();
-        return ppfProject.getInputLocation() == null || ppfProject.getClassLocation() == null || (getCurrentLanguage().getOutputFileExtension() != null && ppfProject.getCompilerOutput() == null);
+        var ppfProject = ProjectManager.getPPFProject();
+        var lang = getCurrentLanguage();
+        return ppfProject.getInputLocation() == null || !lang.getLanguageSettings().requiredFilled() || (getCurrentLanguage().getOutputFileExtension() != null && ppfProject.getCompilerOutput() == null);
     }
 
     public int indexAll() {

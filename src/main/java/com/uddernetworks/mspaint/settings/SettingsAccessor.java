@@ -11,6 +11,10 @@ public abstract class SettingsAccessor<G> {
     protected Map<G, Object> settings = new HashMap<>();
     protected Map<G, List<Consumer>> onChangeSettings = new HashMap<>();
 
+    public boolean isSet(G setting) {
+        return this.settings.containsKey(setting);
+    }
+
     // Everything
     public <T> T getSetting(G setting) {
         return getSetting(setting, null);
@@ -39,8 +43,17 @@ public abstract class SettingsAccessor<G> {
     }
 
     public void setSetting(G setting, Object value) {
+        setSetting(setting, value, false);
+    }
+
+    public void setSetting(G setting, Object value, boolean override) {
+        setSetting(setting, value, override, true);
+    }
+
+    public void setSetting(G setting, Object value, boolean override, boolean runOnChange) {
+        if (this.settings.containsKey(setting) && !override) return;
         settings.put(setting, value);
-        Platform.runLater(() -> onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
+        if (runOnChange) Platform.runLater(() -> this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
         save();
     }
 

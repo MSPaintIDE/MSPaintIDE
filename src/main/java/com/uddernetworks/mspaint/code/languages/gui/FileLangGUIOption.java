@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.languages.gui;
 
+import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -52,6 +53,16 @@ public class FileLangGUIOption extends StringLangGUIOption {
         } else {
             return new File(System.getProperty("user.home", "C:\\"));
         }
+    }
+
+    @Override
+    public void setSetting(Object setting) {
+        if (setting instanceof File) text.set(((File) setting).getAbsolutePath());
+    }
+
+    @Override
+    public <G> void bindValue(G type, LanguageSettings<G> languageSettings) {
+        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(type, new File(newValue), true, false));
     }
 
     @Override

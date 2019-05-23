@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.gui;
 
 import com.jfoenix.controls.JFXTextField;
+import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Control;
@@ -37,6 +38,16 @@ public class StringLangGUIOption implements LangGUIOption {
         textField.getStyleClass().add("theme-text");
         GridPane.setColumnIndex(textField, 1);
         return textField;
+    }
+
+    @Override
+    public void setSetting(Object setting) {
+        if (setting instanceof String) text.set((String) setting);
+    }
+
+    @Override
+    public <G> void bindValue(G type, LanguageSettings<G> languageSettings) {
+        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(type, newValue, true, false));
     }
 
     @Override

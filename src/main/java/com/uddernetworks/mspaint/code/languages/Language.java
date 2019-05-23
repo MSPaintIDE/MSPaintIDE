@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public interface Language {
+public interface Language<G> {
     /**
      * Gets the name of the Language, e.g. "Java", "Python".
      *
@@ -54,11 +54,11 @@ public interface Language {
     DefaultJFlexLexer getLanguageHighlighter();
 
     /**
-     * Gets the
+     * Gets the {@link LanguageSettings<G>} of the current language.
      *
-     * @return
+     * @return The {@link LanguageSettings<G>} used by the current language
      */
-    LanguageSettings getLanguageSettings();
+    LanguageSettings<G> getLanguageSettings();
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.

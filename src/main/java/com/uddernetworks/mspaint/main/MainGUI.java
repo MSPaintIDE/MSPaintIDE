@@ -151,6 +151,7 @@ public class MainGUI extends Application implements Initializable {
     private AtomicBoolean initialized = new AtomicBoolean();
     private static File initialProject = null;
     private ThemeManager themeManager;
+    private boolean runListeners = true;
 
     private Map<String, Image> cachedTaksbarIcons = new HashMap<>();
     private Map<String, ImageView> cachedImageViews = new HashMap<>();
@@ -587,8 +588,6 @@ public class MainGUI extends Application implements Initializable {
             }
         }
     }
-
-    private boolean runListeners = true;
 
     private <T> void addOptionalListener(TextField textField, Class<T> clazz, Consumer<T> callback) {
         textField.textProperty().addListener(event -> {

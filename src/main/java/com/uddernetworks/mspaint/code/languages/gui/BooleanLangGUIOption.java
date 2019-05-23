@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.gui;
 
 import com.jfoenix.controls.JFXCheckBox;
+import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Cursor;
@@ -34,6 +35,23 @@ public class BooleanLangGUIOption implements LangGUIOption {
         GridPane.setColumnIndex(checkbox, 1);
 
         return checkbox;
+    }
+
+    @Override
+    public void setSetting(Object setting) {
+        if (setting instanceof Boolean) {
+            value.set((Boolean) setting);
+        } else if (setting instanceof String) {
+            var settingString = String.valueOf(setting);
+            var isTrue = settingString.equalsIgnoreCase("true");
+            if (!isTrue && !settingString.equalsIgnoreCase("false")) return;
+            value.set(isTrue);
+        }
+    }
+
+    @Override
+    public <G> void bindValue(G type, LanguageSettings<G> languageSettings) {
+        this.value.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(type, newValue, true, false));
     }
 
     @Override

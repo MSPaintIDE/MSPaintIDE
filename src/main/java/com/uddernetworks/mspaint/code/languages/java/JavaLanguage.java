@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JavaLanguage implements Language {
+public class JavaLanguage implements Language<JavaOptions> {
 
     private CodeCompiler codeCompiler = new CodeCompiler();
     private JavaSettings settings = new JavaSettings();
@@ -52,7 +52,7 @@ public class JavaLanguage implements Language {
     }
 
     @Override
-    public LanguageSettings getLanguageSettings() {
+    public LanguageSettings<JavaOptions> getLanguageSettings() {
         return this.settings;
     }
 

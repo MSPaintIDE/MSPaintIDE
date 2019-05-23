@@ -108,7 +108,6 @@ public class ProjectManager {
     }
 
     public static PPFProject readProject(File file) {
-        System.out.println("Reading 222");
         try {
             return (ppfProject = gson.fromJson(new FileReader(file), PPFProject.class));
         } catch (FileNotFoundException e) {

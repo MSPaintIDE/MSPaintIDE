@@ -16,10 +16,6 @@ public class LanguageManager {
     private List<Language> allLanguages = new ArrayList<>();
     private List<Language> enabledLanguages = new ArrayList<>();
 
-    public LanguageManager() {
-
-    }
-
     public List<Language> getAllLanguages() {
         return allLanguages;
     }
