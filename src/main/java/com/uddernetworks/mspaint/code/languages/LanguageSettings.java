@@ -1,11 +1,13 @@
 package com.uddernetworks.mspaint.code.languages;
 
+import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,8 @@ public abstract class LanguageSettings<G> extends SettingsAccessor<G> {
     protected abstract String enumToName(G type);
 
     protected abstract G nameToEnum(String name);
+
+    public abstract LangGUIOptionRequirement getRequirement(G type);
 
     public void generateDefaults() {
         this.defaultGenerators.forEach((type, generator) -> setSetting(type, generator.get(), false));
@@ -53,7 +57,19 @@ public abstract class LanguageSettings<G> extends SettingsAccessor<G> {
     }
 
     public boolean requiredFilled() {
-        return this.optionMap.keySet().stream().allMatch(this::isSet);
+        return getOptionsTyped(Predicate.isEqual(LangGUIOptionRequirement.REQUIRED)).stream().allMatch(this::isSet);
+    }
+
+    public List<Map.Entry<G, LangGUIOption>> getOptions(Predicate<LangGUIOptionRequirement> predicate) {
+        return this.optionMap.entrySet().stream().filter(entry -> predicate.test(getRequirement(entry.getKey()))).collect(Collectors.toList());
+    }
+
+    public List<G> getOptionsTyped(Predicate<LangGUIOptionRequirement> predicate) {
+        return getOptions(predicate).stream().map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
+    public List<LangGUIOption> getOptionsGUI(Predicate<LangGUIOptionRequirement> predicate) {
+        return getOptions(predicate).stream().map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
     public List<LangGUIOption> getOptions() {

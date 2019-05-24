@@ -105,18 +105,12 @@ public class ProjectManager {
     public static void save() {
         try {
 //            gson.toJson(ppfProject, new FileWriter(ppfProject.getFile()));
-
+            // TODO: Clean up
 
             var json = gson.toJson(ppfProject);
 //            System.out.println(json);
             var file = ppfProject.getFile();
 
-            LOGGER.info("Writing gson to " + file.getPath());
-
-
-            System.out.println("Exists1: " + file.exists());
-            System.out.println(file.createNewFile());
-            System.out.println("Exists2: " + file.exists());
             try (var writer = new FileWriter(file)) {
                 IOUtils.write(json, writer);
             }

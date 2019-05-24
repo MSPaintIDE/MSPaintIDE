@@ -77,6 +77,7 @@ public class JavaLanguage extends Language<JavaOptions> {
 
     @Override
     public void highlightAll(List<ImageClass> imageClasses) throws IOException {
+        if (!this.settings.<Boolean>getSetting(JavaOptions.HIGHLIGHT)) return;
         highlightAll(JavaOptions.HIGHLIGHT_DIRECTORY, imageClasses);
     }
 

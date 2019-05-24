@@ -21,7 +21,6 @@ public class PPFProject {
     private File appOutput;             // Application output image file
     private String language;            // The language used in the project
     private String name;                // The name of the project
-    private boolean syntaxHighlight;    // If the IDE should highlight the code TODO: Should this be a language option, accessible in Language?
 //    private boolean compile;            // If the IDE should compile the code
 //    private boolean execute;            // If the IDE should execute the code
     private String activeFont;
@@ -87,15 +86,6 @@ public class PPFProject {
 
     public void setName(String name, boolean override) {
         if (this.name == null || override) this.name = name;
-    }
-
-
-    public boolean isSyntaxHighlight() {
-        return syntaxHighlight;
-    }
-
-    public void setSyntaxHighlight(boolean syntaxHighlight) {
-        this.syntaxHighlight = syntaxHighlight;
     }
 
     public String getActiveFont() {

@@ -100,7 +100,8 @@ public abstract class Language<G> {
     public abstract LanguageSettings<G> getLanguageSettings();
 
     /**
-     * Highlights all {@link ImageClass}s given.
+     * Highlights all {@link ImageClass}s given. When implementing, this method must ALSO check in the settings if
+     * highlighting should occur.
      *
      * @param imageClasses The {@link ImageClass}s to highlight
      * @throws IOException If an IO Exception occurs

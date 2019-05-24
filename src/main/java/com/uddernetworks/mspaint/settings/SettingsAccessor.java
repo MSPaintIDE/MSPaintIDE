@@ -43,7 +43,7 @@ public abstract class SettingsAccessor<G> {
     }
 
     public void setSetting(G setting, Object value) {
-        setSetting(setting, value, false);
+        setSetting(setting, value, true);
     }
 
     public void setSetting(G setting, Object value, boolean override) {

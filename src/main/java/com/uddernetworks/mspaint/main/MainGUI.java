@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.git.GitController;
@@ -22,16 +23,20 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.VPos;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -45,14 +50,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class MainGUI extends Application implements Initializable {
@@ -104,12 +110,6 @@ public class MainGUI extends Application implements Initializable {
     private Label statusText;
 
     @FXML
-    private JFXCheckBox syntaxHighlight;
-    @FXML
-    private JFXCheckBox compile;
-    @FXML
-    private JFXCheckBox execute;
-    @FXML
     private JFXButton invertColors;
     @FXML
     private JFXButton remoteOriginVisibility;
@@ -124,6 +124,9 @@ public class MainGUI extends Application implements Initializable {
 
     @FXML
     private GridPane langSettingsGrid;
+
+    @FXML
+    private FlowPane checkboxFlow;
 
     @FXML
     private MenuBar menu;
@@ -384,9 +387,6 @@ public class MainGUI extends Application implements Initializable {
 
                     changeImage(path);
                 }, true);
-            } else {
-                System.out.println("Already showing, initting fields");
-                initializeInputTextFields();
             }
         }
 
@@ -423,7 +423,6 @@ public class MainGUI extends Application implements Initializable {
 
     public void fullCompile(OverrideExecute executeOverride) {
         try {
-            var ppfProject = ProjectManager.getPPFProject();
             var language = this.startupLogic.getCurrentLanguage();
             if (getCurrentLanguage() == null) {
                 setHaveError();
@@ -445,9 +444,7 @@ public class MainGUI extends Application implements Initializable {
             var imageClassesOptional = language.indexFiles();
             if (imageClassesOptional.isPresent()) {
                 var imageClasses = imageClassesOptional.get();
-                if (ppfProject.isSyntaxHighlight()) {
-                    language.highlightAll(imageClasses);
-                }
+                language.highlightAll(imageClasses);
 
                 // TODO: Skip step in inapplicable languages?
                 startupLogic.compile(imageClasses, executeOverride);
@@ -498,21 +495,6 @@ public class MainGUI extends Application implements Initializable {
         remoteOriginVisibility.setDisable(disabled);
     }
 
-    public void initializeInputTextFields() {
-        PPFProject ppfProject = ProjectManager.getPPFProject();
-//        compilerOutputValue.setText(getAbsolutePath(ppfProject.getCompilerOutput()));
-//        programOutputValue.setText(getAbsolutePath(ppfProject.getAppOutput()));
-
-        syntaxHighlight.setSelected(ProjectManager.getPPFProject().isSyntaxHighlight());
-//        compile.setSelected(ProjectManager.getPPFProject().isCompile());
-//        execute.setSelected(ProjectManager.getPPFProject().isExecute());
-    }
-
-    private String getAbsolutePath(File file) {
-        if (file == null) return "";
-        return file.getAbsolutePath();
-    }
-
     public void setDarkTheme(boolean darkTheme) {
         this.darkTheme = darkTheme;
     }
@@ -523,46 +505,15 @@ public class MainGUI extends Application implements Initializable {
 
     public void updateTheme() {
         if (this.initialized.get()) {
-            Platform.runLater(() -> {
-//                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent().getParent();
-//                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
-                var parent = rootAnchor;
-//                parent.lookupAll(".theme-text").forEach(node -> {
-//                    if (this.darkTheme) {
-//                        node.getStyleClass().add("dark-text");
-//                    } else {
-//                        node.getStyleClass().remove("dark-text");
-//                    }
-//                });
-
-                getThemeManager().onDarkThemeChange(rootAnchor, Map.of(
-                        ".gridpane-theme", "gridpane-theme-dark",
-                        ".output-theme", "output-theme-dark",
-                        ".invert-colors", "invert-colors-white",
-                        ".remote-origin-visibility", "dark",
-                        ".language-selection", "language-selection-dark",
-                        ".vbox-theme", "vbox-theme-dark",
-                        "#menu", "menubar-dark"
-                ));
-
-//                if (this.darkTheme) {
-//                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.add("gridpane-theme-dark"));
-//                    parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
-//                    parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
-//                    parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
-//                    parent.lookup(".language-selection").getStyleClass().add("language-selection-dark");
-//                    parent.lookup(".vbox-theme").getStyleClass().add("vbox-theme-dark");
-//                    this.menu.getStyleClass().add("menubar-dark");
-//                } else {
-//                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
-//                    parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
-//                    parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
-//                    parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
-//                    parent.lookup(".language-selection").getStyleClass().remove("language-selection-dark");
-//                    parent.lookup(".vbox-theme").getStyleClass().remove("vbox-theme-dark");
-//                    this.menu.getStyleClass().remove("menubar-dark");
-//                }
-            });
+            Platform.runLater(() -> getThemeManager().onDarkThemeChange(rootAnchor, Map.of(
+                    ".gridpane-theme", "gridpane-theme-dark",
+                    ".output-theme", "output-theme-dark",
+                    ".invert-colors", "invert-colors-white",
+                    ".remote-origin-visibility", "dark",
+                    ".language-selection", "language-selection-dark",
+                    ".vbox-theme", "vbox-theme-dark",
+                    "#menu", "menubar-dark"
+            )));
         }
     }
 
@@ -593,39 +544,12 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
-    private <T> void addOptionalListener(TextField textField, Class<T> clazz, Consumer<T> callback) {
-        textField.textProperty().addListener(event -> {
-            if (runListeners) {
-                String text = textField.getText();
-                if (clazz.equals(File.class)) {
-                    callback.accept((T) (text == null || text.trim().isEmpty() ? null : new File(text)));
-                } else if (clazz.equals(String.class)) {
-                    callback.accept(text == null ? null : (T) textField.getText().trim());
-                } else {
-                    LOGGER.error("Unknown class " + clazz.getCanonicalName());
-                }
-
-                ProjectManager.save();
-            }
-        });
-    }
-
-    private void addOptionalListener(CheckBox checkBox, Consumer<Boolean> callback) {
-        checkBox.selectedProperty().addListener(event -> {
-            if (runListeners) {
-                callback.accept(checkBox.isSelected());
-                ProjectManager.save();
-            }
-        });
-    }
-
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         var settingsManager = SettingsManager.getInstance();
         Splash.setStatus(SplashMessage.GUI);
 
-        initializeInputTextFields();
         setGitFeaturesDisabled(true);
         this.initialized.set(true);
         this.languageComboBox.setItems(languages);
@@ -683,7 +607,6 @@ public class MainGUI extends Application implements Initializable {
         languageComboBox.setOnAction(event -> {
             Language<?> language = languageComboBox.getSelectionModel().getSelectedItem();
             this.startupLogic.setCurrentLanguage(language);
-            compile.setDisable(language.isInterpreted());
 
             language.loadForCurrent();
             ProjectManager.getPPFProject().setLanguage(language.getClass().getCanonicalName());
@@ -701,36 +624,8 @@ public class MainGUI extends Application implements Initializable {
 
         generate.setOnAction(event -> {
             PPFProject project = ProjectManager.getPPFProject();
-            File parent = project.getFile().getParentFile();
 
-            runListeners = false;
-//            createAndSetFolder(inputName, parent, "src");
-            runListeners = true;
-
-//            project.setInputLocation(new File(inputName.getText()));
-
-//            createAndSetFolder(highlightedImage, parent, "highlighted");
-//            createAndSetFolder(cacheFile, parent, "cache");
-//            createAndSetFolder(classOutput, parent, "out");
-
-            Language language = this.startupLogic.getCurrentLanguage();
-//            compiledJarOutput.setText(language.getOutputFileExtension() == null ? null : new File(parent, "Output." + language.getOutputFileExtension()).getAbsolutePath());
-
-//            Map<String, TextField> imageGen = new HashMap<>();
-//            imageGen.put("program.png", programOutputValue);
-//            imageGen.put("compiler.png", compilerOutputValue);
-
-//            imageGen.forEach((file, textField) -> {
-//                try {
-//                    File classOutputImage = new File(parent, file);
-//                    BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_ARGB);
-//                    clearImage(image);
-//                    ImageIO.write(image, "png", classOutputImage);
-//                    textField.setText(classOutputImage.getAbsolutePath());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            });
+            this.startupLogic.getCurrentLanguage().getLanguageSettings().generateDefaults();
 
             if (project.getActiveFont() == null) {
                 project.addFont("Comic Sans MS", "fonts/ComicSans");
@@ -780,149 +675,43 @@ public class MainGUI extends Application implements Initializable {
 
         push.setOnAction(event -> this.gitController.push());
 
-        // TODO: Work on generation of language-specific settings
+        Function<Runnable, JFXButton> buttonGen = callback -> {
+            var button = new JFXButton();
+            button.setText("Change");
+            button.setOnAction(event -> callback.run());
+            button.setButtonType(JFXButton.ButtonType.RAISED);
+            button.setPrefWidth(75);
+            button.setPrefHeight(30);
+            button.getStyleClass().add("primary-button");
+            GridPane.setColumnIndex(button, 2);
+            GridPane.setHalignment(button, HPos.CENTER);
+            GridPane.setValignment(button, VPos.CENTER);
+            return button;
+        };
+
+        var langSettings = getCurrentLanguage().getLanguageSettings();
 
         var i = new LongAdder();
-        var _1 = getCurrentLanguage();
-        System.out.println("_1 = " + _1);
-        var _2 = _1.getLanguageSettings();
-        System.out.println("_2 = " + _2);
-        var _3 = _2.getOptions();
-        System.out.println("_3 = " + _3);
-
-        _3.forEach(langGUIOption -> {
-            langSettingsGrid.addRow(i.intValue(), langGUIOption.getTextControl(), langGUIOption.getDisplay()); // TODO: Add button
+        langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY))).forEach(langGUIOption -> {
+            var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
+            if (langGUIOption.hasChangeButton()) childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
+            langSettingsGrid.addRow(i.intValue(), childrenAdding.toArray(Control[]::new));
             i.increment();
         });
 
-        /*
-        addOptionalListener(inputName, File.class, startupLogic::setInputImage);
+        BiFunction<String, Consumer<Boolean>, JFXCheckBox> checkBoxGen = (text, callback) -> {
+            var checkbox = new JFXCheckBox(text);
+            checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> callback.accept(newValue));
+            checkbox.setMnemonicParsing(false);
+            checkbox.setStyle("-jfx-checked-color: -primary-button-color;");
+            checkbox.getStyleClass().add("theme-text");
+            checkbox.setCursor(Cursor.HAND);
+            checkbox.setPadding(new Insets(0, 10, 0, 0));
+            return checkbox;
+        };
 
-        changeInputImage.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getInputLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getInputLocation();
-            // TODO: FILES_AND_DIRECTORIES
-
-            FileDirectoryChooser.openDirectorySelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                inputName.setText(file.getAbsolutePath());
-                startupLogic.setInputImage(file);
-            });
-        });
-
-        addOptionalListener(highlightedImage, File.class, ProjectManager.getPPFProject()::setHighlightLocation);
-
-        changeHighlightImage.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getHighlightLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getHighlightLocation();
-
-            FileDirectoryChooser.openDirectorySelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                highlightedImage.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setHighlightLocation(file);
-            });
-        });
-
-        addOptionalListener(cacheFile, File.class, ProjectManager.getPPFProject()::setObjectLocation);
-
-        changeCacheFile.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getObjectLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getObjectLocation();
-
-            FileDirectoryChooser.openDirectorySelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                cacheFile.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setObjectLocation(file);
-            });
-        });
-
-        addOptionalListener(classOutput, File.class, ProjectManager.getPPFProject()::setClassLocation);
-
-        changeClassOutput.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getClassLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getClassLocation();
-
-            FileDirectoryChooser.openDirectorySelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                classOutput.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setClassLocation(file);
-            });
-        });
-
-        addOptionalListener(compiledJarOutput, File.class, ProjectManager.getPPFProject()::setJarFile);
-
-        changeCompiledJar.setOnAction(event -> {
-            // TODO: What the fuck is this expression
-            File selected = ProjectManager.getPPFProject().getJarFile() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getJarFile();
-
-            FileDirectoryChooser.openFileSelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                compiledJarOutput.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setJarFile(file);
-            });
-        });
-
-        addOptionalListener(libraryFile, File.class, ProjectManager.getPPFProject()::setLibraryLocation);
-
-        changeLibraries.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getLibraryLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getLibraryLocation();
-            // TODO: FILES_AND_DIRECTORIES
-
-            FileDirectoryChooser.openDirectorySelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                libraryFile.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setLibraryLocation(file);
-            });
-        });
-
-        addOptionalListener(otherFiles, File.class, ProjectManager.getPPFProject()::setOtherLocation);
-
-        changeOtherFiles.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getOtherLocation() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getOtherLocation();
-            // TODO: FILES_AND_DIRECTORIES
-
-            FileDirectoryChooser.openDirectorySelector(chooser ->
-                    chooser.setInitialDirectory(selected.getParentFile()), file -> {
-                otherFiles.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setOtherLocation(file);
-            });
-        });
-
-        addOptionalListener(compilerOutputValue, File.class, ProjectManager.getPPFProject()::setCompilerOutput);
-
-        compilerOutput.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getCompilerOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getCompilerOutput();
-
-            FileDirectoryChooser.openFileSaver(chooser -> {
-                chooser.setInitialDirectory(selected.getParentFile());
-                chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
-            }, file -> {
-                compilerOutputValue.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setCompilerOutput(file);
-            });
-        });
-
-        addOptionalListener(programOutputValue, File.class, ProjectManager.getPPFProject()::setAppOutput);
-
-        programOutput.setOnAction(event -> {
-            File selected = ProjectManager.getPPFProject().getAppOutput() == null ? ProjectManager.getPPFProject().getJarFile() : ProjectManager.getPPFProject().getAppOutput();
-
-            FileDirectoryChooser.openFileSaver(chooser -> {
-                chooser.setInitialDirectory(selected.getParentFile());
-                chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
-            }, file -> {
-                programOutputValue.setText(file.getAbsolutePath());
-                ProjectManager.getPPFProject().setAppOutput(file);
-            });
-        });
-        */
-
-        // TODO: Should compile and execute be included?
-        addOptionalListener(syntaxHighlight, ProjectManager.getPPFProject()::setSyntaxHighlight);
-//        addOptionalListener(compile, ProjectManager.getPPFProject()::setCompile);
-//        addOptionalListener(execute, ProjectManager.getPPFProject()::setExecute);
-    }
-
-    private void createAndSetFolder(TextField textField, File parent, String folder) {
-        File out = new File(parent, folder);
-        out.mkdirs();
-        textField.setText(out.getAbsolutePath());
+        langSettings.getOptionsGUI(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)).forEach(guiOption ->
+                checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption.getName(), guiOption::setSetting)));
     }
 
     public TextArea getOutputTextArea() {

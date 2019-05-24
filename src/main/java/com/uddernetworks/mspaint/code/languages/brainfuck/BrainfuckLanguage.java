@@ -78,6 +78,7 @@ public class BrainfuckLanguage extends Language<BrainfuckOptions> {
 
     @Override
     public void highlightAll(List<ImageClass> imageClasses) throws IOException {
+        if (!this.settings.<Boolean>getSetting(BrainfuckOptions.HIGHLIGHT)) return;
         highlightAll(BrainfuckOptions.HIGHLIGHT_DIRECTORY, imageClasses);
     }
 

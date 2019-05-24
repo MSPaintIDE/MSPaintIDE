@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
+import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.gui.BooleanLangGUIOption;
 import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
@@ -31,7 +32,7 @@ public class JavaSettings extends LanguageSettings<JavaOptions> {
                         .setSelectDirectories(true),
                 () -> createSubOfProject("highlight"));
 
-        addOption(JavaOptions.MAIN, "", new StringLangGUIOption("StartupLogic class", "com.example.Main"), // TODO: Class selection
+        addOption(JavaOptions.MAIN, "", new StringLangGUIOption("Main class", "com.example.Main"), // TODO: Class selection
                 () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
 
         addOption(JavaOptions.JAR, "",
@@ -48,7 +49,12 @@ public class JavaSettings extends LanguageSettings<JavaOptions> {
                         .setSelectDirectories(true),
                 () -> create(new File(ProjectManager.getPPFProject().getFile().getParentFile(), "build")));
 
-        addOption(JavaOptions.EXECUTE, true, new BooleanLangGUIOption("Execute program"), () -> false);
+
+        addOption(JavaOptions.HIGHLIGHT, true, new BooleanLangGUIOption("Syntax highlight"), () -> true);
+
+        addOption(JavaOptions.COMPILE, true, new BooleanLangGUIOption("Compile program"), () -> true);
+
+        addOption(JavaOptions.EXECUTE, true, new BooleanLangGUIOption("Execute program"), () -> true);
 
         addOption(JavaOptions.LIBRARY_LOCATION, "", new FileLangGUIOption("Library location")
                 .setChooserTitle("Select the directory containing libraries used in your program")
@@ -69,5 +75,10 @@ public class JavaSettings extends LanguageSettings<JavaOptions> {
     @Override
     protected JavaOptions nameToEnum(String name) {
         return JavaOptions.fromName(name);
+    }
+
+    @Override
+    public LangGUIOptionRequirement getRequirement(JavaOptions type) {
+        return type.getRequirement();
     }
 }

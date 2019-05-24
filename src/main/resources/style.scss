@@ -20,6 +20,8 @@
 
     -text-color: #000;
     -text-color-dark: #fff;
+    -text-field-prompt-color: #808080;
+    -text-field-prompt-color-dark: #808080;
     -text-color-console: #000;
     -text-color-dark-console: #fff;
 }
@@ -223,9 +225,16 @@ JFXButton {
     -fx-fill: -text-color-dark;
 }
 
+.jfx-text-field {
+    -fx-prompt-text-fill: -text-field-prompt-color;
+
+    &.dark-text {
+        -fx-prompt-text-fill: -text-field-prompt-color-dark;
+    }
+}
+
 .dark-text {
     -fx-text-fill: -text-color-dark !important;
-    -fx-prompt-text-fill: -text-color-dark !important;
     -jfx-unfocus-color: -text-color-dark !important;
 }
 
