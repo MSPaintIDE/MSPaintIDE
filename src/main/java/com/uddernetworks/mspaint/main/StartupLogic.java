@@ -10,11 +10,9 @@ import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.code.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
-import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.OCRManager;
 import com.uddernetworks.mspaint.painthook.InjectionManager;
-import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
@@ -29,7 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 public class StartupLogic {
@@ -64,8 +65,8 @@ public class StartupLogic {
         Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
         languageManager.addLanguage(new JavaLanguage(this));
-        languageManager.addLanguage(new BrainfuckLanguage());
-        languageManager.addLanguage(new PythonLanguage());
+        languageManager.addLanguage(new BrainfuckLanguage(this));
+//        languageManager.addLanguage(new PythonLanguage());
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
@@ -104,9 +105,13 @@ public class StartupLogic {
             }, true);
         } else {
             ProjectManager.switchProjectConsumer(project -> {
-                System.out.println("Active font: " + project.getActiveFont() + " (" + project.getActiveFont().trim().equals("") + ")");
-                System.out.println("Active font: " + project.getActiveFontConfig() + " (" + project.getActiveFontConfig().trim().equals("") + ")");
-                if (project.getActiveFont() == null) project.setActiveFont(settingsManager.getSetting(Setting.HEADLESS_FONT));
+//                System.out.println("Active font: " + project.getActiveFont() + " (" + project.getActiveFont().trim().equals("") + ")");
+//                System.out.println("Active font: " + project.getActiveFontConfig() + " (" + project.getActiveFontConfig().trim().equals("") + ")");
+                if (project.getActiveFont() == null) {
+                    project.addFont(settingsManager.getSetting(Setting.HEADLESS_FONT), settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG));
+                    project.setActiveFont(settingsManager.getSetting(Setting.HEADLESS_FONT));
+                }
+
                 project.onFontUpdate((name, path) -> this.ocrManager.setActiveFont(name, path), true);
             });
         }
@@ -177,25 +182,6 @@ public class StartupLogic {
 
             mainGUI.setStatusText(null);
         }
-    }
-
-    public void setInputImage(File inputImage) {
-        PPFProject ppfProject = ProjectManager.getPPFProject();
-        if (Objects.equals(inputImage, ppfProject.getInputLocation())) return;
-        ProjectManager.getPPFProject().setInputLocation(inputImage);
-
-        File outputParent = inputImage.getParentFile();
-
-        File file = this.currentLanguage.getOutputFileExtension() == null ? null : new File(outputParent, "Output." + this.currentLanguage.getOutputFileExtension());
-
-        ppfProject.setHighlightLocation(new File(outputParent, "highlighted"), false);
-        ppfProject.setCompilerOutput(new File(outputParent, "compiler.png"), false);
-        ppfProject.setAppOutput(new File(outputParent, "program.png"), false);
-//        ppfProject.setJarFile(file, false);
-//        ppfProject.setClassLocation(new File(outputParent, "classes"), false);
-
-        ProjectManager.save();
-        this.mainGUI.initializeInputTextFields();
     }
 
     public void addPath(String path) {

@@ -33,7 +33,7 @@ public class EditMenu extends MenuBind {
         PPFProject ppfProject = ProjectManager.getPPFProject();
 
         FileDirectoryChooser.openFileSelector(chooser ->
-                chooser.setInitialDirectory(ppfProject.getInputLocation()), file -> Platform.runLater(() -> {
+                chooser.setInitialDirectory(ppfProject.getFile().getParentFile()), file -> Platform.runLater(() -> {
             try {
                 new InspectWindow(this.mainGUI, file);
             } catch (IOException e) {

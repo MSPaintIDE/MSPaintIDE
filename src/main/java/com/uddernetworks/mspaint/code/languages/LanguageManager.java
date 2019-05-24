@@ -13,14 +13,14 @@ public class LanguageManager {
 
     private static Logger LOGGER = LoggerFactory.getLogger(LanguageManager.class);
 
-    private List<Language> allLanguages = new ArrayList<>();
-    private List<Language> enabledLanguages = new ArrayList<>();
+    private List<Language<?>> allLanguages = new ArrayList<>();
+    private List<Language<?>> enabledLanguages = new ArrayList<>();
 
-    public List<Language> getAllLanguages() {
+    public List<Language<?>> getAllLanguages() {
         return allLanguages;
     }
 
-    public List<Language> getEnabledLanguages() {
+    public List<Language<?>> getEnabledLanguages() {
         return enabledLanguages;
     }
 
@@ -41,7 +41,7 @@ public class LanguageManager {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Language> getLanguageFromFileExtension(String fileExtension) {
+    public Optional<Language<?>> getLanguageFromFileExtension(String fileExtension) {
         return this.enabledLanguages.stream()
                 .filter(language ->
                         Arrays.stream(language.getFileExtensions()).anyMatch(extension ->
@@ -51,5 +51,9 @@ public class LanguageManager {
 
     public void reloadAllLanguages() {
         this.enabledLanguages.stream().map(Language::getLanguageSettings).forEach(LanguageSettings::reload);
+    }
+
+    public Optional<Language<?>> getLanguageByClass(Class<?> clazz) {
+        return this.enabledLanguages.stream().filter(language -> language.getClass().equals(clazz)).findFirst();
     }
 }

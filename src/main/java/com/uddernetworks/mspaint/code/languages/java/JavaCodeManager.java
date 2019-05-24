@@ -23,9 +23,9 @@ import java.util.*;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-public class CodeCompiler {
+public class JavaCodeManager {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CodeCompiler.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(JavaCodeManager.class);
 
     private File classOutputFolder;
     private Map<String, ImageClass> imageClassHashMap = new HashMap<>();

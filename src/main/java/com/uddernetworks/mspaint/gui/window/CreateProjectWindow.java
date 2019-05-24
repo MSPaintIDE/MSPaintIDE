@@ -41,7 +41,7 @@ public class CreateProjectWindow extends Stage implements Initializable {
     private JFXButton browse;
 
     @FXML
-    private JFXComboBox<Language> languageComboBox;
+    private JFXComboBox<Language<?>> languageComboBox;
 
     @FXML
     private JFXButton finish;

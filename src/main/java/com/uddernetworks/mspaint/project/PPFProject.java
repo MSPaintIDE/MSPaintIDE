@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.project;
 
 import java.io.File;
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -27,7 +28,7 @@ public class PPFProject {
     private Map<String, String> fonts = new HashMap<>();
     public Map<String, Map<String, Object>> languageSettings = new HashMap<>();
 
-    private BiConsumer<String, String> fontUpdate;
+    private transient BiConsumer<String, String> fontUpdate;
 
     public PPFProject(File file) {
         this.file = file;
@@ -108,7 +109,7 @@ public class PPFProject {
     public void setActiveFont(String activeFont) {
         this.activeFont = activeFont;
 
-        this.fontUpdate.accept(activeFont, getFont(activeFont).getValue());
+        if (this.fontUpdate != null) this.fontUpdate.accept(activeFont, getFont(activeFont).getValue());
     }
 
     public void onFontUpdate(BiConsumer<String, String> fontUpdate) {
@@ -156,7 +157,7 @@ public class PPFProject {
     }
 
     public Map<String, Object> getLanguageSetting(String language) {
-        return languageSettings.get(language);
+        return languageSettings.getOrDefault(language, Collections.emptyMap());
     }
 
     public void setLanguageSetting(String language, Map<String, Object> map) {

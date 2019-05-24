@@ -13,35 +13,38 @@ public class JavaSettings extends LanguageSettings<JavaOptions> {
 
     protected JavaSettings() {
         super("Java");
+    }
 
+    @Override
+    public void initOptions() {
         addOption(JavaOptions.INPUT_DIRECTORY, "",
                 new FileLangGUIOption("Input directory")
                         .setChooserTitle("Select the source directory containing your sourcecode images")
-                        .setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile())
+                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setSelectDirectories(true),
                 () -> createSubOfProject("src"));
 
         addOption(JavaOptions.HIGHLIGHT_DIRECTORY, "",
                 new FileLangGUIOption("Highlight directory")
                         .setChooserTitle("Select the directory to contain all highlighted code images")
-                        .setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile())
+                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setSelectDirectories(true),
                 () -> createSubOfProject("highlight"));
 
-        addOption(JavaOptions.MAIN, "", new StringLangGUIOption("StartupLogic class", "com.example.StartupLogic"), // TODO: Class selection
+        addOption(JavaOptions.MAIN, "", new StringLangGUIOption("StartupLogic class", "com.example.Main"), // TODO: Class selection
                 () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
 
         addOption(JavaOptions.JAR, "",
                 new FileLangGUIOption("Jar output")
                         .setChooserTitle("Select or create the file the compiled jar will be")
-                        .setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile())
+                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setExtensionFilter(ProjectFileFilter.JAR)
                         .setSave(true));
 
         addOption(JavaOptions.CLASS_OUTPUT, "",
                 new FileLangGUIOption("Class output")
                         .setChooserTitle("Select the directory the classes will compile to")
-                        .setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile())
+                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setSelectDirectories(true),
                 () -> create(new File(ProjectManager.getPPFProject().getFile().getParentFile(), "build")));
 
@@ -49,24 +52,13 @@ public class JavaSettings extends LanguageSettings<JavaOptions> {
 
         addOption(JavaOptions.LIBRARY_LOCATION, "", new FileLangGUIOption("Library location")
                 .setChooserTitle("Select the directory containing libraries used in your program")
-                .setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile())
+                .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                 .setSelectDirectories(true));
 
         addOption(JavaOptions.OTHER_LOCATION, "", new FileLangGUIOption("Other location")
                 .setChooserTitle("Select the directory containing all non-java files to be put in your program, used as a 'resources' directory")
-                .setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile())
+                .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                 .setSelectDirectories(true));
-    }
-
-    private File create(File file) {
-        file.mkdirs();
-        return file;
-    }
-
-    private File createSubOfProject(String child) {
-        var file = new File(ProjectManager.getPPFProject().getFile().getParentFile(), child);
-        file.mkdirs();
-        return file;
     }
 
     @Override

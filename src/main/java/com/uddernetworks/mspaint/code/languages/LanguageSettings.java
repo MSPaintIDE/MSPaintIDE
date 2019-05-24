@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -16,8 +17,9 @@ public abstract class LanguageSettings<G> extends SettingsAccessor<G> {
 
     protected LanguageSettings(String langName) {
         this.langName = langName;
-        reload();
     }
+
+    public abstract void initOptions();
 
     protected abstract String enumToName(G type);
 
@@ -39,6 +41,17 @@ public abstract class LanguageSettings<G> extends SettingsAccessor<G> {
         onChangeSetting(type, langGUIOption::setSetting);
     }
 
+    protected File create(File file) {
+        file.mkdirs();
+        return file;
+    }
+
+    protected File createSubOfProject(String child) {
+        var file = new File(ProjectManager.getPPFProject().getFile().getParentFile(), child);
+        file.mkdirs();
+        return file;
+    }
+
     public boolean requiredFilled() {
         return this.optionMap.keySet().stream().allMatch(this::isSet);
     }
@@ -52,7 +65,7 @@ public abstract class LanguageSettings<G> extends SettingsAccessor<G> {
         ProjectManager.getPPFProject().setLanguageSetting(this.langName, this.optionMap.keySet()
                 .stream()
                 .map(langGUIOption -> new AbstractMap.SimpleEntry<>(langGUIOption, this.settings.get(langGUIOption)))
-                .collect(Collectors.toMap(g -> g.getKey().toString(), x -> x)));
+                .collect(Collectors.toMap(g -> enumToName(g.getKey()), x -> x)));
         ProjectManager.save();
     }
 

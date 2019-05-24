@@ -1,9 +1,9 @@
 package com.uddernetworks.mspaint.gui.window.search;
 
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.util.IDEFileUtils;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 
 import java.awt.*;
@@ -30,7 +30,7 @@ public class SearchManager {
 
     public List<SearchResult> searchDirectory(File directory, String text, String extension, boolean ignoreCase) {
         if (!directory.isDirectory()) return Collections.emptyList();
-        return StartupLogic.getFilesFromDirectory(directory, extension)
+        return IDEFileUtils.getFilesFromDirectory(directory, extension)
 //                .parallelStream()
                 .stream()
                 .map(file -> searchFile(file, text, ignoreCase))

@@ -12,10 +12,7 @@ import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class FileMenu extends MenuBind {
@@ -73,37 +70,6 @@ public class FileMenu extends MenuBind {
                 e.printStackTrace();
             }
         });
-    }
-
-    @BindItem(label = "clear-project-caches")
-    private void onClickClearProjectCaches() {
-        LOGGER.info("Clearing project caches...");
-
-        clearCaches(ProjectManager.getPPFProject().getObjectLocation());
-
-        LOGGER.info("Cleared project caches!");
-    }
-
-    @BindItem(label = "clear-global-caches")
-    private void onClickClearGlobalCaches() {
-        LOGGER.info("Clearing global caches...");
-
-        clearCaches(new File(MainGUI.APP_DATA, "global_cache"));
-
-        LOGGER.info("Cleared global caches!");
-    }
-
-    private void clearCaches(File file) {
-        if (file == null) {
-            LOGGER.error("No cache directory found!");
-            return;
-        }
-
-        if (file.isDirectory()) {
-            Arrays.stream(Objects.requireNonNull(file.listFiles())).forEach(File::delete);
-        } else {
-            file.delete();
-        }
     }
 
     @BindItem(label = "settings")

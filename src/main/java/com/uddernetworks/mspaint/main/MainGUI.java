@@ -22,7 +22,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -45,7 +44,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +114,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXButton remoteOriginVisibility;
     @FXML
-    private JFXComboBox<Language> languageComboBox;
+    private JFXComboBox<Language<?>> languageComboBox;
 
     @FXML
     private TextArea output;
@@ -146,7 +144,7 @@ public class MainGUI extends Application implements Initializable {
 
     public static File APP_DATA = new File(System.getenv("LocalAppData"), "MSPaintIDE");
 
-    private ObservableList<Language> languages = FXCollections.observableArrayList();
+    private ObservableList<Language<?>> languages = FXCollections.observableArrayList();
 
     public MainGUI() throws IOException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         System.setProperty("jna.debug_load", "true");
@@ -162,23 +160,23 @@ public class MainGUI extends Application implements Initializable {
         // See com.sun.glass.ui.Application#checkEventThread() javadoc
 //        System.setProperty("glass.disableThreadChecks", "true");
 
-        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-            System.out.println("Exception on " + t.getName());
-            System.out.println(e.getLocalizedMessage());
-            System.out.println(e.getMessage());
-            for (var stackTraceElement : e.getStackTrace()) {
-                System.out.println(stackTraceElement.toString());
-            }
-            e.printStackTrace(System.out);
-            e.printStackTrace();
-        });
+//        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+//            System.out.println("Exception on " + t.getName());
+//            System.out.println(e.getLocalizedMessage());
+//            System.out.println(e.getMessage());
+//            for (var stackTraceElement : e.getStackTrace()) {
+//                System.out.println(stackTraceElement.toString());
+//            }
+//            e.printStackTrace(System.out);
+//            e.printStackTrace();
+//        });
 
 
-        var fiule = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\shit.txt");
-        fiule.mkdirs();
-        fiule.createNewFile();
-        PrintStream o = new PrintStream(fiule);
-        System.setOut(o);
+//        var fiule = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\shit.txt");
+//        fiule.mkdirs();
+//        fiule.createNewFile();
+//        PrintStream o = new PrintStream(fiule);
+//        System.setOut(o);
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
 
@@ -287,18 +285,28 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void refreshProject() {
-        String languageClass = ProjectManager.getPPFProject().getLanguage();
+        String languageClassString = ProjectManager.getPPFProject().getLanguage();
         Platform.runLater(() -> {
             try {
+                var langClass = Class.forName(languageClassString);
+                var languageManager = this.startupLogic.getLanguageManager();
+
+                LOGGER.info(langClass.getCanonicalName());
+
+                languageManager.getLanguageByClass(langClass).ifPresent(language -> {
+                    this.startupLogic.setCurrentLanguage(language);
+                    language.loadForCurrent();
+                });
+                languageManager.reloadAllLanguages();
+
                 registerThings();
                 primaryStage.setHeight(Math.min(primaryStage.getHeight(), GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0].getDisplayMode().getHeight() - 100));
-                setSelectedLanguage(Class.forName(languageClass));
-                var language = this.startupLogic.getLanguageManager();
-                language.reloadAllLanguages();
+
+                setSelectedLanguage(langClass);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                LOGGER.error("No language found with a class of \"" + languageClass + "\"");
+                LOGGER.error("No language found with a class of \"" + languageClassString + "\"");
             }
         });
     }
@@ -338,7 +346,7 @@ public class MainGUI extends Application implements Initializable {
             if (!this.primaryStage.isShowing()) {
                 System.out.println("Not showing now");
 
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/StartupLogic.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
                 loader.setController(this);
                 Parent root = loader.load();
 
@@ -516,41 +524,53 @@ public class MainGUI extends Application implements Initializable {
     public void updateTheme() {
         if (this.initialized.get()) {
             Platform.runLater(() -> {
-                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent().getParent();
-                parent.lookupAll(".theme-text").forEach(node -> {
-                    if (this.darkTheme) {
-                        node.getStyleClass().add("dark-text");
-                    } else {
-                        node.getStyleClass().remove("dark-text");
-                    }
-                });
+//                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent().getParent();
+//                Parent parent = invertColors.getParent().getParent().getParent().getParent().getParent().getParent();
+                var parent = rootAnchor;
+//                parent.lookupAll(".theme-text").forEach(node -> {
+//                    if (this.darkTheme) {
+//                        node.getStyleClass().add("dark-text");
+//                    } else {
+//                        node.getStyleClass().remove("dark-text");
+//                    }
+//                });
 
-                if (this.darkTheme) {
-                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.add("gridpane-theme-dark"));
-                    parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
-                    parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
-                    parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
-                    parent.lookup(".language-selection").getStyleClass().add("language-selection-dark");
-                    parent.lookup(".vbox-theme").getStyleClass().add("vbox-theme-dark");
-                    this.menu.getStyleClass().add("menubar-dark");
-                } else {
-                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
-                    parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
-                    parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
-                    parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
-                    parent.lookup(".language-selection").getStyleClass().remove("language-selection-dark");
-                    parent.lookup(".vbox-theme").getStyleClass().remove("vbox-theme-dark");
-                    this.menu.getStyleClass().remove("menubar-dark");
-                }
+                getThemeManager().onDarkThemeChange(rootAnchor, Map.of(
+                        ".gridpane-theme", "gridpane-theme-dark",
+                        ".output-theme", "output-theme-dark",
+                        ".invert-colors", "invert-colors-white",
+                        ".remote-origin-visibility", "dark",
+                        ".language-selection", "language-selection-dark",
+                        ".vbox-theme", "vbox-theme-dark",
+                        "#menu", "menubar-dark"
+                ));
+
+//                if (this.darkTheme) {
+//                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.add("gridpane-theme-dark"));
+//                    parent.lookup(".output-theme").getStyleClass().add("output-theme-dark");
+//                    parent.lookup(".invert-colors").getStyleClass().add("invert-colors-white");
+//                    parent.lookup(".remote-origin-visibility").getStyleClass().add("dark");
+//                    parent.lookup(".language-selection").getStyleClass().add("language-selection-dark");
+//                    parent.lookup(".vbox-theme").getStyleClass().add("vbox-theme-dark");
+//                    this.menu.getStyleClass().add("menubar-dark");
+//                } else {
+//                    parent.lookupAll(".gridpane-theme").stream().map(Node::getStyleClass).forEach(classes -> classes.remove("gridpane-theme-dark"));
+//                    parent.lookup(".output-theme").getStyleClass().remove("output-theme-dark");
+//                    parent.lookup(".invert-colors").getStyleClass().remove("invert-colors-white");
+//                    parent.lookup(".remote-origin-visibility").getStyleClass().remove("dark");
+//                    parent.lookup(".language-selection").getStyleClass().remove("language-selection-dark");
+//                    parent.lookup(".vbox-theme").getStyleClass().remove("vbox-theme-dark");
+//                    this.menu.getStyleClass().remove("menubar-dark");
+//                }
             });
         }
     }
 
-    public void addLanguages(List<Language> languages) {
+    public void addLanguages(List<Language<?>> languages) {
         this.languages.addAll(languages);
     }
 
-    public ObservableList<Language> getLanguages() {
+    public ObservableList<Language<?>> getLanguages() {
         return languages;
     }
 
@@ -563,8 +583,8 @@ public class MainGUI extends Application implements Initializable {
     }
 
     public void setSelectedLanguage(Class<?> languageClass) {
-        List<Language> items = this.languageComboBox.getItems();
-        SelectionModel<Language> selectionModel = this.languageComboBox.getSelectionModel();
+        var items = this.languageComboBox.getItems();
+        var selectionModel = this.languageComboBox.getSelectionModel();
 
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getClass().equals(languageClass)) {
@@ -661,10 +681,11 @@ public class MainGUI extends Application implements Initializable {
         });
 
         languageComboBox.setOnAction(event -> {
-            Language language = languageComboBox.getSelectionModel().getSelectedItem();
+            Language<?> language = languageComboBox.getSelectionModel().getSelectedItem();
             this.startupLogic.setCurrentLanguage(language);
             compile.setDisable(language.isInterpreted());
 
+            language.loadForCurrent();
             ProjectManager.getPPFProject().setLanguage(language.getClass().getCanonicalName());
             ProjectManager.save();
         });
@@ -762,7 +783,14 @@ public class MainGUI extends Application implements Initializable {
         // TODO: Work on generation of language-specific settings
 
         var i = new LongAdder();
-        getCurrentLanguage().getLanguageSettings().getOptions().forEach(langGUIOption -> {
+        var _1 = getCurrentLanguage();
+        System.out.println("_1 = " + _1);
+        var _2 = _1.getLanguageSettings();
+        System.out.println("_2 = " + _2);
+        var _3 = _2.getOptions();
+        System.out.println("_3 = " + _3);
+
+        _3.forEach(langGUIOption -> {
             langSettingsGrid.addRow(i.intValue(), langGUIOption.getTextControl(), langGUIOption.getDisplay()); // TODO: Add button
             i.increment();
         });

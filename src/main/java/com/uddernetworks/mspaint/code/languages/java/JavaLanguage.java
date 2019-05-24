@@ -23,8 +23,8 @@ public class JavaLanguage extends Language<JavaOptions> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
-    private CodeCompiler codeCompiler = new CodeCompiler();
     private JavaSettings settings = new JavaSettings();
+    private JavaCodeManager javaCodeManager = new JavaCodeManager();
 
     public JavaLanguage(StartupLogic startupLogic) {
         super(startupLogic);
@@ -122,7 +122,7 @@ public class JavaLanguage extends Language<JavaOptions> {
             }
         }
 
-        return this.codeCompiler.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute)
+        return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute)
                 .entrySet()
                 .stream()
                 .map(t -> new AbstractMap.SimpleEntry<ImageClass, List<LanguageError>>(t.getKey(), t.getValue().stream().map(JavaError::new).collect(Collectors.toList())))

@@ -32,6 +32,7 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
     options.compilerArgs << '--add-exports=java.management/sun.management=ALL-UNNAMED'
     options.compilerArgs << '--add-exports=java.desktop/sun.font=ALL-UNNAMED'
+    options.compilerArgs << '--enable-preview'
 }
 
 repositories {
@@ -96,6 +97,9 @@ run {
     jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString())
     jvmArgs("--illegal-access=deny")
     jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
+    jvmArgs("--add-opens", "java.base/java.io=ALL-UNNAMED")
+    jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
+    jvmArgs("--enable-preview")
 //    args = ['E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\Test.txt']
 }
 
@@ -111,13 +115,7 @@ task replaceStuff << {
     }
 }
 
-task generateSplashMessages(type: JavaExec) {
-    classpath sourceSets.main.runtimeClasspath
-    main = "com.uddernetworks.mspaint.splash.SplashGen"
-}
-
 preLaunch.finalizedBy replaceStuff
-replaceStuff.finalizedBy generateSplashMessages
 
 task copyDependencies(type: Copy) {
     from configurations.runtime - configurations.javafxCompile

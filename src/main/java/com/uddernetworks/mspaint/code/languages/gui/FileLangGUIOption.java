@@ -2,18 +2,22 @@ package com.uddernetworks.mspaint.code.languages.gui;
 
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FileLangGUIOption extends StringLangGUIOption {
 
     private boolean selectDirectories;
     private FileChooser.ExtensionFilter extensionFilter;
-    private File initialDirectory;
+    private Supplier<File> initialDirectorySupplier;
     private String chooserTitle;
     private boolean save;
+
+    public static Supplier<File> PPF_PARENT_DIR = () -> ProjectManager.getPPFProject().getFile().getParentFile();
 
     public FileLangGUIOption(String name) {
         super(name);
@@ -29,8 +33,8 @@ public class FileLangGUIOption extends StringLangGUIOption {
         return this;
     }
 
-    public FileLangGUIOption setInitialDirectory(File initialDirectory) {
-        this.initialDirectory = initialDirectory;
+    public FileLangGUIOption setInitialDirectory(Supplier<File> initialDirectorySupplier) {
+        this.initialDirectorySupplier = initialDirectorySupplier;
         return this;
     }
 
@@ -45,11 +49,12 @@ public class FileLangGUIOption extends StringLangGUIOption {
     }
 
     private File getUsingDefaultDirectory() {
+        var initialDirectory = this.initialDirectorySupplier.get();
         if (!this.text.getValueSafe().trim().equals("")) {
             var currentFile = new File(this.text.get());
             return currentFile.getParentFile();
-        } else if (this.initialDirectory != null && this.initialDirectory.isDirectory()) {
-            return this.initialDirectory;
+        } else if (initialDirectory != null && initialDirectory.isDirectory()) {
+            return initialDirectory;
         } else {
             return new File(System.getProperty("user.home", "C:\\"));
         }
@@ -78,11 +83,12 @@ public class FileLangGUIOption extends StringLangGUIOption {
                 chooser.setInitialDirectory(getUsingDefaultDirectory());
             }, file -> this.text.set(file.getAbsolutePath()));
         } else {
+            var initialDirectory = this.initialDirectorySupplier.get();
             Consumer<FileChooser> chooserConsumer = chooser -> {
                 chooser.setTitle(this.chooserTitle);
                 chooser.setInitialDirectory(getUsingDefaultDirectory());
                 if (this.extensionFilter != null) chooser.setSelectedExtensionFilter(this.extensionFilter);
-                if (this.initialDirectory != null && this.initialDirectory.isDirectory()) chooser.setInitialDirectory(this.initialDirectory);
+                if (initialDirectory != null && initialDirectory.isDirectory()) chooser.setInitialDirectory(initialDirectory);
             };
 
             if (this.save) {

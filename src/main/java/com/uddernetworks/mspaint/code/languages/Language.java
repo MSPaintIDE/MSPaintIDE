@@ -33,6 +33,13 @@ public abstract class Language<G> {
     public abstract Logger getLogger();
 
     /**
+     * Loads settings for the current language.
+     */
+    public void loadForCurrent() {
+        getLanguageSettings().initOptions();
+    }
+
+    /**
      * Gets the name of the Language, e.g. "Java", "Python".
      *
      * @return the name of the language

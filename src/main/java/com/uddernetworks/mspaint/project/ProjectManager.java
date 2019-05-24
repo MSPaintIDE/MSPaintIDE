@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.project;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class ProjectManager {
 
     private static Path recent = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE\\recent").toPath();
     private static PPFProject ppfProject;
-    private static Gson gson = new GsonBuilder().serializeNulls().create();
+    private static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
     private static List<PPFProject> recentProjects = new ArrayList<>();
     private static Consumer<PPFProject> projectConsumer;
 
@@ -50,7 +51,8 @@ public class ProjectManager {
                     .filter(File::exists)
                     .map(file -> {
                         try {
-                            return Optional.of(gson.fromJson(new FileReader(file), PPFProject.class));
+                            System.out.println("Map recent " + file.getAbsolutePath());
+                            return Optional.ofNullable(gson.fromJson(new FileReader(file), PPFProject.class));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -60,6 +62,7 @@ public class ProjectManager {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
+            System.out.println("recentProjects = " + recentProjects);
             if (open.get() && !recentProjects.isEmpty()) {
                 ppfProject = recentProjects.get(0);
                 projectConsumer.accept(ppfProject);
@@ -101,7 +104,24 @@ public class ProjectManager {
 
     public static void save() {
         try {
-            gson.toJson(ppfProject, new FileWriter(ppfProject.getFile()));
+//            gson.toJson(ppfProject, new FileWriter(ppfProject.getFile()));
+
+
+            var json = gson.toJson(ppfProject);
+//            System.out.println(json);
+            var file = ppfProject.getFile();
+
+            LOGGER.info("Writing gson to " + file.getPath());
+
+
+            System.out.println("Exists1: " + file.exists());
+            System.out.println(file.createNewFile());
+            System.out.println("Exists2: " + file.exists());
+            try (var writer = new FileWriter(file)) {
+                IOUtils.write(json, writer);
+            }
+//            file.mkdirs();
+//            Files.write(ppfProject.getFile().toPath(), json.getBytes(), StandardOpenOption.CREATE);
         } catch (IOException e) {
             LOGGER.error("Exception saving the PPFProject", e);
         }

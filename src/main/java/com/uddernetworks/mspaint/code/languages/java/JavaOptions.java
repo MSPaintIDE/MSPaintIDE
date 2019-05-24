@@ -29,6 +29,7 @@ public enum JavaOptions {
     }
 
     public static JavaOptions fromName(String name) {
-        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(JavaOptions.class, name));
+        System.out.println("name = " + name);
+        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(JavaOptions.class, name + "|shit"));
     }
 }
