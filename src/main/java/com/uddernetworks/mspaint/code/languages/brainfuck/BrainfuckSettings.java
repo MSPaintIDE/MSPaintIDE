@@ -1,11 +1,10 @@
 package com.uddernetworks.mspaint.code.languages.brainfuck;
 
-import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.gui.BooleanLangGUIOption;
 import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
 
-public class BrainfuckSettings extends LanguageSettings<BrainfuckOptions> {
+public class BrainfuckSettings extends LanguageSettings {
 
     protected BrainfuckSettings() {
         super("Brainfuck");
@@ -31,17 +30,7 @@ public class BrainfuckSettings extends LanguageSettings<BrainfuckOptions> {
     }
 
     @Override
-    protected String enumToName(BrainfuckOptions type) {
-        return type.getName();
-    }
-
-    @Override
     protected BrainfuckOptions nameToEnum(String name) {
-        return BrainfuckOptions.fromName(name);
-    }
-
-    @Override
-    public LangGUIOptionRequirement getRequirement(BrainfuckOptions type) {
-        return type.getRequirement();
+        return BrainfuckOptions.staticFromName(name);
     }
 }

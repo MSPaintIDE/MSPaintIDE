@@ -1,6 +1,5 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
-import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.gui.BooleanLangGUIOption;
 import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
@@ -10,7 +9,7 @@ import com.uddernetworks.mspaint.project.ProjectManager;
 
 import java.io.File;
 
-public class JavaSettings extends LanguageSettings<JavaOptions> {
+public class JavaSettings extends LanguageSettings {
 
     protected JavaSettings() {
         super("Java");
@@ -65,20 +64,12 @@ public class JavaSettings extends LanguageSettings<JavaOptions> {
                 .setChooserTitle("Select the directory containing all non-java files to be put in your program, used as a 'resources' directory")
                 .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                 .setSelectDirectories(true));
-    }
 
-    @Override
-    protected String enumToName(JavaOptions type) {
-        return type.getName();
+        reload();
     }
 
     @Override
     protected JavaOptions nameToEnum(String name) {
-        return JavaOptions.fromName(name);
-    }
-
-    @Override
-    public LangGUIOptionRequirement getRequirement(JavaOptions type) {
-        return type.getRequirement();
+        return JavaOptions.staticFromName(name);
     }
 }

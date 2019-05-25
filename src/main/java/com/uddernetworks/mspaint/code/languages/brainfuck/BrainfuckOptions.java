@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.brainfuck;
 
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
+import com.uddernetworks.mspaint.code.languages.Option;
 import com.uddernetworks.mspaint.code.languages.java.JavaOptions;
 
 import java.util.Arrays;
@@ -8,7 +9,7 @@ import java.util.Arrays;
 import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.BOTTOM_DISPLAY;
 import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.REQUIRED;
 
-public enum BrainfuckOptions {
+public enum BrainfuckOptions implements Option {
     INPUT_DIRECTORY("inputDirectory", REQUIRED),
     HIGHLIGHT("highlight", BOTTOM_DISPLAY),
     HIGHLIGHT_DIRECTORY("highlightDirectory", REQUIRED);
@@ -25,11 +26,16 @@ public enum BrainfuckOptions {
         return name;
     }
 
-    public LangGUIOptionRequirement getRequirement() {
-        return this.requirement;
+    @Override
+    public Option fromName(String name) {
+        return staticFromName(name);
     }
 
-    public static BrainfuckOptions fromName(String name) {
-        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(JavaOptions.class, name + "|shit"));
+    public static BrainfuckOptions staticFromName(String name) {
+        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(JavaOptions.class, name));
+    }
+
+    public LangGUIOptionRequirement getRequirement() {
+        return this.requirement;
     }
 }

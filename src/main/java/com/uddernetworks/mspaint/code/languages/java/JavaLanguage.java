@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JavaLanguage extends Language<JavaOptions> {
+public class JavaLanguage extends Language {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
@@ -71,7 +71,7 @@ public class JavaLanguage extends Language<JavaOptions> {
     }
 
     @Override
-    public LanguageSettings<JavaOptions> getLanguageSettings() {
+    public LanguageSettings getLanguageSettings() {
         return this.settings;
     }
 

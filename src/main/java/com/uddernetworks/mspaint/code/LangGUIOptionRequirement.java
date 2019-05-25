@@ -14,8 +14,7 @@ public enum LangGUIOptionRequirement {
 
     /**
      * Available for boolean values ONLY, showing a checkbox of the value at the bottom of the GUI above the start
-     * button. Note that there is a 6 option limit on these, though more may be added to the API if really necessary.
-     * TODO: Double-check 6 option limit
+     * button.
      */
     BOTTOM_DISPLAY
 }

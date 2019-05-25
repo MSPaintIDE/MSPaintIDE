@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.code.languages.gui;
 
 import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
+import com.uddernetworks.mspaint.code.languages.Option;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Control;
@@ -46,8 +47,18 @@ public class StringLangGUIOption implements LangGUIOption {
     }
 
     @Override
-    public <G> void bindValue(G type, LanguageSettings<G> languageSettings) {
-        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(type, newValue, true, false));
+    public Object getSetting() {
+        return this.text.getValueSafe();
+    }
+
+    @Override
+    public StringProperty getProperty() {
+        return this.text;
+    }
+
+    @Override
+    public void bindValue(Option option, LanguageSettings languageSettings) {
+        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(option, newValue, true, false));
     }
 
     @Override

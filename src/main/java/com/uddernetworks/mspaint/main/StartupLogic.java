@@ -42,7 +42,7 @@ public class StartupLogic {
     private MainGUI mainGUI;
 
     private LanguageManager languageManager = new LanguageManager();
-    private Language<?> currentLanguage;
+    private Language currentLanguage;
     private RunningCodeManager runningCodeManager;
     private OCRManager ocrManager;
 
@@ -117,11 +117,11 @@ public class StartupLogic {
         }
     }
 
-    public <T> void setCurrentLanguage(Language<T> language) {
+    public void setCurrentLanguage(Language language) {
         this.currentLanguage = language;
     }
 
-    public  Language<?> getCurrentLanguage() {
+    public  Language getCurrentLanguage() {
         return this.currentLanguage;
     }
 

@@ -23,7 +23,7 @@ public class ProjectManager {
 
     private static Path recent = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE\\recent").toPath();
     private static PPFProject ppfProject;
-    private static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static List<PPFProject> recentProjects = new ArrayList<>();
     private static Consumer<PPFProject> projectConsumer;
 

@@ -1,12 +1,13 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
+import com.uddernetworks.mspaint.code.languages.Option;
 
 import java.util.Arrays;
 
 import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.*;
 
-public enum JavaOptions {
+public enum JavaOptions implements Option {
     INPUT_DIRECTORY("inputDirectory", REQUIRED),
     HIGHLIGHT_DIRECTORY("highlightDirectory", REQUIRED),
     MAIN("classLocation", REQUIRED),
@@ -30,11 +31,16 @@ public enum JavaOptions {
         return name;
     }
 
-    public LangGUIOptionRequirement getRequirement() {
-        return this.requirement;
+    @Override
+    public Option fromName(String name) {
+        return staticFromName(name);
     }
 
-    public static JavaOptions fromName(String name) {
-        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(JavaOptions.class, name + "|shit"));
+    public static JavaOptions staticFromName(String name) {
+        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(JavaOptions.class, name));
+    }
+
+    public LangGUIOptionRequirement getRequirement() {
+        return this.requirement;
     }
 }

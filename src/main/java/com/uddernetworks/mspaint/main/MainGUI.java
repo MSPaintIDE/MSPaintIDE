@@ -4,6 +4,7 @@ import com.jfoenix.controls.*;
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.languages.Language;
+import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
 import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
@@ -17,6 +18,7 @@ import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -55,8 +57,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -114,7 +114,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     private JFXButton remoteOriginVisibility;
     @FXML
-    private JFXComboBox<Language<?>> languageComboBox;
+    private JFXComboBox<Language> languageComboBox;
 
     @FXML
     private TextArea output;
@@ -147,7 +147,7 @@ public class MainGUI extends Application implements Initializable {
 
     public static File APP_DATA = new File(System.getenv("LocalAppData"), "MSPaintIDE");
 
-    private ObservableList<Language<?>> languages = FXCollections.observableArrayList();
+    private ObservableList<Language> languages = FXCollections.observableArrayList();
 
     public MainGUI() throws IOException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         System.setProperty("jna.debug_load", "true");
@@ -517,15 +517,15 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
-    public void addLanguages(List<Language<?>> languages) {
+    public void addLanguages(List<Language> languages) {
         this.languages.addAll(languages);
     }
 
-    public ObservableList<Language<?>> getLanguages() {
+    public ObservableList<Language> getLanguages() {
         return languages;
     }
 
-    public Language<?> getCurrentLanguage() {
+    public Language getCurrentLanguage() {
         return this.startupLogic.getCurrentLanguage();
     }
 
@@ -605,7 +605,7 @@ public class MainGUI extends Application implements Initializable {
         });
 
         languageComboBox.setOnAction(event -> {
-            Language<?> language = languageComboBox.getSelectionModel().getSelectedItem();
+            Language language = languageComboBox.getSelectionModel().getSelectedItem();
             this.startupLogic.setCurrentLanguage(language);
 
             language.loadForCurrent();
@@ -699,19 +699,22 @@ public class MainGUI extends Application implements Initializable {
             i.increment();
         });
 
-        BiFunction<String, Consumer<Boolean>, JFXCheckBox> checkBoxGen = (text, callback) -> {
-            var checkbox = new JFXCheckBox(text);
-            checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> callback.accept(newValue));
+        Function<LangGUIOption, JFXCheckBox> checkBoxGen = option -> {
+            var checkbox = new JFXCheckBox(option.getName());
             checkbox.setMnemonicParsing(false);
             checkbox.setStyle("-jfx-checked-color: -primary-button-color;");
             checkbox.getStyleClass().add("theme-text");
             checkbox.setCursor(Cursor.HAND);
             checkbox.setPadding(new Insets(0, 10, 0, 0));
+            System.out.println(option.getName() + " = " + option.getSetting());
+            checkbox.selectedProperty().bindBidirectional((BooleanProperty) option.getProperty());
+//            checkbox.setSelected((Boolean) option.getSetting());
+//            checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> callback.accept(newValue));
             return checkbox;
         };
 
         langSettings.getOptionsGUI(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)).forEach(guiOption ->
-                checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption.getName(), guiOption::setSetting)));
+                checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption)));
     }
 
     public TextArea getOutputTextArea() {

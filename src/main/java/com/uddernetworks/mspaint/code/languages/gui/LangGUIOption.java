@@ -1,7 +1,9 @@
 package com.uddernetworks.mspaint.code.languages.gui;
 
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
+import com.uddernetworks.mspaint.code.languages.Option;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
+import javafx.beans.property.Property;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 
@@ -43,12 +45,16 @@ public interface LangGUIOption {
      */
     void setSetting(Object setting);
 
+    Object getSetting();
+
+    Property getProperty();
+
     /**
      * Binds the setting's value with the given {@link LanguageSettings}.
      *
-     * @param languageSettings THe {@link LanguageSettings} to bind with
+     * @param languageSettings The {@link LanguageSettings} to bind with
      */
-    <G> void bindValue(G type, LanguageSettings<G> languageSettings);
+    void bindValue(Option option, LanguageSettings languageSettings);
 
     /**
      * If the option has a "Change" button in the last column.

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BrainfuckLanguage extends Language<BrainfuckOptions> {
+public class BrainfuckLanguage extends Language {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
@@ -72,7 +72,7 @@ public class BrainfuckLanguage extends Language<BrainfuckOptions> {
     }
 
     @Override
-    public LanguageSettings<BrainfuckOptions> getLanguageSettings() {
+    public LanguageSettings getLanguageSettings() {
         return this.settings;
     }
 

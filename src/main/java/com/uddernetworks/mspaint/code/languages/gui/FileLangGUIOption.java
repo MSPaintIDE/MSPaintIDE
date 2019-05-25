@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.gui;
 
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
+import com.uddernetworks.mspaint.code.languages.Option;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.stage.FileChooser;
@@ -66,8 +67,13 @@ public class FileLangGUIOption extends StringLangGUIOption {
     }
 
     @Override
-    public <G> void bindValue(G type, LanguageSettings<G> languageSettings) {
-        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(type, new File(newValue), true, false));
+    public Object getSetting() {
+        return this.text != null ? new File(this.text.getValue()) : null;
+    }
+
+    @Override
+    public void bindValue(Option option, LanguageSettings languageSettings) {
+        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(option, new File(newValue), true, false));
     }
 
     @Override

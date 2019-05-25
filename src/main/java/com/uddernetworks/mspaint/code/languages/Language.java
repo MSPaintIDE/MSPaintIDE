@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.util.IDEFileUtils;
 import org.slf4j.Logger;
@@ -16,10 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class Language<G> {
+public abstract class Language {
 
     // Public as to be used in subclasses
     public StartupLogic startupLogic;
+    private PPFProject lastInitted = null;
 
     public Language(StartupLogic startupLogic) {
         this.startupLogic = startupLogic;
@@ -36,6 +38,9 @@ public abstract class Language<G> {
      * Loads settings for the current language.
      */
     public void loadForCurrent() {
+        var current = ProjectManager.getPPFProject();
+        if (current.equals(this.lastInitted)) return;
+        this.lastInitted = current;
         getLanguageSettings().initOptions();
     }
 
@@ -93,11 +98,11 @@ public abstract class Language<G> {
     public abstract DefaultJFlexLexer getLanguageHighlighter();
 
     /**
-     * Gets the {@link LanguageSettings<G>} of the current language.
+     * Gets the {@link LanguageSettings} of the current language.
      *
-     * @return The {@link LanguageSettings<G>} used by the current language
+     * @return The {@link LanguageSettings} used by the current language
      */
-    public abstract LanguageSettings<G> getLanguageSettings();
+    public abstract LanguageSettings getLanguageSettings();
 
     /**
      * Highlights all {@link ImageClass}s given. When implementing, this method must ALSO check in the settings if
@@ -126,7 +131,7 @@ public abstract class Language<G> {
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
      * @param mainGUI The main instance of MainGUI
-     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link Language#indexFiles(Object)}
+     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link Language#indexFiles(Option)}
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
@@ -136,7 +141,7 @@ public abstract class Language<G> {
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
      * @param mainGUI The main instance of MainGUI
-     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link Language#indexFiles(Object)}
+     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link Language#indexFiles(Option)}
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @param executeOverride The policy for executing or not
@@ -150,10 +155,10 @@ public abstract class Language<G> {
      * Gets all the {@link ImageClass}s that will be used during execution/compilation of the program with the current
      * language.
      *
-     * @param inputDirectorySetting The setting of a File directory containing all source code images
+     * @param highlightDirectorySetting The setting of a File directory containing all source code images
      * @return All the {@link ImageClass}s to be used during compilation/execution
      */
-    protected Optional<List<ImageClass>> indexFiles(G inputDirectorySetting) {
+    protected Optional<List<ImageClass>> indexFiles(Option highlightDirectorySetting) {
         var LOGGER = getLogger();
         var mainGUI = this.startupLogic.getMainGUI();
         if (optionsNotFilled()) {
@@ -166,7 +171,7 @@ public abstract class Language<G> {
 
         mainGUI.setStatusText(null);
 
-        var inputDirectory = getLanguageSettings().<File>getSetting(inputDirectorySetting);
+        var inputDirectory = getLanguageSettings().<File>getSetting(highlightDirectorySetting);
         var imageClasses = new ArrayList<ImageClass>();
 
         for (File imageFile : IDEFileUtils.getFilesFromDirectory(inputDirectory, getFileExtensions(), "png")) {
@@ -185,7 +190,7 @@ public abstract class Language<G> {
      * @param imageClasses The {@link ImageClass}s to highlight
      * @throws IOException If an IO Exception occurs
      */
-    protected void highlightAll(G highlightDirectorySetting, List<ImageClass> imageClasses) throws IOException {
+    protected void highlightAll(Option highlightDirectorySetting, List<ImageClass> imageClasses) throws IOException {
         var LOGGER = getLogger();
         var mainGUI = startupLogic.getMainGUI();
         if (optionsNotFilled()) {

@@ -26,6 +26,7 @@ public class PPFProject {
     private String activeFont;
     private Map<String, String> fonts = new HashMap<>();
     public Map<String, Map<String, Object>> languageSettings = new HashMap<>();
+    // <Lang Name,  Map<Option.getName
 
     private transient BiConsumer<String, String> fontUpdate;
 
