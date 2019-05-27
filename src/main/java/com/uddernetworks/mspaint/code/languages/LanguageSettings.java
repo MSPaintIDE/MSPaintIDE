@@ -35,17 +35,16 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
                 .forEach(entry -> setSetting(entry.getKey(), entry.getValue().get(), false));
     }
 
-    protected void addOption(Option option, Object initial, LangGUIOption langGUIOption) {
-        addOption(option, initial, langGUIOption, null);
+    protected void addOption(Option option, LangGUIOption langGUIOption) {
+        addOption(option, langGUIOption, null);
     }
 
-    protected void addOption(Option option, Object initial, LangGUIOption langGUIOption, Supplier<Object> defaultGenerator) {
+    protected void addOption(Option option, LangGUIOption langGUIOption, Supplier<Object> defaultGenerator) {
         this.optionMap.put(option, langGUIOption);
         this.defaultGenerators.put(option, defaultGenerator);
         langGUIOption.bindValue(option, this);
+        langGUIOption.setIndex(option.ordinal());
         onChangeSetting(option, langGUIOption::setSetting);
-//        setSetting(option, initial, false);
-//        langGUIOption.setSetting(getSetting(option));
     }
 
     protected File create(File file) {
@@ -80,11 +79,17 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     }
 
     @Override
+    public boolean optionalRestriction(Option setting) {
+        return setting.getRequirement() == LangGUIOptionRequirement.OPTIONAL;
+    }
+
+    @Override
     public void save() {
         ProjectManager.getPPFProject().setLanguageSetting(this.langName, this.optionMap.keySet()
                 .stream()
                 .filter(this::isSet)
-                .collect(Collectors.toMap(Option::getName, this::getSetting)));
+                .filter(option -> getSettingOptional(option).isPresent())
+                .collect(Collectors.toMap(Option::getName, option -> getSettingOptional(option).get())));
         ProjectManager.save();
     }
 

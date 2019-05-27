@@ -7,6 +7,10 @@ import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -63,7 +67,29 @@ public class FileLangGUIOption extends StringLangGUIOption {
 
     @Override
     public void setSetting(Object setting) {
-        if (setting instanceof File) text.set(((File) setting).getAbsolutePath());
+        if (setting instanceof String) {
+            var path = getValidPath((String) setting);
+            if (path.isPresent()) {
+                System.out.println("Valid, setting to " + path.get().toFile().getAbsolutePath() + " non abs is " + path.get().toAbsolutePath() + " or " + path.get().toFile().getPath());
+                this.text.set(path.get().toFile().getAbsolutePath());
+            } else {
+                System.out.println("Shit!");
+                this.text.set("shit");
+            }
+        } else if (setting instanceof File) {
+            System.out.println("Already file: " + ((File) setting).getAbsolutePath());
+            this.text.set(((File) setting).getAbsolutePath());
+        }
+    }
+
+    private static Optional<Path> getValidPath(String path) {
+        if (path == null || path.trim().equals("")) return Optional.empty();
+        try {
+            var shit = Optional.ofNullable(Paths.get(path));
+            return shit;
+        } catch (InvalidPathException | NullPointerException ex) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -73,7 +99,19 @@ public class FileLangGUIOption extends StringLangGUIOption {
 
     @Override
     public void bindValue(Option option, LanguageSettings languageSettings) {
-        this.text.addListener((observable, oldValue, newValue) -> languageSettings.setSetting(option, new File(newValue), true, false));
+        this.text.addListener((observable, oldValue, newValue) -> {
+            try {
+                var val = getValidPath(newValue);
+                if (val.isPresent()) {
+                    System.out.println("Present for " + val);
+                    languageSettings.setSetting(option, val.get().toFile(), true, false);
+                } else {
+                    languageSettings.removeSetting(option);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override

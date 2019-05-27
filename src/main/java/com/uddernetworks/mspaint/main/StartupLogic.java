@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 public class StartupLogic {
 
@@ -105,8 +104,6 @@ public class StartupLogic {
             }, true);
         } else {
             ProjectManager.switchProjectConsumer(project -> {
-//                System.out.println("Active font: " + project.getActiveFont() + " (" + project.getActiveFont().trim().equals("") + ")");
-//                System.out.println("Active font: " + project.getActiveFontConfig() + " (" + project.getActiveFontConfig().trim().equals("") + ")");
                 if (project.getActiveFont() == null) {
                     project.addFont(settingsManager.getSetting(Setting.HEADLESS_FONT), settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG));
                     project.setActiveFont(settingsManager.getSetting(Setting.HEADLESS_FONT));
@@ -139,8 +136,8 @@ public class StartupLogic {
 
         mainGUI.setIndeterminate(true);
 
-        var imageOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getAppOutput(), 500);
-        var compilerOutputStream = new ImageOutputStream(this, ProjectManager.getPPFProject().getCompilerOutput(), 500);
+        var imageOutputStream = new ImageOutputStream(this, this.currentLanguage.getAppOutput(), 500);
+        var compilerOutputStream = new ImageOutputStream(this, this.currentLanguage.getCompilerOutput(), 500);
         Map<ImageClass, List<LanguageError>> errors = null;
 
         try {
@@ -150,11 +147,11 @@ public class StartupLogic {
             mainGUI.setStatusText("Highlighting Angry Squiggles...");
 
             for (ImageClass imageClass : errors.keySet()) {
-                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 3, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
+                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1/6D, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
                 highlighter.highlightAngrySquiggles();
             }
 
-        } catch (TranscoderException | ExecutionException | InterruptedException e) {
+        } catch (TranscoderException e) {
             e.printStackTrace();
         } finally {
             Optional<Map.Entry<ImageClass, List<LanguageError>>> firstEntryOptional = errors != null ? errors.entrySet().stream().findFirst() : Optional.empty();

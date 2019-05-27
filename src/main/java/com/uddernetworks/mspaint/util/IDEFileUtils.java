@@ -12,8 +12,8 @@ public class IDEFileUtils {
     }
 
     public static List<File> getFilesFromDirectory(File directory, String[] extensions) {
-        List<File> ret = new ArrayList<>();
-        for (File file : directory.listFiles()) {
+        var ret = new ArrayList<File>();
+        for (var file : directory.listFiles()) {
             if (file.isDirectory()) {
                 ret.addAll(getFilesFromDirectory(file, extensions));
             } else {

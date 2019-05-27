@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.languages.Language;
@@ -21,7 +22,6 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -102,6 +102,9 @@ public class MainGUI extends Application implements Initializable {
     private JFXButton commit;
     @FXML
     private JFXButton push;
+
+    @FXML
+    private JFXButton start;
 
     @FXML
     private JFXProgressBar progress;
@@ -444,6 +447,9 @@ public class MainGUI extends Application implements Initializable {
             var imageClassesOptional = language.indexFiles();
             if (imageClassesOptional.isPresent()) {
                 var imageClasses = imageClassesOptional.get();
+
+                imageClasses.forEach(ImageClass::scan);
+
                 language.highlightAll(imageClasses);
 
                 // TODO: Skip step in inapplicable languages?
@@ -459,11 +465,6 @@ public class MainGUI extends Application implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    private void startScan(ActionEvent event) {
-        LOGGER.error("Is this used?");
     }
 
     public void setHaveError() {
@@ -577,6 +578,8 @@ public class MainGUI extends Application implements Initializable {
         });
 
         updateTheme();
+
+        start.setOnAction(event -> fullCompile(OverrideExecute.DEFAULT));
 
         hiddenOriginURL.setManaged(false);
         hiddenOriginURL.setVisible(false);
@@ -692,7 +695,10 @@ public class MainGUI extends Application implements Initializable {
         var langSettings = getCurrentLanguage().getLanguageSettings();
 
         var i = new LongAdder();
-        langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY))).forEach(langGUIOption -> {
+        langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)))
+                .stream()
+                .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
+                .forEach(langGUIOption -> {
             var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
             if (langGUIOption.hasChangeButton()) childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
             langSettingsGrid.addRow(i.intValue(), childrenAdding.toArray(Control[]::new));

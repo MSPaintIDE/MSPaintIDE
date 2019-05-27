@@ -75,6 +75,10 @@ public abstract class Language {
      */
     public abstract File getInputLocation();
 
+    public abstract File getAppOutput();
+
+    public abstract File getCompilerOutput();
+
     /**
      * Gets if the language is interpreted (Compared to being compiled).
      *
@@ -230,7 +234,6 @@ public abstract class Language {
      * @return If all required options are filled in
      */
     public boolean optionsNotFilled() {
-        var ppfProject = ProjectManager.getPPFProject();
-        return !getLanguageSettings().requiredFilled() || (getOutputFileExtension() != null && ppfProject.getCompilerOutput() == null);
+        return !getLanguageSettings().requiredFilled();
     }
 }

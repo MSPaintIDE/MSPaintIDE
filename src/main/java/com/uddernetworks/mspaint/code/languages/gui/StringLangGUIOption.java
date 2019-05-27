@@ -16,6 +16,7 @@ public class StringLangGUIOption implements LangGUIOption {
     String name;
     StringProperty text = new SimpleStringProperty();
     String promptText;
+    int index;
 
     public StringLangGUIOption(String name) {
         this(name, null);
@@ -64,5 +65,15 @@ public class StringLangGUIOption implements LangGUIOption {
     @Override
     public boolean hasChangeButton() {
         return false;
+    }
+
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    @Override
+    public int getIndex() {
+        return this.index;
     }
 }

@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 
 public class PPFProject {
 
-    private File file;
+    private transient File file;
 
 //    private File inputLocation;         // Input file/image folder
 //    private File highlightLocation;     // Highlight output file/folder
@@ -17,8 +17,6 @@ public class PPFProject {
 //    private File jarFile;               // Output .jar file
 //    private File libraryLocation;       // Library .jar/folder
 //    private File otherLocation;         // File/folder for other packaged files
-    private File compilerOutput;        // Compiler output image file
-    private File appOutput;             // Application output image file
     private String language;            // The language used in the project
     private String name;                // The name of the project
 //    private boolean compile;            // If the IDE should compile the code
@@ -38,31 +36,10 @@ public class PPFProject {
         return file;
     }
 
-    public File getCompilerOutput() {
-        return compilerOutput;
+    public PPFProject setFile(File file) {
+        this.file = file;
+        return this;
     }
-
-    public void setCompilerOutput(File compilerOutput) {
-        setCompilerOutput(compilerOutput, true);
-    }
-
-    public void setCompilerOutput(File compilerOutput, boolean override) {
-        if (this.compilerOutput == null || override) this.compilerOutput = compilerOutput;
-    }
-
-
-    public File getAppOutput() {
-        return appOutput;
-    }
-
-    public void setAppOutput(File appOutput) {
-        setAppOutput(appOutput, true);
-    }
-
-    public void setAppOutput(File appOutput, boolean override) {
-        if (this.appOutput == null || override) this.appOutput = appOutput;
-    }
-
 
     public String getLanguage() {
         return language;

@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LetterFileWriter {
@@ -30,6 +31,8 @@ public class LetterFileWriter {
     }
 
     public void writeToFile() throws IOException {
+        System.out.println("Writing");
+        ImageIO.write(this.image, "png", new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\highlighted\\shit.png"));
         AtomicInteger width = new AtomicInteger(this.image.getWidth());
         AtomicInteger height = new AtomicInteger(this.image.getHeight());
         scannedImage.getGrid().values()
@@ -57,14 +60,19 @@ public class LetterFileWriter {
     }
 
     private void writeLetterToFile(BufferedImage image, ImageLetter imageLetter) {
-        imageLetter.getData(double[][].class).ifPresent(data -> {
-            for (int y = 0; y < imageLetter.getHeight(); y++) {
-                for (int x = 0; x < imageLetter.getWidth(); x++) {
-                    var xyColor = (int) data[y][x];
-                    if (data[y][x] != 0) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, xyColor);
-                }
-            }
+        AtomicBoolean useSingleColor = new AtomicBoolean(false);
+        var data = imageLetter.getData(double[][].class).orElseGet(() -> {
+            useSingleColor.set(true);
+            var grid = imageLetter.getValues();
+            return booleanToDoubleGrid(grid, imageLetter.getData(Color.class).map(Color::getRGB).orElse(0));
         });
+
+        for (int y = 0; y < imageLetter.getHeight(); y++) {
+            for (int x = 0; x < imageLetter.getWidth(); x++) {
+                var xyColor = (int) data[y][x];
+                if (xyColor != 0) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, xyColor);
+            }
+        }
     }
 
     private void background(Color color) {
@@ -73,5 +81,18 @@ public class LetterFileWriter {
                 this.image.setRGB(x, y, color.getRGB());
             }
         }
+    }
+
+    private double[][] booleanToDoubleGrid(boolean[][] grid, double value) {
+        var doubleGrid = new double[grid.length][];
+        for (int i = 0; i < doubleGrid.length; i++) {
+            var row = new double[grid[0].length];
+            for (int i1 = 0; i1 < grid[i].length; i1++) {
+                row[i1] = grid[i][i1] ? value : -1; // Isn't white
+            }
+            doubleGrid[i] = row;
+        }
+
+        return doubleGrid;
     }
 }

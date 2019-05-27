@@ -6,4 +6,5 @@ public interface Option {
     String getName();
     Option fromName(String name);
     LangGUIOptionRequirement getRequirement();
+    int ordinal();
 }

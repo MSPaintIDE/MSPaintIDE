@@ -57,6 +57,16 @@ public class BrainfuckLanguage extends Language {
     }
 
     @Override
+    public File getAppOutput() {
+        return getLanguageSettings().getSetting(BrainfuckOptions.PROGRAM_OUTPUT);
+    }
+
+    @Override
+    public File getCompilerOutput() {
+        return getLanguageSettings().getSetting(BrainfuckOptions.COMPILER_OUTPUT);
+    }
+
+    @Override
     public boolean isInterpreted() {
         return true;
     }

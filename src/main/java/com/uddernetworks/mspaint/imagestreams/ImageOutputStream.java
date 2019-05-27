@@ -90,9 +90,7 @@ public class ImageOutputStream extends OutputStream {
     }
 
     private String breakStringUp(String message) {
-        System.out.println("Breaking!");
         FontMetrics fontMetrics = graphics.getFontMetrics();
-        System.out.println("fontMetrics = " + fontMetrics);
 
         String[] words = message.split(" ");
 
@@ -121,7 +119,6 @@ public class ImageOutputStream extends OutputStream {
     }
 
     private String breakWordUp(String word) {
-        System.out.println("Breaking 2");
         FontMetrics fontMetrics = graphics.getFontMetrics();
 
         char[] chars = word.toCharArray();

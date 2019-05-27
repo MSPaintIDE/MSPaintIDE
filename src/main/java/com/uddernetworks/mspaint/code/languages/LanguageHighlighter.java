@@ -19,6 +19,8 @@ public class LanguageHighlighter {
         seg.count = text.length();
         lexer.parse(seg, 0, toks);
 
+        System.out.println("toks = " + toks);
+
         toks.forEach(token -> {
             TokenType type = token.getTokenType();
 

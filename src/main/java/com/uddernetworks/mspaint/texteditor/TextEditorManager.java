@@ -147,8 +147,6 @@ public class TextEditorManager {
                     continue;
                 }
 
-                System.out.println("=== " + cha + " ===");
-
                 var letterGrid = letterGenerator.generateCharacter(cha, size, ocrManager.getActiveFont(), space);
                 int center = centerPopulator.getCenter(cha, size);
 

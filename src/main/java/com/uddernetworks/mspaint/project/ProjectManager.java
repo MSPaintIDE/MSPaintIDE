@@ -1,7 +1,6 @@
 package com.uddernetworks.mspaint.project;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,10 @@ public class ProjectManager {
 
     private static Path recent = new File(System.getProperties().getProperty("user.home"), "AppData\\Local\\MSPaintIDE\\recent").toPath();
     private static PPFProject ppfProject;
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson gson = new GsonBuilder().setPrettyPrinting()
+            .registerTypeAdapter(File.class, (JsonSerializer<File>) (src, typeOfSrc, context) -> new JsonPrimitive(src.getAbsolutePath()))
+            .registerTypeAdapter(File.class, (JsonDeserializer<File>) (srcElement, typeOfSrc, context) -> new File(srcElement.getAsString()))
+            .create();
     private static List<PPFProject> recentProjects = new ArrayList<>();
     private static Consumer<PPFProject> projectConsumer;
 
@@ -50,14 +52,16 @@ public class ProjectManager {
                     .map(File::new)
                     .filter(File::exists)
                     .map(file -> {
+                        PPFProject project = null;
+
                         try {
-                            System.out.println("Map recent " + file.getAbsolutePath());
-                            return Optional.ofNullable(gson.fromJson(new FileReader(file), PPFProject.class));
+                            project = gson.fromJson(new FileReader(file), PPFProject.class);
+                            if (project != null) project.setFile(file);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
 
-                        return Optional.ofNullable((PPFProject) null);
+                        return Optional.ofNullable(project);
                     })
                     .filter(Optional::isPresent)
                     .map(Optional::get)

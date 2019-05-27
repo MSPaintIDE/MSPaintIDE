@@ -67,4 +67,8 @@ public interface LangGUIOption {
      * Invoked when the "Change" button is clicked, if the current option has one.
      */
     default void activateChangeButtonAction() {}
+
+    void setIndex(int index);
+
+    int getIndex();
 }

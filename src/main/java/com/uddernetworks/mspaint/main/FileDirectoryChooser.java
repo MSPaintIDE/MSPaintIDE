@@ -5,45 +5,33 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class FileDirectoryChooser {
 
     public static void openFileSelector(Consumer<FileChooser> chooserModifier, Consumer<File> onSelected) {
-//        CompletableFuture.runAsync(() -> {
-            try {
-                var fileChooser = new FileChooser();
-                chooserModifier.accept(fileChooser);
-                var selected = fileChooser.showOpenDialog(null);
-                if (selected != null) onSelected.accept(selected);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-//        });
+         var fileChooser = new FileChooser();
+         chooserModifier.accept(fileChooser);
+        Optional.ofNullable(fileChooser.showOpenDialog(null)).ifPresent(onSelected);
     }
 
     public static void openMultiFileSelector(Consumer<FileChooser> chooserModifier, Consumer<List<File>> onSelected) {
-        System.out.println("FileDirectoryChooser.openMultiFileSelector");
         var fileChooser = new FileChooser();
         chooserModifier.accept(fileChooser);
-//        CompletableFuture.runAsync(() -> onSelected.accept(fileChooser.showOpenMultipleDialog(null)));
-        onSelected.accept(fileChooser.showOpenMultipleDialog(null));
+        Optional.ofNullable(fileChooser.showOpenMultipleDialog(null)).ifPresent(onSelected);
     }
 
     public static void openFileSaver(Consumer<FileChooser> chooserModifier, Consumer<File> onSave) {
-        System.out.println("FileDirectoryChooser.openFileSaver");
         var fileChooser = new FileChooser();
         chooserModifier.accept(fileChooser);
-//        CompletableFuture.runAsync(() -> onSave.accept(fileChooser.showSaveDialog(null)));
-        onSave.accept(fileChooser.showSaveDialog(null));
+        Optional.ofNullable(fileChooser.showSaveDialog(null)).ifPresent(onSave);
     }
 
     public static void openDirectorySelector(Consumer<DirectoryChooser> chooserModifier, Consumer<File> onSelected) {
-        System.out.println("FileDirectoryChooser.openDirectorySelector");
         var fileChooser = new DirectoryChooser();
         chooserModifier.accept(fileChooser);
-//        CompletableFuture.runAsync(() -> onSelected.accept(fileChooser.showDialog(null)));
-        onSelected.accept(fileChooser.showDialog(null));
+        Optional.ofNullable(fileChooser.showDialog(null)).ifPresent(onSelected);
     }
 
     public static File givenOrParentDir(File file) {

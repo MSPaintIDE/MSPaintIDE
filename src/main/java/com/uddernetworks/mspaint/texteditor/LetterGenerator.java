@@ -29,7 +29,7 @@ public class LetterGenerator {
         }
     }
 
-    private double[][] trim(double[][] input) {
+    public static double[][] trim(double[][] input) {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
@@ -95,14 +95,6 @@ public class LetterGenerator {
         graphics.setRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
         graphics.drawString(character + "", 0, size);
 
-//        try {
-//            ImageIO.write(image, "png", new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\Text Edit\\gen\\gen_" + ThreadLocalRandom.current().nextInt(10000) + ".png"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        OCRUtils.filter(image);
-
         var values = createGrid(image);
         toGrid(image, values);
 
@@ -122,11 +114,11 @@ public class LetterGenerator {
         return boolGrid;
     }
 
-    private double[][] createGrid(BufferedImage bufferedImage) {
+    public static double[][] createGrid(BufferedImage bufferedImage) {
         return new double[bufferedImage.getHeight()][bufferedImage.getWidth()];
     }
 
-    private void toGrid(BufferedImage input, double[][] values) {
+    public static void toGrid(BufferedImage input, double[][] values) {
         int arrX = 0;
         int arrY = 0;
         for (int y = 0; y < input.getHeight(); y++) {

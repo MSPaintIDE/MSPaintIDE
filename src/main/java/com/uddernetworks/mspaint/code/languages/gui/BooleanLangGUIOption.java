@@ -16,6 +16,7 @@ public class BooleanLangGUIOption implements LangGUIOption {
 
     String name;
     BooleanProperty value = new SimpleBooleanProperty();
+    int index;
 
     public BooleanLangGUIOption(String name) {
         this.name = name;
@@ -68,5 +69,15 @@ public class BooleanLangGUIOption implements LangGUIOption {
     @Override
     public boolean hasChangeButton() {
         return false;
+    }
+
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    @Override
+    public int getIndex() {
+        return this.index;
     }
 }

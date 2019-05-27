@@ -56,6 +56,16 @@ public class JavaLanguage extends Language {
     }
 
     @Override
+    public File getAppOutput() {
+        return getLanguageSettings().getSetting(JavaOptions.PROGRAM_OUTPUT);
+    }
+
+    @Override
+    public File getCompilerOutput() {
+        return getLanguageSettings().getSetting(JavaOptions.COMPILER_OUTPUT);
+    }
+
+    @Override
     public boolean isInterpreted() {
         return false;
     }
@@ -105,8 +115,8 @@ public class JavaLanguage extends Language {
     @Override
     public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException {
         var jarFile = this.settings.<File>getSetting(JavaOptions.JAR);
-        var libDirectory = this.settings.<File>getSetting(JavaOptions.LIBRARY_LOCATION);
-        var otherFiles = this.settings.<File>getSetting(JavaOptions.OTHER_LOCATION);
+        var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaOptions.LIBRARY_LOCATION);
+        var otherFilesOptional = this.settings.<File>getSettingOptional(JavaOptions.OTHER_LOCATION);
         var classOutput = this.settings.<File>getSetting(JavaOptions.CLASS_OUTPUT);
         var execute = switch (executeOverride) {
             case EXECUTE -> true;
@@ -115,15 +125,15 @@ public class JavaLanguage extends Language {
         };
 
         var libFiles = new ArrayList<File>();
-        if (libDirectory != null) {
+        libDirectoryOptional.ifPresent(libDirectory -> {
             if (libDirectory.isFile()) {
                 if (libDirectory.getName().endsWith(".jar")) libFiles.add(libDirectory);
             } else {
                 libFiles.addAll(IDEFileUtils.getFilesFromDirectory(libDirectory, "jar"));
             }
-        }
+        });
 
-        return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFiles, classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute)
+        return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFilesOptional.orElse(null), classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute)
                 .entrySet()
                 .stream()
                 .map(t -> new AbstractMap.SimpleEntry<ImageClass, List<LanguageError>>(t.getKey(), t.getValue().stream().map(JavaError::new).collect(Collectors.toList())))
