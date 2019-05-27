@@ -213,7 +213,6 @@ public abstract class Language {
             return;
         }
 
-        LOGGER.info("Scanning all images...");
         mainGUI.setStatusText("Highlighting...");
         mainGUI.setIndeterminate(true);
         long start = System.currentTimeMillis();

@@ -29,6 +29,7 @@ public class LetterGenerator {
         }
     }
 
+    // TODO: Check this out
     public static double[][] trim(double[][] input) {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;
@@ -55,6 +56,8 @@ public class LetterGenerator {
             Arrays.fill(row, Color.WHITE.getRGB()); // Set to white
             output[y] = row;
         }
+
+        if (maxX == Integer.MIN_VALUE) return input;
 
         for (int y = 0; y < height; y++) {
             System.arraycopy(input[minY + y], minX, output[y], 0, width);

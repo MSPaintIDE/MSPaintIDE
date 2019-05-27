@@ -110,7 +110,15 @@ public class JavaCodeManager {
         } catch (MalformedURLException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ignored) {}
     }
 
+    private void reset() {
+        this.classOutputFolder = null;
+        this.imageClassHashMap.clear();
+        this.errors.clear();
+        this.classLoaders.clear();
+    }
+
     public Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
+        reset();
         this.classOutputFolder = classOutputFolder;
         classOutputFolder.mkdirs();
 

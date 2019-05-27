@@ -1,13 +1,13 @@
 package com.uddernetworks.mspaint.gui.window;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
 import com.uddernetworks.mspaint.gui.window.search.ReplaceManager;
 import com.uddernetworks.mspaint.gui.window.search.SearchListCell;
 import com.uddernetworks.mspaint.gui.window.search.SearchManager;
 import com.uddernetworks.mspaint.gui.window.search.SearchResult;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
-import com.uddernetworks.mspaint.project.ProjectManager;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -258,9 +258,9 @@ public class FindReplaceWindow extends Stage implements Initializable {
             });
 
             if (selectingFile) {
-                FileDirectoryChooser.openFileSelector(chooser -> chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile()), onSelected);
+                FileDirectoryChooser.openFileSelector(chooser -> chooser.setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR.get()), onSelected);
             } else {
-                FileDirectoryChooser.openDirectorySelector(chooser -> chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile()), onSelected);
+                FileDirectoryChooser.openDirectorySelector(chooser -> chooser.setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR.get()), onSelected);
             }
         });
 

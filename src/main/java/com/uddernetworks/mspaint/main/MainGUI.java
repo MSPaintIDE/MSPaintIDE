@@ -19,7 +19,6 @@ import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -713,13 +712,14 @@ public class MainGUI extends Application implements Initializable {
             checkbox.setCursor(Cursor.HAND);
             checkbox.setPadding(new Insets(0, 10, 0, 0));
             System.out.println(option.getName() + " = " + option.getSetting());
-            checkbox.selectedProperty().bindBidirectional((BooleanProperty) option.getProperty());
-//            checkbox.setSelected((Boolean) option.getSetting());
-//            checkbox.selectedProperty().addListener((observable, oldValue, newValue) -> callback.accept(newValue));
+            checkbox.selectedProperty().bindBidirectional(option.getProperty());
             return checkbox;
         };
 
-        langSettings.getOptionsGUI(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)).forEach(guiOption ->
+        langSettings.getOptionsGUI(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY))
+                .stream()
+                .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
+                .forEach(guiOption ->
                 checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption)));
     }
 

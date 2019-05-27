@@ -75,7 +75,6 @@ public class ImageClass {
         LOGGER.info(prefix + "Writing highlighted image to file...");
         start = System.currentTimeMillis();
 
-
         letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
         letterFileWriter.writeToFile();
 

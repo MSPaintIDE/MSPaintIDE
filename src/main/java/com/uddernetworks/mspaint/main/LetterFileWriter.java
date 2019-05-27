@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LetterFileWriter {
@@ -31,8 +30,6 @@ public class LetterFileWriter {
     }
 
     public void writeToFile() throws IOException {
-        System.out.println("Writing");
-        ImageIO.write(this.image, "png", new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\highlighted\\shit.png"));
         AtomicInteger width = new AtomicInteger(this.image.getWidth());
         AtomicInteger height = new AtomicInteger(this.image.getHeight());
         scannedImage.getGrid().values()
@@ -48,7 +45,9 @@ public class LetterFileWriter {
 
         scannedImage.getGrid().values().forEach(line -> {
             line.forEach(imageLetter -> {
-                if (imageLetter.getLetter() != ' ') writeLetterToFile(image, imageLetter);
+                if (imageLetter.getLetter() != ' ') {
+                    writeLetterToFile(imageLetter);
+                }
             });
         });
 
@@ -59,20 +58,20 @@ public class LetterFileWriter {
         return image;
     }
 
-    private void writeLetterToFile(BufferedImage image, ImageLetter imageLetter) {
-        AtomicBoolean useSingleColor = new AtomicBoolean(false);
-        var data = imageLetter.getData(double[][].class).orElseGet(() -> {
-            useSingleColor.set(true);
-            var grid = imageLetter.getValues();
-            return booleanToDoubleGrid(grid, imageLetter.getData(Color.class).map(Color::getRGB).orElse(0));
-        });
-
-        for (int y = 0; y < imageLetter.getHeight(); y++) {
-            for (int x = 0; x < imageLetter.getWidth(); x++) {
-                var xyColor = (int) data[y][x];
+    private void writeLetterToFile(ImageLetter imageLetter, double[][] realValues) {
+        for (int y = 0; y < realValues.length; y++) {
+            for (int x = 0; x < realValues[0].length; x++) {
+                var xyColor = (int) realValues[y][x];
                 if (xyColor != 0) image.setRGB(imageLetter.getX() + x, imageLetter.getY() + y, xyColor);
             }
         }
+    }
+
+    private void writeLetterToFile(ImageLetter imageLetter) {
+        var data = imageLetter.getData(double[][].class).orElseGet(() ->
+                booleanToDoubleGrid(imageLetter.getValues(), imageLetter.getData(Color.class).map(Color::getRGB).orElse(0)));
+
+        writeLetterToFile(imageLetter, data);
     }
 
     private void background(Color color) {

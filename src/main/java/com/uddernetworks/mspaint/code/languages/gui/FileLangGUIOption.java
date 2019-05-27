@@ -85,8 +85,7 @@ public class FileLangGUIOption extends StringLangGUIOption {
     private static Optional<Path> getValidPath(String path) {
         if (path == null || path.trim().equals("")) return Optional.empty();
         try {
-            var shit = Optional.ofNullable(Paths.get(path));
-            return shit;
+            return Optional.ofNullable(Paths.get(path));
         } catch (InvalidPathException | NullPointerException ex) {
             return Optional.empty();
         }

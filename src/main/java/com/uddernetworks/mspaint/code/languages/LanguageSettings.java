@@ -41,7 +41,7 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
 
     protected void addOption(Option option, LangGUIOption langGUIOption, Supplier<Object> defaultGenerator) {
         this.optionMap.put(option, langGUIOption);
-        this.defaultGenerators.put(option, defaultGenerator);
+        this.defaultGenerators.put(option, defaultGenerator == null ? () -> null : defaultGenerator);
         langGUIOption.bindValue(option, this);
         langGUIOption.setIndex(option.ordinal());
         onChangeSetting(option, langGUIOption::setSetting);

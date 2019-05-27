@@ -8,19 +8,18 @@ import com.uddernetworks.newocr.recognition.ScannedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class ReplaceManager {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ReplaceManager.class);
 
+    private final int WHITE = Color.WHITE.getRGB();
     private MainGUI mainGUI;
 
     public ReplaceManager(MainGUI mainGUI) {
@@ -31,7 +30,7 @@ public class ReplaceManager {
         var ocrManager = this.mainGUI.getStartupLogic().getOCRManager();
         ScannedImage scannedImage = searchResult.getScannedImage();
 
-        var size = ocrManager.getFontSize(scannedImage);
+        int size = (int) Math.round(ocrManager.getFontSize(scannedImage));
 
         LetterGenerator letterGenerator = new LetterGenerator();
         var spaceOptional = this.mainGUI.getStartupLogic().getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get().stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
@@ -46,11 +45,41 @@ public class ReplaceManager {
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3);
 
+
+        // Get real (non-binary) pixel data for for ImageLetters
+
+        var original = scannedImage.getOriginalImage();
+
+        for (int x = 0; x < original.getWidth(); x++) {
+            for (int y = 0; y < original.getHeight(); y++) {
+                var originalColor = new Color(original.getRGB(x, y));
+                var use = (int) Math.round((originalColor.getRed() + originalColor.getGreen() + originalColor.getBlue()) / 3D);
+                original.setRGB(x, y, new Color(use, use, use).getRGB());
+            }
+        }
+
+        for (int lineNum = 0; lineNum < scannedImage.getLineCount(); lineNum++) {
+            scannedImage.getGridLineAtIndex(lineNum).ifPresent(line -> {
+                line.forEach(letter -> {
+                    var image = original.getSubimage(letter.getX(), letter.getY(), letter.getWidth(), letter.getHeight());
+                    image = grabRealSub(original, letter);
+                    image = trimImage(image);
+                    var values = LetterGenerator.createGrid(image);
+                    LetterGenerator.toGrid(image, values);
+
+                    var grid = LetterGenerator.trim(values);
+
+                    letter.setValues(LetterGenerator.doubleToBooleanGrid(grid));
+                    letter.setData(grid);
+                });
+            });
+        }
+
         var centerPopulator = this.mainGUI.getStartupLogic().getCenterPopulator();
-        centerPopulator.generateCenters((int) size);
+        centerPopulator.generateCenters(size);
 
         int foundPos = searchResult.getFoundPosition();
-        Map.Entry<Integer, List<ImageLetter>> lineEntry = scannedImage.getLineEntry(searchResult.getLineNumber() - 1);
+        var lineEntry = scannedImage.getLineEntry(searchResult.getLineNumber() - 1);
         List<ImageLetter> line = lineEntry.getValue();
         int lineY = lineEntry.getKey();
 
@@ -77,12 +106,12 @@ public class ReplaceManager {
             if (cha == ' ') {
                 addBy = (int) Math.floor(spaceRatio * size) - characterBetweenSpace;
             } else {
-                var letterGrid = letterGenerator.generateCharacter(cha, (int) size, ocrManager.getActiveFont(), space);
-                int center = centerPopulator.getCenter(cha, (int) size);
+                var letterGrid = letterGenerator.generateCharacter(cha, size, ocrManager.getActiveFont(), space);
+                int center = centerPopulator.getCenter(cha, size);
 
-                ImageLetter letter = new ImageLetter(cha, 0, x, lineY - center - (int) size + (int) size, letterGrid[0].length, letterGrid.length - 1, 0D, 0D, 0D);
+                ImageLetter letter = new ImageLetter(cha, 0, x, (int) Math.round(lineY + center - (size / 2D)), letterGrid[0].length, letterGrid.length, 0D, 0D, 0D);
                 letter.setValues(LetterGenerator.doubleToBooleanGrid(letterGrid));
-                letter.setData(Color.BLACK);
+                letter.setData(letterGrid);
                 adding.add(letter);
 
                 addBy = letterGrid[0].length + characterBetweenSpace;
@@ -94,11 +123,99 @@ public class ReplaceManager {
 
         line.addAll(adding);
 
-        BufferedImage original = ImageIO.read(searchResult.getFile());
-
         BufferedImage bufferedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         LetterFileWriter letterFileWriter = new LetterFileWriter(scannedImage, bufferedImage, searchResult.getFile());
         letterFileWriter.writeToFile();
+    }
+    // TODO: Change the following methods in this commit to use 2D arrays, not BufferedImages
+
+    private BufferedImage grabRealSub(BufferedImage original, ImageLetter imageLetter) {
+        var sub = original.getSubimage(imageLetter.getX(), imageLetter.getY(), imageLetter.getWidth(), imageLetter.getHeight());
+        return expandToWhite(original, sub, imageLetter);
+    }
+
+    private BufferedImage expandToWhite(BufferedImage original, BufferedImage input, ImageLetter imageLetter) {
+        var modded = false;
+        if (yHasBlack(input, 0)) {
+            if (expandUp(imageLetter)) modded = true;
+        }
+
+        if (!modded && yHasBlack(input, input.getHeight() - 1)) {
+            if (expandDown(original, imageLetter)) modded = true;
+        }
+
+        if (!modded && xHasBlack(input, 0)) {
+            if (expandLeft(imageLetter)) modded = true;
+        }
+
+        if (!modded && xHasBlack(input, input.getWidth() - 1)) {
+            if (expandRight(original, imageLetter)) modded = true;
+        }
+
+        if (modded)
+            input = expandToWhite(original, original.getSubimage(imageLetter.getX(), imageLetter.getY(), imageLetter.getWidth(), imageLetter.getHeight()), imageLetter);
+        return input;
+    }
+
+    private BufferedImage trimImage(BufferedImage image) {
+        if (!yHasBlack(image, 0)) image = image.getSubimage(0, 1, image.getWidth(), image.getHeight() - 1);
+        if (!yHasBlack(image, image.getHeight() - 1))
+            image = image.getSubimage(0, 0, image.getWidth(), image.getHeight() - 1);
+        if (!xHasBlack(image, 0)) image = image.getSubimage(1, 0, image.getWidth() - 1, image.getHeight());
+        if (!xHasBlack(image, image.getWidth() - 1))
+            image = image.getSubimage(0, 0, image.getWidth() - 1, image.getHeight());
+
+        var width = image.getWidth();
+        var height = image.getHeight();
+
+        while (image.getWidth() != width && image.getHeight() != height) {
+            width = image.getWidth();
+            height = image.getHeight();
+            image = trimImage(image);
+        }
+
+        return image;
+    }
+
+    // Return: successful
+    private boolean expandUp(ImageLetter imageLetter) {
+        if (imageLetter.getY() == 0) return false;
+        imageLetter.setY(imageLetter.getY() - 1);
+        imageLetter.setHeight(imageLetter.getHeight() + 1);
+        return true;
+    }
+
+    private boolean expandDown(BufferedImage original, ImageLetter imageLetter) {
+        if (imageLetter.getY() + imageLetter.getHeight() >= original.getHeight()) return false;
+        imageLetter.setHeight(imageLetter.getHeight() + 1);
+        return true;
+    }
+
+    private boolean expandLeft(ImageLetter imageLetter) {
+        if (imageLetter.getX() == 0) return false;
+        imageLetter.setX(imageLetter.getX() - 1);
+        imageLetter.setWidth(imageLetter.getWidth() + 1);
+        return true;
+    }
+
+    private boolean expandRight(BufferedImage original, ImageLetter imageLetter) {
+        if (imageLetter.getX() + imageLetter.getWidth() >= original.getWidth()) return false;
+        imageLetter.setWidth(imageLetter.getWidth() + 1);
+        return true;
+    }
+
+    private boolean yHasBlack(BufferedImage input, int y) {
+        for (int x = 0; x < input.getWidth(); x++) {
+            if (input.getRGB(x, y) != WHITE) return true;
+        }
+        return false;
+    }
+
+    private boolean xHasBlack(BufferedImage input, int x) {
+        for (int y = 0; y < input.getHeight(); y++) {
+            if (input.getRGB(x, y) != WHITE) return true;
+        }
+        return false;
     }
 }

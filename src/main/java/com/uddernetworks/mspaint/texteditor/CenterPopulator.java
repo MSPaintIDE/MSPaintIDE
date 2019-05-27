@@ -93,11 +93,6 @@ public class CenterPopulator {
             var topOfLetterToCenter = imageLetter.getY() - lineBound.getKey();
 
             // Extra space above character to Y
-            System.out.println(letter);
-            System.out.println(imageLetter.getY() + " - " + lineBound);
-
-            System.out.println("lletter = " + letter + "(" + topOfLetterToCenter + ")");
-
             currentCenters.put(letter, (int) topOfLetterToCenter);
         });
 

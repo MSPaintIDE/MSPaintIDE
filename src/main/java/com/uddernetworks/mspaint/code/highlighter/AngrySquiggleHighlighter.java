@@ -84,7 +84,6 @@ public class AngrySquiggleHighlighter {
         int i = 0;
         Optional<ImageLetter> letterOptional;
         while ((letterOptional = this.scannedImage.letterAt(i++)).isPresent()) {
-            System.out.println("Shit " + i);
             var letter = letterOptional.get();
             if (letter.getLetter() == ' ') continue;
             fontSize = (int) actions.getFontSize(letter).getAsDouble();

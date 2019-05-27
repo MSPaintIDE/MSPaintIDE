@@ -12,6 +12,7 @@ import com.uddernetworks.newocr.recognition.mergence.MergenceManager;
 import com.uddernetworks.newocr.recognition.similarity.DefaultSimilarityManager;
 import com.uddernetworks.newocr.recognition.similarity.SimilarityManager;
 import com.uddernetworks.newocr.train.ComputerTrainGenerator;
+import com.uddernetworks.newocr.train.ImageReadMethod;
 import com.uddernetworks.newocr.train.TrainGenerator;
 import com.uddernetworks.newocr.train.TrainGeneratorOptions;
 import org.slf4j.Logger;
@@ -93,6 +94,8 @@ public class FontData {
         updateMergeRules();
 
         var options = this.configuration.fetchOptions();
+        options.setImageReadMethod(ImageReadMethod.IMAGEIO_STREAM);
+
         var generatorOptions = new TrainGeneratorOptions()
                 .setFontFamily(this.fontName)
                 .setMinFontSize(settingsManager.getSetting(Setting.TRAIN_LOWER_BOUND))

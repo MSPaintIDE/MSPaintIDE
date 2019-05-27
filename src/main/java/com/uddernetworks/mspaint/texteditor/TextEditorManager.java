@@ -10,7 +10,6 @@ import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.DefaultScannedImage;
 import com.uddernetworks.newocr.recognition.ScannedImage;
-import com.uddernetworks.newocr.train.ImageReadMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +69,6 @@ public class TextEditorManager {
         this.imageFile = createImageFile();
 
         this.imageClass = new ImageClass(this.imageFile, mainGUI, this.startupLogic);
-        var options = this.startupLogic.getOCRManager().getActions().getOptions();
-        options.setImageReadMethod(ImageReadMethod.IMAGEIO_STREAM);
 
         (this.savingThread = new Thread(() -> {
             try {
@@ -110,7 +107,7 @@ public class TextEditorManager {
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
         var ocrManager = this.startupLogic.getOCRManager();
-        ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null);
+        ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null, null);
         LetterGenerator letterGenerator = new LetterGenerator();
 
         int size = SettingsManager.getInstance().getSetting(Setting.EDIT_FILE_SIZE);

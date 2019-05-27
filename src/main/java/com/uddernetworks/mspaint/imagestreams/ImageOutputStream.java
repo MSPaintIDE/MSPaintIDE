@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.imagestreams;
 
 import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.newocr.utils.ConversionUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -39,6 +40,8 @@ public class ImageOutputStream extends OutputStream {
     }
 
     public void saveImage() {
+        var fontSize = 24; // In pts
+        var fontSizePx = ConversionUtils.pointToPixel(fontSize);
         BufferedImage image = new BufferedImage(width, minHeight, BufferedImage.TYPE_INT_ARGB);
         this.graphics = image.createGraphics();
 
@@ -46,7 +49,7 @@ public class ImageOutputStream extends OutputStream {
 
         graphics.setRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
 
-        Font font = new Font(this.startupLogic.getFontName(), Font.PLAIN, 24);
+        Font font = new Font(this.startupLogic.getFontName(), Font.PLAIN, fontSize);
         graphics.setFont(font);
 
         List<String> linesList = new ArrayList<>();
@@ -57,7 +60,7 @@ public class ImageOutputStream extends OutputStream {
             linesList.addAll(Arrays.asList(innerLines));
         }
 
-        int newHeight = linesList.size() * 20;
+        int newHeight = (linesList.size() + 1) * fontSizePx;
 
         var height = Math.max(newHeight, minHeight);
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -71,7 +74,7 @@ public class ImageOutputStream extends OutputStream {
         graphics.setPaint(this.color);
 
         for (int i = 0; i < linesList.size(); i++) {
-            graphics.drawString(linesList.get(i), 10, 20 + (i * 20));
+            graphics.drawString(linesList.get(i), 10, fontSizePx + (i * fontSizePx));
         }
 
         try {
