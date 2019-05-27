@@ -95,7 +95,7 @@ public class ReplaceManager {
 
         int addBy = 0;
 
-        line.forEach(imageLetter -> imageLetter.setX(imageLetter.getX() - farRight));
+        line.subList(foundPos, line.size()).forEach(imageLetter -> imageLetter.setX(imageLetter.getX() - farRight));
 
         List<ImageLetter> adding = new ArrayList<>();
 
@@ -118,7 +118,7 @@ public class ReplaceManager {
             }
 
             int finalAddBy = addBy;
-            line.forEach(imageLetter -> imageLetter.setX(imageLetter.getX() + finalAddBy));
+            line.subList(foundPos, line.size()).forEach(imageLetter -> imageLetter.setX(imageLetter.getX() + finalAddBy));
         }
 
         line.addAll(adding);
@@ -128,8 +128,8 @@ public class ReplaceManager {
         LetterFileWriter letterFileWriter = new LetterFileWriter(scannedImage, bufferedImage, searchResult.getFile());
         letterFileWriter.writeToFile();
     }
-    // TODO: Change the following methods in this commit to use 2D arrays, not BufferedImages
 
+    // TODO: Change the following methods in this commit to use 2D arrays, not BufferedImages
     private BufferedImage grabRealSub(BufferedImage original, ImageLetter imageLetter) {
         var sub = original.getSubimage(imageLetter.getX(), imageLetter.getY(), imageLetter.getWidth(), imageLetter.getHeight());
         return expandToWhite(original, sub, imageLetter);
