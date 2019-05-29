@@ -3,15 +3,19 @@ package com.uddernetworks.mspaint.code.execution;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class RunningCode {
 
     protected ThrowableRunnable runnable;
+    protected Future<?> future;
+    protected int exitCode = 0;
 
-    protected List<Runnable> success = new LinkedList<>();
+    protected List<Consumer<Integer>> success = new LinkedList<>();
     protected List<Consumer<String>> error = new LinkedList<>();
-    protected List<Consumer<Optional<String>>> any = new LinkedList<>();
+    protected List<BiConsumer<Integer, Optional<String>>> any = new LinkedList<>();
 
     /**
      * @param runnable The task that actually runs the code
@@ -30,21 +34,55 @@ public abstract class RunningCode {
      *
      * @return If code is being ran
      */
-    public abstract boolean isRunning();
+    public boolean isRunning() {
+        return this.future != null && !this.future.isDone();
+    }
 
     /**
      * Stops the execution of the code ran by, if it's still running.
      */
-    public abstract void stopExecution();
+    public void stopExecution() {
+        if (this.future != null) {
+            this.exitCode = -1;
+            this.future.cancel(true);
+        }
+    }
+
+    /**
+     * Sets the running future, used by the {@link RunningCodeManager}.
+     *
+     * @param future The future of the running code.
+     */
+    public void setRunningFuture(Future<?> future) {
+        this.future = future;
+    }
+
+    /**
+     * Gets the exit code of the program.
+     *
+     * @return The exit code
+     */
+    public int getExitCode() {
+        return this.exitCode;
+    }
+
+    /**
+     * Sets the exit code of the program.
+     *
+     * @param exitCode The exit code
+     */
+    public void setExitCode(int exitCode) {
+        this.exitCode = exitCode;
+    }
 
     /**
      * Executed after the code was successfully executed.
      *
-     * @param runnable The code to run
+     * @param exitCode The code to run, with the exit code
      * @return The current {@link RunningCode}
      */
-    public RunningCode afterSuccess(Runnable runnable) {
-        this.success.add(runnable);
+    public RunningCode afterSuccess(Consumer<Integer> exitCode) {
+        this.success.add(exitCode);
         return this;
     }
 
@@ -63,11 +101,11 @@ public abstract class RunningCode {
      * Executed after the code executed for any reason. If it stopped from errors or forcibly via
      * {@link RunningCode#stopExecution()}, a message will be present.
      *
-     * @param optionalMessage The code to run with the stop reason, if applicable
+     * @param exitCodeMessage The code to run with the exit code and stop reason, if applicable
      * @return The current {@link RunningCode}
      */
-    public RunningCode afterAll(Consumer<Optional<String>> optionalMessage) {
-        this.any.add(optionalMessage);
+    public RunningCode afterAll(BiConsumer<Integer, Optional<String>> exitCodeMessage) {
+        this.any.add(exitCodeMessage);
         return this;
     }
 }

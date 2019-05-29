@@ -146,11 +146,13 @@ public class StartupLogic {
 
             if (result.getCompletionStatus() == CompilationResult.Status.RUNNING) {
                 this.runningCodeManager.getRunningCode().ifPresentOrElse(runningCode -> {
-                    runningCode.afterAll(ignored -> {
+                    runningCode.afterAll((exitCode, ignored) -> {
                         LOGGER.info("Saving program output images...");
                         mainGUI.setStatusText("Saving program output images...");
 
                         imageOutputStream.saveImage();
+
+                        mainGUI.setStatusText("");
                     });
                 }, () -> LOGGER.error("Completion status is RUNNING however no RunningCode has been found..."));
             } else {

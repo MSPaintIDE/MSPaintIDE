@@ -103,7 +103,6 @@ public class JavaCodeManager {
 
     private void runIt(List<URLClassLoader> classLoaders, File classOutputFolder, String classPackage, String className) {
         try {
-            System.out.println("Running main in " + classPackage + " in " + className);
             classLoaders.add(new URLClassLoader(new URL[]{classOutputFolder.toURI().toURL()}));
 
             Class<?> thisClass = classLoaders.get(classLoaders.size() - 1).loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
@@ -124,7 +123,6 @@ public class JavaCodeManager {
 
     // TODO: Multi-thread this
     public CompilationResult compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
-        // Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>>
         reset();
         this.classOutputFolder = classOutputFolder;
         classOutputFolder.mkdirs();
@@ -140,8 +138,8 @@ public class JavaCodeManager {
         ConsoleManager.setAll(new PrintStream(compilerOut));
 
         long start = System.currentTimeMillis();
-        System.out.println("Compiling...");
 
+        info("Compiling...");
         mainGUI.setStatusText("Compiling...");
 
         List<JavaFileObject> filesList = new ArrayList<>();
@@ -162,8 +160,8 @@ public class JavaCodeManager {
             if (className.trim().endsWith("{"))
                 className = className.trim().substring(0, className.trim().length() - 1);
 
-            System.out.println("Class name = " + className);
-            System.out.println("Class package = " + classPackage);
+            info("Class name = " + className);
+            info("Class package = " + classPackage);
 
             namePackages.put(className, classPackage);
             imageClassHashMap.put(classPackage + "." + className, imageClass);
@@ -173,10 +171,10 @@ public class JavaCodeManager {
 
         compile(filesList, libs);
 
-        System.out.println("Compiled in " + (System.currentTimeMillis() - start) + "ms");
+        info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        System.out.println("Packaging jar...");
+        info("Packaging jar...");
         mainGUI.setStatusText("Packaging jar...");
 
         if (otherFiles != null) {
@@ -192,12 +190,12 @@ public class JavaCodeManager {
         FileJarrer fileJarrer = new FileJarrer(classOutputFolder, jarFile);
         fileJarrer.jarDirectory();
 
-        LOGGER.info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
+        info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
         if (!errors.isEmpty()) {
             for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {
                 for (Diagnostic<? extends JavaFileObject> error : errorList) {
-                    System.out.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
+                    info("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
                 }
             }
         }
@@ -211,7 +209,7 @@ public class JavaCodeManager {
             return new DefaultCompilationResult(abstractedErrors, CompilationResult.Status.COMPILE_COMPLETE);
         }
 
-        System.out.println("Executing...");
+        info("Executing...");
         mainGUI.setStatusText("Executing...");
         final var programStart = System.currentTimeMillis();
 
@@ -219,16 +217,18 @@ public class JavaCodeManager {
         runningCodeManager.runCode(new JavaRunningCode(() -> {
             ConsoleManager.setAll(programOut);
 
-            System.out.println("namePackages = " + namePackages);
             for (String className : namePackages.keySet()) {
-                System.out.println("className = " + className);
                 runIt(classLoaders, classOutputFolder, namePackages.get(className), className);
             }
-        }).afterSuccess(() -> {
-            System.out.println("Executed in " + (System.currentTimeMillis() - programStart) + "ms");
+        }).afterSuccess(exitCode -> {
+            if (exitCode < 0) {
+                info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");
+            } else {
+                info("Executed " + (exitCode > 0 ? "with errors " : "") + "in " + (System.currentTimeMillis() - programStart) + "ms");
+            }
         }).afterError(message -> {
-            System.out.println("Program stopped for the reason: " + message);
-        }).afterAll(ignored -> {
+            info("Program stopped for the reason: " + message);
+        }).afterAll((exitCode, ignored) -> {
             try {
                 mainGUI.setStatusText("");
 
@@ -245,6 +245,10 @@ public class JavaCodeManager {
         return new DefaultCompilationResult(abstractedErrors, CompilationResult.Status.RUNNING);
     }
 
+    private void info(String message) {
+        LOGGER.info(message);
+        System.out.println(message);
+    }
 
     private static void copyFolder(File src, File dest) throws IOException {
         if (src.isDirectory()) {

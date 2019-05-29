@@ -193,7 +193,7 @@
                                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                        </padding>
                                     </FlowPane>
-                                              <JFXButton fx:id="start" buttonType="RAISED" layoutX="10.0" layoutY="124.0" prefHeight="30" prefWidth="150.0" text="Start">
+                                              <JFXButton fx:id="startStop" buttonType="RAISED" layoutX="10.0" layoutY="124.0" prefHeight="30" prefWidth="150.0" text="Start">
                                                   <cursor>
                                                       <Cursor fx:constant="HAND" />
                                                   </cursor>

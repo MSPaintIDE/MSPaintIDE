@@ -1,6 +1,9 @@
 package com.uddernetworks.mspaint.code.execution;
 
 import com.uddernetworks.mspaint.main.StartupLogic;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +20,8 @@ public class GeneralRunningCodeManager implements RunningCodeManager {
     private ExecutorService executor = Executors.newCachedThreadPool();
     private StartupLogic startupLogic;
 
+    private StringProperty boundText = new SimpleStringProperty("Start");
+
     public GeneralRunningCodeManager(StartupLogic startupLogic) {
         this.startupLogic = startupLogic;
     }
@@ -26,12 +31,15 @@ public class GeneralRunningCodeManager implements RunningCodeManager {
         var currentRunning = this.currentlyRunning.get();
         if (currentRunning != null && currentRunning.isRunning()) {
             LOGGER.info("Code already running, so terminating its execution.");
-            this.currentlyRunning.get().stopExecution();
+            stopRunning();
         }
 
-        this.currentlyRunning.set(runningCode);
-        this.executor.execute(runningCode::runCode);
+        runningCode.afterAll((exitCode, optMessage) -> Platform.runLater(() -> this.boundText.set("Start")));
 
+        this.currentlyRunning.set(runningCode);
+        var future = this.executor.submit(runningCode::runCode);
+        runningCode.setRunningFuture(future);
+        this.boundText.set("Stop");
     }
 
     @Override
@@ -41,7 +49,17 @@ public class GeneralRunningCodeManager implements RunningCodeManager {
     }
 
     @Override
+    public boolean isRunning() {
+        return getRunningCode().map(RunningCode::isRunning).orElse(false);
+    }
+
+    @Override
     public Optional<RunningCode> getRunningCode() {
         return Optional.ofNullable(currentlyRunning.get());
+    }
+
+    @Override
+    public void bindStartButton(StringProperty startStopText) {
+        this.boundText.bindBidirectional(startStopText);
     }
 }

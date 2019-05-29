@@ -13,11 +13,12 @@ public class JavaRunningCode extends RunningCode {
 
     @Override
     public void runCode() {
+        setExitCode(0);
         String message = null;
 
         try {
             this.runnable.run();
-            this.success.forEach(Runnable::run);
+            this.success.forEach(exitCode -> exitCode.accept(getExitCode()));
         } catch (Exception e) {
             e.printStackTrace();
             message = e.getLocalizedMessage();
@@ -25,16 +26,6 @@ public class JavaRunningCode extends RunningCode {
         }
 
         var optionalUsing = Optional.ofNullable(message);
-        this.any.forEach(consumer -> consumer.accept(optionalUsing));
-    }
-
-    @Override
-    public boolean isRunning() {
-        return false;
-    }
-
-    @Override
-    public void stopExecution() {
-
+        this.any.forEach(consumer -> consumer.accept(getExitCode(), optionalUsing));
     }
 }
