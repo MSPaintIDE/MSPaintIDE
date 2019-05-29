@@ -1,9 +1,10 @@
 package com.uddernetworks.mspaint.main;
 
-import com.uddernetworks.mspaint.code.GeneralRunningCodeManager;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.OverrideExecute;
-import com.uddernetworks.mspaint.code.RunningCodeManager;
+import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.GeneralRunningCodeManager;
+import com.uddernetworks.mspaint.code.execution.RunningCodeManager;
 import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
@@ -141,16 +142,27 @@ public class StartupLogic {
         Map<ImageClass, List<LanguageError>> errors = null;
 
         try {
-            errors = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, overrideExecute);
+            var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, overrideExecute);
 
-            LOGGER.info("Highlighting Angry Squiggles...");
-            mainGUI.setStatusText("Highlighting Angry Squiggles...");
+            if (result.getCompletionStatus() == CompilationResult.Status.RUNNING) {
+                this.runningCodeManager.getRunningCode().ifPresentOrElse(runningCode -> {
+                    runningCode.afterAll(ignored -> {
+                        LOGGER.info("Saving program output images...");
+                        mainGUI.setStatusText("Saving program output images...");
 
-            for (ImageClass imageClass : errors.keySet()) {
-                AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1/6D, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
-                highlighter.highlightAngrySquiggles();
+                        imageOutputStream.saveImage();
+                    });
+                }, () -> LOGGER.error("Completion status is RUNNING however no RunningCode has been found..."));
+            } else {
+                errors = result.getErrors();
+                LOGGER.info("Highlighting Angry Squiggles...");
+                mainGUI.setStatusText("Highlighting Angry Squiggles...");
+
+                for (ImageClass imageClass : errors.keySet()) {
+                    AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1 / 6D, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
+                    highlighter.highlightAngrySquiggles();
+                }
             }
-
         } catch (TranscoderException e) {
             e.printStackTrace();
         } finally {
@@ -171,10 +183,9 @@ public class StartupLogic {
 
             LOGGER.info("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms" + append);
 
-            LOGGER.info("Saving output images...");
-            mainGUI.setStatusText("Saving output images...");
+            LOGGER.info("Saving compiler output images...");
+            mainGUI.setStatusText("Saving compiler output images...");
 
-            imageOutputStream.saveImage();
             compilerOutputStream.saveImage();
 
             mainGUI.setStatusText(null);

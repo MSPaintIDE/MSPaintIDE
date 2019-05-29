@@ -2,9 +2,10 @@ package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.OverrideExecute;
+import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
-import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -16,8 +17,10 @@ import org.slf4j.LoggerFactory;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class JavaLanguage extends Language {
 
@@ -97,23 +100,23 @@ public class JavaLanguage extends Language {
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
         var imageClassesOptional = indexFiles();
         if (imageClassesOptional.isEmpty()) {
             LOGGER.error("Error while finding ImageClasses, aborting...");
-            return Collections.emptyMap();
+            return new DefaultCompilationResult(Collections.emptyMap(), CompilationResult.Status.COMPILE_COMPLETE);
         }
 
         return compileAndExecute(mainGUI, imageClassesOptional.get(), imageOutputStream, compilerStream);
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
         return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, OverrideExecute.DEFAULT);
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException {
         var jarFile = this.settings.<File>getSetting(JavaOptions.JAR);
         var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaOptions.LIBRARY_LOCATION);
         var otherFilesOptional = this.settings.<File>getSettingOptional(JavaOptions.OTHER_LOCATION);
@@ -133,11 +136,7 @@ public class JavaLanguage extends Language {
             }
         });
 
-        return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFilesOptional.orElse(null), classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute)
-                .entrySet()
-                .stream()
-                .map(t -> new AbstractMap.SimpleEntry<ImageClass, List<LanguageError>>(t.getKey(), t.getValue().stream().map(JavaError::new).collect(Collectors.toList())))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFilesOptional.orElse(null), classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute);
     }
 
     @Override

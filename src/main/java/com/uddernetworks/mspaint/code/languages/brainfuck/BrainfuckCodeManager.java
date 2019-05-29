@@ -1,6 +1,8 @@
 package com.uddernetworks.mspaint.code.languages.brainfuck;
 
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -14,7 +16,8 @@ import java.util.Map;
 
 public class BrainfuckCodeManager {
 
-    public Map<ImageClass, List<LanguageError>> executeCode(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
+    // TODO: Multi-thread this with the CodeRunner API, and use the ConsoleManager
+    public CompilationResult executeCode(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
         Map<ImageClass, List<LanguageError>> errors = new HashMap<>();
 
         PrintStream imageOut = new PrintStream(imageOutputStream);
@@ -44,7 +47,7 @@ public class BrainfuckCodeManager {
                 compilerOut.println("Completed in " + (System.currentTimeMillis() - start));
 
                 System.setOut(oldPS);
-                return errors;
+                return new DefaultCompilationResult(errors, CompilationResult.Status.COMPILE_COMPLETE);
             }
 
             compilerOut.println("Executing...");
@@ -60,7 +63,7 @@ public class BrainfuckCodeManager {
             mainGUI.setStatusText("");
         }
 
-        return errors;
+        return new DefaultCompilationResult(errors, CompilationResult.Status.COMPILE_COMPLETE);
     }
 
     private void execute(String code) {

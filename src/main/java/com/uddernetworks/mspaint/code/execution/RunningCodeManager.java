@@ -1,4 +1,6 @@
-package com.uddernetworks.mspaint.code;
+package com.uddernetworks.mspaint.code.execution;
+
+import java.util.Optional;
 
 public interface RunningCodeManager {
 
@@ -13,4 +15,11 @@ public interface RunningCodeManager {
      * Stops any code running from the IDE
      */
     void stopRunning();
+
+    /**
+     * Gets the actively running {@link RunningCode} if existent
+     *
+     * @return The current {@link RunningCode}
+     */
+    Optional<RunningCode> getRunningCode();
 }

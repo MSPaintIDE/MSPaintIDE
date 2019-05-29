@@ -2,9 +2,10 @@ package com.uddernetworks.mspaint.code.languages.brainfuck;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.OverrideExecute;
+import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
-import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -17,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class BrainfuckLanguage extends Language {
@@ -98,23 +98,23 @@ public class BrainfuckLanguage extends Language {
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
         var imageClassesOptional = indexFiles();
         if (imageClassesOptional.isEmpty()) {
             LOGGER.error("Error while finding ImageClasses, aborting...");
-            return Collections.emptyMap();
+            return new DefaultCompilationResult(Collections.emptyMap(), CompilationResult.Status.COMPILE_COMPLETE);
         }
 
         return compileAndExecute(mainGUI, imageClassesOptional.get(), imageOutputStream, compilerStream);
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
         return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, OverrideExecute.DEFAULT);
     }
 
     @Override
-    public Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) {
         return this.codeManager.executeCode(mainGUI, imageClasses, imageOutputStream, compilerStream);
     }
 

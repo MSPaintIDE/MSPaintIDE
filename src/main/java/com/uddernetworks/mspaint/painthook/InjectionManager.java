@@ -84,10 +84,12 @@ public class InjectionManager {
     }
 
     private void clickRun() {
-        System.out.println("Run");
+        LOGGER.info("Running...");
+        this.mainGUI.fullCompile(OverrideExecute.DEFAULT);
     }
 
     private void clickStop() {
+        // TODO: Stop
         System.out.println("Stop");
     }
 
@@ -110,6 +112,6 @@ public class InjectionManager {
     }
 
     private void clickPull() {
-
+        LOGGER.error("How did you even do this?");
     }
 }

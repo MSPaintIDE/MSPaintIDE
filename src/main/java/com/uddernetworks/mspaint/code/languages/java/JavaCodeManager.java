@@ -2,6 +2,10 @@ package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.code.FileJarrer;
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
+import com.uddernetworks.mspaint.code.languages.LanguageError;
+import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import org.slf4j.Logger;
@@ -20,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -117,7 +122,9 @@ public class JavaCodeManager {
         this.classLoaders.clear();
     }
 
-    public Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
+    // TODO: Multi-thread this
+    public CompilationResult compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
+        // Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>>
         reset();
         this.classOutputFolder = classOutputFolder;
         classOutputFolder.mkdirs();
@@ -126,15 +133,14 @@ public class JavaCodeManager {
             file.delete();
         }
 
-        PrintStream imageOut = new PrintStream(imageOutputStream);
-        PrintStream compilerOut = new PrintStream(compilerStream);
         compilerStream.changeColor(Color.RED);
+        PrintStream compilerOut = new PrintStream(compilerStream);
+        PrintStream programOut = new PrintStream(imageOutputStream);
 
-        PrintStream oldPS = System.out;
-        System.setOut(imageOut);
+        ConsoleManager.setAll(new PrintStream(compilerOut));
 
         long start = System.currentTimeMillis();
-        compilerOut.println("Compiling...");
+        System.out.println("Compiling...");
 
         mainGUI.setStatusText("Compiling...");
 
@@ -153,10 +159,11 @@ public class JavaCodeManager {
                 }
             }
 
-            if (className.trim().endsWith("{")) className = className.trim().substring(0, className.trim().length() - 1);
+            if (className.trim().endsWith("{"))
+                className = className.trim().substring(0, className.trim().length() - 1);
 
-            compilerOut.println("Class name = " + className);
-            compilerOut.println("Class package = " + classPackage);
+            System.out.println("Class name = " + className);
+            System.out.println("Class package = " + classPackage);
 
             namePackages.put(className, classPackage);
             imageClassHashMap.put(classPackage + "." + className, imageClass);
@@ -166,10 +173,10 @@ public class JavaCodeManager {
 
         compile(filesList, libs);
 
-        compilerOut.println("Compiled in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        compilerOut.println("Packaging jar...");
+        System.out.println("Packaging jar...");
         mainGUI.setStatusText("Packaging jar...");
 
         if (otherFiles != null) {
@@ -190,43 +197,52 @@ public class JavaCodeManager {
         if (!errors.isEmpty()) {
             for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {
                 for (Diagnostic<? extends JavaFileObject> error : errorList) {
-                    compilerOut.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
+                    System.out.println("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
                 }
             }
         }
 
+        var abstractedErrors = errors.entrySet()
+                .stream()
+                .map(t -> new AbstractMap.SimpleEntry<ImageClass, List<LanguageError>>(t.getKey(), t.getValue().stream().map(JavaError::new).collect(Collectors.toList())))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+
         if (!execute) {
-            System.setOut(oldPS);
-            return errors;
+            return new DefaultCompilationResult(abstractedErrors, CompilationResult.Status.COMPILE_COMPLETE);
         }
 
-        compilerOut.println("Executing...");
+        System.out.println("Executing...");
         mainGUI.setStatusText("Executing...");
-        start = System.currentTimeMillis();
+        final var programStart = System.currentTimeMillis();
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new JavaRunningCode(() -> {
+            ConsoleManager.setAll(programOut);
 
+            System.out.println("namePackages = " + namePackages);
+            for (String className : namePackages.keySet()) {
+                System.out.println("className = " + className);
+                runIt(classLoaders, classOutputFolder, namePackages.get(className), className);
+            }
+        }).afterSuccess(() -> {
+            System.out.println("Executed in " + (System.currentTimeMillis() - programStart) + "ms");
+        }).afterError(message -> {
+            System.out.println("Program stopped for the reason: " + message);
+        }).afterAll(ignored -> {
+            try {
+                mainGUI.setStatusText("");
+
+                for (URLClassLoader classLoader : this.classLoaders) {
+                    classLoader.close();
+                }
+
+                this.classLoaders.clear();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }));
-        System.out.println("namePackages = " + namePackages);
-        for (String className : namePackages.keySet()) {
-            System.out.println("className = " + className);
-            runIt(classLoaders, classOutputFolder, namePackages.get(className), className);
-        }
 
-        System.setOut(oldPS);
-
-        compilerOut.println("Executed in " + (System.currentTimeMillis() - start) + "ms");
-
-        mainGUI.setStatusText("");
-
-        for (URLClassLoader classLoader : this.classLoaders) {
-            classLoader.close();
-        }
-
-        this.classLoaders.clear();
-
-        return errors;
+        return new DefaultCompilationResult(abstractedErrors, CompilationResult.Status.RUNNING);
     }
 
 

@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.code.languages;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.OverrideExecute;
+import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
@@ -14,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public abstract class Language {
@@ -130,7 +130,7 @@ public abstract class Language {
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
      */
-    public abstract Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException;
+    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException;
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
@@ -140,7 +140,7 @@ public abstract class Language {
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
      */
-    public abstract Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException;
+    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException;
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
@@ -151,7 +151,7 @@ public abstract class Language {
      * @param executeOverride The policy for executing or not
      * @throws IOException If an IO Exception occurs
      */
-    public abstract Map<ImageClass, List<LanguageError>> compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException;
+    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException;
 
     /**
      * Intended for internal use only.
