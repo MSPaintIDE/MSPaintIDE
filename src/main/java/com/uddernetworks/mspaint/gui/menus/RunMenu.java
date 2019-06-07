@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.gui.menus;
 
-import com.uddernetworks.mspaint.code.OverrideExecute;
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.gui.BindItem;
 import com.uddernetworks.mspaint.gui.MenuBind;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -18,7 +18,7 @@ public class RunMenu extends MenuBind {
     @BindItem(label = "run")
     public void onClickRun() {
         LOGGER.info("Running...");
-        this.mainGUI.fullCompile(OverrideExecute.DEFAULT);
+        this.mainGUI.fullCompile(BuildSettings.DEFAULT);
     }
 
     @BindItem(label = "stop")
@@ -36,6 +36,6 @@ public class RunMenu extends MenuBind {
             return;
         }
 
-        this.mainGUI.fullCompile(OverrideExecute.DONT_EXECUTE);
+        this.mainGUI.fullCompile(BuildSettings.DONT_EXECUTE);
     }
 }

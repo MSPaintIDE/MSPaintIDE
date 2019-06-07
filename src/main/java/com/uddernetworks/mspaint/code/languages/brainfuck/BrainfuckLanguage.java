@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.brainfuck;
 
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
@@ -110,11 +110,11 @@ public class BrainfuckLanguage extends Language {
 
     @Override
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
-        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, OverrideExecute.DEFAULT);
+        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, BuildSettings.DEFAULT);
     }
 
     @Override
-    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) {
         return this.codeManager.executeCode(mainGUI, imageClasses, imageOutputStream, compilerStream);
     }
 

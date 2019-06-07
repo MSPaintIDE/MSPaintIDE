@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
@@ -112,11 +112,11 @@ public class JavaLanguage extends Language {
 
     @Override
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
-        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, OverrideExecute.DEFAULT);
+        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, BuildSettings.DEFAULT);
     }
 
     @Override
-    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException {
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException {
         var jarFile = this.settings.<File>getSetting(JavaOptions.JAR);
         var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaOptions.LIBRARY_LOCATION);
         var otherFilesOptional = this.settings.<File>getSettingOptional(JavaOptions.OTHER_LOCATION);

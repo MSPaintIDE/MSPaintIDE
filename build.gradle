@@ -63,10 +63,6 @@ configurations {
 
 dependencies {
     compile group: 'com.intellij', name: 'forms_rt', version:'7.0.3'
-//    compile(group: 'org.apache.tika', name: 'tika-parsers', version:'1.20') {
-//        exclude(module: 'jhighlight')
-//    }
-
     compile group: 'org.codelibs', name: 'jhighlight', version:'1.0.3'
 
     compile group: 'com.jfoenix', name: 'jfoenix', version: '9.0.8-J12'
@@ -85,6 +81,14 @@ dependencies {
     javafxCompile "org.openjfx:javafx-graphics:12.0.1:win"
     javafxCompile "org.openjfx:javafx-controls:12.0.1:win"
     javafxCompile "org.openjfx:javafx-fxml:12.0.1:win"
+
+    // Local dependency from https://github.com/MSPaintIDE/PaintAssistant
+    compile ('com.uddernetworks.paintassist:PaintAssistant:1.0-SNAPSHOT') {
+        exclude group: 'com.google.auto.value'
+    }
+
+    compile             "com.google.auto.value:auto-value-annotations:1.6.2"
+    annotationProcessor "com.google.auto.value:auto-value:1.6.2"
 
     compile configurations.javafxCompile
 }

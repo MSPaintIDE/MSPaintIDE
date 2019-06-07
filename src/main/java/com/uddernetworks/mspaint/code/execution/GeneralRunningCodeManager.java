@@ -39,7 +39,7 @@ public class GeneralRunningCodeManager implements RunningCodeManager {
         this.currentlyRunning.set(runningCode);
         var future = this.executor.submit(runningCode::runCode);
         runningCode.setRunningFuture(future);
-        this.boundText.set("Stop");
+        Platform.runLater(() -> this.boundText.set("Stop"));
     }
 
     @Override

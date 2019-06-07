@@ -1,9 +1,9 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
-import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.git.GitController;
@@ -132,6 +132,12 @@ public class MainGUI extends Application implements Initializable {
 
     @FXML
     private MenuBar menu;
+
+    @FXML
+    private ImageView profilePicture;
+
+    @FXML
+    private Label profileName;
 
     private StartupLogic startupLogic;
     private Stage primaryStage;
@@ -422,7 +428,7 @@ public class MainGUI extends Application implements Initializable {
         return this.primaryStage.getScene().getStylesheets();
     }
 
-    public void fullCompile(OverrideExecute executeOverride) {
+    public void fullCompile(BuildSettings executeOverride) {
         try {
             var language = this.startupLogic.getCurrentLanguage();
             if (getCurrentLanguage() == null) {
@@ -543,6 +549,14 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
+    public void setProfilePicture(String url) {
+        profilePicture.setImage(url == null ? null : new Image(url));
+    }
+
+    public void setProfileNameText(String text) {
+        this.profileName.setText(text);
+    }
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -583,7 +597,7 @@ public class MainGUI extends Application implements Initializable {
                 LOGGER.info("Stopping current running program...");
                 codeManager.stopRunning();
             } else {
-                fullCompile(OverrideExecute.DEFAULT);
+                fullCompile(BuildSettings.DEFAULT);
             }
         });
 

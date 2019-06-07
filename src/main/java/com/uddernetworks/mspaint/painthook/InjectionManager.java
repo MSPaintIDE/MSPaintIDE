@@ -1,6 +1,6 @@
 package com.uddernetworks.mspaint.painthook;
 
-import com.uddernetworks.mspaint.code.OverrideExecute;
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.gui.window.UserInputWindow;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
@@ -77,7 +77,7 @@ public class InjectionManager {
                 LOGGER.error("The selected language does not support building.");
                 return;
             }
-            this.mainGUI.fullCompile(OverrideExecute.DONT_EXECUTE);
+            this.mainGUI.fullCompile(BuildSettings.DONT_EXECUTE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -85,7 +85,7 @@ public class InjectionManager {
 
     private void clickRun() {
         LOGGER.info("Running...");
-        this.mainGUI.fullCompile(OverrideExecute.DEFAULT);
+        this.mainGUI.fullCompile(BuildSettings.DEFAULT);
     }
 
     private void clickStop() {

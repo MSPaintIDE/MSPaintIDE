@@ -3,88 +3,114 @@
 <?import com.jfoenix.controls.*?>
 <?import com.uddernetworks.mspaint.gui.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
 <AnchorPane fx:id="rootAnchor" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <VBox styleClass="vbox-theme" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <MenuBar fx:id="menu" id="menu" styleClass="menubar-theme">
-              <menus>
-                <MaterialMenu bindClass="FileMenu" text="File">
-                  <items>
-                    <MaterialMenu bindClass="FileMenu" clickLabel="new" text="New">
+            <GridPane>
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                      <MenuBar id="menu" fx:id="menu" styleClass="menubar-theme">
+                    <menus>
+                      <MaterialMenu bindClass="FileMenu" text="File">
                         <items>
-                            <MaterialMenuItem clickLabel="project" text="Project" />
-                            <MaterialMenuItem clickLabel="image-file" text="Image File" />
-                            <MaterialMenuItem clickLabel="text-file" text="Text File" />
+                          <MaterialMenu bindClass="FileMenu" clickLabel="new" text="New">
+                              <items>
+                                  <MaterialMenuItem clickLabel="project" text="Project" />
+                                  <MaterialMenuItem clickLabel="image-file" text="Image File" />
+                                  <MaterialMenuItem clickLabel="text-file" text="Text File" />
+                              </items>
+                          </MaterialMenu>
+                            <MaterialMenu bindClass="FileMenu" clickLabel="open" text="Open">
+                                <items>
+                                    <MaterialMenuItem clickLabel="project" text="Project" />
+                                    <MaterialMenuItem clickLabel="file" text="File" />
+                                </items>
+                            </MaterialMenu>
+                          <MaterialMenuItem clickLabel="settings" text="Settings" />
+                          <MaterialMenuItem clickLabel="print" text="Print" />
+                          <MaterialMenuItem clickLabel="close-project" text="Close Project" />
+                          <MaterialMenuItem clickLabel="exit" text="Exit" />
                         </items>
-                    </MaterialMenu>
-                      <MaterialMenu bindClass="FileMenu" clickLabel="open" text="Open">
+                      </MaterialMenu>
+                      <MaterialMenu bindClass="EditMenu" text="Edit">
+                        <items>
+                          <MaterialMenuItem clickLabel="find" text="Find" />
+                          <MaterialMenuItem clickLabel="replace" text="Replace" />
+                          <MaterialMenuItem clickLabel="inspect" text="Inspect" />
+                        </items>
+                      </MaterialMenu>
+                      <MaterialMenu bindClass="OCRMenu" text="OCR">
+                        <items>
+                          <MaterialMenuItem clickLabel="settings" text="Settings" />
+                          <MaterialMenuItem clickLabel="train" text="Train" />
+                          <MaterialMenuItem clickLabel="generate" text="Generate" />
+                        </items>
+                      </MaterialMenu>
+                      <MaterialMenu bindClass="RunMenu" text="Run">
+                        <items>
+                          <MaterialMenuItem clickLabel="run" text="Run" />
+                          <MaterialMenuItem clickLabel="stop" text="Stop" />
+                          <MaterialMenuItem clickLabel="build" text="Build" />
+                        </items>
+                      </MaterialMenu>
+                      <MaterialMenu bindClass="GitMenu" text="Git">
+                        <items>
+                          <MaterialMenuItem clickLabel="create-repo" text="Create Repo" />
+                          <MaterialMenuItem clickLabel="add-files" text="Add Files" />
+                          <MaterialMenuItem clickLabel="push" text="Push" />
+                          <MaterialMenuItem clickLabel="add-remote" text="Add Remote" />
+                          <MaterialMenuItem clickLabel="commit" text="Commit" />
+                        </items>
+                      </MaterialMenu>
+                      <MaterialMenu bindClass="InjectMenu" text="Inject">
                           <items>
-                              <MaterialMenuItem clickLabel="project" text="Project" />
-                              <MaterialMenuItem clickLabel="file" text="File" />
+                              <MaterialMenuItem clickLabel="settings" text="Settings" />
+                              <MaterialMenuItem clickLabel="select-process" text="Select Process" />
+                              <MaterialMenuItem clickLabel="process-id" text="Manual Process ID" />
                           </items>
                       </MaterialMenu>
-                    <MaterialMenuItem clickLabel="settings" text="Settings" />
-                    <MaterialMenuItem clickLabel="print" text="Print" />
-                    <MaterialMenuItem clickLabel="close-project" text="Close Project" />
-                    <MaterialMenuItem clickLabel="exit" text="Exit" />
-                  </items>
-                </MaterialMenu>
-                <MaterialMenu bindClass="EditMenu" text="Edit">
-                  <items>
-                    <MaterialMenuItem clickLabel="find" text="Find" />
-                    <MaterialMenuItem clickLabel="replace" text="Replace" />
-                    <MaterialMenuItem clickLabel="inspect" text="Inspect" />
-                  </items>
-                </MaterialMenu>
-                <MaterialMenu bindClass="OCRMenu" text="OCR">
-                  <items>
-                    <MaterialMenuItem clickLabel="settings" text="Settings" />
-                    <MaterialMenuItem clickLabel="train" text="Train" />
-                    <MaterialMenuItem clickLabel="generate" text="Generate" />
-                  </items>
-                </MaterialMenu>
-                <MaterialMenu bindClass="RunMenu" text="Run">
-                  <items>
-                    <MaterialMenuItem clickLabel="run" text="Run" />
-                    <MaterialMenuItem clickLabel="stop" text="Stop" />
-                    <MaterialMenuItem clickLabel="build" text="Build" />
-                  </items>
-                </MaterialMenu>
-                <MaterialMenu bindClass="GitMenu" text="Git">
-                  <items>
-                    <MaterialMenuItem clickLabel="create-repo" text="Create Repo" />
-                    <MaterialMenuItem clickLabel="add-files" text="Add Files" />
-                    <MaterialMenuItem clickLabel="push" text="Push" />
-                    <MaterialMenuItem clickLabel="add-remote" text="Add Remote" />
-                    <MaterialMenuItem clickLabel="commit" text="Commit" />
-                  </items>
-                </MaterialMenu>
-                  <MaterialMenu bindClass="InjectMenu" text="Inject">
-                      <items>
-                          <MaterialMenuItem clickLabel="settings" text="Settings" />
-                          <MaterialMenuItem clickLabel="select-process" text="Select Process" />
-                          <MaterialMenuItem clickLabel="process-id" text="Manual Process ID" />
-                      </items>
-                  </MaterialMenu>
-                <MaterialMenu bindClass="HelpMenu" text="Help">
-                  <items>
-                    <MaterialMenuItem clickLabel="help" text="Help" />
-                    <MaterialMenuItem clickLabel="source" text="Source" />
-                    <MaterialMenuItem clickLabel="submit-a-bug" text="Submit A Bug" />
-                    <MaterialMenuItem clickLabel="donate" text="Donate" />
-                    <MaterialMenuItem clickLabel="discord" text="Join our Discord" />
-                  </items>
-                </MaterialMenu>
-              </menus>
-            </MenuBar>
+                      <MaterialMenu bindClass="AssistantMenu" text="Assistant">
+                          <items>
+                              <MaterialMenuItem clickLabel="login" text="Log in" />
+                              <MaterialMenuItem clickLabel="logout" text="Log out" />
+                              <MaterialMenuItem clickLabel="help" text="Help" />
+                          </items>
+                      </MaterialMenu>
+                      <MaterialMenu bindClass="HelpMenu" text="Help">
+                        <items>
+                          <MaterialMenuItem clickLabel="help" text="Help" />
+                          <MaterialMenuItem clickLabel="source" text="Source" />
+                          <MaterialMenuItem clickLabel="submit-a-bug" text="Submit A Bug" />
+                          <MaterialMenuItem clickLabel="donate" text="Donate" />
+                          <MaterialMenuItem clickLabel="discord" text="Join our Discord" />
+                        </items>
+                      </MaterialMenu>
+                    </menus>
+                  </MenuBar>
+                  <ImageView fx:id="profilePicture" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2">
+                     <GridPane.margin>
+                        <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
+                     </GridPane.margin>
+                  </ImageView>
+                  <Label fx:id="profileName" alignment="CENTER_RIGHT" prefWidth="1000.0" styleClass="theme-text" textAlignment="RIGHT" GridPane.columnIndex="1">
+                     <GridPane.margin>
+                        <Insets right="5.0" />
+                     </GridPane.margin></Label>
+               </children>
+            </GridPane>
               <GridPane fx:id="test" maxWidth="99999.0" minWidth="500.0" styleClass="gridpane-theme" VBox.vgrow="ALWAYS">
                   <columnConstraints>
                       <ColumnConstraints hgrow="NEVER" maxWidth="500.0" minWidth="10.0" prefWidth="500.0" />

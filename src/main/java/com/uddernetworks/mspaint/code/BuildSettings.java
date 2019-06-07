@@ -1,5 +1,5 @@
 package com.uddernetworks.mspaint.code;
 
-public enum OverrideExecute {
+public enum BuildSettings {
     EXECUTE, DONT_EXECUTE, DEFAULT
 }

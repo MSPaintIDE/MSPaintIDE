@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.GeneralRunningCodeManager;
 import com.uddernetworks.mspaint.code.execution.RunningCodeManager;
@@ -20,6 +20,8 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
+import com.uddernetworks.paintassist.DefaultPaintAssist;
+import com.uddernetworks.paintassist.PaintAssist;
 import org.apache.batik.transcoder.TranscoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,7 @@ public class StartupLogic {
     private Language currentLanguage;
     private RunningCodeManager runningCodeManager;
     private OCRManager ocrManager;
+    private PaintAssist paintAssist;
 
     private CenterPopulator centerPopulator;
 
@@ -74,6 +77,7 @@ public class StartupLogic {
         this.runningCodeManager = new GeneralRunningCodeManager(this);
 
         new InjectionManager(mainGUI, this).createHooks();
+        this.paintAssist = new DefaultPaintAssist();
     }
 
     public void headlessStart() throws IOException {
@@ -124,7 +128,7 @@ public class StartupLogic {
     }
 
     // TODO: Move to different class?
-    public void compile(List<ImageClass> imageClasses, OverrideExecute overrideExecute) throws IOException {
+    public void compile(List<ImageClass> imageClasses, BuildSettings buildSettings) throws IOException {
         long start = System.currentTimeMillis();
 
         if (this.currentLanguage.isInterpreted()) {
@@ -142,7 +146,7 @@ public class StartupLogic {
         Map<ImageClass, List<LanguageError>> errors = null;
 
         try {
-            var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, overrideExecute);
+            var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, buildSettings);
 
             if (result.getCompletionStatus() == CompilationResult.Status.RUNNING) {
                 this.runningCodeManager.getRunningCode().ifPresentOrElse(runningCode -> {
@@ -254,6 +258,10 @@ public class StartupLogic {
 
     public CenterPopulator getCenterPopulator() {
         return centerPopulator;
+    }
+
+    public PaintAssist getPaintAssist() {
+        return paintAssist;
     }
 
     public String getFontName() {

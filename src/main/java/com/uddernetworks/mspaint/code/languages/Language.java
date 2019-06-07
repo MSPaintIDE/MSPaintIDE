@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.code.languages;
 
+import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.code.OverrideExecute;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -151,7 +151,7 @@ public abstract class Language {
      * @param executeOverride The policy for executing or not
      * @throws IOException If an IO Exception occurs
      */
-    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, OverrideExecute executeOverride) throws IOException;
+    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException;
 
     /**
      * Intended for internal use only.
