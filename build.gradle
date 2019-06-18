@@ -62,6 +62,7 @@ configurations {
 }
 
 dependencies {
+    // TODO: Clean this monstrosity of shit
     compile group: 'com.intellij', name: 'forms_rt', version:'7.0.3'
     compile group: 'org.codelibs', name: 'jhighlight', version:'1.0.3'
 
@@ -89,6 +90,8 @@ dependencies {
 
     compile             "com.google.auto.value:auto-value-annotations:1.6.2"
     annotationProcessor "com.google.auto.value:auto-value:1.6.2"
+
+    compile 'org.eclipse.lsp4j:org.eclipse.lsp4j:0.7.2'
 
     compile configurations.javafxCompile
 }
