@@ -27,7 +27,7 @@ Compression=lzma
 SolidCompression=yes
 ChangesAssociations=yes
 SetupIconFile="@icon.directory@\icon.ico"
-UninstallDisplayIcon="{app}\icon.ico"
+UninstallDisplayIcon="{app}\MSPaintIDE.ico"
 WizardSmallImageFile={#InstLogoDir}\small-logo-55.bmp,{#InstLogoDir}\small-logo-64.bmp,{#InstLogoDir}\small-logo-97.bmp,{#InstLogoDir}\small-logo-110.bmp,{#InstLogoDir}\small-logo-120.bmp,{#InstLogoDir}\small-logo-140.bmp
 
 [Types]
@@ -64,10 +64,10 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 Type: filesandordirs; Name: "{localappdata}\MSPaintIDE"
 
 [Registry]
-Root: HKLM; Subkey: "Software\Classes\.ppf"; ValueType: string; ValueName: ""; ValueData: "MSPaintIDE"; Flags: uninsdeletevalue; Components: ppf_file
-Root: HKLM; Subkey: "Software\Classes\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "MS Paint IDE"; Flags: uninsdeletekey; Components: ppf_file
-Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\icon.ico"; Components: ppf_file
-Root: HKLM; Subkey: "Software\Classes\MSPaintIDE\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Components: ppf_file
+Root: HKCR; Subkey: ".ppf"; ValueType: string; ValueName: ""; ValueData: "MSPaintIDE"; Flags: uninsdeletevalue; Components: ppf_file
+Root: HKCR; Subkey: "MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "MS Paint IDE"; Flags: uninsdeletekey; Components: ppf_file
+Root: HKCR; Subkey: "MSPaintIDE\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\MSPaintIDE.ico"; Components: ppf_file
+Root: HKCR; Subkey: "MSPaintIDE\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Components: ppf_file
 
 Root: HKCR; Subkey: "*\shell\MSPaintIDE"; ValueType: string; ValueName: ""; ValueData: "Edit with MS Paint IDE"; Components: context_menu
 Root: HKCR; Subkey: "*\shell\MSPaintIDE\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; Components: context_menu

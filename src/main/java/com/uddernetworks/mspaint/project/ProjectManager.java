@@ -112,8 +112,9 @@ public class ProjectManager {
             // TODO: Clean up
 
             var json = gson.toJson(ppfProject);
-//            System.out.println(json);
+            System.out.println(json);
             var file = ppfProject.getFile();
+            System.out.println("file = " + file);
 
             try (var writer = new FileWriter(file)) {
                 IOUtils.write(json, writer);
@@ -127,7 +128,7 @@ public class ProjectManager {
 
     public static PPFProject readProject(File file) {
         try {
-            return (ppfProject = gson.fromJson(new FileReader(file), PPFProject.class));
+            return (ppfProject = gson.fromJson(new FileReader(file), PPFProject.class)).setFile(file);
         } catch (FileNotFoundException e) {
             LOGGER.error("Exception reading the PPFProject", e);
             return ppfProject;

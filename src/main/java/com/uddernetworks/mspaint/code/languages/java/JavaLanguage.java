@@ -14,7 +14,6 @@ import com.uddernetworks.mspaint.util.IDEFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,7 +74,8 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean meetsRequirements() {
-        return ToolProvider.getSystemJavaCompiler() != null;
+//        return ToolProvider.getSystemJavaCompiler() != null;
+        return true;
     }
 
     @Override
@@ -121,11 +121,12 @@ public class JavaLanguage extends Language {
         var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaOptions.LIBRARY_LOCATION);
         var otherFilesOptional = this.settings.<File>getSettingOptional(JavaOptions.OTHER_LOCATION);
         var classOutput = this.settings.<File>getSetting(JavaOptions.CLASS_OUTPUT);
-        var execute = switch (executeOverride) {
-            case EXECUTE -> true;
-            case DONT_EXECUTE -> false;
-            default -> this.settings.<Boolean>getSetting(JavaOptions.EXECUTE);
-        };
+        var execute = false;
+        if (executeOverride == BuildSettings.EXECUTE) {
+            execute = true;
+        } else if (executeOverride != BuildSettings.DONT_EXECUTE) {
+            execute = this.settings.<Boolean>getSetting(JavaOptions.EXECUTE);
+        }
 
         var libFiles = new ArrayList<File>();
         libDirectoryOptional.ifPresent(libDirectory -> {

@@ -5,13 +5,7 @@ set JAR=%4
 set VERSION=%5
 set APP_ICON=%6
 
-call "%JAVA_HOME%\bin\java.exe" ^
-    -Xmx512M ^
-    --module-path "%JAVA_HOME%\jmods" ^
-    --add-opens jdk.jlink/jdk.tools.jlink.internal.packager=jdk.packager ^
-    -m jdk.packager/jdk.packager.Main ^
-    create-image ^
-    --module-path "%MODULE_PATH%" ^
+call "C:\Users\RubbaBoy\Downloads\openjdk-13-jpackage+49_windows-x64_bin\jdk-13\bin\jpackage.exe" ^
     --verbose ^
     --echo-mode ^
     --add-modules "java.base,javafx.controls,javafx.fxml" ^
@@ -19,7 +13,6 @@ call "%JAVA_HOME%\bin\java.exe" ^
     --output "%OUTPUT%" ^
     --name "MSPaintIDE" ^
     --main-jar "%JAR%" ^
-    --version "%VERSION%" ^
     --jvm-args "--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-opens javafx.base/com.sun.javafx.collections=ALL-UNNAMED --illegal-access=deny" ^
     --icon "%APP_ICON%" ^
     --class "com.uddernetworks.mspaint.main.JFXWorkaround" ^
