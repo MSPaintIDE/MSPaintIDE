@@ -24,7 +24,7 @@ public class RunMenu extends MenuBind {
     @BindItem(label = "stop")
     public void onClickStop() {
         LOGGER.info("Stopping...");
-        // TODO: Stopping via RunningCodeManager
+        this.mainGUI.getStartupLogic().getRunningCodeManager().stopRunning();
     }
 
     @BindItem(label = "build")

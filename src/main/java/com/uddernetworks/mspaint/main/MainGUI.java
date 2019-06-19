@@ -14,6 +14,9 @@ import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
+import com.uddernetworks.mspaint.socket.DefaultInternalSocketCommunicator;
+import com.uddernetworks.mspaint.socket.InternalConnection;
+import com.uddernetworks.mspaint.socket.InternalSocketCommunicator;
 import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
@@ -53,6 +56,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
@@ -156,6 +160,9 @@ public class MainGUI extends Application implements Initializable {
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
+    // Not in StartupLogic, since it may not be initialized yet when accessed
+    private static InternalSocketCommunicator socketCommunicator;
+
     public MainGUI() throws IOException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         System.setProperty("jna.debug_load", "true");
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -163,30 +170,13 @@ public class MainGUI extends Application implements Initializable {
         this.startupLogic = new StartupLogic();
         startupLogic.start(this);
 
+        startServer(this);
+
         this.gitController = new GitController(this);
     }
 
+    // TODO: Move non-gui related stuff out of this method
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-        // See com.sun.glass.ui.Application#checkEventThread() javadoc
-//        System.setProperty("glass.disableThreadChecks", "true");
-
-//        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-//            System.out.println("Exception on " + t.getName());
-//            System.out.println(e.getLocalizedMessage());
-//            System.out.println(e.getMessage());
-//            for (var stackTraceElement : e.getStackTrace()) {
-//                System.out.println(stackTraceElement.toString());
-//            }
-//            e.printStackTrace(System.out);
-//            e.printStackTrace();
-//        });
-
-
-//        var fiule = new File("C:\\Users\\RubbaBoy\\AppData\\Local\\MSPaintIDE\\shit.txt");
-//        fiule.mkdirs();
-//        fiule.createNewFile();
-//        PrintStream o = new PrintStream(fiule);
-//        System.setOut(o);
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
 
@@ -211,20 +201,88 @@ public class MainGUI extends Application implements Initializable {
             frame.setVisible(true);
         }
 
-//        new Splash();
+        socketCommunicator = new DefaultInternalSocketCommunicator();
 
         if (args.length == 1) {
             if (args[0].endsWith(".ppf")) {
+                if (socketCommunicator.serverAvailable()) {
+                    LOGGER.error("Error: You can't have more than one instance of MS Paint IDE running at the same time!");
+                    System.exit(1);
+                }
+
                 initialProject = new File(args[0]);
                 if (!initialProject.isFile()) initialProject = null;
             } else {
-                HEADLESS = true;
-                new TextEditorManager(args[0]);
+                if (!socketCommunicator.serverAvailable()) {
+                    HEADLESS = true;
+                    startServer(null);
+                    new TextEditorManager(args[0]);
+                } else {
+                    LOGGER.info("Server is available, connecting...");
+                    startDocumentClient(args[0]);
+                }
                 return;
             }
         }
 
         launch(args);
+    }
+
+    private static void startServer(MainGUI mainGUI) {
+        socketCommunicator.startServer(Map.of("headless", HEADLESS), new InternalConnection() {
+            @Override
+            public void onConnect() {
+                LOGGER.info("Started a server socket MS Paint IDE server at localhost:{}", getPort());
+            }
+
+            @Override
+            public String accept(String name, String data) {
+                if (name.equals("OpenDocument")) {
+                    LOGGER.info("Client requested a document to be opened: {}", data);
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            new TextEditorManager(new File(data), mainGUI);
+                        } catch (IOException | InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    return "Opening,success";
+                }
+                return "";
+            }
+        });
+    }
+
+    private static void startDocumentClient(String open) throws InterruptedException {
+        socketCommunicator.connectToServer(new InternalConnection() {
+
+            @Override
+            public void onConnect() {
+                LOGGER.info("Connected to MS Paint IDE server at localhost:{}", getPort());
+            }
+
+            @Override
+            public String accept(String name, String data) {
+                var ret = "";
+                switch (name) {
+                    case "headless":
+                        LOGGER.info("Connected to a {} server!", data.equals("true") ? "headless" : "headded");
+                        ret = "OpenDocument," + open;
+                        break;
+                    case "Opening":
+                        LOGGER.info("Closing program instance, as localhost:{} is handling the document request", getPort());
+                        System.exit(0);
+                        ret = "";
+                        break;
+                }
+                return ret;
+            }
+
+        }, e -> {
+            LOGGER.error("Error connecting to socket", e);
+            System.exit(0);
+        });
+        Thread.sleep(100000);
     }
 
     public void createAndOpenTextFile(File file) {
@@ -719,11 +777,12 @@ public class MainGUI extends Application implements Initializable {
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .forEach(langGUIOption -> {
-            var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
-            if (langGUIOption.hasChangeButton()) childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
-            langSettingsGrid.addRow(i.intValue(), childrenAdding.toArray(Control[]::new));
-            i.increment();
-        });
+                    var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
+                    if (langGUIOption.hasChangeButton())
+                        childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
+                    langSettingsGrid.addRow(i.intValue(), childrenAdding.toArray(Control[]::new));
+                    i.increment();
+                });
 
         Function<LangGUIOption, JFXCheckBox> checkBoxGen = option -> {
             var checkbox = new JFXCheckBox(option.getName());
@@ -741,7 +800,7 @@ public class MainGUI extends Application implements Initializable {
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .forEach(guiOption ->
-                checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption)));
+                        checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption)));
     }
 
     public TextArea getOutputTextArea() {

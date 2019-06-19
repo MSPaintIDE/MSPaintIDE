@@ -21,6 +21,7 @@
   </b>
 </p>
 
+
 People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
 
 
@@ -53,6 +54,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 - Supports Java, Brainfuck, and Python*, with more planned
   - Also includes very simple language API to add custom languages
 - Git tools, to create and manage your project in Git from within the IDE
+- Google Assistant support
 - Right-click context menu to open and edit ANY text file in an MS Paint instance <small>[(details)](#Context-Menu)</small>
 - Integrated buttons within MS Paint (No program modifications) to do basic IDE tasks* <small>[(details)](#MS-Paint-Integration)</small>
 - Native installer for easy usage
@@ -65,7 +67,6 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 MS Paint IDE has many features, however it will not stop there. Some of these planned features are easier than others to implement, but I understand how much the programming community wants these, so I will try my best.
 
 - Gradle/maven support
-- Natural image processing with [NewOCR](https://github.com/RubbaBoy/NewOCR/)
 - Improving [PaintInjector](https://github.com/RubbaBoy/PaintInjector) to provide with an image modification API
   - Live debugging with line highlights from MS Paint
   - Autocompletition
@@ -73,6 +74,7 @@ MS Paint IDE has many features, however it will not stop there. Some of these pl
 - More languages
 - Auto updater/checker
 - Implement [LSP](https://microsoft.github.io/language-server-protocol/)
+- Discord RCP
 - Acquire [JetBrains](https://www.jetbrains.com/)
 
 # Projects

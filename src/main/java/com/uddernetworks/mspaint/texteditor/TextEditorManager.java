@@ -96,9 +96,7 @@ public class TextEditorManager {
                         }
                     }
                 }
-            } catch (IOException | InterruptedException ignored) {
-                ignored.printStackTrace();
-            }
+            } catch (IOException | InterruptedException ignored) {}
         })).start();
 
         initialProcess();
@@ -201,6 +199,8 @@ public class TextEditorManager {
 
         Runtime runtime = Runtime.getRuntime();
         Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
 
         LOGGER.info("Opened MS Paint");
         process.waitFor();
