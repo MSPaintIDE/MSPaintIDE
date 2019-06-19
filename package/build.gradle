@@ -1,102 +1,94 @@
-// Adapted from Santulator in package/build.gradle to work with MS Paint IDE by Adam Yarris
-
 import org.apache.tools.ant.filters.ReplaceTokens
 
-/*
- * Open Source Software published under the Apache Licence, Version 2.0.
- */
-
-/*
- * Compile jar and installer:
- *  createBundle -PjavafxJmodsPath="C:\javafx-jmods-12.0.1"
- *
- * Compile JUST jar and no inno compile:
- *  createBundle -x package:innoCompile -PjavafxJmodsPath="C:\javafx-jmods-12.0.1"
- *
- * Run in IDE:
- *  preLaunch run
- */
-
 apply plugin: 'java'
+apply plugin: 'application'
 
+assert Runtime.version().major() == 12
 sourceCompatibility = 12
 targetCompatibility = 12
 
+mainClassName = 'com.uddernetworks.mspaint.main.JFXWorkaround'
+
 ext {
     publishedVersion = rootProject.version
+
     libraryPath = file("${rootProject.buildDir}/libraries")
     mainJar = rootProject.jar.outputs.files[0].name
     bundlePath = file("${buildDir}/bundle")
-    extraBundlerArguments = []
 
-    appIcon = file('src/main/resources/icons/')
-    bundlerScript = file('bin/build-package.bat')
-    generatedInnoSetupFile = file("${buildDir}/resources/main/MSPaintIDE.iss")
+    // In-bundle resources
     windowsExecutable = file("${bundlePath}/MSPaintIDE/MSPaintIDE.exe")
     bundleContent = file("${bundlePath}/MSPaintIDE/*")
     bundleReadme = file("src/main/resources/README.html")
-    // Locations for the DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
-    windowsDllDirectory = file('C:\\Windows\\System32')
-    windowsDllMSVCP140 = file("${windowsDllDirectory}/MSVCP140.dll")
-    windowsDllVCRUNTIME140 = file("${windowsDllDirectory}/VCRUNTIME140.dll")
+    appIcon = file('src/main/resources/icons/')
+
+    generatedInnoSetupFile = file("${buildDir}/resources/main/MSPaintIDE.iss")
+
+    bundlePath.deleteDir()
+    bundlePath.mkdirs()
 }
 
-task checkBundlingEnvironment {
-    description 'Check the environment for building the installable bundle'
-    doLast {
-        if (project.hasProperty('javafxJmodsPath')) {
-            def modsPath = file("${javafxJmodsPath}")
-
-            if (modsPath.exists() && modsPath.isDirectory()) {
-                if (!modsPath.list({ d, f -> f ==~ /.*.jmod/ } as FilenameFilter)) {
-                    throw new GradleException("JavaFX modules directory '$modsPath' does not contain any '*.jmod' files")
-                }
-            } else {
-                throw new GradleException("JavaFX modules directory '$modsPath' not found")
-            }
-        } else {
-            throw new GradleException("Use -PjavafxJmodsPath=... to specify the directory containing the OpenJFX 11 JMod files")
-        }
-        def javaHome = System.env.JAVA_HOME
-
-        if (javaHome) {
-            def javaExecutable = file("${javaHome}/bin/java.exe")
-            def packagerFile = file("${javaHome}/bin/jpackager.exe")
-            def jmodFile = file("${javaHome}/jmods/jdk.packager.jar")
-
-            if (!javaExecutable.exists()) {
-                throw new GradleException("Unable to find Java executable '${javaExecutable}'")
-            }
-            if (!packagerFile.exists()) {
-                throw new GradleException("Unable to find Java packager executable at '${packagerFile}'")
-            }
-            if (!jmodFile.exists()) {
-                throw new GradleException("Unable to find Java packager module at '${jmodFile}'")
-            }
-            // Check existence of files for DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
-            if (!windowsDllMSVCP140.exists() || !windowsDllVCRUNTIME140.exists()) {
-                throw new GradleException("Unable to find '${windowsDllMSVCP140}' and '${windowsDllVCRUNTIME140}' (see https://github.com/Santulator/Santulator/issues/5)")
-            }
-        } else {
-            throw new GradleException("JAVA_HOME must be set")
-        }
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
     }
 }
 
-task createBundle(type: Exec, dependsOn: [processResources, checkBundlingEnvironment]) {
-    description 'Build the installable bundle'
-    commandLine 'cmd', '/c',
-            bundlerScript,
-            "${-> javafxJmodsPath}",
-            libraryPath,
-            bundlePath,
-            mainJar,
-            publishedVersion,
-            file("${appIcon.toPath()}/icon.ico")
+// Happens during assembly
+task jpackage(type: Exec, dependsOn: ':copyDependencies') {
+    def modules = [
+            'java.management',
+            'java.desktop',
+            'java.compiler',
+            'javafx.graphics',
+            'javafx.controls',
+            'javafx.fxml',
+            'java.sql',
+            'java.naming'
+    ]
+
+    commandLine "${project.properties['jpackage.home']}/bin/jpackage",
+            'create-app-image',
+            '--verbose',
+            '--module-path', 'C:\\javafx-jmods-12.0.1',
+            '--add-modules', modules.join(','),
+            '--name', 'MSPaintIDE',
+            '--icon', "${appIcon}/icon.ico",
+            '--app-version', publishedVersion,
+            '--description', 'MS Paint IDE',
+            '--vendor', 'Adam Yarris',
+            '--input', libraryPath,
+            '--output', bundlePath,
+            '--main-jar', mainJar,
+            '--main-class', mainClassName,
+            '--java-options', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-opens javafx.base/com.sun.javafx.collections=ALL-UNNAMED --illegal-access=deny'
+    environment << [JPACKAGE_DEBUG: true]
 }
 
-createBundle.dependsOn ':copyDependencies'
+// Copies dependencies and resources to the bundle path
+task completeInnoSetup {
+    doLast {
+        println "From " + "${rootProject.projectDir}\\package/src/main/java/resources to ${bundlePath}/MSPaintIDE"
+        copy {
+            from "${rootProject.projectDir}\\package\\src\\main\\resources"
+            into "${bundlePath}\\MSPaintIDE"
+            exclude 'MSPaintIDE.iss'
+            exclude 'icons'
+        }
 
+        copy {
+            from "${rootProject.projectDir}/native/"
+            into "${bundlePath}/MSPaintIDE/native"
+            include 'PaintInjector.dll'
+        }
+
+        println "Inno Setup file: ${generatedInnoSetupFile}"
+    }
+}
+
+// Replaces values in the .iss file
 processResources {
     filesMatching('MSPaintIDE.iss') {
         filter ReplaceTokens, tokens: [
@@ -109,41 +101,7 @@ processResources {
     }
 }
 
-task completeInnoSetup(dependsOn: processResources) {
-    doLast {
-        copy {
-            from 'src/main/java/resources'
-            into "${bundlePath}/MSPaintIDE"
-            exclude 'MSPaintIDE.iss'
-        }
-
-        copy {
-            from "${rootProject.projectDir}/native/"
-            into "${bundlePath}/MSPaintIDE/native"
-            include 'PaintInjector.dll'
-        }
-
-        copy {
-            from "${rootProject.projectDir}/src/main/resources/splash/"
-            into "${bundlePath}/MSPaintIDE/app"
-            include 'splash-full.png'
-        }
-
-        copy {
-            from "${rootProject.projectDir}/splash"
-            into "${bundlePath}/MSPaintIDE/splash"
-        }
-
-        // Copy files for DLL workaround (see https://github.com/Santulator/Santulator/issues/5)
-        copy {
-            from windowsDllMSVCP140
-            from windowsDllVCRUNTIME140
-            into "${bundlePath}/MSPaintIDE"
-        }
-        println "Inno Setup file: ${generatedInnoSetupFile}"
-    }
-}
-
+// Actually compiles the installer
 task innoCompile(type: Exec) {
     executable 'C:\\Program Files (x86)\\Inno Setup 5\\compil32.exe'
     args "/cc", "\"${generatedInnoSetupFile}\""
@@ -163,13 +121,4 @@ task innoCompile(type: Exec) {
     }
 }
 
-task replaceCfg << {
-    ant.replaceregexp(match: 'app.name=', replace: 'app.splash=splash-full.png\napp.name=') {
-        fileset(dir: "${bundlePath}/MSPaintIDE/app", includes: 'MSPaintIDE.cfg')
-    }
-}
-
-createBundle.dependsOn clean
-createBundle.finalizedBy completeInnoSetup
-completeInnoSetup.finalizedBy replaceCfg
-replaceCfg.finalizedBy innoCompile
+assemble.dependsOn jpackage

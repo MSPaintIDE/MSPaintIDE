@@ -224,8 +224,6 @@ public class MainGUI extends Application implements Initializable {
             }
         }
 
-        new Splash();
-
         launch(args);
     }
 
