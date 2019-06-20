@@ -48,7 +48,7 @@ public class ImageClass {
             this.startupLogic = this.mainGUI.getStartupLogic();
         }
 
-        System.out.println("Getting text at " + System.currentTimeMillis() +  "(" + this.inputImage.getAbsolutePath() + ")");
+//        System.out.println("Getting text at " + System.currentTimeMillis() +  "(" + this.inputImage.getAbsolutePath() + ")");
 
         this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.startupLogic);
 

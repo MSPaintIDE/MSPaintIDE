@@ -60,6 +60,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -350,8 +351,12 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
+    private PPFProject previousProject = null;
+    private File previousInput = null;
+
     public void refreshProject() {
-        String languageClassString = ProjectManager.getPPFProject().getLanguage();
+        var currentProject = ProjectManager.getPPFProject();
+        String languageClassString = currentProject.getLanguage();
         Platform.runLater(() -> {
             try {
                 var langClass = Class.forName(languageClassString);
@@ -359,11 +364,29 @@ public class MainGUI extends Application implements Initializable {
 
                 LOGGER.info(langClass.getCanonicalName());
 
-                languageManager.getLanguageByClass(langClass).ifPresent(language -> {
+                languageManager.getLanguageByClass(langClass).ifPresentOrElse(language -> {
                     LOGGER.info("Refresh");
                     this.startupLogic.setCurrentLanguage(language);
                     language.loadForCurrent();
-                });
+
+                    var lspWrapper = language.getLSPWrapper();
+
+                    var fileWatchManager = this.startupLogic.getFileWatchManager();
+                    if (previousInput != null) fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
+
+                    language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) file -> {
+                        if (previousInput != null) {
+                            fileWatchManager.getWatcher(file).ifPresent(fileWatchManager::removeWatcher);
+                            lspWrapper.closeWorkspace(file);
+                        }
+
+                        lspWrapper.openWorkspace(previousInput = file);
+                    }, true);
+
+                    var fileWatcher = fileWatchManager.watchFile(currentProject.getFile().getParentFile());
+
+
+                }, () -> LOGGER.error("No language found with a class of \"{}\"", languageClassString));
                 languageManager.reloadAllLanguages();
 
                 registerThings();
@@ -373,7 +396,7 @@ public class MainGUI extends Application implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                LOGGER.error("No language found with a class of \"" + languageClassString + "\"");
+                LOGGER.error("No language found with a class of \"{}\"", languageClassString);
             }
         });
     }

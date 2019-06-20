@@ -4,18 +4,17 @@ import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
+import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import com.uddernetworks.mspaint.util.IDEFileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +76,8 @@ public abstract class Language {
                 .collect(Collectors.toSet())
                 .contains(FilenameUtils.getExtension(file.getAbsolutePath()).toLowerCase());
     }
+
+    public abstract Option getInputOption();
 
     /**
      * Gets the source directory that files are coming from.
@@ -196,6 +197,7 @@ public abstract class Language {
      * @return All the {@link ImageClass}s to be used during compilation/execution
      */
     protected Optional<List<ImageClass>> indexFiles(Option highlightDirectorySetting) {
+        // TODO: Files should already be indexed by the DocumentManager, so this is unnecessary
         var LOGGER = getLogger();
         var mainGUI = this.startupLogic.getMainGUI();
         if (optionsNotFilled()) {
@@ -204,6 +206,7 @@ public abstract class Language {
             return Optional.empty();
         }
 
+        /*
         LOGGER.info("Scanning all images...");
 
         mainGUI.setStatusText(null);
@@ -215,6 +218,15 @@ public abstract class Language {
             LOGGER.info("Adding non directory: " + imageFile.getAbsolutePath());
             imageClasses.add(new ImageClass(imageFile, mainGUI));
         }
+         */
+        var lspWrapper = getLSPWrapper();
+        var documentManager = lspWrapper.getDocumentManager();
+
+        LOGGER.info("Reading {}'s DocumentManager index...", getName());
+
+        var imageClasses = documentManager.getAllDocuments().stream().map(Document::getImageClass).collect(Collectors.toList());
+
+        LOGGER.info("Found {} documents", imageClasses.size());
 
         mainGUI.setStatusText(null);
         return Optional.of(imageClasses);

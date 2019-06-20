@@ -6,6 +6,7 @@ import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
+import com.uddernetworks.mspaint.code.languages.Option;
 import com.uddernetworks.mspaint.code.lsp.LSP;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -44,6 +45,11 @@ public class JavaLanguage extends Language {
     @Override
     public String[] getFileExtensions() {
         return new String[]{"java"};
+    }
+
+    @Override
+    public Option getInputOption() {
+        return JavaOptions.INPUT_DIRECTORY;
     }
 
     @Override

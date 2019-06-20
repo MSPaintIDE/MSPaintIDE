@@ -1,94 +1,64 @@
 package com.uddernetworks.mspaint.code.lsp.doc;
 
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
-import com.uddernetworks.mspaint.code.lsp.RequestManager;
-import org.eclipse.lsp4j.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Collections;
 
-public class Document {
+public interface Document {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Document.class);
+    /**
+     * Opens the {@link Document}.
+     */
+    void open();
 
-    private File file;
-    private ImageClass imageClass;
-    private String text;
+    /**
+     * Closes the {@link Document}.
+     */
+    void close();
 
-    // I believe version is just used internally, and does not matter on its initial value
-    private int version = 0;
-    private boolean opened;
+    /**
+     * Deletes the {@link Document}.
+     */
+    void delete();
 
-    private DidChangeTextDocumentParams changesParams;
+    /**
+     * Sets the new text of the {@link Document}.
+     *
+     * @param text The text to set
+     */
+    void modifyText(String text);
 
-    private LanguageServerWrapper lsWrapper;
-    private RequestManager requestManager;
+    /**
+     * Does the same thing as {@link Document#modifyText(String)}, but it forces the document to scan the internal
+     * {@link ImageClass} to receive the text contents, then send it to the LSP server.
+     */
+    void notifyOfTextChange();
 
-    public Document(ImageClass imageClass, LanguageServerWrapper lsWrapper) {
-        this.file = imageClass.getInputImage();
-        this.imageClass = imageClass;
-        this.lsWrapper = lsWrapper;
-        this.requestManager = lsWrapper.getRequestManager();
+    /**
+     * Gets the real File of the {@link Document}. This is most often a .png or other image file.
+     *
+     * @return The file
+     */
+    File getFile();
 
-        try {
-            this.text = Files.readString(file.toPath());
-        } catch (IOException e) {
-            LOGGER.error("Error while creating Document", e);
-        }
+    /**
+     * Gets the {@link ImageClass} used by the {@link Document}.
+     *
+     * @return The {@link ImageClass}
+     */
+    ImageClass getImageClass();
 
-        this.changesParams = new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(),
-                Collections.singletonList(new TextDocumentContentChangeEvent()));
+    /**
+     * Get the current text of the {@link Document}.
+     *
+     * @return The current text
+     */
+    String getText();
 
-        changesParams.getTextDocument().setUri(getURI());
-    }
-
-    public void open() {
-        this.opened = true;
-
-        System.out.println("requestManager = " + requestManager);
-        System.out.println("text = " + text);
-        System.out.println("getURI() = " + getURI());
-        requestManager.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(getURI(), "java", version++, this.text)));
-    }
-
-    public void close() {
-        this.opened = false;
-
-        requestManager.didClose(new DidCloseTextDocumentParams(new TextDocumentIdentifier(getURI())));
-    }
-
-    public void modifyText(String text) {
-        this.text = text;
-
-        changesParams.getTextDocument().setVersion(version++);
-
-        // Sync settings *should* be incremental, but will be full since I'm lazy
-        changesParams.getContentChanges().get(0).setText(getText());
-        requestManager.didChange(changesParams);
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public String getURI() {
-        return this.file.toURI().toString();
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public boolean isOpened() {
-        return opened;
-    }
-
-    public void setOpened(boolean opened) {
-        this.opened = opened;
-    }
+    /**
+     * If the {@link Document} is opened currently.
+     *
+     * @return If the {@link Document} is opened
+     */
+    boolean isOpened();
 }

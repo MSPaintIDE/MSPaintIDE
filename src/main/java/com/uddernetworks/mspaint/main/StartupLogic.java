@@ -19,6 +19,8 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
+import com.uddernetworks.mspaint.watcher.DefaultFileWatchManager;
+import com.uddernetworks.mspaint.watcher.FileWatchManager;
 import com.uddernetworks.paintassist.DefaultPaintAssist;
 import com.uddernetworks.paintassist.PaintAssist;
 import org.apache.batik.transcoder.TranscoderException;
@@ -47,6 +49,7 @@ public class StartupLogic {
     private RunningCodeManager runningCodeManager;
     private OCRManager ocrManager;
     private PaintAssist paintAssist;
+    private FileWatchManager fileWatchManager;
 
     private CenterPopulator centerPopulator;
 
@@ -54,6 +57,7 @@ public class StartupLogic {
     private List<String> added = new ArrayList<>();
 
     public void start(MainGUI mainGUI) throws IOException {
+        this.fileWatchManager = new DefaultFileWatchManager();
         headlessStart();
         this.mainGUI = mainGUI;
 
@@ -103,9 +107,8 @@ public class StartupLogic {
         }
 
         if (MainGUI.HEADLESS) {
-            settingsManager.<String>onChangeSetting(Setting.HEADLESS_FONT, font -> {
-                this.ocrManager.setActiveFont(font, settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG));
-            }, true);
+            settingsManager.<String>onChangeSetting(Setting.HEADLESS_FONT, font ->
+                    this.ocrManager.setActiveFont(font, settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG)), true);
         } else {
             ProjectManager.switchProjectConsumer(project -> {
                 if (project.getActiveFont() == null) {
@@ -119,7 +122,6 @@ public class StartupLogic {
     }
 
     public void setCurrentLanguage(Language language) {
-        new Exception("Break").printStackTrace();
         this.currentLanguage = language;
     }
 
@@ -270,5 +272,9 @@ public class StartupLogic {
 
     public String getFontConfig() {
         return MainGUI.HEADLESS ? SettingsManager.getInstance().getSetting(Setting.HEADLESS_FONT_CONFIG) : ProjectManager.getPPFProject().getActiveFontConfig();
+    }
+
+    public FileWatchManager getFileWatchManager() {
+        return fileWatchManager;
     }
 }

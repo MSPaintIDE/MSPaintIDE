@@ -70,6 +70,7 @@ public class TextEditorManager {
 
         this.imageClass = new ImageClass(this.imageFile, mainGUI, this.startupLogic);
 
+        // TODO: Replace this with the FileWatchManager shit
         (this.savingThread = new Thread(() -> {
             try {
                 Path path = FileSystems.getDefault().getPath(this.imageFile.getParent());

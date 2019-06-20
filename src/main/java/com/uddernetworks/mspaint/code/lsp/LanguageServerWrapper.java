@@ -3,6 +3,9 @@ package com.uddernetworks.mspaint.code.lsp;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.doc.DefaultDocumentManager;
 import com.uddernetworks.mspaint.code.lsp.doc.DocumentManager;
+import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.watcher.FileWatchManager;
+import com.uddernetworks.mspaint.watcher.FileWatcher;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -38,13 +41,15 @@ public class LanguageServerWrapper {
 
     private ObservableList<WorkspaceFolder> workspaces = FXCollections.observableArrayList();
 
-//    private static final String TEMP_ROOT = System.getenv("lsp_demo"); // /shit
+    private StartupLogic startupLogic;
+    private FileWatchManager fileWatchManager;
+    //    private static final String TEMP_ROOT = System.getenv("lsp_demo"); // /shit
     private LSP lsp;
     private String serverPath;
     private List<String> lspArgs;
 
     public static void main(String[] args) {
-        new LanguageServerWrapper(LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
+        new LanguageServerWrapper(null, LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
                 Arrays.asList(
                         "java",
                         "-Declipse.application=org.eclipse.jdt.ls.core.id1",
@@ -61,11 +66,13 @@ public class LanguageServerWrapper {
                 )).start(new File(""));
     }
 
-    public LanguageServerWrapper(LSP lsp, String serverPath, List<String> lspArgs) {
+    public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, String serverPath, List<String> lspArgs) {
+        this.startupLogic = startupLogic;
+        this.fileWatchManager = startupLogic.getFileWatchManager();
         this.lsp = lsp;
         this.serverPath = serverPath;
         this.lspArgs = lspArgs;
-        this.documentManager = new DefaultDocumentManager(this);
+        this.documentManager = new DefaultDocumentManager(this, startupLogic);
 
         this.workspaces.addListener((ListChangeListener<WorkspaceFolder>) change ->
                 this.languageServer.getWorkspaceService().didChangeWorkspaceFolders(
@@ -149,6 +156,42 @@ public class LanguageServerWrapper {
         verifyStatus(file.getParentFile()).thenRun(() -> {
             LOGGER.info("Adding workspace {}", file.getAbsolutePath());
             this.workspaces.add(getWorkspace(file));
+
+            // This is NOT done in the Document class, because stuff may get messed up when deleting and mainly creating
+            // new files.
+            this.fileWatchManager.watchFile(file).addListener((type, changedFile) -> {
+                // TODO: Not sure if this should happen before or after the following switch?
+                this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
+                        new FileEvent(changedFile.toURI().toString(), type.toFCT())
+                )));
+
+                switch (type) {
+                    case CREATE:
+                        LOGGER.info("Create document event");
+                        this.documentManager.getDocument(file);
+                        break;
+                    case MODIFY:
+                        LOGGER.info("Modify document event");
+                        // The consumer should always run, since a Document will be created
+                        this.documentManager.getDocument(file, true).ifPresent(document -> {
+                            document.open();
+                            document.notifyOfTextChange();
+                        });
+                        break;
+                    case DELETE:
+                        LOGGER.info("Delete document event");
+                        this.documentManager.getDocument(file, false).ifPresent(this.documentManager::deleteDocument);
+                        break;
+                }
+            });
+        });
+    }
+
+    public void closeWorkspace(File file) {
+        verifyStatus(file.getParentFile()).thenRun(() -> {
+            LOGGER.info("Closing workspace {}", file.getAbsolutePath());
+            this.workspaces.removeIf(workspace -> workspace.getUri().equals(file.toURI().toString()));
+            this.fileWatchManager.getWatcher(file).ifPresent(FileWatcher::stopWatching);
         });
     }
 
@@ -245,6 +288,10 @@ public class LanguageServerWrapper {
 
     public RequestManager getRequestManager() {
         return requestManager;
+    }
+
+    public DocumentManager getDocumentManager() {
+        return documentManager;
     }
 
     public LanguageServer getLanguageServer() {
