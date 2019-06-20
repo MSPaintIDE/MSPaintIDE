@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.lsp.doc;
 
+import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.RequestManager;
 import org.eclipse.lsp4j.*;
@@ -16,6 +17,7 @@ public class Document {
     private static Logger LOGGER = LoggerFactory.getLogger(Document.class);
 
     private File file;
+    private ImageClass imageClass;
     private String text;
 
     // I believe version is just used internally, and does not matter on its initial value
@@ -27,8 +29,9 @@ public class Document {
     private LanguageServerWrapper lsWrapper;
     private RequestManager requestManager;
 
-    public Document(File file, LanguageServerWrapper lsWrapper) {
-        this.file = file;
+    public Document(ImageClass imageClass, LanguageServerWrapper lsWrapper) {
+        this.file = imageClass.getInputImage();
+        this.imageClass = imageClass;
         this.lsWrapper = lsWrapper;
         this.requestManager = lsWrapper.getRequestManager();
 

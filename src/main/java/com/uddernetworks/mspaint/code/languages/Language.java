@@ -3,19 +3,24 @@ package com.uddernetworks.mspaint.code.languages;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.util.IDEFileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public abstract class Language {
 
@@ -60,13 +65,18 @@ public abstract class Language {
     public abstract String[] getFileExtensions();
 
     /**
-     * Gets the extension of the compiled/packaged output file that is generated from the source code. An example of an
-     * output of this method is "jar" for Java.
-     * The method may return null if the language does not support output/packaged files.
+     * Gets if the current language is associated with the given file's filetype. A simple method, but removes some
+     * annoying stuff.
      *
-     * @return the extension of the output file
+     * @param file The file to test
+     * @return If the extension matches one of the extensions from {@link Language#getFileExtensions()}
      */
-    public abstract String getOutputFileExtension();
+    public boolean isFileApplicable(File file) {
+        return Arrays.stream(getFileExtensions())
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet())
+                .contains(FilenameUtils.getExtension(file.getAbsolutePath()).toLowerCase());
+    }
 
     /**
      * Gets the source directory that files are coming from.
@@ -86,20 +96,43 @@ public abstract class Language {
      */
     public abstract boolean isInterpreted();
 
+    public abstract LanguageServerWrapper getLSPWrapper();
+
     /**
      * Gets if the language has the correct software/libraries needed to compile/interpret and execute the language on
      * the system.
      *
      * @return if the system meets the requirements to use the language
      */
-    public abstract boolean meetsRequirements();
+    public abstract boolean hasLSP();
 
     /**
-     * Gets the language's Lexer for custom highlighting
+     * Downloads and installs the LSP for the current language without any user prompt.
      *
-     * @return the language's implementation of DefaultJFlexLexer
+     * @param successful If the install was successful or not
      */
-    public abstract DefaultJFlexLexer getLanguageHighlighter();
+    public abstract void installLSP(Consumer<Boolean> successful);
+
+    /**
+     * If the system has the runtime or whatever is needed to compile and run code
+     *
+     * @return If the system can compile and run code in the current language
+     */
+    public abstract boolean hasRuntime();
+
+    /**
+     * Returns a link to download the runtime. This should not be a direct link.
+     *
+     * @return A link to download the runtime
+     */
+    public abstract String downloadRuntimeLink();
+
+    /**
+     * Gets the name of the TextMate file used by the language.
+     *
+     * @return The name of the internal .json TextMate file
+     */
+    public abstract String getLanguageHighlighter();
 
     /**
      * Gets the {@link LanguageSettings} of the current language.

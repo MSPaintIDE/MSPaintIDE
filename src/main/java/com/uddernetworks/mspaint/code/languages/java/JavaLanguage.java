@@ -4,9 +4,10 @@ import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
-import com.uddernetworks.mspaint.code.languages.DefaultJFlexLexer;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
+import com.uddernetworks.mspaint.code.lsp.LSP;
+import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
@@ -16,10 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class JavaLanguage extends Language {
 
@@ -44,12 +43,7 @@ public class JavaLanguage extends Language {
 
     @Override
     public String[] getFileExtensions() {
-        return new String[] {"java"};
-    }
-
-    @Override
-    public String getOutputFileExtension() {
-        return "jar";
+        return new String[]{"java"};
     }
 
     @Override
@@ -73,14 +67,47 @@ public class JavaLanguage extends Language {
     }
 
     @Override
-    public boolean meetsRequirements() {
-//        return ToolProvider.getSystemJavaCompiler() != null;
+    public LanguageServerWrapper getLSPWrapper() {
+        return new LanguageServerWrapper(LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
+                Arrays.asList(
+                        "java",
+                        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+                        "-Dosgi.bundles.defaultStartLevel=4",
+                        "-Declipse.product=org.eclipse.jdt.ls.core.product",
+                        "-Dlog.level=ALL",
+                        "-noverify",
+                        "-Xmx1G",
+                        "-jar",
+                        "%server-path%\\plugins\\org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
+                        "-configuration",
+                        "%server-path%\\config_win",
+                        "-data"
+                ));
+    }
+
+    @Override
+    public boolean hasLSP() {
         return true;
     }
 
     @Override
-    public DefaultJFlexLexer getLanguageHighlighter() {
-        return new JavaLexer();
+    public void installLSP(Consumer<Boolean> successful) {
+
+    }
+
+    @Override
+    public boolean hasRuntime() {
+        return false;
+    }
+
+    @Override
+    public String downloadRuntimeLink() {
+        return null;
+    }
+
+    @Override
+    public String getLanguageHighlighter() {
+        return null;
     }
 
     @Override

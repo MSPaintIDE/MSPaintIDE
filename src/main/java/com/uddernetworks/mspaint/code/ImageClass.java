@@ -68,7 +68,7 @@ public class ImageClass {
         LOGGER.info(prefix + "Highlighting...");
         long start = System.currentTimeMillis();
 
-        new LanguageHighlighter().highlight(this.mainGUI.getCurrentLanguage().getLanguageHighlighter(), this.scannedImage);
+        new LanguageHighlighter().highlight(this.scannedImage);
 
         LOGGER.info(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 

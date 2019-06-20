@@ -360,6 +360,7 @@ public class MainGUI extends Application implements Initializable {
                 LOGGER.info(langClass.getCanonicalName());
 
                 languageManager.getLanguageByClass(langClass).ifPresent(language -> {
+                    LOGGER.info("Refresh");
                     this.startupLogic.setCurrentLanguage(language);
                     language.loadForCurrent();
                 });
@@ -493,7 +494,7 @@ public class MainGUI extends Application implements Initializable {
                 return;
             }
 
-            if (!getCurrentLanguage().meetsRequirements()) {
+            if (!getCurrentLanguage().hasRuntime()) {
                 setHaveError();
                 LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
                 return;

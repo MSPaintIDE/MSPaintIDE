@@ -1,6 +1,11 @@
 package com.uddernetworks.mspaint.code.lsp;
 
+import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.lsp.doc.DefaultDocumentManager;
 import com.uddernetworks.mspaint.code.lsp.doc.DocumentManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageServer;
@@ -8,18 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
-import static com.uddernetworks.mspaint.code.lsp.LSStatus.INITIALIZED;
-import static com.uddernetworks.mspaint.code.lsp.LSStatus.STARTED;
+import static com.uddernetworks.mspaint.code.lsp.LSStatus.*;
 
 public class LanguageServerWrapper {
 
     private static Logger LOGGER = LoggerFactory.getLogger(LanguageServerWrapper.class);
 
     private LSStatus status = LSStatus.STOPPED;
+    private File rootPath;
 
     private RequestManager requestManager;
     private LanguageServer languageServer;
@@ -27,55 +34,57 @@ public class LanguageServerWrapper {
     private LSPClient client;
 
     private DocumentManager documentManager;
+    private CompletableFuture<Void> startingFuture;
 
-    private static final String TEMP_ROOT = System.getenv("lsp_demo"); // Example: C:\\MSPaintIDEDemos\\project
+    private ObservableList<WorkspaceFolder> workspaces = FXCollections.observableArrayList();
 
-    public static void main(String[] args) throws InterruptedException {
-        new LanguageServerWrapper().main();
+//    private static final String TEMP_ROOT = System.getenv("lsp_demo"); // /shit
+    private LSP lsp;
+    private String serverPath;
+    private List<String> lspArgs;
+
+    public static void main(String[] args) {
+        new LanguageServerWrapper(LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
+                Arrays.asList(
+                        "java",
+                        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+                        "-Dosgi.bundles.defaultStartLevel=4",
+                        "-Declipse.product=org.eclipse.jdt.ls.core.product",
+                        "-Dlog.level=ALL",
+                        "-noverify",
+                        "-Xmx1G",
+                        "-jar",
+                        "%server-path%\\plugins\\org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
+                        "-configuration",
+                        "%server-path%\\config_win",
+                        "-data"
+                )).start(new File(""));
     }
 
-    private void main() {
-        //        CompletableFuture.runAsync(() -> {
-        client = new LSPClient();
+    public LanguageServerWrapper(LSP lsp, String serverPath, List<String> lspArgs) {
+        this.lsp = lsp;
+        this.serverPath = serverPath;
+        this.lspArgs = lspArgs;
+        this.documentManager = new DefaultDocumentManager(this);
+
+        this.workspaces.addListener((ListChangeListener<WorkspaceFolder>) change ->
+                this.languageServer.getWorkspaceService().didChangeWorkspaceFolders(
+                        new DidChangeWorkspaceFoldersParams(
+                                new WorkspaceFoldersChangeEvent(
+                                        change.getAddedSubList().stream().map(WorkspaceFolder.class::cast).collect(Collectors.toList()),
+                                        change.getRemoved().stream().map(WorkspaceFolder.class::cast).collect(Collectors.toList())))));
+    }
+
+    // rootPath will be null if launching LSP in headless mode
+    private CompletableFuture<Void> start(File rootPath) {
+        this.client = new LSPClient();
+        this.rootPath = rootPath;
 
         try {
-//                ExecutorService executorService = Executors.newCachedThreadPool();
-
-//                Socket socket = new Socket("localhost", 1044);
-//                socket.setKeepAlive(true);
-//                InputStream inputStream = socket.getInputStream();
-//                OutputStream outputStream = socket.getOutputStream();
-
-            var streamConnectionProvider = new BetterProvider(Arrays.asList(
-                    "java",
-                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044",
-                    "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-                    "-Dosgi.bundles.defaultStartLevel=4",
-                    "-Declipse.product=org.eclipse.jdt.ls.core.product",
-                    "-Dlog.level=ALL",
-                    "-noverify",
-                    "-Xmx1G",
-                    "-jar",
-                    "E:/MSPaintIDE/jdt-language-server-latest/plugins/org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
-                    "-configuration",
-                    "E:/MSPaintIDE/jdt-language-server-latest/config_win",
-                    "-data",
-                    "\"" + TEMP_ROOT + "\"",
-                    "--add-modules=ALL-SYSTEM",
-                    "--add-opens",
-                    "java.base/java.util=ALL-UNNAMED",
-                    "--add-opens",
-                    "java.base/java.lang=ALL-UNNAMED"
-            ), TEMP_ROOT);
-
+            var streamConnectionProvider = new BetterProvider(
+                    lspArgs.stream().map(str -> str.replace("%server-path%", serverPath)).collect(Collectors.toList()),
+                    serverPath); // new File(TEMP_ROOT).getParent()
             streamConnectionProvider.start();
-
-//                System.setOut(new PrintStream(streamConnectionProvider.getOutputStream()));
-
-//                Launcher<LanguageServer> launcher =
-//                        Launcher.createLauncher(client, LanguageServer.class, streamConnectionProvider.getInputStream(), streamConnectionProvider.getOutputStream(), executorService, consumer -> message -> {
-//                            LOGGER.debug("Got: " + message.getJsonrpc());
-//                        });
 
             Launcher<LanguageServer> launcher =
                     Launcher.createLauncher(client, LanguageServer.class, streamConnectionProvider.getInputStream(), streamConnectionProvider.getOutputStream());
@@ -84,25 +93,17 @@ public class LanguageServerWrapper {
             client.connect(languageServer);
             launcherFuture = launcher.startListening();
 
-            documentManager = new DocumentManager(this);
-
-            languageServer.initialize(getInitParams()).thenApply(res -> {
+            return (startingFuture = languageServer.initialize(getInitParams()).thenApply(res -> {
                 LOGGER.info("Started {}", res);
 
                 requestManager = new DefaultRequestManager(this, languageServer, client, res.getCapabilities());
                 setStatus(STARTED);
                 requestManager.initialized(new InitializedParams());
                 setStatus(INITIALIZED);
-
-//                languageServer.getWorkspaceService().didChangeWorkspaceFolders(
-//                        new DidChangeWorkspaceFoldersParams(
-//                                new WorkspaceFoldersChangeEvent(
-//                                        Arrays.asList(
-//                                                new WorkspaceFolder(new File(TEMP_ROOT).toURI().toString())
-//                                        ), Collections.emptyList())));
 //                languageServer.getWorkspaceService().didChangeWorkspaceFolders();
 
                 var workspaceService = languageServer.getWorkspaceService();
+//                workspaceService.didChangeWorkspaceFolders();
 //                workspaceService.didChangeConfiguration();
 
 //                WorkspaceFoldersChangeEvent event = new WorkspaceFoldersChangeEvent();
@@ -111,50 +112,97 @@ public class LanguageServerWrapper {
 //                params.setEvent(event);
 //                workspaceService.didChangeWorkspaceFolders(params);
 
-                // Temp
 
+//                languageServer.getWorkspaceService().didChangeWorkspaceFolders(
+//                        new DidChangeWorkspaceFoldersParams(
+//                                new WorkspaceFoldersChangeEvent(
+//                                        Arrays.asList(
+//                                                new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other").toURI().toString())
+//                                        ), Arrays.asList(
+//                                        new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\jdt.ls-java-project").toURI().toString())))));
                 return res;
             }).thenRun(() -> {
-                documentManager.openFile(new File(TEMP_ROOT + "\\src\\Main.java"));
-            });
-//                var params = new InitializeParams();
-//                params.setWorkspaceFolders(List.of(new WorkspaceFolder(new File(TEMP_ROOT).toURI().toString())));
-//                var stuff = proxy.initialize(params);
-            LOGGER.info("End of proxy!");
+
+//                LOGGER.info("Shidddddddddddddd");
+
+//                documentManager.openFile(new File(TEMP_ROOT + "\\src\\Main.java"));
+//                documentManager.openFile(new File(TEMP_ROOT + "\\demo.rub"));
+//                documentManager.openFile(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other\\src\\App.java"));
+                var workspaceService = languageServer.getWorkspaceService();
+
+
+                LOGGER.info("Done starting LSP!");
+            }));
 
         } catch (Exception e) {
             LOGGER.error("Can't launch language server for project", e);
         }
 
-        LOGGER.info("End!");
+        return CompletableFuture.runAsync(() -> {});
+    }
 
-//            try {
-//                Thread.sleep(100_000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+    /*
+     * Realistically, this only accepts ONE open workspace, since the IDE only allows one open window at once.
+     */
+    public void openWorkspace(File file) {
+        // TODO: Throw if `file` is not in `rootPath`?
+        verifyStatus(file.getParentFile()).thenRun(() -> {
+            LOGGER.info("Adding workspace {}", file.getAbsolutePath());
+            this.workspaces.add(getWorkspace(file));
+        });
+    }
 
-//        });
+    /*
+     * As many open files are allowed, as they are not separate IDE windows abd are not part of any workspace.
+     */
+    public void openFile(ImageClass imageClass) {
+        verifyStatus(null).thenRun(() -> {
+            LOGGER.info("Opening file {}", imageClass.getInputImage().getAbsolutePath());
+            this.documentManager.openFile(imageClass);
+        });
+    }
+
+    public CompletableFuture<Void> verifyStatus(File rootPath) {
+        if (getStatus() == STARTED || getStatus() == STARTING) {
+            LOGGER.info("LSP server is starting up, waiting for it to finish...");
+            return this.startingFuture;
+        } else if (getStatus() == STOPPED) {
+            LOGGER.info("LSP is stopped, waiting for it to start up...");
+            return start(rootPath);
+        }
+        // INITIALIZED
+        return CompletableFuture.runAsync(() -> {});
+    }
+
+    private WorkspaceFolder getWorkspace(File file) {
+        return getWorkspace(file.getAbsolutePath());
+    }
+
+    private WorkspaceFolder getWorkspace(String file) {
+        var workspace = new WorkspaceFolder();
+        workspace.setUri(getURI(file));
+        return workspace;
     }
 
     private WorkspaceFolder getWorkspace(String file, String name) {
         var workspace = new WorkspaceFolder();
-        workspace.setUri(new File(file).toURI().toString());
+        workspace.setUri(getURI(file));
         workspace.setName(name);
         return workspace;
     }
 
     private String getURI(String file) {
-        return URI.create(file).toString();
+        return new File(file).toURI().toString();
     }
 
     // Init params from this method modified from LSP4IntelliJ ( Copyright (c) 2018-2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved )
     private InitializeParams getInitParams() {
         InitializeParams initParams = new InitializeParams();
 //        initParams.setClientName("MS Paint IDE");
-//        initParams.setWorkspaceFolders(List.of(getWorkspace(TEMP_ROOT, "Temp")));
+//        initParams.setWorkspaceFolders(List.of(new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other").toURI().toString())));
 //        initParams.setWorkspaceFolders(Arrays.asList(new WorkspaceFolder(new File(TEMP_ROOT).toURI().toString())));
-        initParams.setRootUri(new File(TEMP_ROOT).toURI().toString());
+//        initParams.setRootUri(new File(TEMP_ROOT).getParentFile().toURI().toString());
+        if (this.rootPath != null) initParams.setRootUri(rootPath.toURI().toString());
         WorkspaceClientCapabilities workspaceClientCapabilities = new WorkspaceClientCapabilities();
 //        workspaceClientCapabilities.setApplyEdit(true);
 //        workspaceClientCapabilities.setDidChangeWatchedFiles(new DidChangeWatchedFilesCapabilities());
@@ -205,5 +253,9 @@ public class LanguageServerWrapper {
 
     public LSPClient getClient() {
         return client;
+    }
+
+    public LSP getLSP() {
+        return lsp;
     }
 }

@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.code.lsp;
 
 import com.uddernetworks.mspaint.gui.window.search.ReplaceManager;
 import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class LSPClient implements LanguageClient {
@@ -28,6 +30,11 @@ public class LSPClient implements LanguageClient {
 
     protected final LanguageServer getLanguageServer() {
         return server;
+    }
+
+    @JsonNotification("language/status")
+    public void languageStatus(Map<Object, Object> data) {
+        LOGGER.info("[{}] {}", data.get("type"), data.get("message"));
     }
 
     @Override

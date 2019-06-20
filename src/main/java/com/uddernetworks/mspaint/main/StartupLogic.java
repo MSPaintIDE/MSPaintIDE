@@ -9,7 +9,6 @@ import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
-import com.uddernetworks.mspaint.code.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.OCRManager;
@@ -68,7 +67,7 @@ public class StartupLogic {
         Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
         languageManager.addLanguage(new JavaLanguage(this));
-        languageManager.addLanguage(new BrainfuckLanguage(this));
+//        languageManager.addLanguage(new BrainfuckLanguage(this));
 //        languageManager.addLanguage(new PythonLanguage());
 
         languageManager.initializeLanguages();
@@ -120,6 +119,7 @@ public class StartupLogic {
     }
 
     public void setCurrentLanguage(Language language) {
+        new Exception("Break").printStackTrace();
         this.currentLanguage = language;
     }
 
