@@ -10,6 +10,7 @@ import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
+import com.uddernetworks.mspaint.gui.window.diagnostic.DiagnosticManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.OCRManager;
 import com.uddernetworks.mspaint.painthook.InjectionManager;
@@ -50,6 +51,7 @@ public class StartupLogic {
     private OCRManager ocrManager;
     private PaintAssist paintAssist;
     private FileWatchManager fileWatchManager;
+    private DiagnosticManager diagnosticManager;
 
     private CenterPopulator centerPopulator;
 
@@ -81,6 +83,8 @@ public class StartupLogic {
 
         new InjectionManager(mainGUI, this).createHooks();
         this.paintAssist = new DefaultPaintAssist();
+
+        this.diagnosticManager = new DiagnosticManager(this);
     }
 
     public void headlessStart() throws IOException {
@@ -276,5 +280,9 @@ public class StartupLogic {
 
     public FileWatchManager getFileWatchManager() {
         return fileWatchManager;
+    }
+
+    public DiagnosticManager getDiagnosticManager() {
+        return diagnosticManager;
     }
 }

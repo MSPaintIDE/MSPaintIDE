@@ -73,7 +73,14 @@ public abstract class SettingsAccessor<G> {
         if (this.settings.containsKey(setting) && !override) return;
         System.out.println("Setting: " + setting + " to " + value);
         settings.put(setting, value);
-        if (runOnChange) Platform.runLater(() -> this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
+        new Exception("Here! val type: " + value.getClass().getCanonicalName()).printStackTrace(System.out);
+        if (runOnChange) Platform.runLater(() -> {
+            this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> {
+                System.out.println("consumer = " + consumer);
+                System.out.println("consumer = " + consumer.getClass().getCanonicalName());
+                consumer.accept(value);
+            });
+        });
         save();
     }
 

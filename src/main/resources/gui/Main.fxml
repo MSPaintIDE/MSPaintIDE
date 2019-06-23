@@ -3,10 +3,13 @@
 <?import com.jfoenix.controls.*?>
 <?import com.uddernetworks.mspaint.gui.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.InlineCssTextArea?>
 <?import java.lang.String?>
 <AnchorPane fx:id="rootAnchor" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
@@ -40,6 +43,7 @@
                                 </items>
                             </MaterialMenu>
                           <MaterialMenuItem clickLabel="settings" text="Settings" />
+                          <MaterialMenuItem clickLabel="show-diagnostics" text="Show Diagnostics" />
                           <MaterialMenuItem clickLabel="print" text="Print" />
                           <MaterialMenuItem clickLabel="close-project" text="Close Project" />
                           <MaterialMenuItem clickLabel="exit" text="Exit" />
@@ -120,7 +124,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="855.0" vgrow="ALWAYS" />
                   </rowConstraints>
                   <children>
-                      <TextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
+                      <InlineCssTextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
                           <opaqueInsets>
                               <Insets />
                           </opaqueInsets>
@@ -131,7 +135,7 @@
                      <GridPane.margin>
                         <Insets left="15.0" />
                      </GridPane.margin>
-                      </TextArea>
+                      </InlineCssTextArea>
                       <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="gridpane-theme">
                           <content>
                               <GridPane maxHeight="851.0" maxWidth="500.0" minHeight="851.0" minWidth="500.0" prefHeight="851.0" prefWidth="500.0" styleClass="gridpane-theme">

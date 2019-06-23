@@ -71,6 +71,7 @@ public class DefaultFileWatcher implements FileWatcher {
 
     @Override
     public void stopWatching() {
+        if (!isWatching()) return;
         this.watchingFuture.cancel(true);
         this.watching = false;
     }

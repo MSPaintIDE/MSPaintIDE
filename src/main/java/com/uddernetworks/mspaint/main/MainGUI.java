@@ -9,7 +9,7 @@ import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
 import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
-import com.uddernetworks.mspaint.logging.GUIConsoleAppender;
+import com.uddernetworks.mspaint.logging.FormattedAppender;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -36,7 +36,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -44,6 +43,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.fxmisc.richtext.InlineCssTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +124,7 @@ public class MainGUI extends Application implements Initializable {
     private JFXComboBox<Language> languageComboBox;
 
     @FXML
-    private TextArea output;
+    private InlineCssTextArea output;
 
     @FXML
     private AnchorPane rootAnchor;
@@ -374,10 +374,16 @@ public class MainGUI extends Application implements Initializable {
                     var fileWatchManager = this.startupLogic.getFileWatchManager();
                     if (previousInput != null) fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
 
-                    language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) file -> {
+                    LOGGER.info("About to change setting listener!");
+                    language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<String>) fileString -> {
+                        LOGGER.info("Prev = {} Curr = {}", previousInput, fileString);
+                        var file = new File(fileString).getParentFile();
+                        if (file.equals(this.previousInput)) return;
+                        LOGGER.info("Changing input to: {}", fileString);
                         if (previousInput != null) {
-                            fileWatchManager.getWatcher(file).ifPresent(fileWatchManager::removeWatcher);
-                            lspWrapper.closeWorkspace(file);
+                            LOGGER.info("Previous input: {}", previousInput.getAbsolutePath());
+                            fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
+                            lspWrapper.closeWorkspace(previousInput);
                         }
 
                         lspWrapper.openWorkspace(previousInput = file);
@@ -640,6 +646,8 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        FormattedAppender.activate(output);
+
         var settingsManager = SettingsManager.getInstance();
         Splash.setStatus(SplashMessage.GUI);
 
@@ -662,7 +670,10 @@ public class MainGUI extends Application implements Initializable {
             setHaveError();
         });
 
-        GUIConsoleAppender.activate(output);
+        // TODO
+//        GUIConsoleAppender.activate(output);
+        LOGGER.info("Is it working?");
+        LOGGER.error("Haha, it is working", new Exception("Test some shit"));
 
         invertColors.setOnAction(event -> {
             settingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);
@@ -825,10 +836,6 @@ public class MainGUI extends Application implements Initializable {
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .forEach(guiOption ->
                         checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption)));
-    }
-
-    public TextArea getOutputTextArea() {
-        return output;
     }
 
     public ThemeManager getThemeManager() {

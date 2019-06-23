@@ -16,10 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static com.uddernetworks.mspaint.code.lsp.LSStatus.*;
@@ -37,54 +40,54 @@ public class LanguageServerWrapper {
     private LSPClient client;
 
     private DocumentManager documentManager;
+    private BiConsumer<LanguageServerWrapper, File> workspaceInit;
     private CompletableFuture<Void> startingFuture;
 
     private ObservableList<WorkspaceFolder> workspaces = FXCollections.observableArrayList();
 
     private StartupLogic startupLogic;
     private FileWatchManager fileWatchManager;
-    //    private static final String TEMP_ROOT = System.getenv("lsp_demo"); // /shit
     private LSP lsp;
     private String serverPath;
     private List<String> lspArgs;
 
-    public static void main(String[] args) {
-        new LanguageServerWrapper(null, LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
-                Arrays.asList(
-                        "java",
-                        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-                        "-Dosgi.bundles.defaultStartLevel=4",
-                        "-Declipse.product=org.eclipse.jdt.ls.core.product",
-                        "-Dlog.level=ALL",
-                        "-noverify",
-                        "-Xmx1G",
-                        "-jar",
-                        "%server-path%\\plugins\\org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
-                        "-configuration",
-                        "%server-path%\\config_win",
-                        "-data"
-                )).start(new File(""));
+    public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, String serverPath, List<String> lspArgs) {
+        this(startupLogic, lsp, serverPath, lspArgs, null);
     }
 
-    public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, String serverPath, List<String> lspArgs) {
+    public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, String serverPath, List<String> lspArgs, BiConsumer<LanguageServerWrapper, File> workspaceInit) {
         this.startupLogic = startupLogic;
         this.fileWatchManager = startupLogic.getFileWatchManager();
         this.lsp = lsp;
         this.serverPath = serverPath;
         this.lspArgs = lspArgs;
         this.documentManager = new DefaultDocumentManager(this, startupLogic);
+        this.workspaceInit = workspaceInit;
 
-        this.workspaces.addListener((ListChangeListener<WorkspaceFolder>) change ->
-                this.languageServer.getWorkspaceService().didChangeWorkspaceFolders(
-                        new DidChangeWorkspaceFoldersParams(
-                                new WorkspaceFoldersChangeEvent(
-                                        change.getAddedSubList().stream().map(WorkspaceFolder.class::cast).collect(Collectors.toList()),
-                                        change.getRemoved().stream().map(WorkspaceFolder.class::cast).collect(Collectors.toList())))));
+        this.workspaces.addListener((ListChangeListener<WorkspaceFolder>) change -> {
+            var added = new ArrayList<WorkspaceFolder>();
+            var removed = new ArrayList<WorkspaceFolder>();
+
+            while (change.next()) {
+                added.addAll(change.getAddedSubList());
+                removed.addAll(change.getRemoved());
+            }
+
+            LOGGER.info("Adding: {}  Removing: {}", added, removed);
+
+            this.languageServer.getWorkspaceService().didChangeWorkspaceFolders(
+                    new DidChangeWorkspaceFoldersParams(
+                            new WorkspaceFoldersChangeEvent(
+                                    added,
+                                    removed)));
+        });
     }
 
     // rootPath will be null if launching LSP in headless mode
     private CompletableFuture<Void> start(File rootPath) {
-        this.client = new LSPClient();
+        setStatus(STARTING);
+        this.client = new LSPClient(this.startupLogic);
+
         this.rootPath = rootPath;
 
         try {
@@ -154,6 +157,12 @@ public class LanguageServerWrapper {
     public void openWorkspace(File file) {
         // TODO: Throw if `file` is not in `rootPath`?
         verifyStatus(file.getParentFile()).thenRun(() -> {
+
+            if (this.workspaceInit != null) {
+                LOGGER.info("Running language-specific workspace init code...");
+                this.workspaceInit.accept(this, file);
+            }
+
             LOGGER.info("Adding workspace {}", file.getAbsolutePath());
             this.workspaces.add(getWorkspace(file));
 
@@ -212,8 +221,7 @@ public class LanguageServerWrapper {
         } else if (getStatus() == STOPPED) {
             LOGGER.info("LSP is stopped, waiting for it to start up...");
             return start(rootPath);
-        }
-        // INITIALIZED
+        } // INITIALIZED
         return CompletableFuture.runAsync(() -> {});
     }
 
@@ -224,6 +232,7 @@ public class LanguageServerWrapper {
     private WorkspaceFolder getWorkspace(String file) {
         var workspace = new WorkspaceFolder();
         workspace.setUri(getURI(file));
+        workspace.setName("JavaProject");
         return workspace;
     }
 
@@ -245,7 +254,10 @@ public class LanguageServerWrapper {
 //        initParams.setWorkspaceFolders(List.of(new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other").toURI().toString())));
 //        initParams.setWorkspaceFolders(Arrays.asList(new WorkspaceFolder(new File(TEMP_ROOT).toURI().toString())));
 //        initParams.setRootUri(new File(TEMP_ROOT).getParentFile().toURI().toString());
-        if (this.rootPath != null) initParams.setRootUri(rootPath.toURI().toString());
+        if (this.rootPath != null) {
+            initParams.setRootUri(rootPath.toURI().toString());
+            LOGGER.info("Root is to {}", rootPath.toURI().toString());
+        }
         WorkspaceClientCapabilities workspaceClientCapabilities = new WorkspaceClientCapabilities();
 //        workspaceClientCapabilities.setApplyEdit(true);
 //        workspaceClientCapabilities.setDidChangeWatchedFiles(new DidChangeWatchedFilesCapabilities());
@@ -276,6 +288,10 @@ public class LanguageServerWrapper {
 //                serverDefinition.getInitializationOptions(URI.create(initParams.getRootUri())));
 
         return initParams;
+    }
+
+    public Optional<File> getRootPath() {
+        return Optional.ofNullable(rootPath);
     }
 
     public LSStatus getStatus() {

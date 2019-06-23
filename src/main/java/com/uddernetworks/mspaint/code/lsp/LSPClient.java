@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.lsp;
 
 import com.uddernetworks.mspaint.gui.window.search.ReplaceManager;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -19,8 +20,14 @@ public class LSPClient implements LanguageClient {
 
 //    private LSPDiagnosticsToMarkers diagnosticHandler;
 
+    private StartupLogic startupLogic;
     private LanguageServer server;
 //    private LanguageServerWrapper wrapper;
+
+
+    public LSPClient(StartupLogic startupLogic) {
+        this.startupLogic = startupLogic;
+    }
 
     public final void connect(LanguageServer server) {
         this.server = server;
@@ -59,7 +66,12 @@ public class LSPClient implements LanguageClient {
     @Override
     public final void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
 //        this.diagnosticHandler.accept(diagnostics);
-        LOGGER.info("shidd publishDiagnostics {}", diagnostics);
+//        LOGGER.info("shidd publishDiagnostics {}", diagnostics);
+        diagnostics.getDiagnostics().forEach(diagnostic -> {
+            LOGGER.info("Diagnostic at " + diagnostic.getSeverity() + " > " + diagnostic.getMessage());
+        });
+
+        this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics());
     }
 
     @Override

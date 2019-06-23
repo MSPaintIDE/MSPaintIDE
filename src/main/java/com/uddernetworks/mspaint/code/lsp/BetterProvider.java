@@ -37,6 +37,19 @@ public class BetterProvider {
         } else {
             LOGGER.info("Server process started " + process);
         }
+
+//        final var pid = process.pid();
+//
+////        Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
+//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+//            try {
+//                var cmd = "taskkill /F /PID " + pid;
+//                System.out.println("Kill " + pid + " via " + cmd);
+//                Runtime.getRuntime().exec(cmd);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }));
     }
 
     private ProcessBuilder createProcessBuilder() {

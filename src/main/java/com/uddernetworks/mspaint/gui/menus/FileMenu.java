@@ -77,6 +77,11 @@ public class FileMenu extends MenuBind {
         new SettingsWindow(this.mainGUI, null);
     }
 
+    @BindItem(label = "show-diagnostics")
+    private void onClickShowDiagnostics() {
+        this.mainGUI.getStartupLogic().getDiagnosticManager().openGUI();
+    }
+
     @BindItem(label = "print")
     private void onClickPrint() {
         // TODO: Print

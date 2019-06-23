@@ -13,6 +13,7 @@ import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.util.IDEFileUtils;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,37 @@ public class JavaLanguage extends Language {
 
     private JavaSettings settings = new JavaSettings();
     private JavaCodeManager javaCodeManager = new JavaCodeManager();
+    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
+            Arrays.asList(
+                    "java",
+                    "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+                    "-Dosgi.bundles.defaultStartLevel=4",
+                    "-Declipse.product=org.eclipse.jdt.ls.core.product",
+                    "-Dlog.level=ALL",
+                    "-noverify",
+                    "-Xmx1G",
+                    "-jar",
+                    "%server-path%\\plugins\\org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
+                    "-configuration",
+                    "%server-path%\\config_win",
+                    "-data"
+            ), (wrapper, workspaceDir) -> {
+        LOGGER.info("Setting up the Java project...");
+
+        if (new File(workspaceDir.getAbsolutePath(), ".classpath").exists()) {
+            LOGGER.info("Project already contains template files, no need to copy them again.");
+            return;
+        }
+
+        LOGGER.info("Copying template files...");
+
+        try {
+//            FileUtils.copyDirectory(new File(StartupLogic.getJarParent().orElse(new File("")), "lsp\\java\\project-template"), workspaceDir);
+            FileUtils.copyDirectory(new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp\\java\\project-template"), workspaceDir);
+        } catch (IOException e) {
+            LOGGER.error("An error occurred while copying over project template files!", e);
+        }
+    });
 
     public JavaLanguage(StartupLogic startupLogic) {
         super(startupLogic);
@@ -74,21 +106,7 @@ public class JavaLanguage extends Language {
 
     @Override
     public LanguageServerWrapper getLSPWrapper() {
-        return new LanguageServerWrapper(LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
-                Arrays.asList(
-                        "java",
-                        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-                        "-Dosgi.bundles.defaultStartLevel=4",
-                        "-Declipse.product=org.eclipse.jdt.ls.core.product",
-                        "-Dlog.level=ALL",
-                        "-noverify",
-                        "-Xmx1G",
-                        "-jar",
-                        "%server-path%\\plugins\\org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
-                        "-configuration",
-                        "%server-path%\\config_win",
-                        "-data"
-                ));
+        return this.lspWrapper;
     }
 
     @Override

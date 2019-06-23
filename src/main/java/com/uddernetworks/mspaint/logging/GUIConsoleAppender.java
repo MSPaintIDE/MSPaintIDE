@@ -1,16 +1,16 @@
 package com.uddernetworks.mspaint.logging;
 
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
+import org.fxmisc.richtext.CodeArea;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class GUIConsoleAppender extends ConsoleAppender {
 
-    private static TextArea textArea;
+    private static CodeArea textArea;
     private static StringBuilder previous = new StringBuilder();
     private static boolean activated;
     private static boolean copyingPrevious;
@@ -28,7 +28,7 @@ public class GUIConsoleAppender extends ConsoleAppender {
         super(layout, target);
     }
 
-    public static void activate(TextArea textArea) {
+    public static void activate(CodeArea textArea) {
         GUIConsoleAppender.textArea = textArea;
         activated = true;
         copyingPrevious = true;

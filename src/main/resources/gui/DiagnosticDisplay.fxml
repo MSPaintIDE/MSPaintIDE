@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import java.lang.String?>
+<AnchorPane prefHeight="300.0" prefWidth="600.0" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXScrollPane fx:id="scroll" layoutY="15.0" maxWidth="600.0" minWidth="600.0" prefHeight="235.0" prefWidth="600.0" styleClass="diagnostic-pane">
+         <children>
+            <JFXListView id="diagnosticWindow" fx:id="diagnosticList" maxWidth="600.0" minWidth="600.0" prefHeight="200.0" prefWidth="600.0" styleClass="gridpane-theme" />
+         </children></JFXScrollPane>
+      <JFXButton fx:id="cancel" buttonType="RAISED" layoutX="515.0" layoutY="260.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Cancel">
+         <styleClass>
+            <String fx:value="theme-text" />
+            <String fx:value="primary-button" />
+         </styleClass></JFXButton>
+   </children>
+</AnchorPane>
