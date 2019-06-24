@@ -29,7 +29,6 @@ public class DefaultFileWatchManager implements FileWatchManager {
         var optionalWatcher = fileWatchers.stream().filter(watcher -> watcher.hasCovered(file)).findFirst();
         if (optionalWatcher.isPresent()) return optionalWatcher.get();
         LOGGER.info("Creating a FileWatcher for {}", file.getAbsolutePath());
-        LOGGER.error("Test", new Exception("Test trace"));
         var watcher = new DefaultFileWatcher(file);
         this.fileWatchers.add(watcher);
         return watcher;

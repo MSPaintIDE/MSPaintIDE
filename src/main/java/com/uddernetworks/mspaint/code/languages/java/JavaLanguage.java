@@ -12,6 +12,7 @@ import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.util.IDEFileUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -19,6 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -28,6 +32,7 @@ public class JavaLanguage extends Language {
 
     private JavaSettings settings = new JavaSettings();
     private JavaCodeManager javaCodeManager = new JavaCodeManager();
+    private Map<String, Map<String, String>> replaceData = new HashMap<>();
     private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
             Arrays.asList(
                     "java",
@@ -45,20 +50,69 @@ public class JavaLanguage extends Language {
             ), (wrapper, workspaceDir) -> {
         LOGGER.info("Setting up the Java project...");
 
-        if (new File(workspaceDir.getAbsolutePath(), ".classpath").exists()) {
-            LOGGER.info("Project already contains template files, no need to copy them again.");
-            return;
-        }
+        // TODO: Remove hardcoding
+        var templateDir = new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp\\java\\project-template");
 
-        LOGGER.info("Copying template files...");
+        if (!new File(workspaceDir.getAbsolutePath(), ".classpath").exists()) {
+            LOGGER.info("Copying template files...");
+
+            try {
+//            FileUtils.copyDirectory(new File(StartupLogic.getJarParent().orElse(new File("")), "lsp\\java\\project-template"), workspaceDir);
+                FileUtils.copyDirectory(templateDir, workspaceDir);
+            } catch (IOException e) {
+                LOGGER.error("An error occurred while copying over project template files!", e);
+            }
+        } else {
+            LOGGER.info("Project already contains template files, no need to copy them again.");
+        }
 
         try {
-//            FileUtils.copyDirectory(new File(StartupLogic.getJarParent().orElse(new File("")), "lsp\\java\\project-template"), workspaceDir);
-            FileUtils.copyDirectory(new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp\\java\\project-template"), workspaceDir);
-        } catch (IOException e) {
-            LOGGER.error("An error occurred while copying over project template files!", e);
+            var corePrefs = new File(workspaceDir, ".settings\\org.eclipse.jdt.core.prefs").toPath();
+            var corePrefsTemplate = new File(templateDir, ".settings\\org.eclipse.jdt.core.prefs").toPath();
+
+            var sourceListener = bindFileVariable(corePrefsTemplate, corePrefs, "replace.versionnumber");
+            getLanguageSettings().onChangeSetting(JavaOptions.JAVA_VERSION, (Consumer<String>) value -> sourceListener.accept(value.substring(5)), true);
+
+            var classpath = new File(workspaceDir, ".classpath").toPath();
+            var classpathTemplate = new File(templateDir, ".classpath").toPath();
+
+            var versionListener = bindFileVariable(classpathTemplate, classpath, "replace.version");
+            getLanguageSettings().onChangeSetting(JavaOptions.JAVA_VERSION, (Consumer<String>) value -> versionListener.accept("JavaSE-" + value.substring(5)), true);
+
+            var srcListener = bindFileVariable(classpathTemplate, classpath, "replace.src");
+            getLanguageSettings().onChangeSetting(JavaOptions.INPUT_DIRECTORY, (Consumer<File>) file -> srcListener.accept(relativizeFromBase(file)), true);
+
+            var binListener = bindFileVariable(classpathTemplate, classpath, "replace.bin");
+            getLanguageSettings().onChangeSetting(JavaOptions.CLASS_OUTPUT, (Consumer<File>) file -> binListener.accept(relativizeFromBase(file)), true);
+
+            var project = new File(workspaceDir, ".project").toPath();
+            var projectTemplate = new File(templateDir, ".project").toPath();
+
+            // TODO: Fix if a method to change project names is added
+            LOGGER.info("Replacing to name {}", ProjectManager.getPPFProject().getName());
+            bindFileVariable(projectTemplate, project, "replace.name").accept(ProjectManager.getPPFProject().getName());
+        } catch (Exception e) { // Caught due to error suppression in the lambdas
+            LOGGER.error("There was an exception while writing replacement values for files", e);
         }
     });
+
+    private String relativizeFromBase(File file) {
+        return ProjectManager.getPPFProject().getFile().getParentFile().toURI().relativize(file.toURI()).toString();
+    }
+
+    private Consumer<String> bindFileVariable(Path input, Path output, String variableName) {
+        var fileVariables = this.replaceData.computeIfAbsent(input.toString(), i -> new HashMap<>());
+        return newValue -> {
+            try {
+                fileVariables.put(variableName, newValue);
+                String[] content = {new String(Files.readAllBytes(input))};
+                fileVariables.forEach((variable, value) -> content[0] = content[0].replace("%" + variable + "%", value));
+                Files.write(output, content[0].getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                LOGGER.error("There was a problem writing to " + output.toString(), e);
+            }
+        };
+    }
 
     public JavaLanguage(StartupLogic startupLogic) {
         super(startupLogic);

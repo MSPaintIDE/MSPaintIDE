@@ -3,10 +3,10 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane fx:id="anchor" maxHeight="25.0" maxWidth="580.0" minHeight="25.0" minWidth="580.0" prefHeight="25.0" prefWidth="580.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="anchor" maxWidth="580.0" minHeight="25.0" minWidth="580.0" prefWidth="580.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Canvas fx:id="icon" height="25.0" layoutX="5.0" width="25.0" />
       <Label fx:id="time" layoutX="505.0" layoutY="4.0" prefHeight="17.0" prefWidth="75.0" styleClass="theme-text" text="9:28:34" />
-      <Label fx:id="message" layoutX="45.0" layoutY="4.0" prefHeight="17.0" prefWidth="450.0" styleClass="theme-text" text="Something with packages is wrong, uh uo." />
+      <Label fx:id="message" layoutX="45.0" layoutY="4.0" prefWidth="450.0" styleClass="theme-text" text="Something with packages is wrong, uh uo." />
    </children>
 </AnchorPane>

@@ -1,15 +1,21 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
+import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.gui.BooleanLangGUIOption;
+import com.uddernetworks.mspaint.code.languages.gui.DropdownLangGUIOption;
 import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
 import com.uddernetworks.mspaint.code.languages.gui.StringLangGUIOption;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 public class JavaSettings extends LanguageSettings {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(JavaSettings.class);
 
     protected JavaSettings() {
         super("Java");
@@ -61,6 +67,18 @@ public class JavaSettings extends LanguageSettings {
                         .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setExtensionFilter(ProjectFileFilter.PNG)
                         .setSave(true));
+
+        addOption(JavaOptions.JAVA_VERSION,
+                new DropdownLangGUIOption("Java Version", "Java 8", "Java 9", "Java 10", "Java 11", "Java 12", "Java 13"),
+                () -> {
+                    String[] out = {null};
+                    Commandline.runCommand("java --version", false, null, result -> out[0] = result);
+                    var output = out[0];
+                    if (output == null || !output.contains(" ")) return "Java 11";
+                    var version = "Java " + output.split("\\s+")[1].split("\\.")[0];
+                    LOGGER.info("Current version of Java is {}", version);
+                    return version;
+                });
 
         addOption(JavaOptions.HIGHLIGHT, new BooleanLangGUIOption("Syntax highlight"), () -> true);
 

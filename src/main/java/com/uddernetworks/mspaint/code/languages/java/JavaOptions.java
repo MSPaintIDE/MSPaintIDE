@@ -49,6 +49,11 @@ public enum JavaOptions implements Option {
      */
     PROGRAM_OUTPUT("programOutput", REQUIRED),
     /**
+     * The version of Java to be used, from a dropdown selector
+     * @see LangGUIOptionRequirement#REQUIRED
+     */
+    JAVA_VERSION("javaVersion", REQUIRED),
+    /**
      * A boolean to toggle the highlighting of code files
      * @see LangGUIOptionRequirement#BOTTOM_DISPLAY
      */

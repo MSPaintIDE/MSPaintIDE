@@ -41,6 +41,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.fxmisc.richtext.InlineCssTextArea;
@@ -63,6 +64,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MainGUI extends Application implements Initializable {
@@ -672,8 +674,6 @@ public class MainGUI extends Application implements Initializable {
 
         // TODO
 //        GUIConsoleAppender.activate(output);
-        LOGGER.info("Is it working?");
-        LOGGER.error("Haha, it is working", new Exception("Test some shit"));
 
         invertColors.setOnAction(event -> {
             settingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);
@@ -808,10 +808,20 @@ public class MainGUI extends Application implements Initializable {
         var langSettings = getCurrentLanguage().getLanguageSettings();
 
         var i = new LongAdder();
-        langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)))
+        var addingSettings = langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)))
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
-                .forEach(langGUIOption -> {
+                .collect(Collectors.toList());
+
+        var constraints = langSettingsGrid.getRowConstraints();
+        constraints.clear();
+        for (int i1 = 0; i1 < addingSettings.size() + 1; i1++) {
+            constraints.add(new RowConstraints(50, 50, 50));
+        }
+
+        GridPane.setRowIndex(generate, constraints.size() - 1);
+
+        addingSettings.forEach(langGUIOption -> {
                     var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
                     if (langGUIOption.hasChangeButton())
                         childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));

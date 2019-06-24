@@ -18,11 +18,8 @@ public class LSPClient implements LanguageClient {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ReplaceManager.class);
 
-//    private LSPDiagnosticsToMarkers diagnosticHandler;
-
     private StartupLogic startupLogic;
     private LanguageServer server;
-//    private LanguageServerWrapper wrapper;
 
 
     public LSPClient(StartupLogic startupLogic) {
@@ -31,8 +28,6 @@ public class LSPClient implements LanguageClient {
 
     public final void connect(LanguageServer server) {
         this.server = server;
-//        this.wrapper = wrapper;
-//        this.diagnosticHandler = new LSPDiagnosticsToMarkers(wrapper.serverDefinition.id);
     }
 
     protected final LanguageServer getLanguageServer() {
@@ -46,87 +41,53 @@ public class LSPClient implements LanguageClient {
 
     @Override
     public void telemetryEvent(Object object) {
-        // TODO
-        LOGGER.info("shidd telemetryEvent {}", object);
+        LOGGER.info("telemetryEvent {}", object);
     }
 
     @Override
     public final CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
-        LOGGER.info("shidd showMessageRequest {}", requestParams);
-//        return ServerMessageHandler.showMessageRequest(requestParams);
+        LOGGER.info("showMessageRequest {}", requestParams);
         return CompletableFuture.supplyAsync(MessageActionItem::new);
     }
 
     @Override
     public final void showMessage(MessageParams messageParams) {
-        LOGGER.info("shidd showMessage {}", messageParams);
-//        ServerMessageHandler.showMessage(wrapper.serverDefinition.label, messageParams);
+        LOGGER.info("showMessage {}", messageParams);
     }
 
     @Override
     public final void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-//        this.diagnosticHandler.accept(diagnostics);
-//        LOGGER.info("shidd publishDiagnostics {}", diagnostics);
-        diagnostics.getDiagnostics().forEach(diagnostic -> {
-            LOGGER.info("Diagnostic at " + diagnostic.getSeverity() + " > " + diagnostic.getMessage());
-        });
+        diagnostics.getDiagnostics().forEach(diagnostic -> LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage()));
 
         this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics());
     }
 
     @Override
     public final void logMessage(MessageParams message) {
-//        CompletableFuture.runAsync(() -> ServerMessageHandler.logMessage(wrapper, message));
         LOGGER.info(message.getMessage());
     }
 
     @Override
     public final CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(ApplyWorkspaceEditParams params) {
-        LOGGER.info("shidd applyEdit {}", params);
-        return CompletableFuture.supplyAsync(() -> {
-            return new ApplyWorkspaceEditResponse(true);
-        });
-//        return CompletableFuture.supplyAsync(() -> {
-//            Job job = new Job(Messages.serverEdit) {
-//                @Override
-//                public IStatus run(IProgressMonitor monitor) {
-//                    LSPEclipseUtils.applyWorkspaceEdit(params.getEdit());
-//                    return Status.OK_STATUS;
-//                }
-//            };
-//            job.schedule();
-//            try {
-//                job.join();
-//                return new ApplyWorkspaceEditResponse(true);
-//            } catch (InterruptedException e) {
-//                LanguageServerPlugin.logError(e);
-//                Thread.currentThread().interrupt();
-//                return new ApplyWorkspaceEditResponse(Boolean.FALSE);
-//            }
-//        });
+        LOGGER.info("applyEdit {}", params);
+        return CompletableFuture.supplyAsync(() -> new ApplyWorkspaceEditResponse(true));
     }
 
     @Override
     public CompletableFuture<Void> registerCapability(RegistrationParams params) {
-//        return CompletableFuture.runAsync(() -> wrapper.registerCapability(params));
-        LOGGER.info("shidd registerCapability {}", params);
+        LOGGER.info("registerCapability {}", params);
         return CompletableFuture.runAsync(() -> {});
     }
 
     @Override
     public CompletableFuture<Void> unregisterCapability(UnregistrationParams params) {
-//        return CompletableFuture.runAsync(() -> wrapper.unregisterCapability(params));
-        LOGGER.info("shidd unregisterCapability {}", params);
+        LOGGER.info("unregisterCapability {}", params);
         return CompletableFuture.runAsync(() -> {});
     }
 
     @Override
     public CompletableFuture<List<WorkspaceFolder>> workspaceFolders() {
-//        List<WorkspaceFolder> res = new ArrayList<>(wrapper.allWatchedProjects.size());
-//        for (final IProject project : wrapper.allWatchedProjects) {
-//            res.add(LSPEclipseUtils.toWorkspaceFolder(project));
-//        }
-        LOGGER.info("shidd workspaceFolders");
+        LOGGER.info("workspaceFolders");
         return CompletableFuture.completedFuture(Collections.emptyList());
     }
 }
