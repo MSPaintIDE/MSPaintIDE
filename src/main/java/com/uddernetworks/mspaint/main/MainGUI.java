@@ -379,7 +379,8 @@ public class MainGUI extends Application implements Initializable {
                     LOGGER.info("About to change setting listener!");
                     language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<String>) fileString -> {
                         LOGGER.info("Prev = {} Curr = {}", previousInput, fileString);
-                        var file = new File(fileString).getParentFile();
+                        var inputFile = new File(fileString);
+                        var file = inputFile.getParentFile();
                         if (file.equals(this.previousInput)) return;
                         LOGGER.info("Changing input to: {}", fileString);
                         if (previousInput != null) {
@@ -388,11 +389,10 @@ public class MainGUI extends Application implements Initializable {
                             lspWrapper.closeWorkspace(previousInput);
                         }
 
-                        lspWrapper.openWorkspace(previousInput = file);
+                        lspWrapper.openWorkspace(previousInput = file, inputFile);
                     }, true);
 
-                    var fileWatcher = fileWatchManager.watchFile(currentProject.getFile().getParentFile());
-
+//                    var fileWatcher = fileWatchManager.watchFile(currentProject.getFile().getParentFile());
 
                 }, () -> LOGGER.error("No language found with a class of \"{}\"", languageClassString));
                 languageManager.reloadAllLanguages();

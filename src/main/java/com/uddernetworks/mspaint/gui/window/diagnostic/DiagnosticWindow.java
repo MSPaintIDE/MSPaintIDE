@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXListView;
 import com.uddernetworks.mspaint.gui.kvselection.EmptySelection;
 import com.uddernetworks.mspaint.main.MainGUI;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -28,7 +29,7 @@ public class DiagnosticWindow extends Stage implements Initializable {
     private static Logger LOGGER = LoggerFactory.getLogger(DiagnosticWindow.class);
 
     @FXML
-    private JFXListView<Diagnostic> diagnosticList;
+    private JFXListView<Map.Entry<String, Diagnostic>> diagnosticList;
 
     @FXML
     private JFXButton cancel;
@@ -77,9 +78,11 @@ public class DiagnosticWindow extends Stage implements Initializable {
         this.diagnosticList.setCellFactory(t -> new DiagnosticCell(this.mainGUI));
 
         this.diagnosticManager.onDiagnosticChange(diagnostics -> {
-            var items = this.diagnosticList.getItems();
-            items.removeIf(Predicate.not(diagnostics::contains));
-            diagnostics.stream().filter(Predicate.not(items::contains)).forEach(items::add);
+            Platform.runLater(() -> {
+                var items = this.diagnosticList.getItems();
+                items.removeIf(Predicate.not(diagnostics::contains));
+                diagnostics.stream().filter(Predicate.not(items::contains)).forEach(items::add);
+            });
         });
 
         cancel.setOnAction(event -> close());

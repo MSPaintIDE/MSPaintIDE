@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.doc.DefaultDocumentManager;
 import com.uddernetworks.mspaint.code.lsp.doc.DocumentManager;
 import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.watcher.FileWatchManager;
 import com.uddernetworks.mspaint.watcher.FileWatcher;
 import javafx.collections.FXCollections;
@@ -16,6 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -154,7 +159,7 @@ public class LanguageServerWrapper {
     /*
      * Realistically, this only accepts ONE open workspace, since the IDE only allows one open window at once.
      */
-    public void openWorkspace(File file) {
+    public void openWorkspace(File file, File inputFile) {
         // TODO: Throw if `file` is not in `rootPath`?
         verifyStatus(file.getParentFile()).thenRun(() -> {
 
@@ -166,9 +171,22 @@ public class LanguageServerWrapper {
             LOGGER.info("Adding workspace {}", file.getAbsolutePath());
             this.workspaces.add(getWorkspace(file));
 
+            // Opening all paths because the Java LSP server listens to files itself
+            try {
+                Files.walk(inputFile.toPath(), FileVisitOption.FOLLOW_LINKS)
+                        .map(Path::toFile)
+                        .filter(File::isFile)
+                        .filter(walking -> walking.getName().endsWith(".png"))
+                        .forEach(path -> this.documentManager.getDocument(path).open());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             // This is NOT done in the Document class, because stuff may get messed up when deleting and mainly creating
             // new files.
-            this.fileWatchManager.watchFile(file).addListener((type, changedFile) -> {
+            this.fileWatchManager.watchFile(inputFile).addListener((type, changedFile) -> {
+                changedFile = changedFile.getAbsoluteFile();
+                if (!changedFile.getName().endsWith("png") && !changedFile.getName().endsWith("java")) return;
                 // TODO: Not sure if this should happen before or after the following switch?
                 this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
                         new FileEvent(changedFile.toURI().toString(), type.toFCT())
@@ -176,20 +194,19 @@ public class LanguageServerWrapper {
 
                 switch (type) {
                     case CREATE:
-                        LOGGER.info("Create document event");
-                        this.documentManager.getDocument(file);
+                        LOGGER.info("Create document event {}", changedFile.getAbsolutePath());
+                        this.documentManager.getDocument(changedFile).open();
                         break;
                     case MODIFY:
-                        LOGGER.info("Modify document event");
-                        // The consumer should always run, since a Document will be created
-                        this.documentManager.getDocument(file, true).ifPresent(document -> {
-                            document.open();
-                            document.notifyOfTextChange();
-                        });
+                        LOGGER.info("Modify document event {}", changedFile.getAbsolutePath());
+                        var document = this.documentManager.getDocument(changedFile);
+                        if (!document.isOpened()) document.open();
+
+                        document.notifyOfTextChange();
                         break;
                     case DELETE:
-                        LOGGER.info("Delete document event");
-                        this.documentManager.getDocument(file, false).ifPresent(this.documentManager::deleteDocument);
+                        LOGGER.info("Delete document event {}", changedFile.getAbsolutePath());
+                        this.documentManager.getDocument(changedFile, false).ifPresent(this.documentManager::deleteDocument);
                         break;
                 }
             });
@@ -232,7 +249,8 @@ public class LanguageServerWrapper {
     private WorkspaceFolder getWorkspace(String file) {
         var workspace = new WorkspaceFolder();
         workspace.setUri(getURI(file));
-        workspace.setName("JavaProject");
+//        workspace.setName("JavaProject");
+        workspace.setName(ProjectManager.getPPFProject().getName());
         return workspace;
     }
 
@@ -259,13 +277,13 @@ public class LanguageServerWrapper {
             LOGGER.info("Root is to {}", rootPath.toURI().toString());
         }
         WorkspaceClientCapabilities workspaceClientCapabilities = new WorkspaceClientCapabilities();
-//        workspaceClientCapabilities.setApplyEdit(true);
-//        workspaceClientCapabilities.setDidChangeWatchedFiles(new DidChangeWatchedFilesCapabilities());
-//        workspaceClientCapabilities.setExecuteCommand(new ExecuteCommandCapabilities());
-//        workspaceClientCapabilities.setWorkspaceEdit(new WorkspaceEditCapabilities());
+        workspaceClientCapabilities.setApplyEdit(true);
+        workspaceClientCapabilities.setDidChangeWatchedFiles(new DidChangeWatchedFilesCapabilities());
+        workspaceClientCapabilities.setExecuteCommand(new ExecuteCommandCapabilities());
+        workspaceClientCapabilities.setWorkspaceEdit(new WorkspaceEditCapabilities());
 //        workspaceClientCapabilities.setSymbol(new SymbolCapabilities());
         workspaceClientCapabilities.setWorkspaceFolders(true);
-//        workspaceClientCapabilities.setConfiguration(false);
+        workspaceClientCapabilities.setConfiguration(true);
 
         TextDocumentClientCapabilities textDocumentClientCapabilities = new TextDocumentClientCapabilities();
         textDocumentClientCapabilities.setCodeAction(new CodeActionCapabilities());

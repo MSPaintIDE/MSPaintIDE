@@ -31,7 +31,7 @@ public class DefaultFileWatchManager implements FileWatchManager {
         LOGGER.info("Creating a FileWatcher for {}", file.getAbsolutePath());
         var watcher = new DefaultFileWatcher(file);
         this.fileWatchers.add(watcher);
-        return watcher;
+        return watcher.startWatching();
     }
 
     @Override

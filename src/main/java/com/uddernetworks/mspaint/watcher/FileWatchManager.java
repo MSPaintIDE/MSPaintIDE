@@ -22,7 +22,8 @@ public interface FileWatchManager {
     Optional<FileWatcher> getWatcher(File file);
 
     /**
-     * Creates or returns a {@link FileWatcher} to watch the given file.
+     * Creates or returns a {@link FileWatcher} to watch the given file. The created {@link FileWatcher} will be
+     * started.
      *
      * @param file The file to watch
      * @return The {@link FileWatcher} to watch the given file

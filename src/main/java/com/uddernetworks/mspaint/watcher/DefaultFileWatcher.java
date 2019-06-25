@@ -1,14 +1,12 @@
 package com.uddernetworks.mspaint.watcher;
 
+import com.sun.nio.file.ExtendedWatchEventModifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchService;
+import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -34,46 +32,57 @@ public class DefaultFileWatcher implements FileWatcher {
     }
 
     @Override
-    public void startWatching() {
+    public FileWatcher startWatching() {
         this.watching = true;
         this.watchingFuture = executor.submit(() -> {
-            try {
-                try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-                    this.file.toPath().register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+            try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+                this.file.toPath().register(watchService,
+                        new WatchEvent.Kind<?>[]{StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE},
+                        ExtendedWatchEventModifier.FILE_TREE);
 
-                    var last = System.currentTimeMillis();
-                    while (true) {
-                        var watchKey = watchService.take();
-                        Map<WatchType, File> found = null;
-                        for (var event : watchKey.pollEvents()) {
-                            var changed = ((Path) event.context()).toAbsolutePath().toFile();
-                            if (hasCovered(changed)) {
-                                if (found == null) found = new HashMap<>();
-                                found.put(WatchType.fromKind(event.kind()), changed);
-                            }
+                var cooldownMap = new HashMap<File, Long>();
+                while (true) {
+                    var watchKey = watchService.take();
+                    Map<WatchType, File> found = null;
+                    for (var event : watchKey.pollEvents()) {
+                        var dir = (Path) watchKey.watchable();
+                        var changed = dir.resolve((Path) event.context()).toFile();
+                        if (hasCovered(changed)) {
+                            if (found == null) found = new HashMap<>();
+                            found.put(WatchType.fromKind(event.kind()), changed);
                         }
+                    }
 
-                        if (found != null && (System.currentTimeMillis() - last) > MIN_TIME_IN_MILLS) {
-                            found.forEach((type, file) -> this.fileListeners.values().forEach(listener -> listener.accept(type, file)));
-                            last = System.currentTimeMillis();
-                        }
+                    // TODO: Add back time?
+                    if (found != null) {
+                        found.forEach((type, file) -> {
+                            LOGGER.info("Found {}", file.getAbsolutePath());
+                            if (System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
+                                return;
+                            cooldownMap.put(file, System.currentTimeMillis());
+                            this.fileListeners.values().forEach(listener -> listener.accept(type, file));
+                        });
+                    }
 
-                        if (!watchKey.reset()) {
-                            LOGGER.info("Key has been unregistered");
-                        }
+                    if (!watchKey.reset()) {
+                        LOGGER.info("Key has been unregistered");
                     }
                 }
             } catch (IOException e) {
                 LOGGER.error("An exception has occurred in a FileWatcher!", e);
             } catch (InterruptedException ignored) {}
         });
+
+        return this;
     }
 
     @Override
-    public void stopWatching() {
-        if (!isWatching()) return;
+    public FileWatcher stopWatching() {
+        LOGGER.error("Stop watching!");
+        if (!isWatching()) return this;
         this.watchingFuture.cancel(true);
         this.watching = false;
+        return this;
     }
 
     @Override

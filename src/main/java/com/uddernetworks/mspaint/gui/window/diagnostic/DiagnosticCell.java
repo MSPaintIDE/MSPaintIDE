@@ -7,29 +7,31 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-public class DiagnosticCell extends ListCell<Diagnostic> {
+public class DiagnosticCell extends ListCell<Map.Entry<String, Diagnostic>> {
 
     @FXML
-    private AnchorPane anchor;
+    private GridPane anchor;
 
     @FXML
     private Canvas icon;
 
     @FXML
-    private Label time;
+    private Label message;
 
     @FXML
-    private Label message;
+    private Label info;
 
     private FXMLLoader fxmlLoader;
     private MainGUI mainGUI;
@@ -39,10 +41,10 @@ public class DiagnosticCell extends ListCell<Diagnostic> {
     }
 
     @Override
-    public void updateItem(Diagnostic diagnostic, boolean empty) {
-        super.updateItem(diagnostic, empty);
+    public void updateItem(Map.Entry<String, Diagnostic> entry, boolean empty) {
+        super.updateItem(entry, empty);
 
-        if (empty || diagnostic == null) {
+        if (empty || entry == null) {
             setText(null);
             setGraphic(null);
         } else {
@@ -63,12 +65,22 @@ public class DiagnosticCell extends ListCell<Diagnostic> {
                 ));
             }
 
+            var file = new File(URI.create(entry.getKey()));
+            var diagnostic = entry.getValue();
+
             appendIcon(this.icon.getGraphicsContext2D(), diagnostic.getSeverity());
 
-            this.time.setText(new SimpleDateFormat("HH:mm:ss").format(new Date()));
-            this.message.setText(diagnostic.getMessage());
+            var infoText = new StringBuilder();
 
-            // TODO: Add initial check if it's dark theme?
+            this.message.setText(diagnostic.getMessage());
+            infoText.append(file.getName())
+                    .append(":")
+                    .append(diagnostic.getRange().getStart().getLine())
+                    .append("   ")
+                    .append(new SimpleDateFormat("HH:mm:ss").format(new Date()))
+                    .append("\t");
+
+            this.info.setText(infoText.toString());
 
             setText(null);
             setGraphic(anchor);

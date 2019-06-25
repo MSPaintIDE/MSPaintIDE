@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collections;
 
 public class BasicDocument implements Document {
@@ -35,11 +33,7 @@ public class BasicDocument implements Document {
         this.lsWrapper = lsWrapper;
         this.requestManager = lsWrapper.getRequestManager();
 
-        try {
-            this.text = Files.readString(file.toPath());
-        } catch (IOException e) {
-            LOGGER.error("Error while creating Document", e);
-        }
+        this.text = imageClass.getText();
 
         this.changesParams = new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(),
                 Collections.singletonList(new TextDocumentContentChangeEvent()));
@@ -51,9 +45,14 @@ public class BasicDocument implements Document {
     public void open() {
         this.opened = true;
 
-        System.out.println("requestManager = " + requestManager);
-        System.out.println("text = " + text);
-        System.out.println("getURI() = " + getURI());
+        LOGGER.info("requestManager = " + requestManager);
+        LOGGER.info("text = " + text);
+        LOGGER.info("getURI() = " + getURI());
+        if (this.text == null) {
+            this.imageClass.scan();
+            if ((this.text = this.imageClass.getText()) == null) return;
+        }
+
         this.requestManager.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(getURI(), "java", version++, this.text)));
     }
 
@@ -84,6 +83,7 @@ public class BasicDocument implements Document {
 
     @Override
     public void notifyOfTextChange() {
+        LOGGER.info("Notifying of text change");
         this.imageClass.scan();
         modifyText(this.imageClass.getText());
     }
@@ -108,7 +108,12 @@ public class BasicDocument implements Document {
         return opened;
     }
 
+    /**
+     * Returns the URI to be used when sending file data to the LSP server, which removes the .png file extension.
+     *
+     * @return The .png-removed URI
+     */
     private String getURI() {
-        return this.file.toURI().toString();
+        return this.file.toURI().toString().replaceAll("\\.png?$", "");
     }
 }

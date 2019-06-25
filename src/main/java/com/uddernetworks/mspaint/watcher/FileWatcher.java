@@ -7,13 +7,17 @@ public interface FileWatcher {
 
     /**
      * Starts watching the file given in the constructor.
+     *
+     * @return The current {@link FileWatcher}
      */
-    void startWatching();
+    FileWatcher startWatching();
 
     /**
      * Stops any watching of the file.
+     *
+     * @return The current {@link FileWatcher}
      */
-    void stopWatching();
+    FileWatcher stopWatching();
 
     /**
      * Adds a listener to be invoked when the given file(s) are changed.

@@ -1,6 +1,5 @@
 package com.uddernetworks.mspaint.code.lsp;
 
-import com.uddernetworks.mspaint.gui.window.search.ReplaceManager;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification;
@@ -16,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class LSPClient implements LanguageClient {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ReplaceManager.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(LSPClient.class);
 
     private StartupLogic startupLogic;
     private LanguageServer server;
@@ -39,6 +38,11 @@ public class LSPClient implements LanguageClient {
         LOGGER.info("[{}] {}", data.get("type"), data.get("message"));
     }
 
+    @JsonNotification("java/didChangeWorkspaceFolders")
+    public void test(Object object) {
+        LOGGER.info("Stuff java/didChangeWorkspaceFolders is {}", object);
+    }
+
     @Override
     public void telemetryEvent(Object object) {
         LOGGER.info("telemetryEvent {}", object);
@@ -57,9 +61,14 @@ public class LSPClient implements LanguageClient {
 
     @Override
     public final void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        diagnostics.getDiagnostics().forEach(diagnostic -> LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage()));
+        if (diagnostics.getDiagnostics().isEmpty()) {
+            LOGGER.warn("Diagnostics empty for {}", diagnostics.getUri());
+        }
+        diagnostics.getDiagnostics().forEach(diagnostic -> {
+            LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage());
+        });
 
-        this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics());
+        this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics(), diagnostics.getUri());
     }
 
     @Override
