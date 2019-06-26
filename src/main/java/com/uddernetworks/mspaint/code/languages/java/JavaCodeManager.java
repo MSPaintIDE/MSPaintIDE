@@ -1,28 +1,24 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
-import com.uddernetworks.mspaint.code.FileJarrer;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.tools.*;
 import java.awt.*;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -30,104 +26,16 @@ public class JavaCodeManager {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaCodeManager.class);
 
-    private File classOutputFolder;
-    private Map<String, ImageClass> imageClassHashMap = new HashMap<>();
-    private Map<ImageClass, List<Diagnostic<? extends JavaFileObject>>> errors = new HashMap<>();
-    private List<URLClassLoader> classLoaders = new ArrayList<>();
+    private JavaLanguage language;
 
-    public class MyDiagnosticListener implements DiagnosticListener<JavaFileObject> {
-
-        @Override
-        public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-            String packageName = diagnostic.getSource().getName().substring(1).replace("/", ".");
-            packageName = packageName.substring(0, packageName.length() - 5);
-
-            LOGGER.info("packageName = " + packageName);
-
-            ImageClass imageClass = imageClassHashMap.get(packageName);
-
-            if (errors.containsKey(imageClass)) {
-                errors.get(imageClass).add(diagnostic);
-            } else {
-                List<Diagnostic<? extends JavaFileObject>> list = new ArrayList<>();
-                list.add(diagnostic);
-                errors.put(imageClass, list);
-            }
-        }
-    }
-
-    public static class InMemoryJavaFileObject extends SimpleJavaFileObject {
-        private String contents;
-
-        private InMemoryJavaFileObject(String className, String contents) {
-            super(URI.create("string:///" + className.replace('.', '/')
-                    + Kind.SOURCE.extension), Kind.SOURCE);
-            this.contents = contents;
-        }
-
-        @Override
-        public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-            return contents;
-        }
-    }
-
-    private JavaFileObject getJavaFileObject(String code, String classPackage, String className) {
-        JavaFileObject so = null;
-        try {
-            so = new InMemoryJavaFileObject(classPackage + "." + className, code);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return so;
-    }
-
-    private void compile(Iterable<? extends JavaFileObject> files, List<File> libs) {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-        MyDiagnosticListener c = new MyDiagnosticListener();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(c, Locale.ENGLISH, null);
-
-        List<String> options = new ArrayList<>(Arrays.asList("-d", classOutputFolder.getAbsolutePath()));
-
-        if (!libs.isEmpty()) {
-            options.add("-classpath");
-
-            libs.forEach(lib -> options.add(lib.getAbsolutePath()));
-        }
-
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, c, options, null, files);
-        task.call();
-    }
-
-    private void runIt(List<URLClassLoader> classLoaders, File classOutputFolder, String classPackage, String className) {
-        try {
-            classLoaders.add(new URLClassLoader(new URL[]{classOutputFolder.toURI().toURL()}));
-
-            Class<?> thisClass = classLoaders.get(classLoaders.size() - 1).loadClass(classPackage.trim().isEmpty() ? className : classPackage + "." + className);
-
-            Object instance = thisClass.newInstance();
-            Method thisMethod = thisClass.getDeclaredMethod("main", String[].class);
-
-            thisMethod.invoke(instance, new Object[]{new String[0]});
-        } catch (MalformedURLException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException ignored) {}
-    }
-
-    private void reset() {
-        this.classOutputFolder = null;
-        this.imageClassHashMap.clear();
-        this.errors.clear();
-        this.classLoaders.clear();
+    public JavaCodeManager(JavaLanguage language) {
+        this.language = language;
     }
 
     // TODO: Multi-thread this
     public CompilationResult compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
-        reset();
-        this.classOutputFolder = classOutputFolder;
+        mainGUI.setIndeterminate(true);
         classOutputFolder.mkdirs();
-
-        for (File file : getFilesFromDirectory(classOutputFolder, null)) {
-            file.delete();
-        }
 
         compilerStream.changeColor(Color.RED);
         PrintStream compilerOut = new PrintStream(compilerStream);
@@ -140,39 +48,47 @@ public class JavaCodeManager {
         info("Compiling...");
         mainGUI.setStatusText("Compiling...");
 
-        List<JavaFileObject> filesList = new ArrayList<>();
+        LOGGER.info("Compiling {} files", imageClasses.size());
 
-        Map<String, String> namePackages = new HashMap<>();
+        // Puts .java files into this directory, which are then compiled from here
+        var generateJava = new File(System.getProperty("java.io.tmpdir"), "MSPaintIDE_" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+        var genSrc = new File(generateJava, "src");
 
-        for (ImageClass imageClass : imageClasses) {
-            String classPackage = (imageClass.getText().trim().startsWith("package") ? imageClass.getText().trim().substring(8, imageClass.getText().trim().indexOf(";")) : "");
-            String[] spaces = imageClass.getText().trim().split(" ");
-            String className = "Main";
-            for (int i = 0; i < spaces.length; i++) {
-                if (spaces[i].equals("class")) {
-                    className = spaces[i + 1];
-                    break;
-                }
+        var javaFiles = new ArrayList<File>();
+        var input = this.language.getLanguageSettings().<File>getSetting(JavaOptions.INPUT_DIRECTORY);
+        imageClasses.forEach(imageClass -> {
+            var relative = input.toURI().relativize(imageClass.getInputImage().toURI());
+            var absoluteOutput = new File(genSrc, relative.getPath().replaceAll("\\.png$", ""));
+
+            javaFiles.add(absoluteOutput);
+            try {
+                FileUtils.write(absoluteOutput, imageClass.getText(), Charset.defaultCharset());
+            } catch (IOException e) {
+                LOGGER.error("An error occurred while writing to the temp file {}", absoluteOutput.getAbsolutePath());
             }
+        });
 
-            if (className.trim().endsWith("{"))
-                className = className.trim().substring(0, className.trim().length() - 1);
+        jarFile.delete();
+        FileUtils.deleteDirectory(classOutputFolder);
+        classOutputFolder.mkdirs();
 
-            info("Class name = " + className);
-            info("Class package = " + classPackage);
+        var javac = new ArrayList<String>();
+        javac.add("javac");
+        javac.add("-g");
+        javac.add("-verbose");
+        if (!libs.isEmpty()) javac.add("-cp");
+        libs.forEach(file -> {
+            javac.add(file.getAbsolutePath());
+        });
+        javac.add("-d");
+        javac.add(classOutputFolder.getAbsolutePath());
+        javaFiles.forEach(file -> javac.add(file.getAbsolutePath()));
+        runCommand(javac);
 
-            namePackages.put(className, classPackage);
-            imageClassHashMap.put(classPackage + "." + className, imageClass);
-
-            filesList.add(getJavaFileObject(imageClass.getText(), classPackage, className));
-        }
-
-        compile(filesList, libs);
-
-        info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
-        info("Packaging jar...");
+        LOGGER.info("Packaging jar...");
         mainGUI.setStatusText("Packaging jar...");
 
         if (otherFiles != null) {
@@ -185,54 +101,40 @@ public class JavaCodeManager {
             }
         }
 
-        FileJarrer fileJarrer = new FileJarrer(classOutputFolder, jarFile);
-        fileJarrer.jarDirectory();
+        var jarCreate = new ArrayList<String>();
+        jarCreate.add("jar");
+        jarCreate.add("-c");
+        jarCreate.add("-f");
+        jarCreate.add(jarFile.getAbsolutePath());
+        jarCreate.add("-e");
+        jarCreate.add(this.language.getLanguageSettings().getSetting(JavaOptions.MAIN));
+        jarCreate.add("*");
+        runCommand(jarCreate, classOutputFolder);
 
-        info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
-
-        if (!errors.isEmpty()) {
-            for (List<Diagnostic<? extends JavaFileObject>> errorList : errors.values()) {
-                for (Diagnostic<? extends JavaFileObject> error : errorList) {
-                    info("Error on " + error.getSource().getName() + " [" + error.getLineNumber() + ":" + (error.getColumnNumber() == -1 ? "?" : error.getColumnNumber()) + "] " + error.getMessage(Locale.ENGLISH));
-                }
-            }
-        }
+        LOGGER.info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
         if (!execute) {
             return new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
         }
 
-        info("Executing...");
+        LOGGER.info("Executing...");
         mainGUI.setStatusText("Executing...");
         final var programStart = System.currentTimeMillis();
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new JavaRunningCode(() -> {
             ConsoleManager.setAll(programOut);
-
-            for (String className : namePackages.keySet()) {
-                runIt(classLoaders, classOutputFolder, namePackages.get(className), className);
-            }
+            return runCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()));
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
-                info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");
+                LOGGER.info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");
             } else {
-                info("Executed " + (exitCode > 0 ? "with errors " : "") + "in " + (System.currentTimeMillis() - programStart) + "ms");
+                LOGGER.info("Executed " + (exitCode > 0 ? "with errors " : "") + "in " + (System.currentTimeMillis() - programStart) + "ms");
             }
         }).afterError(message -> {
             info("Program stopped for the reason: " + message);
         }).afterAll((exitCode, ignored) -> {
-            try {
-                mainGUI.setStatusText("");
-
-                for (URLClassLoader classLoader : this.classLoaders) {
-                    classLoader.close();
-                }
-
-                this.classLoaders.clear();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            mainGUI.setStatusText("");
         }));
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);
@@ -284,5 +186,57 @@ public class JavaCodeManager {
         }
 
         return ret;
+    }
+
+    private int runCommand(List<String> command) {
+        return runCommand(command, null);
+    }
+
+    private int runCommand(List<String> command, File directory) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+//            processBuilder.redirectError();
+            processBuilder.inheritIO();
+            if (directory != null) processBuilder.directory(directory);
+            Process p = processBuilder.start();
+            InputStreamConsumer streamConsumer = new InputStreamConsumer(p.getInputStream());
+            streamConsumer.start();
+            int exitCode = p.waitFor();
+            streamConsumer.join();
+            LOGGER.info("Process terminated with {}", exitCode);
+            return exitCode;
+        } catch (IOException | InterruptedException e) {
+            LOGGER.error("An error occurred while running command with arguments " + command, e);
+            return -1;
+        }
+    }
+
+    public static class InputStreamConsumer extends Thread {
+
+        private InputStream is;
+        private StringBuilder line = new StringBuilder();
+
+        public InputStreamConsumer(InputStream is) {
+            this.is = is;
+        }
+
+        @Override
+        public void run() {
+            try {
+                int intVal = -1;
+                while ((intVal = is.read()) != -1) {
+                    char value = (char) intVal;
+                    if (value == '\n') {
+                        LOGGER.info(line.toString());
+                        line = new StringBuilder();
+                    } else {
+                        line.append(value);
+                    }
+                }
+            } catch (IOException exp) {
+                exp.printStackTrace();
+            }
+
+        }
     }
 }

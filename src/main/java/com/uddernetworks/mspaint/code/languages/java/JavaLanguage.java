@@ -31,7 +31,7 @@ public class JavaLanguage extends Language {
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
     private JavaSettings settings = new JavaSettings();
-    private JavaCodeManager javaCodeManager = new JavaCodeManager();
+    private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
     private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
             Arrays.asList(

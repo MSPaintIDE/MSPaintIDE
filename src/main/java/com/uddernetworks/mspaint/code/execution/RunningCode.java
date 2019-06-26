@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 public abstract class RunningCode {
 
     protected ThrowableRunnable runnable;
+    protected ThrowableSupplier<Integer> supplier;
     protected Future<?> future;
     protected int exitCode = 0;
 
@@ -22,6 +23,13 @@ public abstract class RunningCode {
      */
     public RunningCode(ThrowableRunnable runnable) {
         this.runnable = runnable;
+    }
+
+    /**
+     * @param supplier The task that actually runs the code, returning the exit code
+     */
+    public RunningCode(ThrowableSupplier<Integer> supplier) {
+        this.supplier = supplier;
     }
 
     /**

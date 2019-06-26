@@ -94,11 +94,7 @@ public class StartupLogic {
                 try {
                     var document = documentManager.getDocument(new File(URI.create(uri + ".png")));
                     var imageClass = document.getImageClass();
-                    imageClass.getScannedImage().ifPresentOrElse(img -> {
-                        LOGGER.error("All clear! Image has been scanned {}", uri);
-                    }, () -> {
-                        LOGGER.error("Error! Image has not been scanned yet! {}", uri);
-                    });
+                    imageClass.getScannedImage().ifPresentOrElse(img -> {}, () -> LOGGER.error("Error! Image has not been scanned yet! {}", uri));
                     AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1 / 6D, imageClass.getHighlightedFile(), imageClass.getScannedImage().get(), diagnostics);
                     highlighter.highlightAngrySquiggles();
                 } catch (IOException | TranscoderException e) {

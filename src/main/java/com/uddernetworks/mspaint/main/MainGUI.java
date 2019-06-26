@@ -525,11 +525,11 @@ public class MainGUI extends Application implements Initializable {
                 return;
             }
 
-            if (!getCurrentLanguage().hasRuntime()) {
-                setHaveError();
-                LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
-                return;
-            }
+//            if (!getCurrentLanguage().hasRuntime()) {
+//                setHaveError();
+//                LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
+//                return;
+//            }
 
             progress.setProgress(0);
             progress.getStyleClass().remove("progressError");
