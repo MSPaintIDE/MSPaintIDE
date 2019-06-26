@@ -1,12 +1,14 @@
 package com.uddernetworks.mspaint.code.highlighter;
 
 import com.uddernetworks.mspaint.code.ImageClass;
-import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 import com.uddernetworks.newocr.utils.ConversionUtils;
 import org.apache.batik.transcoder.TranscoderException;
+import org.eclipse.lsp4j.Diagnostic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -18,31 +20,51 @@ import java.util.Optional;
 
 public class AngrySquiggleHighlighter {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(AngrySquiggleHighlighter.class);
+
     private StartupLogic startupLogic;
     private ImageClass imageClass;
     private BufferedImage image;
     private double extraSquigglePaddingRatio;
     private File highlightedFile;
     private ScannedImage scannedImage;
-    private List<LanguageError> errors;
+    private List<Diagnostic> diagnostics;
     private BufferedImage squiggleImage; // The highlighter will use the size of the first character to calculate the persistent angry squiggle image
 
-    public AngrySquiggleHighlighter(StartupLogic startupLogic, ImageClass imageClass, double extraSquigglePaddingRatio, File highlightedFile, ScannedImage scannedImage, List<LanguageError> errors) throws IOException, TranscoderException {
+    public AngrySquiggleHighlighter(StartupLogic startupLogic, ImageClass imageClass, double extraSquigglePaddingRatio, File highlightedFile, ScannedImage scannedImage, List<Diagnostic> diagnostics) {
         this.startupLogic = startupLogic;
         this.imageClass = imageClass;
         this.image = imageClass.getImage();
         this.extraSquigglePaddingRatio = extraSquigglePaddingRatio;
         this.highlightedFile = highlightedFile;
         this.scannedImage = scannedImage;
-        this.errors = errors;
+        this.diagnostics = diagnostics;
     }
 
     public void highlightAngrySquiggles() throws IOException, TranscoderException {
-        for (LanguageError error : errors) {
-            int lineNumber = Long.valueOf(error.getLineNumber()).intValue() - 1;
-            int columnNumber = Long.valueOf(error.getColumnNumber()).intValue() - 1;
+        LOGGER.info("Starting highlight");
+        for (Diagnostic diagnostic : diagnostics) {
+            var range = diagnostic.getRange();
+            var start = range.getStart();
+            var end = range.getEnd();
+            int startLine = start.getLine();
+            int startColumn = start.getCharacter();
 
-            getLineAndLength(lineNumber, columnNumber);
+            var endLine = end.getLine();
+            var endColumn = end.getCharacter();
+
+            if (endLine != startLine) {
+                var numOfFullLines = endLine - startLine - 1;
+                for (int fullLine = 0; fullLine < numOfFullLines; fullLine++) {
+                    LOGGER.info("Highlight full {}", fullLine);
+                    getLineAndLength(startLine, startColumn, Integer.MAX_VALUE);
+                }
+
+                getLineAndLength(startLine, startColumn, Integer.MAX_VALUE);
+                getLineAndLength(endLine, endColumn, Integer.MAX_VALUE);
+            } else {
+                getLineAndLength(startLine, startColumn, endColumn - startColumn);
+            }
         }
     }
 
@@ -69,11 +91,11 @@ public class AngrySquiggleHighlighter {
                 && 0 <= y;
     }
 
-    private void getLineAndLength(int lineNumber, int columnNumber) throws IOException, TranscoderException {
+    private void getLineAndLength(int lineNumber, int columnNumber, int length) throws IOException, TranscoderException {
         var actions = this.startupLogic.getOCRManager().getActions();
         int xIndex;
         int yIndex;
-        int length;
+        int pixelLength;
         int fontSize = 0;
 
         List<ImageLetter> line = this.scannedImage.getLine(lineNumber);
@@ -93,14 +115,24 @@ public class AngrySquiggleHighlighter {
 
         if (columnNumber == -1) {
             calcXY = first;
-
-            length = last.getX() + last.getWidth() - first.getX();
+            pixelLength = last.getX() + last.getWidth() - first.getX();
         } else {
-            ImageLetter columnLetter = line.get(Math.min(columnNumber, line.size() - 1)); // Need to get BEFORE
-            System.out.println("Column letter info: " + columnLetter.getLetter()  +" width: " + columnLetter.getWidth());
-            calcXY = columnLetter;
-            length = columnLetter.getWidth();
-            extraSquigglePadding = (int) Math.round(this.extraSquigglePaddingRatio * length);
+            var startIndex = Math.min(columnNumber, line.size() - 1); // Need to get BEFORE
+            ImageLetter firstLetter = line.get(startIndex);
+            System.out.println("Column letter info: " + firstLetter.getLetter()  +" width: " + firstLetter.getWidth());
+            calcXY = firstLetter;
+
+            LOGGER.info("Length = {} plus {} is {}", length, startIndex, startIndex + length);
+            var lastLetterIndex = 0;
+            if (length == Integer.MAX_VALUE) {
+                lastLetterIndex = line.size() - 1;
+            } else {
+                lastLetterIndex = Math.min(startIndex + length, line.size() - 1);
+            }
+            var lastLetter = line.get(lastLetterIndex);
+
+            pixelLength = lastLetter.getX() - firstLetter.getX() + lastLetter.getWidth();
+            extraSquigglePadding = (int) Math.round(this.extraSquigglePaddingRatio * pixelLength);
         }
 
         xIndex = calcXY.getX() + (int) Math.round(calcXY.getWidth() / 2D);
@@ -108,16 +140,16 @@ public class AngrySquiggleHighlighter {
 
         fontSize = ConversionUtils.pointToPixel(fontSize); // fontSize is now in pixels
 
-        length = length + extraSquigglePadding * 2;
+        pixelLength = pixelLength + extraSquigglePadding * 2;
 
         if (this.squiggleImage == null) {
             AngrySquiggleGenerator angrySquiggleGenerator = new AngrySquiggleGenerator(fontSize);
             this.squiggleImage = angrySquiggleGenerator.getGeneratedPNG();
         }
 
-        length = getRoundedSquiggleLength(length);
+        pixelLength = getRoundedSquiggleLength(pixelLength);
 
-        drawAngrySquiggle((int) Math.round(xIndex - (length / 2D)), (int) Math.round(yIndex + this.squiggleImage.getHeight() / 2D), length);
+        drawAngrySquiggle((int) Math.round(xIndex - (pixelLength / 2D)), (int) Math.round(yIndex + this.squiggleImage.getHeight() / 2D), pixelLength);
     }
 
     private int getRoundedSquiggleLength(int originalLength) {
