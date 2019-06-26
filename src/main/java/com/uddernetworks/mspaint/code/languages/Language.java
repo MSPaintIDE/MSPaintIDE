@@ -242,11 +242,11 @@ public abstract class Language {
     protected void highlightAll(Option highlightDirectorySetting, List<ImageClass> imageClasses) throws IOException {
         var LOGGER = getLogger();
         var mainGUI = startupLogic.getMainGUI();
-        if (optionsNotFilled()) {
-            LOGGER.error("Please select files for all options");
-            mainGUI.setHaveError();
-            return;
-        }
+//        if (optionsNotFilled()) {
+//            LOGGER.error("Please select files for all options");
+//            mainGUI.setHaveError();
+//            return;
+//        }
 
         var highlightDirectory = getLanguageSettings().<File>getSetting(highlightDirectorySetting);
 

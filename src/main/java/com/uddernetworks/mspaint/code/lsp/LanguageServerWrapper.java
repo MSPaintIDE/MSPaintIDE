@@ -2,11 +2,13 @@ package com.uddernetworks.mspaint.code.lsp;
 
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.doc.DefaultDocumentManager;
+import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.code.lsp.doc.DocumentManager;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.watcher.FileWatchManager;
 import com.uddernetworks.mspaint.watcher.FileWatcher;
+import com.uddernetworks.mspaint.watcher.WatchType;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -21,10 +23,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
@@ -61,12 +60,12 @@ public class LanguageServerWrapper {
     }
 
     public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, String serverPath, List<String> lspArgs, BiConsumer<LanguageServerWrapper, File> workspaceInit) {
+        this.documentManager = new DefaultDocumentManager(this, startupLogic);
         this.startupLogic = startupLogic;
         this.fileWatchManager = startupLogic.getFileWatchManager();
         this.lsp = lsp;
         this.serverPath = serverPath;
         this.lspArgs = lspArgs;
-        this.documentManager = new DefaultDocumentManager(this, startupLogic);
         this.workspaceInit = workspaceInit;
 
         this.workspaces.addListener((ListChangeListener<WorkspaceFolder>) change -> {
@@ -172,34 +171,42 @@ public class LanguageServerWrapper {
             this.workspaces.add(getWorkspace(file));
 
             // Opening all paths because the Java LSP server listens to files itself
+            var diagnosticManager = this.startupLogic.getDiagnosticManager();
+            diagnosticManager.pauseDiagnostics();
             try {
                 Files.walk(inputFile.toPath(), FileVisitOption.FOLLOW_LINKS)
                         .map(Path::toFile)
                         .filter(File::isFile)
                         .filter(walking -> walking.getName().endsWith(".png"))
-                        .forEach(path -> this.documentManager.getDocument(path).open());
+                        .forEach(path -> {
+                            var document = this.documentManager.getDocument(path);
+                            document.open();
+                            highlightFile(document);
+                        });
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            diagnosticManager.resumeDiagnostics();
 
             // This is NOT done in the Document class, because stuff may get messed up when deleting and mainly creating
             // new files.
             this.fileWatchManager.watchFile(inputFile).addListener((type, changedFile) -> {
                 changedFile = changedFile.getAbsoluteFile();
-                if (!changedFile.getName().endsWith("png") && !changedFile.getName().endsWith("java")) return;
+                if (!changedFile.getName().endsWith("png")) return;
                 // TODO: Not sure if this should happen before or after the following switch?
                 this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
                         new FileEvent(changedFile.toURI().toString(), type.toFCT())
                 )));
 
+                Document document = null;
                 switch (type) {
                     case CREATE:
                         LOGGER.info("Create document event {}", changedFile.getAbsolutePath());
-                        this.documentManager.getDocument(changedFile).open();
+                        (document = this.documentManager.getDocument(changedFile)).open();
                         break;
                     case MODIFY:
                         LOGGER.info("Modify document event {}", changedFile.getAbsolutePath());
-                        var document = this.documentManager.getDocument(changedFile);
+                        document = this.documentManager.getDocument(changedFile);
                         if (!document.isOpened()) document.open();
 
                         document.notifyOfTextChange();
@@ -209,8 +216,21 @@ public class LanguageServerWrapper {
                         this.documentManager.getDocument(changedFile, false).ifPresent(this.documentManager::deleteDocument);
                         break;
                 }
+
+                if (document != null) {
+                    var imageClass = document.getImageClass();
+                    if (type == WatchType.CREATE && imageClass.getScannedImage().isPresent()) highlightFile(document);
+                }
             });
         });
+    }
+
+    private void highlightFile(Document document) {
+        try {
+            this.startupLogic.getCurrentLanguage().highlightAll(Collections.singletonList(document.getImageClass()));
+        } catch (IOException e) {
+            LOGGER.error("There was an error trying to highlight the created/modified file " + document.getFile().getName(), e);
+        }
     }
 
     public void closeWorkspace(File file) {

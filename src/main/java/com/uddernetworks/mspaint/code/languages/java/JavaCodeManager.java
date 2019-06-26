@@ -4,7 +4,6 @@ import com.uddernetworks.mspaint.code.FileJarrer;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
-import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -24,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -200,13 +198,8 @@ public class JavaCodeManager {
             }
         }
 
-        var abstractedErrors = errors.entrySet()
-                .stream()
-                .map(t -> new AbstractMap.SimpleEntry<ImageClass, List<LanguageError>>(t.getKey(), t.getValue().stream().map(JavaError::new).collect(Collectors.toList())))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-
         if (!execute) {
-            return new DefaultCompilationResult(abstractedErrors, CompilationResult.Status.COMPILE_COMPLETE);
+            return new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
         }
 
         info("Executing...");
@@ -242,7 +235,7 @@ public class JavaCodeManager {
             }
         }));
 
-        return new DefaultCompilationResult(abstractedErrors, CompilationResult.Status.RUNNING);
+        return new DefaultCompilationResult(CompilationResult.Status.RUNNING);
     }
 
     private void info(String message) {

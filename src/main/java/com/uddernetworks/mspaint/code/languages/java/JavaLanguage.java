@@ -209,7 +209,7 @@ public class JavaLanguage extends Language {
         var imageClassesOptional = indexFiles();
         if (imageClassesOptional.isEmpty()) {
             LOGGER.error("Error while finding ImageClasses, aborting...");
-            return new DefaultCompilationResult(Collections.emptyMap(), CompilationResult.Status.COMPILE_COMPLETE);
+            return new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
         }
 
         return compileAndExecute(mainGUI, imageClassesOptional.get(), imageOutputStream, compilerStream);

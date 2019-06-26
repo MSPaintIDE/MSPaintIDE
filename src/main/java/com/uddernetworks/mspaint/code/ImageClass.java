@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class ImageClass {
 
@@ -75,8 +76,13 @@ public class ImageClass {
         LOGGER.info(prefix + "Writing highlighted image to file...");
         start = System.currentTimeMillis();
 
-        letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
-        letterFileWriter.writeToFile();
+        // TODO: Remove try/catch
+        try {
+            letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
+            letterFileWriter.writeToFile();
+        } catch (Exception e) {
+            LOGGER.error("Error!", e);
+        }
 
         LOGGER.info(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -101,8 +107,8 @@ public class ImageClass {
         return this.inputImage;
     }
 
-    public ScannedImage getScannedImage() {
-        return this.scannedImage;
+    public Optional<ScannedImage> getScannedImage() {
+        return Optional.ofNullable(this.scannedImage);
     }
 
     public MainGUI getMainGUI() {
