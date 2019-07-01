@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public abstract class Language {
@@ -110,9 +109,9 @@ public abstract class Language {
     /**
      * Downloads and installs the LSP for the current language without any user prompt.
      *
-     * @param successful If the install was successful or not
+     * @return If the install was successful or not
      */
-    public abstract void installLSP(Consumer<Boolean> successful);
+    public abstract boolean installLSP();
 
     /**
      * If the system has the runtime or whatever is needed to compile and run code

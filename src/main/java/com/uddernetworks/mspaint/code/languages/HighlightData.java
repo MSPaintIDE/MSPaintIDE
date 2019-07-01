@@ -34,11 +34,4 @@ public abstract class HighlightData {
         return this.tokenMap.entrySet().stream().filter(entry -> entry.getKey().contains(tokenName)).findFirst().map(Map.Entry::getValue).map(Color::new).orElseThrow(() -> new RuntimeException("No color found for token " + tokenName));
     }
 
-    public Color hex2Rgb(String colorStr) {
-        return new Color(
-                Integer.valueOf( colorStr.substring( 0, 2 ), 16 ),
-                Integer.valueOf( colorStr.substring( 2, 4 ), 16 ),
-                Integer.valueOf( colorStr.substring( 4, 6 ), 16 ) );
-    }
-
 }

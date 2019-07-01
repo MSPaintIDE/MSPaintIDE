@@ -62,13 +62,11 @@ public class LSPSettingItem extends Stage implements SettingItem, Initializable 
 
         this.downloadLSP.setOnAction(event -> {
             var lang = this.mainGUI.getStartupLogic().getCurrentLanguage();
-            lang.installLSP(successful -> {
-                if (successful) {
-                    LOGGER.info("Install was successful!");
-                } else {
-                    LOGGER.info("Install was NOT successful");
-                }
-            });
+            if (lang.installLSP()) {
+                LOGGER.info("Install was successful!");
+            } else {
+                LOGGER.info("Install was NOT successful");
+            }
         });
     }
 

@@ -95,8 +95,12 @@ public class LanguageServerWrapper {
         this.rootPath = rootPath;
 
         try {
+
+            var plugins = new File(this.serverPath, "plugins");
+            var launcherFile = Arrays.stream(plugins.listFiles()).filter(file -> file.getName().startsWith("org.eclipse.equinox.launcher_")).findFirst().orElseThrow(() -> new RuntimeException("Couldn't find launcher jar!"));
+
             var streamConnectionProvider = new BetterProvider(
-                    lspArgs.stream().map(str -> str.replace("%server-path%", serverPath)).collect(Collectors.toList()),
+                    lspArgs.stream().map(str -> str.replace("%server-path%", serverPath).replace("%launch-jar%", launcherFile.getAbsolutePath())).collect(Collectors.toList()),
                     serverPath); // new File(TEMP_ROOT).getParent()
             streamConnectionProvider.start();
 
@@ -329,7 +333,8 @@ public class LanguageServerWrapper {
     }
 
     public static File getLSPDirectory() {
-        return new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
+//        return new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
+        return new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp"); // TODO: Uncomment
     }
 
     public Optional<File> getRootPath() {

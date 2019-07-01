@@ -2,12 +2,17 @@ package com.uddernetworks.mspaint.texteditor;
 
 import com.uddernetworks.mspaint.ocr.FontData;
 import com.uddernetworks.newocr.character.DatabaseCharacter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.util.Arrays;
 
 public class LetterGenerator {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(LetterGenerator.class);
 
     private Graphics2D graphics;
     private int lastSize = -1;
@@ -126,30 +131,54 @@ public class LetterGenerator {
     }
 
     public static void toGrid(BufferedImage input, double[][] values, Color mask) {
+        if (mask != null) input = createImage(input, mask, Color.WHITE);
+
         int arrX = 0;
         int arrY = 0;
         for (int y = 0; y < input.getHeight(); y++) {
             for (int x = 0; x < input.getWidth(); x++) {
-                var color = new Color(input.getRGB(x, y));
-                if (mask != null && color.getRGB() != -1) { //  && WHITE != color.getRGB()
-                    double r = color.getRed();
-                    double g = color.getGreen();
-                    double b = color.getBlue();
-
-                    double maskR = mask.getRed();
-                    double maskG = mask.getGreen();
-                    double maskB = mask.getBlue();
-
-                    double Y = 0.2126*r + 0.7152*g + 0.0722*b;
-
-                    color = new Color((int) ((maskR + Y) / 2D), (int) ((maskG + Y) / 2D), (int) ((maskB + Y) / 2D), mask.getAlpha());
-                }
-                values[arrY][arrX++] = color.getRGB();
+                values[arrY][arrX++] = input.getRGB(x, y);
             }
 
             arrX = 0;
             arrY++;
         }
+    }
+
+    // Thanks https://stackoverflow.com/a/30157899/3929546 :)
+    private static BufferedImage createImage(BufferedImage original, Color... colors) {
+        int w = original.getWidth();
+        int h = original.getHeight();
+
+        BufferedImage gray = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
+        Graphics2D g2 = gray.createGraphics();
+        g2.drawImage(original, 0, 0, null);
+
+        byte[] r = new byte[256];
+        byte[] g = new byte[256];
+        byte[] b = new byte[256];
+
+        final int fade = (256 / (colors.length - 1));
+
+        for (int i = 0; i < 256; ++i) {
+            Color c0 = colors[(i / fade)];
+            Color c1 = colors[(i / fade) + 1];
+
+            float amt = (i % fade) / ((float) fade);
+
+            r[i] = getChannel(amt, c0.getRed(),   c1.getRed());
+            g[i] = getChannel(amt, c0.getGreen(), c1.getGreen());
+            b[i] = getChannel(amt, c0.getBlue(),  c1.getBlue());
+        }
+
+        // (remap same pixels to new model)
+        return new BufferedImage(
+                new IndexColorModel(8, 256, r, g, b),
+                gray.getRaster(), false, null);
+    }
+
+    private static byte getChannel(float amt, int ch0, int ch1) {
+        return (byte) ((ch0 * (1 - amt)) + (ch1 * amt));
     }
 
 }

@@ -367,6 +367,15 @@ public class MainGUI extends Application implements Initializable {
                 LOGGER.info(langClass.getCanonicalName());
 
                 languageManager.getLanguageByClass(langClass).ifPresentOrElse(language -> {
+
+                    if (!language.hasLSP()) {
+                        LOGGER.warn("LSP server not found for {}. Requesting install.", language.getName());
+                        if (!language.installLSP()) {
+                            LOGGER.warn("LSP was not installed, so exiting program. Check if any errors occurred, please report them.");
+                            System.exit(0);
+                        }
+                    }
+
                     LOGGER.info("Refresh");
                     this.startupLogic.setCurrentLanguage(language);
                     language.loadForCurrent();

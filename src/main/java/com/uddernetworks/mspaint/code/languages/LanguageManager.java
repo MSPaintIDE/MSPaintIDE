@@ -36,7 +36,7 @@ public class LanguageManager {
 
                     if (!language.hasLSP()) {
                         LOGGER.warn("Your system does not have the LSP for {}, which is required to use the language. Go to the settings if you would like to add it or remove this warning.", language.getName());
-                        return false;
+                        return true;
                     }
 
                     if (language.hasRuntime()) {

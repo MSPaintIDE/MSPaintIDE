@@ -14,6 +14,7 @@ import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.util.ExtractUtils;
 import com.uddernetworks.mspaint.util.IDEFileUtils;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -58,7 +60,7 @@ public class JavaLanguage extends Language {
                     "-noverify",
                     "-Xmx1G",
                     "-jar",
-                    "%server-path%\\plugins\\org.eclipse.equinox.launcher_1.5.400.v20190515-0925.jar",
+                    "%launch-jar%",
                     "-configuration",
                     "%server-path%\\config_win",
                     "-data"
@@ -185,14 +187,12 @@ public class JavaLanguage extends Language {
     }
 
     @Override
-    public void installLSP(Consumer<Boolean> successful) {
+    public boolean installLSP() {
         if (hasLSP()) {
-            successful.accept(false);
-            return;
+            return false;
         }
 
         try {
-            // TODO: Test this
             var res = JOptionPane.showOptionDialog(null,
                     "Would you like to proceed with downloading the Java Language Server by the Eclipse Foundation? This will take up about 94MB.",
                     "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
@@ -203,15 +203,24 @@ public class JavaLanguage extends Language {
             if (res == 0) {
                 this.lspPath.mkdirs();
 
-                FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), this.lspPath);
+                var tarGz = new File(this.lspPath, "jdt-language-server-latest.tar.gz");
+                System.out.println("tarGz = " + tarGz.getAbsolutePath());
+                FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), tarGz);
 
-                TarArchiveInputStream fin = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(new File(this.lspPath, "jdt-language-server-latest.tar.gz"))));
                 var destDir = new File(this.lspPath, "jdt-language-server-latest");
-                destDir.mkdirs();
-                FileUtils.copyInputStreamToFile(fin, destDir);
 
-                successful.accept(true);
-                return;
+                try (var in = new TarArchiveInputStream(
+                        new GzipCompressorInputStream(
+                                new BufferedInputStream(
+                                        new FileInputStream(tarGz))))) {
+                    ExtractUtils.untar(in, destDir);
+                }
+
+                tarGz.delete();
+
+                LOGGER.info("Done downloading the LSP");
+
+                return true;
             } else if (res == 1) {
             } else {
                 Desktop.getDesktop().browse(new URI("https://github.com/eclipse/eclipse.jdt.ls"));
@@ -220,7 +229,7 @@ public class JavaLanguage extends Language {
             LOGGER.error("There was an error while trying to install the LSP server for " + getName(), e);
         }
 
-        successful.accept(false);
+        return false;
     }
 
     @Override
