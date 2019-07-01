@@ -40,7 +40,7 @@ public class LanguageManager {
                     }
 
                     if (language.hasRuntime()) {
-                        LOGGER.warn("Your system does not have the runtime for {}. You will still be allowed to edit with the language, just not compile/execute code with it. Go to the settings if you would like to add it or remove this warning.");
+                        LOGGER.warn("Your system does not have the runtime for {}. You will still be allowed to edit with the language, just not compile/execute code with it. Go to the settings if you would like to add it or remove this warning.", language.getName());
                     }
 
                     return true;

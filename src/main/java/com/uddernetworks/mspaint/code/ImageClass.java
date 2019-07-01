@@ -51,8 +51,6 @@ public class ImageClass {
             this.startupLogic = this.mainGUI.getStartupLogic();
         }
 
-//        System.out.println("Getting text at " + System.currentTimeMillis() +  "(" + this.inputImage.getAbsolutePath() + ")");
-
         this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.startupLogic);
 
         this.text = this.scannedImage.getPrettyString();
@@ -70,7 +68,7 @@ public class ImageClass {
 
         LOGGER.info(prefix + "Highlighting...");
         long start = System.currentTimeMillis();
-        this.languageHighlighter.highlight(this.scannedImage);
+        this.languageHighlighter.highlight(this.startupLogic.getCurrentLanguage(), this.scannedImage);
 
         LOGGER.info(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 

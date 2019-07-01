@@ -328,6 +328,10 @@ public class LanguageServerWrapper {
         return initParams;
     }
 
+    public static File getLSPDirectory() {
+        return new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
+    }
+
     public Optional<File> getRootPath() {
         return Optional.ofNullable(rootPath);
     }

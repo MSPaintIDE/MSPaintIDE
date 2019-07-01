@@ -61,6 +61,7 @@ dependencies {
     compile group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
     compile 'commons-codec:commons-codec:1.11'
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.18'
 
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'

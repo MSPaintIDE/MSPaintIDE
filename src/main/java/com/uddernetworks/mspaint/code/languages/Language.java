@@ -133,7 +133,7 @@ public abstract class Language {
      *
      * @return The name of the internal .json TextMate file
      */
-    public abstract String getLanguageHighlighter();
+    public abstract HighlightData getHighlightData();
 
     /**
      * Gets the {@link LanguageSettings} of the current language.

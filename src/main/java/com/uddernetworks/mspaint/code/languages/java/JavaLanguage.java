@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
+import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
@@ -14,17 +15,29 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.util.IDEFileUtils;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
+
+import static com.uddernetworks.mspaint.cmd.Commandline.runCommand;
 
 public class JavaLanguage extends Language {
 
@@ -32,8 +45,10 @@ public class JavaLanguage extends Language {
 
     private JavaSettings settings = new JavaSettings();
     private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
+    private HighlightData highlightData = new JavaHighlightData();
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
-    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, "E:\\MSPaintIDE\\jdt-language-server-latest",
+    private File lspPath = new File(LanguageServerWrapper.getLSPDirectory(), "java");
+    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, new File(this.lspPath, "jdt-language-server-latest").getAbsolutePath(),
             Arrays.asList(
                     "java",
                     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
@@ -51,13 +66,13 @@ public class JavaLanguage extends Language {
         LOGGER.info("Setting up the Java project...");
 
         // TODO: Remove hardcoding
-        var templateDir = new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp\\java\\project-template");
+//        var templateDir = new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp\\java\\project-template");
+        var templateDir = new File(this.lspPath, "project-template");
 
         if (!new File(workspaceDir.getAbsolutePath(), ".classpath").exists()) {
             LOGGER.info("Copying template files...");
 
             try {
-//            FileUtils.copyDirectory(new File(StartupLogic.getJarParent().orElse(new File("")), "lsp\\java\\project-template"), workspaceDir);
                 FileUtils.copyDirectory(templateDir, workspaceDir);
             } catch (IOException e) {
                 LOGGER.error("An error occurred while copying over project template files!", e);
@@ -165,27 +180,66 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        return true;
+        LOGGER.info("lsp path = {}", this.lspPath.getAbsolutePath());
+        return new File(this.lspPath, "jdt-language-server-latest").exists();
     }
 
     @Override
     public void installLSP(Consumer<Boolean> successful) {
+        if (hasLSP()) {
+            successful.accept(false);
+            return;
+        }
 
+        try {
+            // TODO: Test this
+            var res = JOptionPane.showOptionDialog(null,
+                    "Would you like to proceed with downloading the Java Language Server by the Eclipse Foundation? This will take up about 94MB.",
+                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
+                    new ImageIcon(ImageIO.read(new File("E:\\MSPaintIDE\\src\\main\\resources\\icons\\popup\\save.png"))),
+                    new String[]{"Yes", "No", "Website"}, "Yes");
+
+            LOGGER.info("Result = {}", res);
+            if (res == 0) {
+                this.lspPath.mkdirs();
+
+                FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), this.lspPath);
+
+                TarArchiveInputStream fin = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(new File(this.lspPath, "jdt-language-server-latest.tar.gz"))));
+                var destDir = new File(this.lspPath, "jdt-language-server-latest");
+                destDir.mkdirs();
+                FileUtils.copyInputStreamToFile(fin, destDir);
+
+                successful.accept(true);
+                return;
+            } else if (res == 1) {
+            } else {
+                Desktop.getDesktop().browse(new URI("https://github.com/eclipse/eclipse.jdt.ls"));
+            }
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.error("There was an error while trying to install the LSP server for " + getName(), e);
+        }
+
+        successful.accept(false);
     }
 
     @Override
     public boolean hasRuntime() {
-        return false;
+        final String[] out = {""};
+        runCommand("java -version", false, null, res -> out[0] = res);
+        var output = out[0];
+
+        return output.contains("Runtime Environment");
     }
 
     @Override
     public String downloadRuntimeLink() {
-        return null;
+        return "https://openjdk.java.net/install/";
     }
 
     @Override
-    public String getLanguageHighlighter() {
-        return null;
+    public HighlightData getHighlightData() {
+        return this.highlightData;
     }
 
     @Override
