@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
@@ -87,20 +84,36 @@ public class StartupLogic {
         new InjectionManager(mainGUI, this).createHooks();
         this.paintAssist = new DefaultPaintAssist();
 
+        List<ImageClass> hasErrors = new ArrayList<>();
+
         (this.diagnosticManager = new DefaultDiagnosticManager(this)).onDiagnosticChange(entries -> {
-            var documentManager = getCurrentLanguage().getLSPWrapper().getDocumentManager();
+            var documentManager = this.currentLanguage.getLSPWrapper().getDocumentManager();
             var sortedDiagnostics = entries.stream().collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())));
+            var thisAdded = new ArrayList<ImageClass>();
             sortedDiagnostics.forEach((uri, diagnostics) -> {
                 try {
                     var document = documentManager.getDocument(new File(URI.create(uri + ".png")));
                     var imageClass = document.getImageClass();
+                    thisAdded.add(imageClass);
                     imageClass.getScannedImage().ifPresentOrElse(img -> {}, () -> LOGGER.error("Error! Image has not been scanned yet! {}", uri));
+                    this.currentLanguage.highlightAll(Collections.singletonList(imageClass));
                     AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1 / 6D, imageClass.getHighlightedFile(), imageClass.getScannedImage().get(), diagnostics);
                     highlighter.highlightAngrySquiggles();
                 } catch (IOException | TranscoderException e) {
                     LOGGER.error("Error while writing diagnostics to " + uri, e);
                 }
             });
+
+            hasErrors.removeAll(thisAdded);
+
+            try {
+                this.currentLanguage.highlightAll(hasErrors);
+            } catch (IOException e) {
+                LOGGER.error("An error occurred while highlighting images", e);
+            }
+
+            hasErrors.clear();
+            hasErrors.addAll(thisAdded);
         });
     }
 

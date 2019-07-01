@@ -460,3 +460,13 @@ $pseudos: hover, focused, showing;
 .ALL {
     -fx-fill: WHITE;
 }
+
+.lsp-language-red {
+    -fx-fill: RED !important;
+    -fx-text-fill: RED !important;
+}
+
+.lsp-language-green {
+    -fx-fill: GREEN !important;
+    -fx-text-fill: GREEN !important;
+}

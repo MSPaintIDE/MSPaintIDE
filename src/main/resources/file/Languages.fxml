@@ -1,33 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.uddernetworks.mspaint.gui.elements.SettingsGroup?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="525.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="525.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>
     <children>
-        <SettingsGroup prefWidth="710.0" styleClass="gridpane-theme" title="Training">
-            <children>
-                <VBox prefWidth="100.0">
-                    <children>
-                        <Label styleClass="theme-text" text="LSP Server not found">
-                            <VBox.margin>
-                                <Insets top="15.0" />
-                            </VBox.margin>
-                        </Label>
-
-                        <JFXButton fx:id="downloadRuntime" buttonType="RAISED" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" styleClass="primary-button" text="Download Runtime" />
-                        <JFXButton fx:id="downloadLSP" buttonType="RAISED" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" styleClass="primary-button" text="Download LSP" />
-                    </children>
-                    <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
-                    </padding>
-                </VBox>
-            </children>
-        </SettingsGroup>
     </children>
 </VBox>

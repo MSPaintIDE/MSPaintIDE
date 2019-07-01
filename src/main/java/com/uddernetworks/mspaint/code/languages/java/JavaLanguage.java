@@ -235,7 +235,7 @@ public class JavaLanguage extends Language {
     @Override
     public boolean hasRuntime() {
         final String[] out = {""};
-        runCommand("java -version", false, null, res -> out[0] = res);
+        runCommand("java --version", false, null, res -> out[0] = res);
         var output = out[0];
 
         return output.contains("Runtime Environment");
