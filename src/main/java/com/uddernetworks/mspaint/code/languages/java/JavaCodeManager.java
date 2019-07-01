@@ -172,22 +172,6 @@ public class JavaCodeManager {
         }
     }
 
-
-    private List<File> getFilesFromDirectory(File directory, String extension) {
-        List<File> ret = new ArrayList<>();
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                ret.add(file);
-                ret.addAll(getFilesFromDirectory(file, extension));
-            } else {
-                if (extension == null) ret.add(file);
-                else if (file.getName().endsWith("." + extension)) ret.add(file);
-            }
-        }
-
-        return ret;
-    }
-
     private int runCommand(List<String> command) {
         return runCommand(command, null);
     }
@@ -213,18 +197,18 @@ public class JavaCodeManager {
 
     public static class InputStreamConsumer extends Thread {
 
-        private InputStream is;
+        private InputStream inputStream;
         private StringBuilder line = new StringBuilder();
 
-        public InputStreamConsumer(InputStream is) {
-            this.is = is;
+        public InputStreamConsumer(InputStream inputStream) {
+            this.inputStream = inputStream;
         }
 
         @Override
         public void run() {
             try {
                 int intVal = -1;
-                while ((intVal = is.read()) != -1) {
+                while ((intVal = inputStream.read()) != -1) {
                     char value = (char) intVal;
                     if (value == '\n') {
                         LOGGER.info(line.toString());

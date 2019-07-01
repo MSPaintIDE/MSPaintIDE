@@ -26,6 +26,7 @@ public class ImageClass {
     private File highlightedFile;
     private MainGUI mainGUI;
     private StartupLogic startupLogic;
+    private LanguageHighlighter languageHighlighter;
 
     public ImageClass(File inputImage, MainGUI mainGUI) {
         this(inputImage, mainGUI, null);
@@ -35,6 +36,7 @@ public class ImageClass {
         this.inputImage = inputImage;
         this.mainGUI = mainGUI;
         this.startupLogic = startupLogic;
+        this.languageHighlighter = new LanguageHighlighter();
     }
 
     public void scan() {
@@ -68,21 +70,15 @@ public class ImageClass {
 
         LOGGER.info(prefix + "Highlighting...");
         long start = System.currentTimeMillis();
-
-        new LanguageHighlighter().highlight(this.scannedImage);
+        this.languageHighlighter.highlight(this.scannedImage);
 
         LOGGER.info(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 
         LOGGER.info(prefix + "Writing highlighted image to file...");
         start = System.currentTimeMillis();
 
-        // TODO: Remove try/catch
-        try {
-            letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
-            letterFileWriter.writeToFile();
-        } catch (Exception e) {
-            LOGGER.error("Error!", e);
-        }
+        letterFileWriter = new LetterFileWriter(scannedImage, inputImage, highlightedFile);
+        letterFileWriter.writeToFile();
 
         LOGGER.info(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
     }

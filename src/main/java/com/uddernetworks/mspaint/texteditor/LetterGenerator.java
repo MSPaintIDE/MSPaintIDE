@@ -122,11 +122,28 @@ public class LetterGenerator {
     }
 
     public static void toGrid(BufferedImage input, double[][] values) {
+        toGrid(input, values, null);
+    }
+
+    public static void toGrid(BufferedImage input, double[][] values, Color mask) {
         int arrX = 0;
         int arrY = 0;
         for (int y = 0; y < input.getHeight(); y++) {
             for (int x = 0; x < input.getWidth(); x++) {
                 var color = new Color(input.getRGB(x, y));
+                if (mask != null && color.getRGB() != -1) { //  && WHITE != color.getRGB()
+                    double r = color.getRed();
+                    double g = color.getGreen();
+                    double b = color.getBlue();
+
+                    double maskR = mask.getRed();
+                    double maskG = mask.getGreen();
+                    double maskB = mask.getBlue();
+
+                    double Y = 0.2126*r + 0.7152*g + 0.0722*b;
+
+                    color = new Color((int) ((maskR + Y) / 2D), (int) ((maskG + Y) / 2D), (int) ((maskB + Y) / 2D), mask.getAlpha());
+                }
                 values[arrY][arrX++] = color.getRGB();
             }
 

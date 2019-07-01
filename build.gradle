@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'java'
     id 'maven'
+    id 'antlr'
     id "it.tellnet.sass" version "1.2"
     id "com.github.johnrengelman.shadow" version "4.0.2"
     id 'org.openjfx.javafxplugin' version '0.0.6'
@@ -79,6 +80,8 @@ dependencies {
 
     compile 'org.eclipse.lsp4j:org.eclipse.lsp4j:0.7.2'
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.1'
+    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
+    antlr 'org.antlr:antlr4:4.7.2'
 
     compile configurations.javafxCompile
 }
