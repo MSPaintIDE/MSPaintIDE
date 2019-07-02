@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
 import static com.uddernetworks.mspaint.code.lsp.LSStatus.*;
 
@@ -54,6 +54,11 @@ public class LanguageServerWrapper {
     private LSP lsp;
     private String serverPath;
     private List<String> lspArgs;
+    private BiFunction<LanguageServerWrapper, List<String>, List<String>> argumentPreprocessor = (x, y) -> y;
+
+    public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, List<String> lspArgs) {
+        this(startupLogic, lsp, null, lspArgs);
+    }
 
     public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, String serverPath, List<String> lspArgs) {
         this(startupLogic, lsp, serverPath, lspArgs, null);
@@ -68,6 +73,7 @@ public class LanguageServerWrapper {
         this.lspArgs = lspArgs;
         this.workspaceInit = workspaceInit;
 
+        if (!lsp.usesWorkspaces()) return;
         this.workspaces.addListener((ListChangeListener<WorkspaceFolder>) change -> {
             var added = new ArrayList<WorkspaceFolder>();
             var removed = new ArrayList<WorkspaceFolder>();
@@ -95,12 +101,10 @@ public class LanguageServerWrapper {
         this.rootPath = rootPath;
 
         try {
-
-            var plugins = new File(this.serverPath, "plugins");
-            var launcherFile = Arrays.stream(plugins.listFiles()).filter(file -> file.getName().startsWith("org.eclipse.equinox.launcher_")).findFirst().orElseThrow(() -> new RuntimeException("Couldn't find launcher jar!"));
+            var processedArgs = this.argumentPreprocessor.apply(this, new ArrayList<>(this.lspArgs));
 
             var streamConnectionProvider = new BetterProvider(
-                    lspArgs.stream().map(str -> str.replace("%server-path%", serverPath).replace("%launch-jar%", launcherFile.getAbsolutePath())).collect(Collectors.toList()),
+                    processedArgs,
                     serverPath); // new File(TEMP_ROOT).getParent()
             streamConnectionProvider.start();
 
@@ -118,39 +122,8 @@ public class LanguageServerWrapper {
                 setStatus(STARTED);
                 requestManager.initialized(new InitializedParams());
                 setStatus(INITIALIZED);
-//                languageServer.getWorkspaceService().didChangeWorkspaceFolders();
-
-                var workspaceService = languageServer.getWorkspaceService();
-//                workspaceService.didChangeWorkspaceFolders();
-//                workspaceService.didChangeConfiguration();
-
-//                WorkspaceFoldersChangeEvent event = new WorkspaceFoldersChangeEvent();
-//                event.getAdded().add(getWorkspace(TEMP_ROOT, "Temp"));
-//                DidChangeWorkspaceFoldersParams params = new DidChangeWorkspaceFoldersParams();
-//                params.setEvent(event);
-//                workspaceService.didChangeWorkspaceFolders(params);
-
-
-//                languageServer.getWorkspaceService().didChangeWorkspaceFolders(
-//                        new DidChangeWorkspaceFoldersParams(
-//                                new WorkspaceFoldersChangeEvent(
-//                                        Arrays.asList(
-//                                                new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other").toURI().toString())
-//                                        ), Arrays.asList(
-//                                        new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\jdt.ls-java-project").toURI().toString())))));
                 return res;
-            }).thenRun(() -> {
-
-//                LOGGER.info("Shidddddddddddddd");
-
-//                documentManager.openFile(new File(TEMP_ROOT + "\\src\\Main.java"));
-//                documentManager.openFile(new File(TEMP_ROOT + "\\demo.rub"));
-//                documentManager.openFile(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other\\src\\App.java"));
-                var workspaceService = languageServer.getWorkspaceService();
-
-
-                LOGGER.info("Done starting LSP!");
-            }));
+            }).thenRun(() -> LOGGER.info("Done starting LSP!")));
 
         } catch (Exception e) {
             LOGGER.error("Can't launch language server for project", e);
@@ -183,9 +156,14 @@ public class LanguageServerWrapper {
                         .filter(File::isFile)
                         .filter(walking -> walking.getName().endsWith(".png"))
                         .forEach(path -> {
-                            var document = this.documentManager.getDocument(path);
-                            document.open();
-                            highlightFile(document);
+                            try {
+                                LOGGER.info("File {}", path.getName());
+                                var document = this.documentManager.getDocument(path);
+                                document.open();
+                                highlightFile(document);
+                            } catch (Exception e) {
+                                LOGGER.error("Error", e);
+                            }
                         });
             } catch (IOException e) {
                 e.printStackTrace();
@@ -194,13 +172,18 @@ public class LanguageServerWrapper {
 
             // This is NOT done in the Document class, because stuff may get messed up when deleting and mainly creating
             // new files.
+            LOGGER.info("Watching {}", inputFile.getAbsolutePath());
             this.fileWatchManager.watchFile(inputFile).addListener((type, changedFile) -> {
                 changedFile = changedFile.getAbsoluteFile();
+                LOGGER.info("Changed: {}", changedFile.getAbsolutePath());
                 if (!changedFile.getName().endsWith("png")) return;
-                // TODO: Not sure if this should happen before or after the following switch?
-                this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
-                        new FileEvent(changedFile.toURI().toString(), type.toFCT())
-                )));
+
+                if (lsp.usesWorkspaces()) {
+                    // TODO: Not sure if this should happen before or after the following switch?
+                    this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
+                            new FileEvent(changedFile.toURI().toString(), type.toFCT())
+                    )));
+                }
 
                 Document document = null;
                 switch (type) {
@@ -273,7 +256,6 @@ public class LanguageServerWrapper {
     private WorkspaceFolder getWorkspace(String file) {
         var workspace = new WorkspaceFolder();
         workspace.setUri(getURI(file));
-//        workspace.setName("JavaProject");
         workspace.setName(ProjectManager.getPPFProject().getName());
         return workspace;
     }
@@ -332,9 +314,14 @@ public class LanguageServerWrapper {
         return initParams;
     }
 
+    public LanguageServerWrapper argumentPreprocessor(BiFunction<LanguageServerWrapper, List<String>, List<String>> argumentPreprocessor) {
+        this.argumentPreprocessor = argumentPreprocessor;
+        return this;
+    }
+
     public static File getLSPDirectory() {
 //        return new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
-        return new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp"); // TODO: Uncomment
+        return new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp"); // TODO: Uncomment before release
     }
 
     public Optional<File> getRootPath() {
@@ -367,5 +354,9 @@ public class LanguageServerWrapper {
 
     public LSP getLSP() {
         return lsp;
+    }
+
+    public String getServerPath() {
+        return serverPath;
     }
 }

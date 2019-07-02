@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
-import com.uddernetworks.code.lexer.Java9Lexer;
-import com.uddernetworks.code.lexer.Java9Parser;
+import com.uddernetworks.code.lexer.java.Java9Lexer;
+import com.uddernetworks.code.lexer.java.Java9Parser;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;

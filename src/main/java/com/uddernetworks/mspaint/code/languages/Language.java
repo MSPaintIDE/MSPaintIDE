@@ -76,6 +76,11 @@ public abstract class Language {
                 .contains(FilenameUtils.getExtension(file.getAbsolutePath()).toLowerCase());
     }
 
+    /**
+     * Gets the input {@link Option} for the language.
+     *
+     * @return The {@link Option} specifying the lang's input
+     */
     public abstract Option getInputOption();
 
     /**
@@ -85,8 +90,18 @@ public abstract class Language {
      */
     public abstract File getInputLocation();
 
+    /**
+     * Gets the image file where executed programs' console output will go.
+     *
+     * @return The image file
+     */
     public abstract File getAppOutput();
 
+    /**
+     * Gets the image file where the compiler/interpreter's console output will go.
+     *
+     * @return The image file
+     */
     public abstract File getCompilerOutput();
 
     /**
@@ -96,6 +111,11 @@ public abstract class Language {
      */
     public abstract boolean isInterpreted();
 
+    /**
+     * Gets the instance of {@link LanguageServerWrapper} being used by the current {@link Language}.
+     *
+     * @return The instance of the used {@link LanguageServerWrapper}
+     */
     public abstract LanguageServerWrapper getLSPWrapper();
 
     /**
@@ -278,5 +298,10 @@ public abstract class Language {
      */
     public boolean optionsNotFilled() {
         return !getLanguageSettings().requiredFilled();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

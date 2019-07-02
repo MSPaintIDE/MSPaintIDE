@@ -386,12 +386,12 @@ public class MainGUI extends Application implements Initializable {
                     if (previousInput != null) fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
 
                     LOGGER.info("About to change setting listener!");
-                    language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<String>) fileString -> {
-                        LOGGER.info("Prev = {} Curr = {}", previousInput, fileString);
-                        var inputFile = new File(fileString);
+                    language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) inputFile -> {
+                        if (inputFile == null) return;
+                        LOGGER.info("Prev = {} Curr = {}", previousInput, inputFile.getAbsolutePath());
                         var file = inputFile.getParentFile();
                         if (file.equals(this.previousInput)) return;
-                        LOGGER.info("Changing input to: {}", fileString);
+                        LOGGER.info("Changing input to: {}", inputFile.getAbsolutePath());
                         if (previousInput != null) {
                             LOGGER.info("Previous input: {}", previousInput.getAbsolutePath());
                             fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
@@ -400,9 +400,6 @@ public class MainGUI extends Application implements Initializable {
 
                         lspWrapper.openWorkspace(previousInput = file, inputFile);
                     }, true);
-
-//                    var fileWatcher = fileWatchManager.watchFile(currentProject.getFile().getParentFile());
-
                 }, () -> LOGGER.error("No language found with a class of \"{}\"", languageClassString));
                 languageManager.reloadAllLanguages();
 

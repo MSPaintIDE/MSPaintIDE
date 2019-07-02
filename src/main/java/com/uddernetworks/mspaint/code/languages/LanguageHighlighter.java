@@ -1,15 +1,12 @@
 package com.uddernetworks.mspaint.code.languages;
 
-import com.uddernetworks.code.lexer.Java9Lexer;
-import com.uddernetworks.code.lexer.Java9Parser;
+import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.texteditor.LetterGenerator;
-import com.uddernetworks.newocr.recognition.ScannedImage;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.CommonTokenFactory;
-import org.antlr.v4.runtime.UnbufferedTokenStream;
+import org.antlr.v4.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 
 import static com.uddernetworks.mspaint.gui.window.search.ReplaceManager.grabRealSub;
 import static com.uddernetworks.mspaint.gui.window.search.ReplaceManager.trimImage;
@@ -18,28 +15,30 @@ public class LanguageHighlighter {
 
     private static Logger LOGGER = LoggerFactory.getLogger(LanguageHighlighter.class);
 
-    public void highlight(Language language, ScannedImage scannedImage) {
+    public void highlight(Language language, ImageClass imageClass) {
         try {
             var highlightData = language.getHighlightData();
-            String text = scannedImage.getPrettyString();
+            String text = imageClass.getText();
 
             var input = CharStreams.fromString(text);
-            var lex = new Java9Lexer(input);
-            // copy text out of sliding buffer and store in tokens
+            var lex = highlightData.getLexer(input);
             lex.setTokenFactory(new CommonTokenFactory(true));
             var tokens = new UnbufferedTokenStream<CommonToken>(lex);
-            var parser = new Java9Parser(tokens);
+            var parser = highlightData.getParser(tokens);
             parser.setBuildParseTree(false);
+            var vocabulary = parser.getVocabulary();
 
-            var original = scannedImage.getOriginalImage();
+            var original = imageClass.getScannedImage().orElseThrow().getOriginalImage();
 
-            for (var token : lex.getAllTokens()) {
+            var i2 = 0;
+            for (Token token; (token = tokens.get(i2)).getType() != Token.EOF; i2++, tokens.consume()) {
+                if (token.getText().isBlank()) continue;
                 var from = token.getCharPositionInLine();
                 var to = from + token.getText().length();
-                var color = highlightData.getColor(lex.getTokenNames()[token.getType()]);
+                Color color = highlightData.getColor(vocabulary.getDisplayName(token.getType()));
 
-                var line = scannedImage.getLine(token.getLine() - 1);
-                for (int i = from; i < to; i++) {
+                var line = imageClass.getScannedImage().orElseThrow().getLine(token.getLine() - 1);
+                for (int i = from; i < Math.min(to, line.size()); i++) {
                     var letter = line.get(i);
 
                     // Could the following be improved?

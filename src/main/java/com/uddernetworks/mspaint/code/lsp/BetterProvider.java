@@ -17,46 +17,31 @@ public class BetterProvider {
 
     private List<String> commands;
     private String workingDir;
+    private Process process;
 
     public BetterProvider(List<String> commands, String workingDir) {
         this.commands = commands;
         this.workingDir = workingDir;
     }
 
-    private Process process = null;
-
     public void start() throws IOException {
-        if (workingDir == null || commands == null || commands.isEmpty() || commands.contains(null)) {
+        if (commands == null || commands.isEmpty() || commands.contains(null)) {
             throw new IOException("Unable to start language server: " + this.toString());
         }
         ProcessBuilder builder = createProcessBuilder();
-        LOGGER.info("Starting server process with commands " + commands + " and workingDir " + workingDir);
+        LOGGER.info("Starting server process with commands " + commands);
         process = builder.start();
         if (!process.isAlive()) {
             throw new IOException("Unable to start language server: " + this.toString());
         } else {
             LOGGER.info("Server process started " + process);
         }
-
-//        final var pid = process.pid();
-//
-////        Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
-//        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//            try {
-//                var cmd = "taskkill /F /PID " + pid;
-//                System.out.println("Kill " + pid + " via " + cmd);
-//                Runtime.getRuntime().exec(cmd);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }));
     }
 
     private ProcessBuilder createProcessBuilder() {
-        //TODO for cquery, REMOVE
         commands.forEach(c -> c = c.replace("\'", ""));
         ProcessBuilder builder = new ProcessBuilder(commands);
-        builder.directory(new File(workingDir));
+        if (this.workingDir != null) builder.directory(new File(workingDir));
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         return builder;
     }

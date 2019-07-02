@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
+import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
@@ -38,14 +39,13 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
-
-import static com.uddernetworks.mspaint.cmd.Commandline.runCommand;
+import java.util.stream.Collectors;
 
 public class JavaLanguage extends Language {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
-    private JavaSettings settings = new JavaSettings();
+    private LanguageSettings settings = new JavaSettings();
     private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
     private HighlightData highlightData = new JavaHighlightData();
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
@@ -111,7 +111,17 @@ public class JavaLanguage extends Language {
         } catch (Exception e) { // Caught due to error suppression in the lambdas
             LOGGER.error("There was an exception while writing replacement values for files", e);
         }
-    });
+    })
+            .argumentPreprocessor(((languageServerWrapper, args) -> {
+                var serverPath = languageServerWrapper.getServerPath();
+                var plugins = new File(serverPath, "plugins");
+                var launcherFile = Arrays.stream(plugins.listFiles()).filter(file -> file.getName().startsWith("org.eclipse.equinox.launcher_")).findFirst().orElseThrow(() -> new RuntimeException("Couldn't find launcher jar!"));
+                return args.stream().map(str -> str.replace("%server-path%", serverPath).replace("%launch-jar%", launcherFile.getAbsolutePath())).collect(Collectors.toList());
+            }));
+
+    public JavaLanguage(StartupLogic startupLogic) {
+        super(startupLogic);
+    }
 
     private String relativizeFromBase(File file) {
         return ProjectManager.getPPFProject().getFile().getParentFile().toURI().relativize(file.toURI()).toString();
@@ -129,10 +139,6 @@ public class JavaLanguage extends Language {
                 LOGGER.error("There was a problem writing to " + output.toString(), e);
             }
         };
-    }
-
-    public JavaLanguage(StartupLogic startupLogic) {
-        super(startupLogic);
     }
 
     @Override
@@ -182,15 +188,12 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        LOGGER.info("lsp path = {}", this.lspPath.getAbsolutePath());
         return new File(this.lspPath, "jdt-language-server-latest").exists();
     }
 
     @Override
     public boolean installLSP() {
-        if (hasLSP()) {
-            return false;
-        }
+        if (hasLSP()) return false;
 
         try {
             var res = JOptionPane.showOptionDialog(null,
@@ -218,7 +221,7 @@ public class JavaLanguage extends Language {
 
                 tarGz.delete();
 
-                LOGGER.info("Done downloading the LSP");
+                LOGGER.info("Successfully downloaded the Java Language Server");
 
                 return true;
             } else if (res == 1) {
@@ -226,7 +229,7 @@ public class JavaLanguage extends Language {
                 Desktop.getDesktop().browse(new URI("https://github.com/eclipse/eclipse.jdt.ls"));
             }
         } catch (IOException | URISyntaxException e) {
-            LOGGER.error("There was an error while trying to install the LSP server for " + getName(), e);
+            LOGGER.error("There was an error while trying to install the Java LSP server", e);
         }
 
         return false;
@@ -234,11 +237,7 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        final String[] out = {""};
-        runCommand("java --version", false, null, res -> out[0] = res);
-        var output = out[0];
-
-        return output.contains("Runtime Environment");
+        return Commandline.runSyncCommand("java --version").contains("Runtime Environment");
     }
 
     @Override
@@ -306,10 +305,5 @@ public class JavaLanguage extends Language {
         });
 
         return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFilesOptional.orElse(null), classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute);
-    }
-
-    @Override
-    public String toString() {
-        return getName();
     }
 }

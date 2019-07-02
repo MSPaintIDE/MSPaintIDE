@@ -9,6 +9,7 @@ import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
+import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DefaultDiagnosticManager;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DiagnosticManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -74,7 +75,7 @@ public class StartupLogic {
 
         languageManager.addLanguage(new JavaLanguage(this));
 //        languageManager.addLanguage(new BrainfuckLanguage(this));
-//        languageManager.addLanguage(new PythonLanguage());
+        languageManager.addLanguage(new PythonLanguage(this));
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
@@ -97,6 +98,20 @@ public class StartupLogic {
                     thisAdded.add(imageClass);
                     imageClass.getScannedImage().ifPresentOrElse(img -> {}, () -> LOGGER.error("Error! Image has not been scanned yet! {}", uri));
                     this.currentLanguage.highlightAll(Collections.singletonList(imageClass));
+
+                    if (ImageClass.AUTO_TRIM_TEXT) {
+                        diagnostics.forEach(diag -> {
+                            var range = diag.getRange();
+                            var start = range.getStart();
+                            var end = range.getEnd();
+                            start.setCharacter(imageClass.getLeadingStripped() + start.getCharacter());
+                            end.setCharacter(imageClass.getLeadingStripped() + end.getCharacter());
+                            range.setStart(start);
+                            range.setEnd(end);
+                            diag.setRange(range);
+                        });
+                    }
+
                     AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1 / 6D, imageClass.getHighlightedFile(), imageClass.getScannedImage().get(), diagnostics);
                     highlighter.highlightAngrySquiggles();
                 } catch (IOException | TranscoderException e) {

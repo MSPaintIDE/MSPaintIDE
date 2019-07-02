@@ -97,7 +97,11 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     protected void reload() {
         this.settings.clear();
         ProjectManager.getPPFProject().getLanguageSetting(langName)
-                .forEach((name, value) -> setSetting(nameToEnum(name), value));
+                .forEach((name, value) -> {
+                    var enumName = nameToEnum(name);
+                    if (enumName.getType().equals(File.class) && value instanceof String) value = new File((String) value);
+                    setSetting(enumName, value);
+                });
     }
 
     public String getLangName() {

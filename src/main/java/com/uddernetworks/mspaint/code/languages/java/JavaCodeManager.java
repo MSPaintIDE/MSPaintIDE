@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
+import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
@@ -83,7 +84,7 @@ public class JavaCodeManager {
         javac.add("-d");
         javac.add(classOutputFolder.getAbsolutePath());
         javaFiles.forEach(file -> javac.add(file.getAbsolutePath()));
-        runCommand(javac);
+        Commandline.runLiveCommand(javac);
 
         LOGGER.info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -109,7 +110,7 @@ public class JavaCodeManager {
         jarCreate.add("-e");
         jarCreate.add(this.language.getLanguageSettings().getSetting(JavaOptions.MAIN));
         jarCreate.add("*");
-        runCommand(jarCreate, classOutputFolder);
+        Commandline.runLiveCommand(jarCreate, classOutputFolder);
 
         LOGGER.info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -124,7 +125,7 @@ public class JavaCodeManager {
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new JavaRunningCode(() -> {
             ConsoleManager.setAll(programOut);
-            return runCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()));
+            return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()));
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
                 LOGGER.info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");
@@ -169,58 +170,6 @@ public class JavaCodeManager {
                     }
                 }
             }
-        }
-    }
-
-    private int runCommand(List<String> command) {
-        return runCommand(command, null);
-    }
-
-    private int runCommand(List<String> command, File directory) {
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-//            processBuilder.redirectError();
-            processBuilder.inheritIO();
-            if (directory != null) processBuilder.directory(directory);
-            Process p = processBuilder.start();
-            InputStreamConsumer streamConsumer = new InputStreamConsumer(p.getInputStream());
-            streamConsumer.start();
-            int exitCode = p.waitFor();
-            streamConsumer.join();
-            LOGGER.info("Process terminated with {}", exitCode);
-            return exitCode;
-        } catch (IOException | InterruptedException e) {
-            LOGGER.error("An error occurred while running command with arguments " + command, e);
-            return -1;
-        }
-    }
-
-    public static class InputStreamConsumer extends Thread {
-
-        private InputStream inputStream;
-        private StringBuilder line = new StringBuilder();
-
-        public InputStreamConsumer(InputStream inputStream) {
-            this.inputStream = inputStream;
-        }
-
-        @Override
-        public void run() {
-            try {
-                int intVal = -1;
-                while ((intVal = inputStream.read()) != -1) {
-                    char value = (char) intVal;
-                    if (value == '\n') {
-                        LOGGER.info(line.toString());
-                        line = new StringBuilder();
-                    } else {
-                        line.append(value);
-                    }
-                }
-            } catch (IOException exp) {
-                exp.printStackTrace();
-            }
-
         }
     }
 }

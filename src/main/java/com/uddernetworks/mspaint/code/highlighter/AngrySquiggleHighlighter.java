@@ -4,9 +4,11 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.ScannedImage;
-import com.uddernetworks.newocr.utils.ConversionUtils;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import org.apache.batik.transcoder.TranscoderException;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class AngrySquiggleHighlighter {
 
@@ -43,7 +47,11 @@ public class AngrySquiggleHighlighter {
 
     public void highlightAngrySquiggles() throws IOException, TranscoderException {
         LOGGER.info("Starting highlight");
-        for (Diagnostic diagnostic : diagnostics) {
+
+        // TODO: Make this configurable?
+        this.diagnostics.removeIf(diagnostic -> diagnostic.getSeverity() != DiagnosticSeverity.Error);
+
+        for (Diagnostic diagnostic : this.diagnostics) {
             var range = diagnostic.getRange();
             var start = range.getStart();
             var end = range.getEnd();
@@ -56,7 +64,6 @@ public class AngrySquiggleHighlighter {
             if (endLine != startLine) {
                 var numOfFullLines = endLine - startLine - 1;
                 for (int fullLine = 0; fullLine < numOfFullLines; fullLine++) {
-                    LOGGER.info("Highlight full {}", fullLine);
                     getLineAndLength(startLine, startColumn, Integer.MAX_VALUE);
                 }
 
@@ -136,9 +143,8 @@ public class AngrySquiggleHighlighter {
         }
 
         xIndex = calcXY.getX() + (int) Math.round(calcXY.getWidth() / 2D);
-        yIndex = calcXY.getY() + calcXY.getHeight();
 
-        fontSize = ConversionUtils.pointToPixel(fontSize); // fontSize is now in pixels
+        yIndex = getBaseline(line, fontSize);
 
         pixelLength = pixelLength + extraSquigglePadding * 2;
 
@@ -150,6 +156,26 @@ public class AngrySquiggleHighlighter {
         pixelLength = getRoundedSquiggleLength(pixelLength);
 
         drawAngrySquiggle((int) Math.round(xIndex - (pixelLength / 2D)), (int) Math.round(yIndex + this.squiggleImage.getHeight() / 2D), pixelLength);
+    }
+
+    private int getBaseline(List<ImageLetter> imageLetters, int fontSize) throws IOException {
+        var centerPopulator = this.startupLogic.getCenterPopulator();
+        centerPopulator.generateCenters(fontSize);
+
+        var descriptiveStatistics = new DescriptiveStatistics();
+
+        var sizes = imageLetters
+                .stream()
+                .map(imageLetter -> (double) imageLetter.getHeight() + imageLetter.getY())
+                .peek(descriptiveStatistics::addValue)
+                .collect(Collectors.toCollection(DoubleArrayList::new));
+
+        var lowerBound = descriptiveStatistics.getPercentile(40);
+        var upperBound = descriptiveStatistics.getPercentile(60);
+
+        sizes.removeIf((Predicate<Double>) value -> value > upperBound || value < lowerBound);
+
+        return (int) sizes.stream().mapToDouble(Double::valueOf).average().orElse(0);
     }
 
     private int getRoundedSquiggleLength(int originalLength) {

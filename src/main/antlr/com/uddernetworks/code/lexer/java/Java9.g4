@@ -64,7 +64,7 @@ Total lexer+parser time 2497ms.
 grammar Java9;
 
 @header {
-package com.uddernetworks.code.lexer;
+package com.uddernetworks.code.lexer.java;
 }
 
 /*
