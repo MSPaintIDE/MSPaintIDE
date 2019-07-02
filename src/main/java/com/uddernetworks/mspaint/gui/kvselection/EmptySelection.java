@@ -6,7 +6,7 @@ import javafx.scene.control.MultipleSelectionModel;
 
 import java.util.ArrayList;
 
-public class EmptySelection extends MultipleSelectionModel<KVData> {
+public class EmptySelection<T> extends MultipleSelectionModel<T> {
 
     @Override
     public ObservableList<Integer> getSelectedIndices() {
@@ -14,7 +14,7 @@ public class EmptySelection extends MultipleSelectionModel<KVData> {
     }
 
     @Override
-    public ObservableList<KVData> getSelectedItems() {
+    public ObservableList<T> getSelectedItems() {
         return null;
     }
 
@@ -49,7 +49,7 @@ public class EmptySelection extends MultipleSelectionModel<KVData> {
     }
 
     @Override
-    public void select(KVData obj) {
+    public void select(T obj) {
 
     }
 

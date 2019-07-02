@@ -69,7 +69,7 @@ public class LetterFileWriter {
 
     private void writeLetterToFile(ImageLetter imageLetter) {
         var data = imageLetter.getData(double[][].class).orElseGet(() ->
-                booleanToDoubleGrid(imageLetter.getValues(), imageLetter.getData(Color.class).map(Color::getRGB).orElse(0)));
+                booleanToDoubleGrid(imageLetter.getValues(), imageLetter.getData(Color.class).map(Color::getRGB).orElse(Color.BLACK.getRGB())));
 
         writeLetterToFile(imageLetter, data);
     }

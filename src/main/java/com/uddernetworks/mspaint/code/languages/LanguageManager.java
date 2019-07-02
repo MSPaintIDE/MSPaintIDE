@@ -28,15 +28,22 @@ public class LanguageManager {
         this.allLanguages.add(language);
     }
 
+    // TODO: Remove warnings with option
     public void initializeLanguages() {
         this.enabledLanguages = this.allLanguages.stream()
                 .filter(language -> {
                     LOGGER.info("Loading the language \"" + language.getName() + "\"");
 
-                    if (language.meetsRequirements()) return true;
+                    if (!language.hasLSP()) {
+                        LOGGER.warn("Your system does not have the LSP for {}, which is required to use the language. Go to the settings if you would like to add it or remove this warning.", language.getName());
+                        return true;
+                    }
 
-                    LOGGER.warn("Your system does not meet the requirements for " + language.getName());
-                    return false;
+                    if (!language.hasRuntime()) {
+                        LOGGER.warn("Your system does not have the runtime for {}. You will still be allowed to edit with the language, just not compile/execute code with it. Go to the settings if you would like to add it or remove this warning.", language.getName());
+                    }
+
+                    return true;
                 })
                 .collect(Collectors.toList());
     }

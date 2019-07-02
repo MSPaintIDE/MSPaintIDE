@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.code.execution.RunningCode;
 import com.uddernetworks.mspaint.code.execution.ThrowableRunnable;
+import com.uddernetworks.mspaint.code.execution.ThrowableSupplier;
 
 import java.util.Optional;
 
@@ -11,21 +12,34 @@ public class JavaRunningCode extends RunningCode {
         super(runnable);
     }
 
+    public JavaRunningCode(ThrowableSupplier<Integer> runnable) {
+        super(runnable);
+    }
+
     @Override
     public void runCode() {
         setExitCode(0);
-        String message = null;
+        Exception error = null;
 
         try {
-            this.runnable.run();
-            this.success.forEach(exitCode -> exitCode.accept(getExitCode()));
+            if (this.runnable != null) {
+                this.runnable.run();
+            } else {
+                setExitCode(this.supplier.get());
+            }
         } catch (Exception e) {
-            e.printStackTrace();
-            message = e.getLocalizedMessage();
-            this.error.forEach(consumer -> consumer.accept(e.getLocalizedMessage()));
+            error = e;
         }
 
-        var optionalUsing = Optional.ofNullable(message);
+        if (error != null) {
+            error.printStackTrace();
+            Exception finalError = error;
+            this.error.forEach(consumer -> consumer.accept(finalError.getLocalizedMessage()));
+        } else {
+            this.success.forEach(exitCode -> exitCode.accept(getExitCode()));
+        }
+
+        var optionalUsing = Optional.ofNullable(error == null ? null : error.getLocalizedMessage());
         this.any.forEach(consumer -> consumer.accept(getExitCode(), optionalUsing));
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<GridPane fx:id="anchor" maxWidth="580.0" minHeight="25.0" minWidth="580.0" prefWidth="580.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Canvas fx:id="icon" height="25.0" width="25.0" />
+      <Label fx:id="message" layoutX="45.0" layoutY="4.0" prefWidth="400.0" styleClass="theme-text" text="test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test " wrapText="true" GridPane.columnIndex="1">
+         <GridPane.margin>
+            <Insets left="15.0" right="15.0" />
+         </GridPane.margin></Label>
+      <Label fx:id="info" ellipsisString="" prefHeight="17.0" styleClass="theme-text" text="MainMyClassIsHere:24 9:24:18" textFill="#808080" textOverrun="CLIP" GridPane.columnIndex="2" />
+   </children>
+   <columnConstraints>
+      <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" />
+      <ColumnConstraints />
+      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>

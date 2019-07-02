@@ -12,10 +12,14 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class ImageClass {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ImageClass.class);
+
+    // TODO: Make this configurable?
+    public static final boolean AUTO_TRIM_TEXT = true;
 
     private File inputImage;
     private ScannedImage scannedImage;
@@ -25,6 +29,8 @@ public class ImageClass {
     private File highlightedFile;
     private MainGUI mainGUI;
     private StartupLogic startupLogic;
+    private LanguageHighlighter languageHighlighter;
+    private int leadingStripped = 0;
 
     public ImageClass(File inputImage, MainGUI mainGUI) {
         this(inputImage, mainGUI, null);
@@ -34,6 +40,7 @@ public class ImageClass {
         this.inputImage = inputImage;
         this.mainGUI = mainGUI;
         this.startupLogic = startupLogic;
+        this.languageHighlighter = new LanguageHighlighter();
     }
 
     public void scan() {
@@ -48,14 +55,17 @@ public class ImageClass {
             this.startupLogic = this.mainGUI.getStartupLogic();
         }
 
-        System.out.println("Getting text at " + System.currentTimeMillis() +  "(" + this.inputImage.getAbsolutePath() + ")");
-
         this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.startupLogic);
 
-        this.text = this.scannedImage.getPrettyString();
-        this.trimmedText = this.scannedImage.stripLeadingSpaces().getPrettyString();
+        var leadingStripped = this.scannedImage.stripLeadingSpaces();
+        this.text = this.trimmedText = leadingStripped.getPrettyString();
+        if (!AUTO_TRIM_TEXT) {
+            this.text = this.scannedImage.getPrettyString();
+        } else {
+            this.leadingStripped = this.scannedImage.getLine(0).size() - leadingStripped.getLine(0).size();
+        }
 
-        LOGGER.info("\n" + prefix + "text =\n" + this.text);
+        LOGGER.info("\n" + prefix + "text \n" + this.scannedImage.getPrettyString());
 
         LOGGER.info(prefix + "Finished scan in " + (System.currentTimeMillis() - start) + "ms");
     }
@@ -67,8 +77,7 @@ public class ImageClass {
 
         LOGGER.info(prefix + "Highlighting...");
         long start = System.currentTimeMillis();
-
-        new LanguageHighlighter().highlight(this.mainGUI.getCurrentLanguage().getLanguageHighlighter(), this.scannedImage);
+        this.languageHighlighter.highlight(this.startupLogic.getCurrentLanguage(), this);
 
         LOGGER.info(prefix + "Finished highlighting in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -101,8 +110,8 @@ public class ImageClass {
         return this.inputImage;
     }
 
-    public ScannedImage getScannedImage() {
-        return this.scannedImage;
+    public Optional<ScannedImage> getScannedImage() {
+        return Optional.ofNullable(this.scannedImage);
     }
 
     public MainGUI getMainGUI() {
@@ -111,5 +120,9 @@ public class ImageClass {
 
     public StartupLogic getStartupLogic() {
         return startupLogic;
+    }
+
+    public int getLeadingStripped() {
+        return leadingStripped;
     }
 }

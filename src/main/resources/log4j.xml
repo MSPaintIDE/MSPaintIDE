@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
 <log4j:configuration debug="false">
-    <appender name="default.console" class="com.uddernetworks.mspaint.logging.GUIConsoleAppender">
+    <appender name="default.console" class="com.uddernetworks.mspaint.logging.FormattedAppender">
         <param name="target" value="System.out"/>
+        <param name="target" value="System.err"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="[%d{HH:mm:ss}] [%t/%p]: %m%n"/>
         </layout>

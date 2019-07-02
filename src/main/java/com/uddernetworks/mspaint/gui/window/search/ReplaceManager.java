@@ -19,7 +19,7 @@ public class ReplaceManager {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ReplaceManager.class);
 
-    private final int WHITE = Color.WHITE.getRGB();
+    private static final int WHITE = Color.WHITE.getRGB();
     private MainGUI mainGUI;
 
     public ReplaceManager(MainGUI mainGUI) {
@@ -130,12 +130,12 @@ public class ReplaceManager {
     }
 
     // TODO: Change the following methods in this commit to use 2D arrays, not BufferedImages
-    private BufferedImage grabRealSub(BufferedImage original, ImageLetter imageLetter) {
+    public static BufferedImage grabRealSub(BufferedImage original, ImageLetter imageLetter) {
         var sub = original.getSubimage(imageLetter.getX(), imageLetter.getY(), imageLetter.getWidth(), imageLetter.getHeight());
         return expandToWhite(original, sub, imageLetter);
     }
 
-    private BufferedImage expandToWhite(BufferedImage original, BufferedImage input, ImageLetter imageLetter) {
+    public static BufferedImage expandToWhite(BufferedImage original, BufferedImage input, ImageLetter imageLetter) {
         var modded = false;
         if (yHasBlack(input, 0)) {
             if (expandUp(imageLetter)) modded = true;
@@ -158,7 +158,7 @@ public class ReplaceManager {
         return input;
     }
 
-    private BufferedImage trimImage(BufferedImage image) {
+    public static BufferedImage trimImage(BufferedImage image) {
         if (!yHasBlack(image, 0)) image = image.getSubimage(0, 1, image.getWidth(), image.getHeight() - 1);
         if (!yHasBlack(image, image.getHeight() - 1))
             image = image.getSubimage(0, 0, image.getWidth(), image.getHeight() - 1);
@@ -179,40 +179,40 @@ public class ReplaceManager {
     }
 
     // Return: successful
-    private boolean expandUp(ImageLetter imageLetter) {
+    public static boolean expandUp(ImageLetter imageLetter) {
         if (imageLetter.getY() == 0) return false;
         imageLetter.setY(imageLetter.getY() - 1);
         imageLetter.setHeight(imageLetter.getHeight() + 1);
         return true;
     }
 
-    private boolean expandDown(BufferedImage original, ImageLetter imageLetter) {
+    public static boolean expandDown(BufferedImage original, ImageLetter imageLetter) {
         if (imageLetter.getY() + imageLetter.getHeight() >= original.getHeight()) return false;
         imageLetter.setHeight(imageLetter.getHeight() + 1);
         return true;
     }
 
-    private boolean expandLeft(ImageLetter imageLetter) {
+    public static boolean expandLeft(ImageLetter imageLetter) {
         if (imageLetter.getX() == 0) return false;
         imageLetter.setX(imageLetter.getX() - 1);
         imageLetter.setWidth(imageLetter.getWidth() + 1);
         return true;
     }
 
-    private boolean expandRight(BufferedImage original, ImageLetter imageLetter) {
+    public static boolean expandRight(BufferedImage original, ImageLetter imageLetter) {
         if (imageLetter.getX() + imageLetter.getWidth() >= original.getWidth()) return false;
         imageLetter.setWidth(imageLetter.getWidth() + 1);
         return true;
     }
 
-    private boolean yHasBlack(BufferedImage input, int y) {
+    public static boolean yHasBlack(BufferedImage input, int y) {
         for (int x = 0; x < input.getWidth(); x++) {
             if (input.getRGB(x, y) != WHITE) return true;
         }
         return false;
     }
 
-    private boolean xHasBlack(BufferedImage input, int x) {
+    public static boolean xHasBlack(BufferedImage input, int x) {
         for (int y = 0; y < input.getHeight(); y++) {
             if (input.getRGB(x, y) != WHITE) return true;
         }

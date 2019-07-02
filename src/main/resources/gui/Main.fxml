@@ -7,6 +7,8 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import org.fxmisc.flowless.VirtualizedScrollPane?>
+<?import org.fxmisc.richtext.InlineCssTextArea?>
 <?import java.lang.String?>
 <AnchorPane fx:id="rootAnchor" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
@@ -40,6 +42,7 @@
                                 </items>
                             </MaterialMenu>
                           <MaterialMenuItem clickLabel="settings" text="Settings" />
+                          <MaterialMenuItem clickLabel="show-diagnostics" text="Show Diagnostics" />
                           <MaterialMenuItem clickLabel="print" text="Print" />
                           <MaterialMenuItem clickLabel="close-project" text="Close Project" />
                           <MaterialMenuItem clickLabel="exit" text="Exit" />
@@ -120,18 +123,22 @@
                       <RowConstraints minHeight="10.0" prefHeight="855.0" vgrow="ALWAYS" />
                   </rowConstraints>
                   <children>
-                      <TextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
-                          <opaqueInsets>
-                              <Insets />
-                          </opaqueInsets>
-                          <styleClass>
-                              <String fx:value="unrounded" />
-                              <String fx:value="output-theme" />
-                          </styleClass>
-                     <GridPane.margin>
-                        <Insets left="15.0" />
-                     </GridPane.margin>
-                      </TextArea>
+                      <VirtualizedScrollPane maxWidth="999999.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
+                          <GridPane.margin>
+                              <Insets left="15.0" />
+                          </GridPane.margin>
+                          <content>
+                              <InlineCssTextArea fx:id="output" maxWidth="999999.0" prefHeight="290.0" styleClass="output-text">
+                                  <opaqueInsets>
+                                      <Insets />
+                                  </opaqueInsets>
+                                  <styleClass>
+                                      <String fx:value="unrounded" />
+                                      <String fx:value="output-theme" />
+                                  </styleClass>
+                              </InlineCssTextArea>
+                          </content>
+                      </VirtualizedScrollPane>
                       <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="gridpane-theme">
                           <content>
                               <GridPane maxHeight="851.0" maxWidth="500.0" minHeight="851.0" minWidth="500.0" prefHeight="851.0" prefWidth="500.0" styleClass="gridpane-theme">
@@ -144,35 +151,39 @@
                                       <RowConstraints maxHeight="238.0" minHeight="10.0" prefHeight="238.0" vgrow="SOMETIMES" />
                                   </rowConstraints>
                                   <children>
-                                      <GridPane fx:id="langSettingsGrid" prefHeight="539.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
-                                          <columnConstraints>
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="162.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="9999999.0" minWidth="10.0" prefWidth="219.0" />
-                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="125.0" minWidth="10.0" prefWidth="125.0" />
-                                          </columnConstraints>
-                                          <rowConstraints>
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                              <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                    <RowConstraints fillHeight="false" maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                                          </rowConstraints>
-                                          <children>
-                                    <JFXButton fx:id="generate" buttonType="RAISED" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Generate" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                       <GridPane.margin>
-                                          <Insets left="10.0" />
-                                       </GridPane.margin>
-                                    </JFXButton>
-                                          </children>
-                                      </GridPane>
+                              <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="539.0" prefWidth="500.0" styleClass="gridpane-theme">
+                                 <content>
+                                            <GridPane fx:id="langSettingsGrid" prefHeight="539.0" prefWidth="500.0" style="-fx-padding: 0 0 0 10;">
+                                                <columnConstraints>
+                                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="162.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="9999999.0" minWidth="10.0" prefWidth="219.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="125.0" minWidth="10.0" prefWidth="125.0" />
+                                                </columnConstraints>
+                                                <children>
+                                          <JFXButton fx:id="generate" buttonType="RAISED" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Generate" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                          </JFXButton>
+                                                </children>
+                                       <rowConstraints>
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                          <RowConstraints />
+                                       </rowConstraints>
+                                            </GridPane>
+                                 </content>
+                              </ScrollPane>
                                       <Pane prefHeight="100.0" prefWidth="500.0" GridPane.rowIndex="1">
                                           <children>
                                               <JFXButton fx:id="createRepo" buttonType="RAISED" layoutX="10.0" prefHeight="30" prefWidth="100.0" styleClass="primary-button" text="Create Repo">

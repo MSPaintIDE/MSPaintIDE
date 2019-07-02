@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.gui.window;
 
 import com.jfoenix.controls.JFXDecorator;
 import com.uddernetworks.mspaint.gui.AppearanceSettingItem;
+import com.uddernetworks.mspaint.gui.LSPSettingItem;
 import com.uddernetworks.mspaint.gui.OCRSettingItem;
 import com.uddernetworks.mspaint.gui.SettingItem;
 import com.uddernetworks.mspaint.gui.kvselection.DefaultSettingItem;
@@ -48,9 +49,10 @@ public class SettingsWindow extends Stage implements Initializable {
     public SettingsWindow(MainGUI mainGUI, String startPath) throws IOException {
         this(mainGUI, Arrays.asList(
                 new AppearanceSettingItem("Appearance", "file/Appearance.fxml", mainGUI),
-                new OCRSettingItem("OCR", "file/OCR.fxml", mainGUI), // searchResults
+                new OCRSettingItem("OCR", "file/OCR.fxml", mainGUI),
                 new DefaultSettingItem("Image Generation", "file/ImageGeneration.fxml"),
-                new DefaultSettingItem("Injection", "file/Injection.fxml")
+                new DefaultSettingItem("Injection", "file/Injection.fxml"),
+                new LSPSettingItem("Languages", "file/Languages.fxml", mainGUI)
         ), startPath);
     }
 

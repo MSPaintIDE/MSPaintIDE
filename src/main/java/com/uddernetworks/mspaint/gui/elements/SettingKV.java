@@ -191,7 +191,7 @@ public class SettingKV extends VBox {
 
         itemSelect.setFocusTraversable(false);
 
-        itemSelect.setSelectionModel(new EmptySelection());
+        itemSelect.setSelectionModel(new EmptySelection<>());
 
         itemSelect.getItems().addAll(initialConsumer.get());
     }

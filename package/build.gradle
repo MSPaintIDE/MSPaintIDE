@@ -70,7 +70,6 @@ task jpackage(type: Exec, dependsOn: ':copyDependencies') {
 // Copies dependencies and resources to the bundle path
 task completeInnoSetup {
     doLast {
-        println "From " + "${rootProject.projectDir}\\package/src/main/java/resources to ${bundlePath}/MSPaintIDE"
         copy {
             from "${rootProject.projectDir}\\package\\src\\main\\resources"
             into "${bundlePath}\\MSPaintIDE"
@@ -82,6 +81,11 @@ task completeInnoSetup {
             from "${rootProject.projectDir}/native/"
             into "${bundlePath}/MSPaintIDE/native"
             include 'PaintInjector.dll'
+        }
+
+        copy {
+            from "${rootProject.projectDir}/src/main/resources/lsp"
+            into "${bundlePath}/MSPaintIDE/lsp"
         }
 
         println "Inno Setup file: ${generatedInnoSetupFile}"

@@ -180,7 +180,7 @@ JFXButton {
     }
 }
 
-.result-pane > * {
+.result-pane, .diagnostic-pane > * {
     -fx-border-insets: 0 !important;
     -fx-border-style: none !important;
     -fx-border-width: 0 !important;
@@ -276,6 +276,7 @@ JFXButton {
 }
 
 .output-text {
+    -fx-font-family: Monospace, sans-serif !important;
     -fx-border-style: none;
     -fx-border-radius: 0;
     -fx-border-color: transparent;
@@ -424,4 +425,48 @@ $pseudos: hover, focused, showing;
 .settings-group-border.gridpane-theme-dark {
     -fx-background-color: -left-background-dark;
     //-fx-border-color: lighten(-right-background-dark, 0.1);
+}
+
+#searchResults {
+    -fx-background-color: -left-background;
+}
+
+#searchResults.dark {
+    -fx-background-color: -left-background-dark;
+}
+
+.OFF {
+    -fx-fill: WHITE;
+}
+.FATAL {
+    -fx-fill: RED !important;
+    -fx-font-weight: bold !important;
+}
+.ERROR {
+    -fx-fill: RED;
+}
+.WARN {
+    -fx-fill: ORANGE;
+}
+.INFO {
+    -fx-fill: WHITE;
+}
+.DEBUG {
+    -fx-fill: GRAY;
+}
+.TRACE {
+    -fx-fill: GRAY;
+}
+.ALL {
+    -fx-fill: WHITE;
+}
+
+.lsp-language-red {
+    -fx-fill: RED !important;
+    -fx-text-fill: RED !important;
+}
+
+.lsp-language-green {
+    -fx-fill: GREEN !important;
+    -fx-text-fill: GREEN !important;
 }

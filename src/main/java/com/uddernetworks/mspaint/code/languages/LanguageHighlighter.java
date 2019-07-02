@@ -1,34 +1,60 @@
 package com.uddernetworks.mspaint.code.languages;
 
-import com.uddernetworks.newocr.recognition.ScannedImage;
+import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.texteditor.LetterGenerator;
+import org.antlr.v4.runtime.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.text.Segment;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import static com.uddernetworks.mspaint.gui.window.search.ReplaceManager.grabRealSub;
+import static com.uddernetworks.mspaint.gui.window.search.ReplaceManager.trimImage;
 
 public class LanguageHighlighter {
 
-    public void highlight(DefaultJFlexLexer lexer, ScannedImage scannedImage) {
-        String text = scannedImage.getPrettyString();
+    private static Logger LOGGER = LoggerFactory.getLogger(LanguageHighlighter.class);
 
-        List<Token> toks = new ArrayList<>(text.length() / 10);
+    public void highlight(Language language, ImageClass imageClass) {
+        try {
+            var highlightData = language.getHighlightData();
+            String text = imageClass.getText();
 
-        Segment seg = new Segment();
-        seg.array = text.toCharArray();
-        seg.count = text.length();
-        lexer.parse(seg, 0, toks);
+            var input = CharStreams.fromString(text);
+            var lex = highlightData.getLexer(input);
+            lex.setTokenFactory(new CommonTokenFactory(true));
+            var tokens = new UnbufferedTokenStream<CommonToken>(lex);
+            var parser = highlightData.getParser(tokens);
+            parser.setBuildParseTree(false);
+            var vocabulary = parser.getVocabulary();
 
-        toks.forEach(token -> {
-            TokenType type = token.getTokenType();
+            var original = imageClass.getScannedImage().orElseThrow().getOriginalImage();
 
-            int start = token.start;
-            for (int i = 0; i < token.length; i++) {
-                char cha = text.charAt(start + i);
-                if (cha == '\n') continue;
-                scannedImage.letterAt(start + i).ifPresent(imageLetter -> imageLetter.setData(new Color(type.getStyle())));
+            var i2 = 0;
+            for (Token token; (token = tokens.get(i2)).getType() != Token.EOF; i2++, tokens.consume()) {
+                if (token.getText().isBlank()) continue;
+                var from = token.getCharPositionInLine();
+                var to = from + token.getText().length();
+                Color color = highlightData.getColor(vocabulary.getDisplayName(token.getType()));
+
+                var line = imageClass.getScannedImage().orElseThrow().getLine(token.getLine() - 1);
+                for (int i = from; i < Math.min(to, line.size()); i++) {
+                    var letter = line.get(i);
+
+                    // Could the following be improved?
+                    var image = original.getSubimage(letter.getX(), letter.getY(), letter.getWidth(), letter.getHeight());
+                    image = grabRealSub(original, letter);
+                    image = trimImage(image);
+                    var values = LetterGenerator.createGrid(image);
+                    LetterGenerator.toGrid(image, values, color);
+
+                    var grid = LetterGenerator.trim(values);
+
+                    letter.setData(grid);
+                }
             }
-        });
+        } catch (Exception e) {
+            LOGGER.error("Error while highlighting!", e);
+        }
     }
-
 }

@@ -3,19 +3,22 @@ package com.uddernetworks.mspaint.code.languages;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
+import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import com.uddernetworks.mspaint.util.IDEFileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class Language {
 
@@ -60,13 +63,25 @@ public abstract class Language {
     public abstract String[] getFileExtensions();
 
     /**
-     * Gets the extension of the compiled/packaged output file that is generated from the source code. An example of an
-     * output of this method is "jar" for Java.
-     * The method may return null if the language does not support output/packaged files.
+     * Gets if the current language is associated with the given file's filetype. A simple method, but removes some
+     * annoying stuff.
      *
-     * @return the extension of the output file
+     * @param file The file to test
+     * @return If the extension matches one of the extensions from {@link Language#getFileExtensions()}
      */
-    public abstract String getOutputFileExtension();
+    public boolean isFileApplicable(File file) {
+        return Arrays.stream(getFileExtensions())
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet())
+                .contains(FilenameUtils.getExtension(file.getAbsolutePath()).toLowerCase());
+    }
+
+    /**
+     * Gets the input {@link Option} for the language.
+     *
+     * @return The {@link Option} specifying the lang's input
+     */
+    public abstract Option getInputOption();
 
     /**
      * Gets the source directory that files are coming from.
@@ -75,8 +90,18 @@ public abstract class Language {
      */
     public abstract File getInputLocation();
 
+    /**
+     * Gets the image file where executed programs' console output will go.
+     *
+     * @return The image file
+     */
     public abstract File getAppOutput();
 
+    /**
+     * Gets the image file where the compiler/interpreter's console output will go.
+     *
+     * @return The image file
+     */
     public abstract File getCompilerOutput();
 
     /**
@@ -87,19 +112,47 @@ public abstract class Language {
     public abstract boolean isInterpreted();
 
     /**
+     * Gets the instance of {@link LanguageServerWrapper} being used by the current {@link Language}.
+     *
+     * @return The instance of the used {@link LanguageServerWrapper}
+     */
+    public abstract LanguageServerWrapper getLSPWrapper();
+
+    /**
      * Gets if the language has the correct software/libraries needed to compile/interpret and execute the language on
      * the system.
      *
      * @return if the system meets the requirements to use the language
      */
-    public abstract boolean meetsRequirements();
+    public abstract boolean hasLSP();
 
     /**
-     * Gets the language's Lexer for custom highlighting
+     * Downloads and installs the LSP for the current language without any user prompt.
      *
-     * @return the language's implementation of DefaultJFlexLexer
+     * @return If the install was successful or not
      */
-    public abstract DefaultJFlexLexer getLanguageHighlighter();
+    public abstract boolean installLSP();
+
+    /**
+     * If the system has the runtime or whatever is needed to compile and run code
+     *
+     * @return If the system can compile and run code in the current language
+     */
+    public abstract boolean hasRuntime();
+
+    /**
+     * Returns a link to download the runtime. This should not be a direct link.
+     *
+     * @return A link to download the runtime
+     */
+    public abstract String downloadRuntimeLink();
+
+    /**
+     * Gets the name of the TextMate file used by the language.
+     *
+     * @return The name of the internal .json TextMate file
+     */
+    public abstract HighlightData getHighlightData();
 
     /**
      * Gets the {@link LanguageSettings} of the current language.
@@ -163,6 +216,7 @@ public abstract class Language {
      * @return All the {@link ImageClass}s to be used during compilation/execution
      */
     protected Optional<List<ImageClass>> indexFiles(Option highlightDirectorySetting) {
+        // TODO: Files should already be indexed by the DocumentManager, so this is unnecessary
         var LOGGER = getLogger();
         var mainGUI = this.startupLogic.getMainGUI();
         if (optionsNotFilled()) {
@@ -171,6 +225,7 @@ public abstract class Language {
             return Optional.empty();
         }
 
+        /*
         LOGGER.info("Scanning all images...");
 
         mainGUI.setStatusText(null);
@@ -182,6 +237,15 @@ public abstract class Language {
             LOGGER.info("Adding non directory: " + imageFile.getAbsolutePath());
             imageClasses.add(new ImageClass(imageFile, mainGUI));
         }
+         */
+        var lspWrapper = getLSPWrapper();
+        var documentManager = lspWrapper.getDocumentManager();
+
+        LOGGER.info("Reading {}'s DocumentManager index...", getName());
+
+        var imageClasses = documentManager.getAllDocuments().stream().map(Document::getImageClass).collect(Collectors.toList());
+
+        LOGGER.info("Found {} documents", imageClasses.size());
 
         mainGUI.setStatusText(null);
         return Optional.of(imageClasses);
@@ -197,11 +261,11 @@ public abstract class Language {
     protected void highlightAll(Option highlightDirectorySetting, List<ImageClass> imageClasses) throws IOException {
         var LOGGER = getLogger();
         var mainGUI = startupLogic.getMainGUI();
-        if (optionsNotFilled()) {
-            LOGGER.error("Please select files for all options");
-            mainGUI.setHaveError();
-            return;
-        }
+//        if (optionsNotFilled()) {
+//            LOGGER.error("Please select files for all options");
+//            mainGUI.setHaveError();
+//            return;
+//        }
 
         var highlightDirectory = getLanguageSettings().<File>getSetting(highlightDirectorySetting);
 
@@ -234,5 +298,10 @@ public abstract class Language {
      */
     public boolean optionsNotFilled() {
         return !getLanguageSettings().requiredFilled();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

@@ -7,10 +7,11 @@ import com.uddernetworks.mspaint.code.execution.GeneralRunningCodeManager;
 import com.uddernetworks.mspaint.code.execution.RunningCodeManager;
 import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
-import com.uddernetworks.mspaint.code.languages.LanguageError;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
-import com.uddernetworks.mspaint.code.languages.brainfuck.BrainfuckLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
+import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
+import com.uddernetworks.mspaint.gui.window.diagnostic.DefaultDiagnosticManager;
+import com.uddernetworks.mspaint.gui.window.diagnostic.DiagnosticManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.ocr.OCRManager;
 import com.uddernetworks.mspaint.painthook.InjectionManager;
@@ -20,6 +21,8 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
+import com.uddernetworks.mspaint.watcher.DefaultFileWatchManager;
+import com.uddernetworks.mspaint.watcher.FileWatchManager;
 import com.uddernetworks.paintassist.DefaultPaintAssist;
 import com.uddernetworks.paintassist.PaintAssist;
 import org.apache.batik.transcoder.TranscoderException;
@@ -29,11 +32,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 public class StartupLogic {
 
@@ -48,6 +51,8 @@ public class StartupLogic {
     private RunningCodeManager runningCodeManager;
     private OCRManager ocrManager;
     private PaintAssist paintAssist;
+    private FileWatchManager fileWatchManager;
+    private DiagnosticManager diagnosticManager;
 
     private CenterPopulator centerPopulator;
 
@@ -55,6 +60,7 @@ public class StartupLogic {
     private List<String> added = new ArrayList<>();
 
     public void start(MainGUI mainGUI) throws IOException {
+        this.fileWatchManager = new DefaultFileWatchManager();
         headlessStart();
         this.mainGUI = mainGUI;
 
@@ -68,8 +74,8 @@ public class StartupLogic {
         Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
         languageManager.addLanguage(new JavaLanguage(this));
-        languageManager.addLanguage(new BrainfuckLanguage(this));
-//        languageManager.addLanguage(new PythonLanguage());
+//        languageManager.addLanguage(new BrainfuckLanguage(this));
+        languageManager.addLanguage(new PythonLanguage(this));
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
@@ -78,6 +84,52 @@ public class StartupLogic {
 
         new InjectionManager(mainGUI, this).createHooks();
         this.paintAssist = new DefaultPaintAssist();
+
+        List<ImageClass> hasErrors = new ArrayList<>();
+
+        (this.diagnosticManager = new DefaultDiagnosticManager(this)).onDiagnosticChange(entries -> {
+            var documentManager = this.currentLanguage.getLSPWrapper().getDocumentManager();
+            var sortedDiagnostics = entries.stream().collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())));
+            var thisAdded = new ArrayList<ImageClass>();
+            sortedDiagnostics.forEach((uri, diagnostics) -> {
+                try {
+                    var document = documentManager.getDocument(new File(URI.create(uri + ".png")));
+                    var imageClass = document.getImageClass();
+                    thisAdded.add(imageClass);
+                    imageClass.getScannedImage().ifPresentOrElse(img -> {}, () -> LOGGER.error("Error! Image has not been scanned yet! {}", uri));
+                    this.currentLanguage.highlightAll(Collections.singletonList(imageClass));
+
+                    if (ImageClass.AUTO_TRIM_TEXT) {
+                        diagnostics.forEach(diag -> {
+                            var range = diag.getRange();
+                            var start = range.getStart();
+                            var end = range.getEnd();
+                            start.setCharacter(imageClass.getLeadingStripped() + start.getCharacter());
+                            end.setCharacter(imageClass.getLeadingStripped() + end.getCharacter());
+                            range.setStart(start);
+                            range.setEnd(end);
+                            diag.setRange(range);
+                        });
+                    }
+
+                    AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1 / 6D, imageClass.getHighlightedFile(), imageClass.getScannedImage().get(), diagnostics);
+                    highlighter.highlightAngrySquiggles();
+                } catch (IOException | TranscoderException e) {
+                    LOGGER.error("Error while writing diagnostics to " + uri, e);
+                }
+            });
+
+            hasErrors.removeAll(thisAdded);
+
+            try {
+                this.currentLanguage.highlightAll(hasErrors);
+            } catch (IOException e) {
+                LOGGER.error("An error occurred while highlighting images", e);
+            }
+
+            hasErrors.clear();
+            hasErrors.addAll(thisAdded);
+        });
     }
 
     public void headlessStart() throws IOException {
@@ -104,9 +156,8 @@ public class StartupLogic {
         }
 
         if (MainGUI.HEADLESS) {
-            settingsManager.<String>onChangeSetting(Setting.HEADLESS_FONT, font -> {
-                this.ocrManager.setActiveFont(font, settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG));
-            }, true);
+            settingsManager.<String>onChangeSetting(Setting.HEADLESS_FONT, font ->
+                    this.ocrManager.setActiveFont(font, settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG)), true);
         } else {
             ProjectManager.switchProjectConsumer(project -> {
                 if (project.getActiveFont() == null) {
@@ -123,7 +174,7 @@ public class StartupLogic {
         this.currentLanguage = language;
     }
 
-    public  Language getCurrentLanguage() {
+    public Language getCurrentLanguage() {
         return this.currentLanguage;
     }
 
@@ -143,59 +194,30 @@ public class StartupLogic {
 
         var imageOutputStream = new ImageOutputStream(this, this.currentLanguage.getAppOutput(), 500);
         var compilerOutputStream = new ImageOutputStream(this, this.currentLanguage.getCompilerOutput(), 500);
-        Map<ImageClass, List<LanguageError>> errors = null;
 
-        try {
-            var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, buildSettings);
+        var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, buildSettings);
 
-            if (result.getCompletionStatus() == CompilationResult.Status.RUNNING) {
-                this.runningCodeManager.getRunningCode().ifPresentOrElse(runningCode -> {
-                    runningCode.afterAll((exitCode, ignored) -> {
-                        LOGGER.info("Saving program output images...");
-                        mainGUI.setStatusText("Saving program output images...");
+        if (result.getCompletionStatus() == CompilationResult.Status.RUNNING) {
+            this.runningCodeManager.getRunningCode().ifPresentOrElse(runningCode -> {
+                runningCode.afterAll((exitCode, ignored) -> {
+                    LOGGER.info("Saving program output images...");
+                    mainGUI.setStatusText("Saving program output images...");
 
-                        imageOutputStream.saveImage();
+                    imageOutputStream.saveImage();
 
-                        mainGUI.setStatusText("");
-                    });
-                }, () -> LOGGER.error("Completion status is RUNNING however no RunningCode has been found..."));
-            } else {
-                errors = result.getErrors();
-                LOGGER.info("Highlighting Angry Squiggles...");
-                mainGUI.setStatusText("Highlighting Angry Squiggles...");
-
-                for (ImageClass imageClass : errors.keySet()) {
-                    AngrySquiggleHighlighter highlighter = new AngrySquiggleHighlighter(mainGUI.getStartupLogic(), imageClass, 1 / 6D, imageClass.getHighlightedFile(), imageClass.getScannedImage(), errors.get(imageClass));
-                    highlighter.highlightAngrySquiggles();
-                }
-            }
-        } catch (TranscoderException e) {
-            e.printStackTrace();
-        } finally {
-            Optional<Map.Entry<ImageClass, List<LanguageError>>> firstEntryOptional = errors != null ? errors.entrySet().stream().findFirst() : Optional.empty();
-            String append = "";
-            if (firstEntryOptional.isPresent()) {
-                var firstEntry = firstEntryOptional.get();
-                append += " With ";
-                List<LanguageError> languageErrors = firstEntry.getValue();
-                if (languageErrors.size() > 1) {
-                    append += languageErrors.size() + " errors";
-                } else {
-                    append += "an error (" + languageErrors.get(0).getMessage() + " in " + firstEntry.getKey().getInputImage().getPath() + ")";
-                }
-
-                append += ". See compiler output image for details";
-            }
-
-            LOGGER.info("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms" + append);
-
-            LOGGER.info("Saving compiler output images...");
-            mainGUI.setStatusText("Saving compiler output images...");
-
-            compilerOutputStream.saveImage();
-
-            mainGUI.setStatusText(null);
+                    mainGUI.setStatusText("");
+                });
+            }, () -> LOGGER.error("Completion status is RUNNING however no RunningCode has been found..."));
         }
+
+        LOGGER.info("Finished " + (getCurrentLanguage().isInterpreted() ? "interpreting" : "compiling") + " in " + (System.currentTimeMillis() - start) + "ms");
+
+        LOGGER.info("Saving compiler output images...");
+        mainGUI.setStatusText("Saving compiler output images...");
+
+        compilerOutputStream.saveImage();
+
+        mainGUI.setStatusText(null);
     }
 
     public void addPath(String path) {
@@ -270,5 +292,13 @@ public class StartupLogic {
 
     public String getFontConfig() {
         return MainGUI.HEADLESS ? SettingsManager.getInstance().getSetting(Setting.HEADLESS_FONT_CONFIG) : ProjectManager.getPPFProject().getActiveFontConfig();
+    }
+
+    public FileWatchManager getFileWatchManager() {
+        return fileWatchManager;
+    }
+
+    public DiagnosticManager getDiagnosticManager() {
+        return diagnosticManager;
     }
 }

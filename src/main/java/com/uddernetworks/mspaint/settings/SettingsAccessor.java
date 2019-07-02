@@ -1,6 +1,9 @@
 package com.uddernetworks.mspaint.settings;
 
+import com.uddernetworks.mspaint.gui.window.search.ReplaceManager;
 import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -8,7 +11,7 @@ import java.util.function.Consumer;
 
 public abstract class SettingsAccessor<G> {
 
-    protected Map<G, Object> settings = new HashMap<>();
+    public Map<G, Object> settings = new HashMap<>();
     protected Map<G, List<Consumer>> onChangeSettings = new HashMap<>();
 
     public boolean isSet(G setting) {
@@ -61,6 +64,8 @@ public abstract class SettingsAccessor<G> {
         this.settings.remove(setting);
     }
 
+    private static Logger LOGGER = LoggerFactory.getLogger(ReplaceManager.class);
+
     public void setSetting(G setting, Object value) {
         setSetting(setting, value, true);
     }
@@ -70,8 +75,10 @@ public abstract class SettingsAccessor<G> {
     }
 
     public void setSetting(G setting, Object value, boolean override, boolean runOnChange) {
+//        if (value instanceof File) {
+//            LOGGER.error("FILE INSTANCE!", new RuntimeException("Type is file, exatc is " + value + " setting is "+ setting));
+//        }
         if (this.settings.containsKey(setting) && !override) return;
-        System.out.println("Setting: " + setting + " to " + value);
         settings.put(setting, value);
         if (runOnChange) Platform.runLater(() -> this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
         save();

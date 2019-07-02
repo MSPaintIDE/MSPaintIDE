@@ -9,7 +9,7 @@ import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
 import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
-import com.uddernetworks.mspaint.logging.GUIConsoleAppender;
+import com.uddernetworks.mspaint.logging.FormattedAppender;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
@@ -36,14 +36,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.fxmisc.richtext.InlineCssTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +61,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MainGUI extends Application implements Initializable {
@@ -123,7 +126,7 @@ public class MainGUI extends Application implements Initializable {
     private JFXComboBox<Language> languageComboBox;
 
     @FXML
-    private TextArea output;
+    private InlineCssTextArea output;
 
     @FXML
     private AnchorPane rootAnchor;
@@ -350,8 +353,12 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
+    private PPFProject previousProject = null;
+    private File previousInput = null;
+
     public void refreshProject() {
-        String languageClassString = ProjectManager.getPPFProject().getLanguage();
+        var currentProject = ProjectManager.getPPFProject();
+        String languageClassString = currentProject.getLanguage();
         Platform.runLater(() -> {
             try {
                 var langClass = Class.forName(languageClassString);
@@ -359,10 +366,41 @@ public class MainGUI extends Application implements Initializable {
 
                 LOGGER.info(langClass.getCanonicalName());
 
-                languageManager.getLanguageByClass(langClass).ifPresent(language -> {
+                languageManager.getLanguageByClass(langClass).ifPresentOrElse(language -> {
+
+                    if (!language.hasLSP()) {
+                        LOGGER.warn("LSP server not found for {}. Requesting install.", language.getName());
+                        if (!language.installLSP()) {
+                            LOGGER.warn("LSP was not installed, so exiting program. Check if any errors occurred, please report them.");
+                            System.exit(0);
+                        }
+                    }
+
+                    LOGGER.info("Refresh");
                     this.startupLogic.setCurrentLanguage(language);
                     language.loadForCurrent();
-                });
+
+                    var lspWrapper = language.getLSPWrapper();
+
+                    var fileWatchManager = this.startupLogic.getFileWatchManager();
+                    if (previousInput != null) fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
+
+                    LOGGER.info("About to change setting listener!");
+                    language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) inputFile -> {
+                        if (inputFile == null) return;
+                        LOGGER.info("Prev = {} Curr = {}", previousInput, inputFile.getAbsolutePath());
+                        var file = inputFile.getParentFile();
+                        if (file.equals(this.previousInput)) return;
+                        LOGGER.info("Changing input to: {}", inputFile.getAbsolutePath());
+                        if (previousInput != null) {
+                            LOGGER.info("Previous input: {}", previousInput.getAbsolutePath());
+                            fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
+                            lspWrapper.closeWorkspace(previousInput);
+                        }
+
+                        lspWrapper.openWorkspace(previousInput = file, inputFile);
+                    }, true);
+                }, () -> LOGGER.error("No language found with a class of \"{}\"", languageClassString));
                 languageManager.reloadAllLanguages();
 
                 registerThings();
@@ -372,7 +410,7 @@ public class MainGUI extends Application implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                LOGGER.error("No language found with a class of \"" + languageClassString + "\"");
+                LOGGER.error("No language found with a class of \"{}\"", languageClassString);
             }
         });
     }
@@ -493,11 +531,11 @@ public class MainGUI extends Application implements Initializable {
                 return;
             }
 
-            if (!getCurrentLanguage().meetsRequirements()) {
-                setHaveError();
-                LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
-                return;
-            }
+//            if (!getCurrentLanguage().hasRuntime()) {
+//                setHaveError();
+//                LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
+//                return;
+//            }
 
             progress.setProgress(0);
             progress.getStyleClass().remove("progressError");
@@ -616,6 +654,8 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        FormattedAppender.activate(output);
+
         var settingsManager = SettingsManager.getInstance();
         Splash.setStatus(SplashMessage.GUI);
 
@@ -638,7 +678,8 @@ public class MainGUI extends Application implements Initializable {
             setHaveError();
         });
 
-        GUIConsoleAppender.activate(output);
+        // TODO
+//        GUIConsoleAppender.activate(output);
 
         invertColors.setOnAction(event -> {
             settingsManager.setSetting(Setting.DARK_THEME, this.darkTheme = !this.darkTheme);
@@ -773,10 +814,20 @@ public class MainGUI extends Application implements Initializable {
         var langSettings = getCurrentLanguage().getLanguageSettings();
 
         var i = new LongAdder();
-        langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)))
+        var addingSettings = langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)))
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
-                .forEach(langGUIOption -> {
+                .collect(Collectors.toList());
+
+        var constraints = langSettingsGrid.getRowConstraints();
+        constraints.clear();
+        for (int i1 = 0; i1 < addingSettings.size() + 1; i1++) {
+            constraints.add(new RowConstraints(50, 50, 50));
+        }
+
+        GridPane.setRowIndex(generate, constraints.size() - 1);
+
+        addingSettings.forEach(langGUIOption -> {
                     var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
                     if (langGUIOption.hasChangeButton())
                         childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
@@ -801,10 +852,6 @@ public class MainGUI extends Application implements Initializable {
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .forEach(guiOption ->
                         checkboxFlow.getChildren().add(checkBoxGen.apply(guiOption)));
-    }
-
-    public TextArea getOutputTextArea() {
-        return output;
     }
 
     public ThemeManager getThemeManager() {

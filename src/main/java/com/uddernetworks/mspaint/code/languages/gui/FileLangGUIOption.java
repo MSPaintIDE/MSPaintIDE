@@ -69,15 +69,8 @@ public class FileLangGUIOption extends StringLangGUIOption {
     public void setSetting(Object setting) {
         if (setting instanceof String) {
             var path = getValidPath((String) setting);
-            if (path.isPresent()) {
-                System.out.println("Valid, setting to " + path.get().toFile().getAbsolutePath() + " non abs is " + path.get().toAbsolutePath() + " or " + path.get().toFile().getPath());
-                this.text.set(path.get().toFile().getAbsolutePath());
-            } else {
-                System.out.println("Shit!");
-                this.text.set("shit");
-            }
+            path.ifPresent(value -> this.text.set(value.toFile().getAbsolutePath()));
         } else if (setting instanceof File) {
-            System.out.println("Already file: " + ((File) setting).getAbsolutePath());
             this.text.set(((File) setting).getAbsolutePath());
         }
     }
@@ -102,7 +95,6 @@ public class FileLangGUIOption extends StringLangGUIOption {
             try {
                 var val = getValidPath(newValue);
                 if (val.isPresent()) {
-                    System.out.println("Present for " + val);
                     languageSettings.setSetting(option, val.get().toFile(), true, false);
                 } else {
                     languageSettings.removeSetting(option);
