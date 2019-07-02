@@ -51,8 +51,8 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 
 - Can read, parse, and highlight code from purely image files
 - Finding and replacing of text from image files
-- Supports Java, Brainfuck, and Python*, with more planned
-  - Also includes very simple language API to add custom languages
+- Supports Java, and Python, with many more planned
+  - Includes [LSP](https://microsoft.github.io/language-server-protocol/) support alongside a very simple language API to add custom languages
 - Git tools, to create and manage your project in Git from within the IDE
 - Google Assistant support
 - Right-click context menu to open and edit ANY text file in an MS Paint instance <small>[(details)](#Context-Menu)</small>
@@ -70,26 +70,10 @@ MS Paint IDE has many features, however it will not stop there. Some of these pl
 - Improving [PaintInjector](https://github.com/RubbaBoy/PaintInjector) to provide with an image modification API
   - Live debugging with line highlights from MS Paint
   - Autocompletition
-  - Inspections
 - More languages
 - Auto updater/checker
-- Implement [LSP](https://microsoft.github.io/language-server-protocol/)
 - Discord RCP
 - Acquire [JetBrains](https://www.jetbrains.com/)
-
-# Projects
-
-The MS Paint IDE project originated from just this repository, however over the past year the project has grown into 5 total repositories. Here is a link and description of each one, along with its creation date and primary language:
-
-**[MS Paint IDE](https://github.com/RubbaBoy/MSPaintIDE)** [12/9/2017 **Java**] - The main IDE with all the core features
-
-**[MS Paint IDE Website](https://github.com/RubbaBoy/MSPaintIDEWebsite)** [4/9/2018 **Dart**] - The previous website wasn't on GitHub, and was a horrible, unreactive mess. This repository was created, so now it's a horrible, _reactive_ mess. It uses the Dart language and AngularDart framework, which are some things I was been playing with prior to making MS Paint IDE.
-
-**[NewOCR](https://github.com/RubbaBoy/NewOCR)** [9/18/2018 **Java**] - When there was an obvious need to rework the internal OCR of MS Paint IDE at the time, this repository was created originally as a research/test environment. Slowly this grew after much research and testing into its own standalone OCR.
-
-**[OpenTitlebarButtons Fork](https://github.com/RubbaBoy/OpenTitlebarButtons)** [1/19/2019 **C#**] - This is a fork of a project by [NickAcPT](https://github.com/NickAcPT), which originally allowed the addition of an extra button on the titlebar of a window. It has been repurposed and heavily refactored to have the ability to add responsive buttons and text to any window, with the intent to be used with MS Paint IDE.
-
-**[PaintInjector](https://github.com/RubbaBoy/PaintInjector)** [1/19/2019 **C#**] - This project is defendant on OpenTitlebarButtons, in that it adds all the buttons at their given locations to the window, handles some application-specific reactivity, and adds the hooks for the JVM so MS Paint IDE can interact with the generated DLL.
 
 # How It Works
 
