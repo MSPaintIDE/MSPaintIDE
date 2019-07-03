@@ -16,13 +16,8 @@ import com.uddernetworks.mspaint.main.StartupLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +27,7 @@ public class PythonLanguage extends Language {
 
     private LanguageSettings settings = new PythonSettings();
     private PythonCodeManager pythonCodeManager = new PythonCodeManager(this);
-    private HighlightData highlightData = new PythonHighlightData();
+    private HighlightData highlightData = new PythonHighlightData(this);
     private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.PYTHON,
             Collections.singletonList("pyls"));
 
@@ -92,41 +87,25 @@ public class PythonLanguage extends Language {
 
     @Override
     public boolean installLSP() {
-        if (hasLSP()) return false;
+        return lspInstallHelper("Would you like to proceed with downloading the Python Language Server by palantir?", "https://github.com/palantir/python-language-server", () -> {
+            var output = Commandline.runSyncCommand("pip install python-language-server[all]");
 
-        try {
-            var res = JOptionPane.showOptionDialog(null,
-                    "Would you like to proceed with downloading the Python Language Server by palantir?",
-                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
-                    new ImageIcon(ImageIO.read(new File("E:\\MSPaintIDE\\src\\main\\resources\\icons\\popup\\save.png"))),
-                    new String[]{"Yes", "No", "Website"}, "Yes");
-
-            if (res == 0) {
-                var output = Commandline.runSyncCommand("pip install python-language-server[all]");
-
-                if (output.contains("'install_requires' must be")) {
-                    Commandline.runSyncCommand("pip install -U setuptools");
-                    output = Commandline.runSyncCommand("pip install python-language-server[all]");
-                }
-
-                if (output.contains("Successfully installed")) {
-                    LOGGER.info("Successfully installed the Python Language Server");
-                    return true;
-                } else if (output.contains("is not recognized as an internal or external command")) {
-                    LOGGER.error("You must have Python and pip installed on your system and in your PATH before installing");
-                    return false;
-                } else {
-                    LOGGER.error("An unknown error caused the LSP to not be installed. The log is below:\n{}", output);
-                }
-            } else if (res == 1) {
-            } else {
-                Desktop.getDesktop().browse(new URI("https://github.com/palantir/python-language-server"));
+            if (output.contains("'install_requires' must be")) {
+                Commandline.runSyncCommand("pip install -U setuptools");
+                output = Commandline.runSyncCommand("pip install python-language-server[all]");
             }
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.error("There was an error while trying to install the Python LSP server", e);
-        }
 
-        return false;
+            if (output.contains("Successfully installed")) {
+                LOGGER.info("Successfully installed the Python Language Server");
+                return true;
+            } else if (output.contains("is not recognized as an internal or external command")) {
+                LOGGER.error("You must have Python and pip installed on your system and in your PATH before installing");
+            } else {
+                LOGGER.error("An unknown error caused the LSP to not be installed. The log is below:\n{}", output);
+            }
+
+            return false;
+        });
     }
 
     @Override

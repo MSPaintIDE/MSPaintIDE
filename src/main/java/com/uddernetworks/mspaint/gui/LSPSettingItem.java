@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.gui;
 import com.jfoenix.controls.JFXButton;
 import com.uddernetworks.mspaint.gui.elements.SettingsGroup;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.util.Browse;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,10 +20,7 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -105,11 +103,7 @@ public class LSPSettingItem extends Stage implements SettingItem, Initializable 
             if (hasRuntime) {
                 downloadRuntime.setDisable(true);
             } else {
-                try {
-                    Desktop.getDesktop().browse(new URI(language.downloadRuntimeLink()));
-                } catch (IOException | URISyntaxException e) {
-                    LOGGER.error("Error while making the URL " + language.downloadRuntimeLink(), e);
-                }
+                Browse.browse(language.downloadRuntimeLink());
             }
 
             var text = "Language is fully set up";

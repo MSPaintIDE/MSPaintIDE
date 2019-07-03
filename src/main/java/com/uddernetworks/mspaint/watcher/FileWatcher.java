@@ -56,14 +56,25 @@ public interface FileWatcher {
      */
     boolean isWatching();
 
-    // TODO: More docs, I'm lazy
+    /**
+     * Adds a filter to any file that is being changed/deleted/created. If the function returns true, that means the
+     * file will be given to any listeners. ALL filters must return true for a file to go through listeners.
+     *
+     * @param filter The filter every file will pass through
+     */
     void addFileFiler(Function<File, Boolean> filter);
 
     /**
-     * If the file should be kept according to filters
+     * Clears all file filters, for whatever reason.
+     */
+    void clearFilters();
+
+    /**
+     * If the file should be kept according to filters added via {@link FileWatcher#addFileFiler(Function)}.
+     * Returns true if ALL filters also return true.
      *
-     * @param file
-     * @return
+     * @param file The file to test
+     * @return If all filters returned true for the file
      */
     boolean keepFromFilters(File file);
 

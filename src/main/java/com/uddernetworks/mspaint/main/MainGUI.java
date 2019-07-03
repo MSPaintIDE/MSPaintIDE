@@ -162,6 +162,7 @@ public class MainGUI extends Application implements Initializable {
     private Map<String, ImageView> cachedImageViews = new HashMap<>();
 
     public static File APP_DATA = new File(System.getenv("LocalAppData"), "MSPaintIDE");
+    public static final boolean DEV_MODE = System.getenv("DEV_MODE").equalsIgnoreCase("true");
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
@@ -185,13 +186,9 @@ public class MainGUI extends Application implements Initializable {
         System.setProperty("logPath", APP_DATA.getAbsolutePath() + "\\log");
         LOGGER = LoggerFactory.getLogger(MainGUI.class);
 
-        System.out.println("111 java.library.path = ");
-        System.out.println(System.getProperty("java.library.path"));
-
         System.setProperty("java.library.path", System.getProperty("java.library.path") + ";" + System.getenv("PATH"));
 
-        System.out.println("222 java.library.path = ");
-        System.out.println(System.getProperty("java.library.path"));
+        LOGGER.info("Running in dev mode: {}", DEV_MODE);
 
         if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
             JFrame frame = new JFrame("MS Paint IDE");
@@ -552,11 +549,11 @@ public class MainGUI extends Application implements Initializable {
                 return;
             }
 
-//            if (!getCurrentLanguage().hasRuntime()) {
-//                setHaveError();
-//                LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
-//                return;
-//            }
+            if (!getCurrentLanguage().hasRuntime()) {
+                setHaveError();
+                LOGGER.error("You somehow selected a language that your system doesn't have the proper requirements for!");
+                return;
+            }
 
             progress.setProgress(0);
             progress.getStyleClass().remove("progressError");
@@ -571,7 +568,6 @@ public class MainGUI extends Application implements Initializable {
 
                 language.highlightAll(imageClasses);
 
-                // TODO: Skip step in inapplicable languages?
                 startupLogic.compile(imageClasses, executeOverride);
             } else {
                 LOGGER.error("Error while finding ImageClasses, aborting...");

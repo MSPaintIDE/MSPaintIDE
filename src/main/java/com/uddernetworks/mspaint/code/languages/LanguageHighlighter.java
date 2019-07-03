@@ -18,7 +18,7 @@ public class LanguageHighlighter {
     private static Logger LOGGER = LoggerFactory.getLogger(LanguageHighlighter.class);
 
     public static void main(String[] args) {
-        var input = CharStreams.fromString("def oof");
+        var input = CharStreams.fromString("");
         var lex = new JavaScriptLexer(input);
         // copy text out of sliding buffer and store in tokens
         lex.setTokenFactory(new CommonTokenFactory(true));
@@ -53,7 +53,8 @@ public class LanguageHighlighter {
                 if (token.getText().isBlank()) continue;
                 var from = token.getCharPositionInLine();
                 var to = from + token.getText().length();
-                Color color = highlightData.getColor(vocabulary.getDisplayName(token.getType()));
+                var colorOptional = highlightData.getColor(vocabulary.getDisplayName(token.getType()));
+                var color = colorOptional.orElse(Color.MAGENTA);
 
                 var line = imageClass.getScannedImage().orElseThrow().getLine(token.getLine() - 1);
                 for (int i = from; i < Math.min(to, line.size()); i++) {

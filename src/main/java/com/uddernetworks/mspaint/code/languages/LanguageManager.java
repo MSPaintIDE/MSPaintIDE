@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.languages;
 
+import com.uddernetworks.mspaint.settings.SettingsManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.uddernetworks.mspaint.settings.Setting.INCOMPATIBLE_LANGUAGE_ERRORS;
 
 public class LanguageManager {
 
@@ -28,18 +31,18 @@ public class LanguageManager {
         this.allLanguages.add(language);
     }
 
-    // TODO: Remove warnings with option
     public void initializeLanguages() {
+        var printIncompatibleMessages = SettingsManager.getInstance().<Boolean>getSetting(INCOMPATIBLE_LANGUAGE_ERRORS);
         this.enabledLanguages = this.allLanguages.stream()
                 .filter(language -> {
                     LOGGER.info("Loading the language \"" + language.getName() + "\"");
 
                     if (!language.hasLSP()) {
-                        LOGGER.warn("Your system does not have the LSP for {}, which is required to use the language. Go to the settings if you would like to add it or remove this warning.", language.getName());
+                        if (printIncompatibleMessages) LOGGER.warn("Your system does not have the LSP for {}, which is required to use the language. Go to the settings if you would like to add it or remove this warning.", language.getName());
                         return true;
                     }
 
-                    if (!language.hasRuntime()) {
+                    if (!language.hasRuntime() && printIncompatibleMessages) {
                         LOGGER.warn("Your system does not have the runtime for {}. You will still be allowed to edit with the language, just not compile/execute code with it. Go to the settings if you would like to add it or remove this warning.", language.getName());
                     }
 

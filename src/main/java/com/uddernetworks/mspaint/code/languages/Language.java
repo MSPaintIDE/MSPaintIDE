@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
+import com.uddernetworks.mspaint.code.execution.ThrowableSupplier;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -11,12 +12,13 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
-import org.apache.commons.io.FilenameUtils;
+import com.uddernetworks.mspaint.util.Browse;
 import org.slf4j.Logger;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,26 +66,17 @@ public abstract class Language {
     public abstract String[] getFileExtensions();
 
     /**
-     * Gets if the current language is associated with the given file's filetype. A simple method, but removes some
-     * annoying stuff.
-     *
-     * @param file The file to test
-     * @return If the extension matches one of the extensions from {@link Language#getFileExtensions()}
-     */
-    public boolean isFileApplicable(File file) {
-        return Arrays.stream(getFileExtensions())
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet())
-                .contains(FilenameUtils.getExtension(file.getAbsolutePath()).toLowerCase());
-    }
-
-    /**
      * Gets the input {@link Option} for the language.
      *
      * @return The {@link Option} specifying the lang's input
      */
     public abstract Option getInputOption();
 
+    /**
+     * Gets the highlight directory {@link Option} for the language.
+     *
+     * @return The {@link Option} specifying the project's highlight output directory
+     */
     public abstract Option getHighlightOption();
 
     /**
@@ -149,6 +142,36 @@ public abstract class Language {
     public abstract boolean installLSP();
 
     /**
+     * Prompts the user for an installation of the lang's LSP, with options for yes, no, or going to teh given website.
+     *
+     * @param promptText The text to ask the user if they want to install the LSP
+     * @param website The website to direct the user to if they click the "Website" option
+     * @param install The code to actually install the LSP. No further checking is required if the LSP should be
+     *                installed, as {@link Language#hasLSP()} has been checked before the prompt.
+     * @return If the install was successful.
+     */
+    protected boolean lspInstallHelper(String promptText, String website, ThrowableSupplier<Boolean> install) {
+        if (hasLSP()) return false;
+
+        try {
+            var res = JOptionPane.showOptionDialog(null,
+                    promptText,
+                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
+                    new ImageIcon(ImageIO.read(getClass().getClassLoader().getResourceAsStream("icons\\popup\\save.png"))),
+                    new String[]{"Yes", "No", "Website"}, "Yes");
+            if (res == 0) {
+                return install.get();
+            } else if (res == 2) {
+                Browse.browse(website);
+            }
+        } catch (Exception e) {
+            getLogger().error("There was an error while trying to install the Java LSP server", e);
+        }
+
+        return false;
+    }
+
+    /**
      * If the system has the runtime or whatever is needed to compile and run code
      *
      * @return If the system can compile and run code in the current language
@@ -186,14 +209,6 @@ public abstract class Language {
     public abstract void highlightAll(List<ImageClass> imageClasses) throws IOException;
 
     /**
-     * Gets all the {@link ImageClass}s that will be used during execution/compilation of the program with the current
-     * language.
-     */
-    public Optional<List<ImageClass>> indexFiles() {
-        return indexFiles(getInputOption());
-    }
-
-    /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
      * @param mainGUI The main instance of MainGUI
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
@@ -213,7 +228,7 @@ public abstract class Language {
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
      * @param mainGUI The main instance of MainGUI
-     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link Language#indexFiles(Option)}
+     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link #indexFiles()}
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
@@ -225,7 +240,7 @@ public abstract class Language {
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
      * @param mainGUI The main instance of MainGUI
-     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link Language#indexFiles(Option)}
+     * @param imageClasses The {@link ImageClass}s to compile/execute, usually derived from {@link #indexFiles()}
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @param executeOverride The policy for executing or not
@@ -234,16 +249,11 @@ public abstract class Language {
     public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException;
 
     /**
-     * Intended for internal use only.
-     *
      * Gets all the {@link ImageClass}s that will be used during execution/compilation of the program with the current
      * language.
-     *
-     * @param highlightDirectorySetting The setting of a File directory containing all source code images
      * @return All the {@link ImageClass}s to be used during compilation/execution
      */
-    protected Optional<List<ImageClass>> indexFiles(Option highlightDirectorySetting) {
-        // TODO: Files should already be indexed by the DocumentManager, so this is unnecessary
+    public Optional<List<ImageClass>> indexFiles() {
         var LOGGER = getLogger();
         var mainGUI = this.startupLogic.getMainGUI();
         if (optionsNotFilled()) {
@@ -252,19 +262,6 @@ public abstract class Language {
             return Optional.empty();
         }
 
-        /*
-        LOGGER.info("Scanning all images...");
-
-        mainGUI.setStatusText(null);
-
-        var inputDirectory = getLanguageSettings().<File>getSetting(highlightDirectorySetting);
-        var imageClasses = new ArrayList<ImageClass>();
-
-        for (File imageFile : IDEFileUtils.getFilesFromDirectory(inputDirectory, getFileExtensions(), "png")) {
-            LOGGER.info("Adding non directory: " + imageFile.getAbsolutePath());
-            imageClasses.add(new ImageClass(imageFile, mainGUI));
-        }
-         */
         var lspWrapper = getLSPWrapper();
         var documentManager = lspWrapper.getDocumentManager();
 
@@ -288,11 +285,11 @@ public abstract class Language {
     protected void highlightAll(Option highlightDirectorySetting, List<ImageClass> imageClasses) throws IOException {
         var LOGGER = getLogger();
         var mainGUI = startupLogic.getMainGUI();
-//        if (optionsNotFilled()) {
-//            LOGGER.error("Please select files for all options");
-//            mainGUI.setHaveError();
-//            return;
-//        }
+        if (optionsNotFilled()) {
+            LOGGER.error("Please select files for all options");
+            mainGUI.setHaveError();
+            return;
+        }
 
         var highlightDirectory = getLanguageSettings().<File>getSetting(highlightDirectorySetting);
 

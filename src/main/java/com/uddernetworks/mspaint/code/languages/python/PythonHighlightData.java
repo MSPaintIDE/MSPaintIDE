@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.code.languages.python;
 import com.uddernetworks.code.lexer.python.Python3Lexer;
 import com.uddernetworks.code.lexer.python.Python3Parser;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
+import com.uddernetworks.mspaint.code.languages.Language;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
@@ -22,6 +23,10 @@ public class PythonHighlightData extends HighlightData {
                 Arrays.asList(), 0x808080, // Gray
                 Arrays.asList("<INVALID>", "SKIP_", "UNKNOWN_CHAR", "DEDENT"), 0xFF0000 // Red
         );
+    }
+
+    public PythonHighlightData(Language language) {
+        super(language);
     }
 
     @Override

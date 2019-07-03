@@ -9,6 +9,7 @@ import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.project.PPFProject;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.util.Browse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,11 +21,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -140,12 +138,6 @@ public class CreateProjectWindow extends Stage implements Initializable {
 
         cancel.setOnAction(event -> close());
 
-        help.setOnAction(event -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/blob/master/README.md"));
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        });
+        help.setOnAction(event -> Browse.browse("https://github.com/RubbaBoy/MSPaintIDE/blob/master/README.md"));
     }
 }

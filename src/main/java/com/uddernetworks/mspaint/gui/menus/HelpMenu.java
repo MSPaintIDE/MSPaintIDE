@@ -4,10 +4,11 @@ import com.uddernetworks.mspaint.gui.BindItem;
 import com.uddernetworks.mspaint.gui.MenuBind;
 import com.uddernetworks.mspaint.main.MainGUI;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import static com.uddernetworks.mspaint.util.Browse.browse;
 
 public class HelpMenu extends MenuBind {
 
@@ -17,26 +18,26 @@ public class HelpMenu extends MenuBind {
 
     @BindItem(label = "help")
     public void onClickHelp() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/blob/master/README.md"));
+        browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/blob/master/README.md"));
     }
 
     @BindItem(label = "source")
     public void onClickSource() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE"));
+        browse(new URI("https://github.com/RubbaBoy/MSPaintIDE"));
     }
 
     @BindItem(label = "submit-a-bug")
     public void onClickSubmitABug() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/issues/new"));
+        browse(new URI("https://github.com/RubbaBoy/MSPaintIDE/issues/new"));
     }
 
     @BindItem(label = "donate")
     public void onClickDonate() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://paypal.me/RubbaBoy"));
+        browse(new URI("https://paypal.me/RubbaBoy"));
     }
 
     @BindItem(label = "discord")
     public void onClickDiscord() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://discord.gg/RXmPkPJ"));
+        browse(new URI("https://discord.gg/RXmPkPJ"));
     }
 }

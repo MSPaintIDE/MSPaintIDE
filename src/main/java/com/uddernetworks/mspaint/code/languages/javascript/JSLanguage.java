@@ -17,13 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +28,7 @@ public class JSLanguage extends Language {
 
     private LanguageSettings settings = new JSSettings();
     private JSCodeManager jsCodeManager = new JSCodeManager(this);
-    private HighlightData highlightData = new JSHighlightData();
+    private HighlightData highlightData = new JSHighlightData(this);
     private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JS, System.getenv("APPDATA") + "\\npm\\node_modules\\javascript-typescript-langserver\\lib",
             Arrays.asList("node", "language-server-stdio"))
                 .writeOnChange();
@@ -95,36 +90,20 @@ public class JSLanguage extends Language {
 
     @Override
     public boolean installLSP() {
-        if (hasLSP()) return false;
+        return lspInstallHelper("Would you like to proceed with downloading the JavaScript Language Server by sourcegraph?", "https://www.npmjs.com/package/javascript-typescript-langserver", () -> {
+            var output = Commandline.runSyncCommand("cmd /c npm install -g javascript-typescript-langserver");
 
-        try {
-            var res = JOptionPane.showOptionDialog(null,
-                    "Would you like to proceed with downloading the JavaScript Language Server by sourcegraph?",
-                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
-                    new ImageIcon(ImageIO.read(new File("E:\\MSPaintIDE\\src\\main\\resources\\icons\\popup\\save.png"))),
-                    new String[]{"Yes", "No", "Website"}, "Yes");
-
-            if (res == 0) {
-                var output = Commandline.runSyncCommand("cmd /c npm install -g javascript-typescript-langserver");
-
-                if (output.contains(" packages from ")) {
-                    LOGGER.info("Successfully installed the JavaScript Language Server");
-                    return true;
-                } else if (output.contains("is not recognized as an internal or external command")) {
-                    LOGGER.error("You must have Node.js installed on your system and in your PATH before installing");
-                    return false;
-                } else {
-                    LOGGER.error("An unknown error caused the LSP to not be installed. The log is below:\n{}", output);
-                }
-            } else if (res == 1) {
+            if (output.contains(" packages from ")) {
+                LOGGER.info("Successfully installed the JavaScript Language Server");
+                return true;
+            } else if (output.contains("is not recognized as an internal or external command")) {
+                LOGGER.error("You must have Node.js installed on your system and in your PATH before installing");
             } else {
-                Desktop.getDesktop().browse(new URI("https://www.npmjs.com/package/javascript-typescript-langserver"));
+                LOGGER.error("An unknown error caused the LSP to not be installed. The log is below:\n{}", output);
             }
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.error("There was an error while trying to install the Python LSP server", e);
-        }
 
-        return false;
+            return false;
+        });
     }
 
     @Override

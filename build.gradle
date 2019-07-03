@@ -9,6 +9,11 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.6'
 }
 
+ext {
+    DEV_MODE = true
+    STATIC_LSP_DIRECTORY = 'C:\\Program Files (x86)\\MS Paint IDE\\lsp' // Only used if in Dev Mode
+}
+
 group = 'com.uddernetworks.mspaint'
 version = '2.2.0-SNAPSHOT'
 
@@ -93,6 +98,8 @@ run {
     environment.putAll([
             "PaintInjector": "${rootProject.projectDir}\\native",
             "NativePath": "${rootProject.projectDir}\\native",
+            "DEV_MODE": DEV_MODE,
+            "STATIC_LSP_DIRECTORY": STATIC_LSP_DIRECTORY
     ])
 //    jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString())
     jvmArgs("--illegal-access=deny")

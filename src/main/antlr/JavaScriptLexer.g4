@@ -208,7 +208,7 @@ fragment SingleStringCharacter
     ;
 fragment EscapeSequence
     : CharacterEscapeSequence
-    | '0' // no digit ahead! TODO
+    | '0' // no digit ahead!
     | HexEscapeSequence
     | UnicodeEscapeSequence
     | ExtendedUnicodeEscapeSequence

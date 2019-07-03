@@ -89,8 +89,8 @@ public class InjectionManager {
     }
 
     private void clickStop() {
-        // TODO: Stop
-        System.out.println("Stop");
+        LOGGER.info("Stopping...");
+        this.mainGUI.getStartupLogic().getRunningCodeManager().stopRunning();
     }
 
     private void clickCommit() {

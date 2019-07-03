@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.gui.BindItem;
 import com.uddernetworks.mspaint.gui.MenuBind;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.util.Browse;
 import com.uddernetworks.paintassist.PaintAssist;
 import com.uddernetworks.paintassist.actions.Action;
 import org.slf4j.Logger;
@@ -102,6 +103,6 @@ public class AssistantMenu extends MenuBind {
 
     @BindItem(label = "help")
     public void onClickHelp() {
-        // TODO: Help
+        Browse.browse("https://wiki.ms-paint-i.de/");
     }
 }

@@ -129,14 +129,9 @@ public class AngrySquiggleHighlighter {
             System.out.println("Column letter info: " + firstLetter.getLetter()  +" width: " + firstLetter.getWidth());
             calcXY = firstLetter;
 
-            LOGGER.info("Length = {} plus {} is {}", length, startIndex, startIndex + length);
-            var lastLetterIndex = 0;
-            if (length == Integer.MAX_VALUE) {
-                lastLetterIndex = line.size() - 1;
-            } else {
-                lastLetterIndex = Math.min(startIndex + length, line.size() - 1);
-            }
-            var lastLetter = line.get(lastLetterIndex);
+            var lastLetter = line.get(length == Integer.MAX_VALUE ?
+                    line.size() - 1 :
+                    Math.min(startIndex + length, line.size() - 1));
 
             pixelLength = lastLetter.getX() - firstLetter.getX() + lastLetter.getWidth();
             extraSquigglePadding = (int) Math.round(this.extraSquigglePaddingRatio * pixelLength);

@@ -110,19 +110,9 @@ public class ProjectManager {
 
     public static void save() {
         try {
-//            gson.toJson(ppfProject, new FileWriter(ppfProject.getFile()));
-            // TODO: Clean up
-
-            var json = gson.toJson(ppfProject);
-            System.out.println(json);
-            var file = ppfProject.getFile();
-            System.out.println("file = " + file);
-
-            try (var writer = new FileWriter(file)) {
-                IOUtils.write(json, writer);
+            try (var writer = new FileWriter(ppfProject.getFile())) {
+                IOUtils.write(gson.toJson(ppfProject), writer);
             }
-//            file.mkdirs();
-//            Files.write(ppfProject.getFile().toPath(), json.getBytes(), StandardOpenOption.CREATE);
         } catch (IOException e) {
             LOGGER.error("Exception saving the PPFProject", e);
         }
@@ -140,17 +130,15 @@ public class ProjectManager {
     private static PPFProject previous = null;
 
     public static void switchProject(PPFProject ppfProject) {
-        LOGGER.info("Switching project prev = {}", previous);
         setCurrentProject(ppfProject);
         save();
         addRecent(ppfProject);
         writeRecent();
         previous = ppfProject;
 
-        // TODO: Test this?
         if (previous != null) {
             try {
-                LOGGER.info("Restarting self...");
+                LOGGER.info("Restarting self, this may take a few seconds...");
                 StringBuilder cmd = new StringBuilder();
                 cmd.append(System.getProperty("java.home")).append(File.separator).append("bin").append(File.separator).append("java ");
                 for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {

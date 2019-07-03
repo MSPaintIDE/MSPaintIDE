@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.code.languages.golang;
 import com.uddernetworks.code.lexer.golang.GolangLexer;
 import com.uddernetworks.code.lexer.golang.GolangParser;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
+import com.uddernetworks.mspaint.code.languages.Language;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
@@ -21,6 +22,10 @@ public class GoHighlightData extends HighlightData {
                 Arrays.asList( "'('", "')'", "'.'", "'='", "','", "'{'", "'}'", "'<-'", "'++'", "'--'", "'+'", "'-'", "'|'", "'^'", "'*'", "'/'", "'%'", "'<<'", "'>>'", "'&'", "'&^'", "':='", "';'", "':'", "'['", "']'", "'...'", "'||'", "'&&'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'!'", "IDENTIFIER", "WS", "TERMINATOR", "0"), 0x000000, // Black
                 Arrays.asList("COMMENT"), 0x808080 // Gray
         );
+    }
+
+    public GoHighlightData(Language language) {
+        super(language);
     }
 
     @Override

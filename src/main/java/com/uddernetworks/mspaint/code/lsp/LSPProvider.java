@@ -10,16 +10,19 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
-public class BetterProvider {
+public class LSPProvider {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(BetterProvider.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(LSPProvider.class);
 
+    private Supplier<RequestManager> requestManagerSupplier;
     private List<String> commands;
     private String workingDir;
     private Process process;
 
-    public BetterProvider(List<String> commands, String workingDir) {
+    public LSPProvider(Supplier<RequestManager> requestManagerSupplier, List<String> commands, String workingDir) {
+        this.requestManagerSupplier = requestManagerSupplier;
         this.commands = commands;
         this.workingDir = workingDir;
     }
@@ -36,6 +39,8 @@ public class BetterProvider {
         } else {
             LOGGER.info("Server process started " + process);
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> this.requestManagerSupplier.get().shutdown()));
     }
 
     private ProcessBuilder createProcessBuilder() {
@@ -62,8 +67,8 @@ public class BetterProvider {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof BetterProvider) {
-            BetterProvider other = (BetterProvider) obj;
+        if (obj instanceof LSPProvider) {
+            LSPProvider other = (LSPProvider) obj;
             return commands.size() == other.commands.size() && new HashSet<>(commands) == new HashSet<>(other.commands)
                     && workingDir.equals(other.workingDir);
         }

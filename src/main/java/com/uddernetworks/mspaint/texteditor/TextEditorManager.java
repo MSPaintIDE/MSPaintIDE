@@ -70,7 +70,8 @@ public class TextEditorManager {
 
         this.imageClass = new ImageClass(this.imageFile, mainGUI, this.startupLogic);
 
-        // TODO: Replace this with the FileWatchManager shit
+        // Could be replaced with FileWatcher, but realistically isn't requiring high-performance, and requires this
+        // kind of thread joining and stuff (And I'm lazy lol, if anyone reads this make an issue immediately)
         (this.savingThread = new Thread(() -> {
             try {
                 Path path = FileSystems.getDefault().getPath(this.imageFile.getParent());

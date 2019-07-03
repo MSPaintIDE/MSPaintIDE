@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.javascript;
 
 import com.uddernetworks.mspaint.code.languages.HighlightData;
+import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer;
 import com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser;
 import org.antlr.v4.runtime.CharStream;
@@ -21,8 +22,13 @@ public class JSHighlightData extends HighlightData {
                 Arrays.asList("0", "'['", "']'", "'('", "')'", "'{'", "'}'", "';'", "','", "'='", "'?'", "':'", "'...'", "'.'", "'++'", "'--'", "'+'", "'-'", "'~'", "'!'", "'*'", "'/'", "'%'", "'>>'", "'<<'", "'>>>'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'==='", "'!=='", "'&'", "'^'", "'|'", "'&&'", "'||'", "'*='", "'/='", "'%='", "'+='", "'-='", "'<<='", "'>>='", "'>>>='", "'&='", "'^='", "'|='", "'=>'", "Identifier", "WhiteSpaces", "LineTerminator"), 0x000000, // Black
                 Arrays.asList("MultiLineComment", "SingleLineComment"), 0x808080, // Gray
                 Arrays.asList("HtmlComment", "CDataComment"), 0x666666, // Light Gray
-                Arrays.asList("RegularExpressionLiteral"), 0x780078 // Dark Pink/Purple
+                Arrays.asList("RegularExpressionLiteral"), 0x780078, // Dark Pink/Purple
+                Arrays.asList("UnexpectedCharacter"), 0xFF0000 // Red
         );
+    }
+
+    public JSHighlightData(Language language) {
+        super(language);
     }
 
     @Override

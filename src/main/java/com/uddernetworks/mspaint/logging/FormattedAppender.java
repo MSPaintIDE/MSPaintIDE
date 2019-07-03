@@ -43,17 +43,16 @@ public class FormattedAppender extends ConsoleAppender {
     public void append(LoggingEvent event) {
         super.append(event);
 
+        if (output == null) return;
         Platform.runLater(() -> {
             var style = STYLE_MAP.get(event.getLevel());
-            if (output != null) {
-                printOut(getLayout().format(event), style);
+            printOut(getLayout().format(event), style);
 
-                if (this.layout.ignoresThrowable()) {
-                    String[] stackTrace = event.getThrowableStrRep();
-                    if (stackTrace != null) {
-                        for (var value : stackTrace) {
-                            printOut(value + Layout.LINE_SEP, style);
-                        }
+            if (this.layout.ignoresThrowable()) {
+                String[] stackTrace = event.getThrowableStrRep();
+                if (stackTrace != null) {
+                    for (var value : stackTrace) {
+                        printOut(value + Layout.LINE_SEP, style);
                     }
                 }
             }

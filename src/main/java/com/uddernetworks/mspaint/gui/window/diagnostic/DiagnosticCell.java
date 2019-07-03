@@ -57,12 +57,6 @@ public class DiagnosticCell extends ListCell<Map.Entry<String, Diagnostic>> {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                // TODO: Change
-                this.mainGUI.getThemeManager().onDarkThemeChange(anchor, Map.of(
-                        ".search-label", "dark",
-                        ".found-context", "dark"
-                ));
             }
 
             var file = new File(URI.create(entry.getKey()));

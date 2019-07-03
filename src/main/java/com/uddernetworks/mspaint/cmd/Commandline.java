@@ -72,6 +72,8 @@ public class Commandline {
             streamConsumer.setName(threadName);
             streamConsumer.start();
             var exitCode = 1;
+            Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
+
             try {
                 exitCode = process.waitFor();
                 streamConsumer.join();

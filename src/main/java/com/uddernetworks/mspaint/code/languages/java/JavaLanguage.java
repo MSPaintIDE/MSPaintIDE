@@ -22,20 +22,14 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,7 +40,7 @@ public class JavaLanguage extends Language {
 
     private LanguageSettings settings = new JavaSettings();
     private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
-    private HighlightData highlightData = new JavaHighlightData();
+    private HighlightData highlightData = new JavaHighlightData(this);
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
     private File lspPath = new File(LanguageServerWrapper.getLSPDirectory(), "java");
     private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, new File(this.lspPath, "jdt-language-server-latest").getAbsolutePath(),
@@ -66,8 +60,6 @@ public class JavaLanguage extends Language {
             ), (wrapper, workspaceDir) -> {
         LOGGER.info("Setting up the Java project...");
 
-        // TODO: Remove hardcoding
-//        var templateDir = new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp\\java\\project-template");
         var templateDir = new File(this.lspPath, "project-template");
 
         if (!new File(workspaceDir.getAbsolutePath(), ".classpath").exists()) {
@@ -104,7 +96,6 @@ public class JavaLanguage extends Language {
             var project = new File(workspaceDir, ".project").toPath();
             var projectTemplate = new File(templateDir, ".project").toPath();
 
-            // TODO: Fix if a method to change project names is added
             LOGGER.info("Replacing to name {}", ProjectManager.getPPFProject().getName());
             bindFileVariable(projectTemplate, project, "replace.name").accept(ProjectManager.getPPFProject().getName());
         } catch (Exception e) { // Caught due to error suppression in the lambdas
@@ -192,46 +183,27 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean installLSP() {
-        if (hasLSP()) return false;
+        return lspInstallHelper("Would you like to proceed with downloading the Java Language Server by the Eclipse Foundation? This will take up about 94MB.", "https://github.com/eclipse/eclipse.jdt.ls", () -> {
+            this.lspPath.mkdirs();
 
-        try {
-            var res = JOptionPane.showOptionDialog(null,
-                    "Would you like to proceed with downloading the Java Language Server by the Eclipse Foundation? This will take up about 94MB.",
-                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
-                    new ImageIcon(ImageIO.read(new File("E:\\MSPaintIDE\\src\\main\\resources\\icons\\popup\\save.png"))),
-                    new String[]{"Yes", "No", "Website"}, "Yes");
+            var tarGz = new File(this.lspPath, "jdt-language-server-latest.tar.gz");
+            System.out.println("tarGz = " + tarGz.getAbsolutePath());
+            FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), tarGz);
 
-            LOGGER.info("Result = {}", res);
-            if (res == 0) {
-                this.lspPath.mkdirs();
+            var destDir = new File(this.lspPath, "jdt-language-server-latest");
 
-                var tarGz = new File(this.lspPath, "jdt-language-server-latest.tar.gz");
-                System.out.println("tarGz = " + tarGz.getAbsolutePath());
-                FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), tarGz);
-
-                var destDir = new File(this.lspPath, "jdt-language-server-latest");
-
-                try (var in = new TarArchiveInputStream(
-                        new GzipCompressorInputStream(
-                                new BufferedInputStream(
-                                        new FileInputStream(tarGz))))) {
-                    ExtractUtils.untar(in, destDir);
-                }
-
-                tarGz.delete();
-
-                LOGGER.info("Successfully downloaded the Java Language Server");
-
-                return true;
-            } else if (res == 1) {
-            } else {
-                Desktop.getDesktop().browse(new URI("https://github.com/eclipse/eclipse.jdt.ls"));
+            try (var in = new TarArchiveInputStream(
+                    new GzipCompressorInputStream(
+                            new BufferedInputStream(
+                                    new FileInputStream(tarGz))))) {
+                ExtractUtils.untar(in, destDir);
             }
-        } catch (IOException | URISyntaxException e) {
-            LOGGER.error("There was an error while trying to install the Java LSP server", e);
-        }
 
-        return false;
+            tarGz.delete();
+
+            LOGGER.info("Successfully downloaded the Java Language Server");
+            return true;
+        });
     }
 
     @Override

@@ -46,9 +46,6 @@ public class BasicDocument implements Document {
     public void open() {
         this.opened = true;
 
-        LOGGER.info("requestManager = " + requestManager);
-        LOGGER.info("text = " + text);
-        LOGGER.info("getURI() = " + getURI());
         if (this.text == null) {
             this.imageClass.scan();
             if ((this.text = this.imageClass.getText()) == null) return;
@@ -67,7 +64,6 @@ public class BasicDocument implements Document {
     @Override
     public void delete() {
         this.opened = false;
-
         // Closing via the LSP is already handled via the LanguageServerWrapper, above the switch
     }
 
@@ -128,7 +124,6 @@ public class BasicDocument implements Document {
     private String getURI() {
         var nonRelPath = this.file.toURI().toString();
         if (this.relParent != null) nonRelPath = this.relParent.toPath().relativize(this.file.toPath()).toString();
-        LOGGER.info("URI is {}", nonRelPath);
         return nonRelPath.replaceAll("\\.png?$", "");
     }
 }

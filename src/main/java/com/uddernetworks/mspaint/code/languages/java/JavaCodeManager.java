@@ -34,7 +34,6 @@ public class JavaCodeManager {
         this.language = language;
     }
 
-    // TODO: Multi-thread this
     public CompilationResult compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
         mainGUI.setIndeterminate(true);
         classOutputFolder.mkdirs();

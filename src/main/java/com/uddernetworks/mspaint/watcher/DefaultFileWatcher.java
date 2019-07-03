@@ -58,22 +58,14 @@ public class DefaultFileWatcher implements FileWatcher {
                         }
                     }
 
-                    // TODO: Add back time?
                     if (found != null) {
                         found.forEach((type, file) -> {
-                            LOGGER.info("Changed {}", file.getAbsolutePath());
-                            if (!keepFromFilters(file)) {
-                                LOGGER.info("Actually, no");
-                                return;
-                            }
+                            if (!keepFromFilters(file)) return;
 
-                            if (lastActionMap.get(file) == type) {
-                                if (System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
-                                    return;
-                            }
+                            if (lastActionMap.get(file) == type && System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
+                                return;
                             lastActionMap.put(file, type);
 
-                            LOGGER.info("Found {}", file.getAbsolutePath());
                             cooldownMap.put(file, System.currentTimeMillis());
                             this.fileListeners.values().forEach(listener -> listener.accept(type, file));
                         });
@@ -93,7 +85,6 @@ public class DefaultFileWatcher implements FileWatcher {
 
     @Override
     public FileWatcher stopWatching() {
-        LOGGER.error("Stop watching!");
         if (!isWatching()) return this;
         this.watchingFuture.cancel(true);
         this.watching = false;
@@ -130,6 +121,11 @@ public class DefaultFileWatcher implements FileWatcher {
     @Override
     public void addFileFiler(Function<File, Boolean> filter) {
         this.fileFilters.add(filter);
+    }
+
+    @Override
+    public void clearFilters() {
+        this.fileFilters.clear();
     }
 
     @Override

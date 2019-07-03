@@ -34,7 +34,6 @@ public class LetterGenerator {
         }
     }
 
-    // TODO: Check this out
     public static double[][] trim(double[][] input) {
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;

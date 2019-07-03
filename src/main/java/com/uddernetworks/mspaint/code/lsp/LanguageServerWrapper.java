@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.doc.DefaultDocumentManager;
 import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.code.lsp.doc.DocumentManager;
+import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.watcher.FileWatchManager;
@@ -106,7 +107,8 @@ public class LanguageServerWrapper {
         try {
             var processedArgs = this.argumentPreprocessor.apply(this, new ArrayList<>(this.lspArgs));
 
-            var streamConnectionProvider = new BetterProvider(
+            var streamConnectionProvider = new LSPProvider(
+                    () -> requestManager,
                     processedArgs,
                     serverPath.get()); // new File(TEMP_ROOT).getParent()
             streamConnectionProvider.start();
@@ -140,7 +142,9 @@ public class LanguageServerWrapper {
      */
     public void openWorkspace(File file, File inputFile) {
         this.inputFile = inputFile;
-        // TODO: Throw if `file` is not in `rootPath`?
+        // Should this throw if `file` is not in `rootPath`?
+        // ^ Current solution is no, as it's pretty dependant on the server and language weather or not it will cause
+        // problems.
         verifyStatus(file.getParentFile()).thenRun(() -> {
 
             if (this.workspaceInit != null) {
@@ -196,7 +200,8 @@ public class LanguageServerWrapper {
                 LOGGER.info("Changed: {}", changedFile.getAbsolutePath());
 
                 if (lsp.usesWorkspaces()) {
-                    // TODO: Not sure if this should happen before or after the following switch?
+                    // Not sure if this should happen before or after the following switch? It has seemed to work fine with
+                    // Java, Python, Go and JS so far, so I'm leaving this the same.
                     this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
                             new FileEvent(changedFile.toURI().toString(), type.toFCT())
                     )));
@@ -387,8 +392,19 @@ public class LanguageServerWrapper {
     }
 
     public static File getLSPDirectory() {
-//        return new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
-        return new File("C:\\Program Files (x86)\\MS Paint IDE\\lsp"); // TODO: Uncomment before release
+        var file = new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
+        if (MainGUI.DEV_MODE) {
+            var envLsp = System.getenv("STATIC_LSP_DIRECTORY");
+            file = new File(envLsp == null ? "C:\\Program Files (x86)\\MS Paint IDE\\lsp" : envLsp);
+            if (!file.exists() && !file.mkdirs()) {
+                LOGGER.error("The IDE is in development mode and the hard-coded LSP directory could not be created. " +
+                        "Either create \"{}\" manually, or set the directory required to the environment variable 'STATIC_LSP_DIRECTORY' " +
+                        "(This can be done by changing the variable with the same name in the build.gradle)", file.getAbsolutePath());
+                System.exit(0);
+            }
+        }
+
+        return file;
     }
 
     public Optional<File> getRootPath() {

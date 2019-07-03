@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.code.languages.java;
 import com.uddernetworks.code.lexer.java.Java9Lexer;
 import com.uddernetworks.code.lexer.java.Java9Parser;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
+import com.uddernetworks.mspaint.code.languages.Language;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
@@ -21,6 +22,10 @@ public class JavaHighlightData extends HighlightData {
                 Arrays.asList("'_'", "'('", "')'", "'{'", "'}'", "'['", "']'", "';'", "','", "'.'", "'...'", "'@'", "'::'", "'='", "'>'", "'<'", "'!'", "'~'", "'?'", "':'", "'->'", "'=='", "'<='", "'>='", "'!='", "'&&'", "'||'", "'++'", "'--'", "'+'", "'-'", "'*'", "'/'", "'&'", "'|'", "'^'", "'%'", "'+='", "'-='", "'*='", "'/='", "'&='", "'|='", "'^='", "'%='", "'<<='", "'>>='", "'>>>='", "Identifier", "WS"), 0x000000, // Black
                 Arrays.asList("COMMENT", "LINE_COMMENT"), 0x808080 // Gray
         );
+    }
+
+    public JavaHighlightData(Language language) {
+        super(language);
     }
 
     @Override
