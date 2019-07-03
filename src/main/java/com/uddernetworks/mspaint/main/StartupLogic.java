@@ -10,6 +10,7 @@ import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.code.languages.golang.GoLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
+import com.uddernetworks.mspaint.code.languages.javascript.JSLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DefaultDiagnosticManager;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DiagnosticManager;
@@ -77,6 +78,7 @@ public class StartupLogic {
         languageManager.addLanguage(new JavaLanguage(this));
         languageManager.addLanguage(new PythonLanguage(this));
         languageManager.addLanguage(new GoLanguage(this));
+        languageManager.addLanguage(new JSLanguage(this));
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());

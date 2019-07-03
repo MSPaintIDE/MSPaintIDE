@@ -84,6 +84,8 @@ dependencies {
     compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
     antlr 'org.antlr:antlr4:4.7.2'
 
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
     compile configurations.javafxCompile
 }
 

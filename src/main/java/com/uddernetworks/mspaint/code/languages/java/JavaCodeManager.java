@@ -85,7 +85,7 @@ public class JavaCodeManager {
         javac.add("-d");
         javac.add(classOutputFolder.getAbsolutePath());
         javaFiles.forEach(file -> javac.add(file.getAbsolutePath()));
-        Commandline.runLiveCommand(javac);
+        Commandline.runLiveCommand(javac, null, "Javac");
 
         LOGGER.info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -111,7 +111,7 @@ public class JavaCodeManager {
         jarCreate.add("-e");
         jarCreate.add(this.language.getLanguageSettings().getSetting(JavaOptions.MAIN));
         jarCreate.add("*");
-        Commandline.runLiveCommand(jarCreate, classOutputFolder);
+        Commandline.runLiveCommand(jarCreate, classOutputFolder, "Jar");
 
         LOGGER.info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -126,7 +126,7 @@ public class JavaCodeManager {
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
             ConsoleManager.setAll(programOut);
-            return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()));
+            return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()), null, "Java");
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
                 LOGGER.info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");

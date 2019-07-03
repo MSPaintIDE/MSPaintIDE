@@ -67,15 +67,21 @@ public class Commandline {
             processBuilder.redirectError();
             processBuilder.redirectOutput();
             if (directory != null) processBuilder.directory(directory);
-            Process p = processBuilder.start();
-            InputStreamConsumer streamConsumer = new InputStreamConsumer(p.getInputStream(), LOGGER);
+            Process process = processBuilder.start();
+            InputStreamConsumer streamConsumer = new InputStreamConsumer(process.getInputStream(), LOGGER);
             streamConsumer.setName(threadName);
             streamConsumer.start();
-            int exitCode = p.waitFor();
-            streamConsumer.join();
+            var exitCode = 1;
+            try {
+                exitCode = process.waitFor();
+                streamConsumer.join();
+            } catch (InterruptedException ignored) { // This is probably from manually stopping the process; nothing bad to report
+                process.destroyForcibly();
+            }
+
             LOGGER.info("Process terminated with {}", exitCode);
             return exitCode;
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             LOGGER.error("An error occurred while running command with arguments " + command, e);
             return -1;
         }

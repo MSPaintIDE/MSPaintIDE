@@ -3,7 +3,8 @@ package com.uddernetworks.mspaint.code.lsp;
 public enum LSP {
     JAVA(true),
     PYTHON(false),
-    GO(true);
+    GO(true),
+    JS(false);
 
     private boolean workspace;
 

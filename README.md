@@ -51,7 +51,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 
 - Can read, parse, and highlight code from purely image files
 - Finding and replacing of text from image files
-- Supports Java, and Python, with many more planned
+- Supports Java, Python, JavaScript, and Go, with many more planned
   - Includes [LSP](https://microsoft.github.io/language-server-protocol/) support alongside a very simple language API to add custom languages
 - Git tools, to create and manage your project in Git from within the IDE
 - Google Assistant support
@@ -70,7 +70,6 @@ MS Paint IDE has many features, however it will not stop there. Some of these pl
 - Improving [PaintInjector](https://github.com/RubbaBoy/PaintInjector) to provide with an image modification API
   - Live debugging with line highlights from MS Paint
   - Autocompletition
-- More languages
 - Auto updater/checker
 - Discord RCP
 - Acquire [JetBrains](https://www.jetbrains.com/)
@@ -110,7 +109,6 @@ Thank you very much to the current donators:
 [@AL1L](https://al1l.com/)
 
 <h2 name="special-thanks">Special Thanks To:</h2>
-
 ![](https://www.yourkit.com/images/yklogo.png)
 
 YourKit supports open source projects with its full-featured Java Profiler.

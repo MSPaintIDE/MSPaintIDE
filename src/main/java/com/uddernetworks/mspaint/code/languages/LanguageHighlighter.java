@@ -1,8 +1,8 @@
 package com.uddernetworks.mspaint.code.languages;
 
-import com.uddernetworks.code.lexer.golang.GolangLexer;
-import com.uddernetworks.code.lexer.golang.GolangParser;
 import com.uddernetworks.mspaint.code.ImageClass;
+import com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer;
+import com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser;
 import com.uddernetworks.mspaint.texteditor.LetterGenerator;
 import org.antlr.v4.runtime.*;
 import org.slf4j.Logger;
@@ -19,11 +19,11 @@ public class LanguageHighlighter {
 
     public static void main(String[] args) {
         var input = CharStreams.fromString("def oof");
-        var lex = new GolangLexer(input);
+        var lex = new JavaScriptLexer(input);
         // copy text out of sliding buffer and store in tokens
         lex.setTokenFactory(new CommonTokenFactory(true));
         var tokens = new UnbufferedTokenStream<CommonToken>(lex);
-        var parser = new GolangParser(tokens);
+        var parser = new JavaScriptParser(tokens);
         parser.setBuildParseTree(false);
         var voc = parser.getVocabulary();
 

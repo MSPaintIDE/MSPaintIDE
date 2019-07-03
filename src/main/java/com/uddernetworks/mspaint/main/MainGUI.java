@@ -222,6 +222,7 @@ public class MainGUI extends Application implements Initializable {
                 Runtime.getRuntime().exec("mspaint.exe \"" + file.getAbsolutePath() + "\"");
                 System.exit(0);
             } else {
+                LOGGER.info("Name is {}", file.getName());
                 if (!socketCommunicator.serverAvailable()) {
                     HEADLESS = true;
                     startServer(null);
@@ -248,6 +249,19 @@ public class MainGUI extends Application implements Initializable {
             public String accept(String name, String data) {
                 if (name.equals("OpenDocument")) {
                     LOGGER.info("Client requested a document to be opened: {}", data);
+                    if (data.endsWith(".png")) {
+                        LOGGER.info("Document is an image, opening it normally...");
+
+                        CompletableFuture.runAsync(() -> {
+                            try {
+                                Runtime.getRuntime().exec("cmd /c mspaint.exe \"" + data + "\"");
+                            } catch (IOException e) {
+                                LOGGER.error("Error while opening paint for " + data, e);
+                            }
+                        });
+
+                        return "Opening,success";
+                    }
                     CompletableFuture.runAsync(() -> {
                         try {
                             new TextEditorManager(new File(data), mainGUI);

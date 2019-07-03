@@ -61,7 +61,12 @@ public class DefaultFileWatcher implements FileWatcher {
                     // TODO: Add back time?
                     if (found != null) {
                         found.forEach((type, file) -> {
-                            if (!keepFromFilters(file)) return;
+                            LOGGER.info("Changed {}", file.getAbsolutePath());
+                            if (!keepFromFilters(file)) {
+                                LOGGER.info("Actually, no");
+                                return;
+                            }
+
                             if (lastActionMap.get(file) == type) {
                                 if (System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
                                     return;

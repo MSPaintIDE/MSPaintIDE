@@ -126,7 +126,7 @@ public class BasicDocument implements Document {
      * @return The .png-removed URI
      */
     private String getURI() {
-        var nonRelPath = this.file.toPath().toString();
+        var nonRelPath = this.file.toURI().toString();
         if (this.relParent != null) nonRelPath = this.relParent.toPath().relativize(this.file.toPath()).toString();
         LOGGER.info("URI is {}", nonRelPath);
         return nonRelPath.replaceAll("\\.png?$", "");

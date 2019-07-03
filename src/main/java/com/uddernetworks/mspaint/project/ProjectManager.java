@@ -140,11 +140,12 @@ public class ProjectManager {
     private static PPFProject previous = null;
 
     public static void switchProject(PPFProject ppfProject) {
-        System.out.println("Switching project");
+        LOGGER.info("Switching project prev = {}", previous);
         setCurrentProject(ppfProject);
         save();
         addRecent(ppfProject);
         writeRecent();
+        previous = ppfProject;
 
         // TODO: Test this?
         if (previous != null) {
@@ -165,8 +166,6 @@ public class ProjectManager {
                 LOGGER.error("Error while trying to self-restart");
             }
         }
-
-        previous = ppfProject;
 
         projectConsumer.accept(ppfProject);
     }

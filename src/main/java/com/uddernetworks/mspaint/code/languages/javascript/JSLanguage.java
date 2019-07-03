@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.code.languages.python;
+package com.uddernetworks.mspaint.code.languages.javascript;
 
 import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
@@ -13,6 +13,7 @@ import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,20 +24,21 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
-public class PythonLanguage extends Language {
+public class JSLanguage extends Language {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(PythonLanguage.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(JSLanguage.class);
 
-    private LanguageSettings settings = new PythonSettings();
-    private PythonCodeManager pythonCodeManager = new PythonCodeManager(this);
-    private HighlightData highlightData = new PythonHighlightData();
-    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.PYTHON,
-            Collections.singletonList("pyls"));
+    private LanguageSettings settings = new JSSettings();
+    private JSCodeManager jsCodeManager = new JSCodeManager(this);
+    private HighlightData highlightData = new JSHighlightData();
+    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JS, System.getenv("APPDATA") + "\\npm\\node_modules\\javascript-typescript-langserver\\lib",
+            Arrays.asList("node", "language-server-stdio"))
+                .writeOnChange();
 
-    public PythonLanguage(StartupLogic startupLogic) {
+    public JSLanguage(StartupLogic startupLogic) {
         super(startupLogic);
     }
 
@@ -47,32 +49,32 @@ public class PythonLanguage extends Language {
 
     @Override
     public String getName() {
-        return "Python";
+        return "JavaScript";
     }
 
     @Override
     public String[] getFileExtensions() {
-        return new String[] {"py"};
+        return new String[] {"js"};
     }
 
     @Override
     public Option getInputOption() {
-        return PythonOptions.INPUT_DIRECTORY;
+        return JSOptions.INPUT_DIRECTORY;
     }
 
     @Override
     public Option getHighlightOption() {
-        return PythonOptions.HIGHLIGHT_DIRECTORY;
+        return JSOptions.HIGHLIGHT_DIRECTORY;
     }
 
     @Override
     public File getAppOutput() {
-        return getLanguageSettings().getSetting(PythonOptions.PROGRAM_OUTPUT);
+        return getLanguageSettings().getSetting(JSOptions.PROGRAM_OUTPUT);
     }
 
     @Override
     public File getCompilerOutput() {
-        return getLanguageSettings().getSetting(PythonOptions.COMPILER_OUTPUT);
+        return getLanguageSettings().getSetting(JSOptions.COMPILER_OUTPUT);
     }
 
     @Override
@@ -87,7 +89,8 @@ public class PythonLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        return Commandline.runSyncCommand("pip list").contains("python-language-server ");
+        var output = Commandline.runSyncCommand("cmd /c node \"%USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\javascript-typescript-langserver\\lib\\language-server-stdio\" --version");
+        return !output.contains("Cannot find module") && Arrays.stream(output.split("\\.")).allMatch(StringUtils::isNumeric);
     }
 
     @Override
@@ -96,31 +99,26 @@ public class PythonLanguage extends Language {
 
         try {
             var res = JOptionPane.showOptionDialog(null,
-                    "Would you like to proceed with downloading the Python Language Server by palantir?",
+                    "Would you like to proceed with downloading the JavaScript Language Server by sourcegraph?",
                     "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
                     new ImageIcon(ImageIO.read(new File("E:\\MSPaintIDE\\src\\main\\resources\\icons\\popup\\save.png"))),
                     new String[]{"Yes", "No", "Website"}, "Yes");
 
             if (res == 0) {
-                var output = Commandline.runSyncCommand("pip install python-language-server[all]");
+                var output = Commandline.runSyncCommand("cmd /c npm install -g javascript-typescript-langserver");
 
-                if (output.contains("'install_requires' must be")) {
-                    Commandline.runSyncCommand("pip install -U setuptools");
-                    output = Commandline.runSyncCommand("pip install python-language-server[all]");
-                }
-
-                if (output.contains("Successfully installed")) {
-                    LOGGER.info("Successfully installed the Python Language Server");
+                if (output.contains(" packages from ")) {
+                    LOGGER.info("Successfully installed the JavaScript Language Server");
                     return true;
                 } else if (output.contains("is not recognized as an internal or external command")) {
-                    LOGGER.error("You must have Python and pip installed on your system and in your PATH before installing");
+                    LOGGER.error("You must have Node.js installed on your system and in your PATH before installing");
                     return false;
                 } else {
                     LOGGER.error("An unknown error caused the LSP to not be installed. The log is below:\n{}", output);
                 }
             } else if (res == 1) {
             } else {
-                Desktop.getDesktop().browse(new URI("https://github.com/palantir/python-language-server"));
+                Desktop.getDesktop().browse(new URI("https://www.npmjs.com/package/javascript-typescript-langserver"));
             }
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("There was an error while trying to install the Python LSP server", e);
@@ -131,12 +129,12 @@ public class PythonLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        return Commandline.runSyncCommand("python --version").startsWith("Python ");
+        return Commandline.runSyncCommand("node --version").startsWith("v");
     }
 
     @Override
     public String downloadRuntimeLink() {
-        return "https://www.python.org/downloads/";
+        return "https://nodejs.org/en/download/";
     }
 
     @Override
@@ -151,12 +149,12 @@ public class PythonLanguage extends Language {
 
     @Override
     public void highlightAll(List<ImageClass> imageClasses) throws IOException {
-        if (!this.settings.<Boolean>getSetting(PythonOptions.HIGHLIGHT)) return;
-        highlightAll(PythonOptions.HIGHLIGHT_DIRECTORY, imageClasses);
+        if (!this.settings.<Boolean>getSetting(JSOptions.HIGHLIGHT)) return;
+        highlightAll(JSOptions.HIGHLIGHT_DIRECTORY, imageClasses);
     }
 
     @Override
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException {
-        return this.pythonCodeManager.executeCode(mainGUI, imageClasses, imageOutputStream, compilerStream);
+        return this.jsCodeManager.executeCode(mainGUI, imageClasses, imageOutputStream, compilerStream);
     }
 }

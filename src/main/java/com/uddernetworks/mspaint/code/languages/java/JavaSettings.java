@@ -73,9 +73,7 @@ public class JavaSettings extends LanguageSettings {
         addOption(JavaOptions.JAVA_VERSION,
                 new DropdownLangGUIOption("Java Version", "Java 8", "Java 9", "Java 10", "Java 11", "Java 12", "Java 13"),
                 () -> {
-                    String[] out = {null};
-                    Commandline.runCommand("java --version", false, null, result -> out[0] = result);
-                    var output = out[0];
+                    var output = Commandline.runSyncCommand("java --version");
                     if (output == null || !output.contains(" ")) return "Java 11";
                     var version = "Java " + output.split("\\s+")[1].split("\\.")[0];
                     LOGGER.info("Current version of Java is {}", version);

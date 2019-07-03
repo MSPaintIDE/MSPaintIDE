@@ -1,5 +1,6 @@
 package com.uddernetworks.mspaint.code.lsp;
 
+import com.google.common.base.CharMatcher;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.doc.DefaultDocumentManager;
 import com.uddernetworks.mspaint.code.lsp.doc.Document;
@@ -20,14 +21,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static com.uddernetworks.mspaint.code.lsp.LSStatus.*;
 
@@ -52,9 +52,12 @@ public class LanguageServerWrapper {
     private StartupLogic startupLogic;
     private FileWatchManager fileWatchManager;
     private LSP lsp;
-    private String serverPath;
+    private Supplier<String> serverPath;
     private List<String> lspArgs;
     private BiFunction<LanguageServerWrapper, List<String>, List<String>> argumentPreprocessor = (x, y) -> y;
+    private boolean useInputForWorkspace;
+    private File inputFile;
+    private boolean writeOnChange;
 
     public LanguageServerWrapper(StartupLogic startupLogic, LSP lsp, List<String> lspArgs) {
         this(startupLogic, lsp, null, lspArgs);
@@ -69,7 +72,7 @@ public class LanguageServerWrapper {
         this.startupLogic = startupLogic;
         this.fileWatchManager = startupLogic.getFileWatchManager();
         this.lsp = lsp;
-        this.serverPath = serverPath;
+        this.serverPath = () -> serverPath;
         this.lspArgs = lspArgs;
         this.workspaceInit = workspaceInit;
 
@@ -105,7 +108,7 @@ public class LanguageServerWrapper {
 
             var streamConnectionProvider = new BetterProvider(
                     processedArgs,
-                    serverPath); // new File(TEMP_ROOT).getParent()
+                    serverPath.get()); // new File(TEMP_ROOT).getParent()
             streamConnectionProvider.start();
 
             Launcher<LanguageServer> launcher =
@@ -136,6 +139,7 @@ public class LanguageServerWrapper {
      * Realistically, this only accepts ONE open workspace, since the IDE only allows one open window at once.
      */
     public void openWorkspace(File file, File inputFile) {
+        this.inputFile = inputFile;
         // TODO: Throw if `file` is not in `rootPath`?
         verifyStatus(file.getParentFile()).thenRun(() -> {
 
@@ -147,6 +151,20 @@ public class LanguageServerWrapper {
             LOGGER.info("Adding workspace {}", file.getAbsolutePath());
             this.workspaces.add(getWorkspace(file));
 
+            // This is NOT done in the Document class, because stuff may get messed up when deleting and mainly creating
+            // new files.
+            LOGGER.info("Watching {}", inputFile.getAbsolutePath());
+
+            var watcher = this.fileWatchManager.watchFile(inputFile);
+            var lang = this.startupLogic.getCurrentLanguage();
+            var highlight = lang.getHighlightOption();
+            var highlightDir = new File[] {null};
+            lang.getLanguageSettings().<File>onChangeSetting(highlight, changed -> highlightDir[0] = changed, true);
+
+            var dotMatcher = CharMatcher.is('.');
+            watcher.addFileFiler(filtering -> filtering.isFile() && filtering.getName().endsWith(".png") && dotMatcher.countIn(filtering.getName()) >= 2);
+            watcher.addFileFiler(filtering -> !isInSubDirectory(highlightDir[0], filtering));
+
             // Opening all paths because the Java LSP server listens to files itself
             var diagnosticManager = this.startupLogic.getDiagnosticManager();
             diagnosticManager.pauseDiagnostics();
@@ -157,8 +175,11 @@ public class LanguageServerWrapper {
                         .filter(walking -> walking.getName().endsWith(".png"))
                         .forEach(path -> {
                             try {
-                                LOGGER.info("File {}", path.getName());
+                                if (!watcher.keepFromFilters(path)) return;
+                                LOGGER.info("Walked to file {} vs {}\tfile is {}", path.toPath(), path.getAbsoluteFile().toPath(), file.toPath());
                                 var document = this.documentManager.getDocument(path);
+                                if (this.useInputForWorkspace) document.setUseRelativeToDirectory(file);
+                                writeIfApplicable(document);
                                 document.open();
                                 highlightFile(document);
                             } catch (Exception e) {
@@ -170,13 +191,9 @@ public class LanguageServerWrapper {
             }
             diagnosticManager.resumeDiagnostics();
 
-            // This is NOT done in the Document class, because stuff may get messed up when deleting and mainly creating
-            // new files.
-            LOGGER.info("Watching {}", inputFile.getAbsolutePath());
-            this.fileWatchManager.watchFile(inputFile).addListener((type, changedFile) -> {
+            watcher.addListener((type, changedFile) -> {
                 changedFile = changedFile.getAbsoluteFile();
                 LOGGER.info("Changed: {}", changedFile.getAbsolutePath());
-                if (!changedFile.getName().endsWith("png")) return;
 
                 if (lsp.usesWorkspaces()) {
                     // TODO: Not sure if this should happen before or after the following switch?
@@ -189,14 +206,23 @@ public class LanguageServerWrapper {
                 switch (type) {
                     case CREATE:
                         LOGGER.info("Create document event {}", changedFile.getAbsolutePath());
-                        (document = this.documentManager.getDocument(changedFile)).open();
+                        writeIfApplicable(document = this.documentManager.getDocument(changedFile));
+                        if (this.useInputForWorkspace) document.setUseRelativeToDirectory(file);
+                        document.open();
                         break;
                     case MODIFY:
                         LOGGER.info("Modify document event {}", changedFile.getAbsolutePath());
                         document = this.documentManager.getDocument(changedFile);
+
+                        var imageClass = document.getImageClass();
+                        imageClass.scan();
+                        document.setText(imageClass.getText());
+
+                        writeIfApplicable(document);
+
                         if (!document.isOpened()) document.open();
 
-                        document.notifyOfTextChange();
+                        document.modifyText(document.getText());
                         break;
                     case DELETE:
                         LOGGER.info("Delete document event {}", changedFile.getAbsolutePath());
@@ -210,6 +236,25 @@ public class LanguageServerWrapper {
                 }
             });
         });
+    }
+
+    private void writeIfApplicable(Document document) {
+        if (this.writeOnChange) {
+            var writingFile = new File(document.getFile().getAbsolutePath().replaceAll("\\.png$", ""));
+            LOGGER.info("Writing to {} from image path being {}", writingFile.getAbsolutePath(), document.getFile().getAbsolutePath());
+            try {
+                var imageClass = document.getImageClass();
+                if (imageClass.getScannedImage().isEmpty()) {
+                    imageClass.scan();
+                    document.setText(imageClass.getText());
+                }
+
+                if (writingFile.createNewFile()) setHidden(writingFile);
+                Files.write(writingFile.toPath(), document.getText().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+            } catch (IOException e) {
+                LOGGER.error("Error while writing to file after creation/modification", e);
+            }
+        }
     }
 
     private void highlightFile(Document document) {
@@ -267,6 +312,23 @@ public class LanguageServerWrapper {
         return workspace;
     }
 
+    private static boolean isInSubDirectory(File dir, File file) {
+        if (file == null) return false;
+        if (file.equals(dir)) return true;
+        return isInSubDirectory(dir, file.getParentFile());
+    }
+
+    public LanguageServerWrapper setServerDirectorySupplier(Supplier<String> supplier) {
+        this.serverPath = supplier;
+        return this;
+    }
+
+    private void setHidden(File file) {
+        try {
+            Files.setAttribute(file.toPath(), "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS); //< set hidden attribute
+        } catch (IOException e) {}
+    }
+
     private String getURI(String file) {
         return new File(file).toURI().toString();
     }
@@ -279,8 +341,13 @@ public class LanguageServerWrapper {
 //        initParams.setWorkspaceFolders(Arrays.asList(new WorkspaceFolder(new File(TEMP_ROOT).toURI().toString())));
 //        initParams.setRootUri(new File(TEMP_ROOT).getParentFile().toURI().toString());
         if (this.rootPath != null) {
-            initParams.setRootUri(rootPath.toURI().toString());
-            LOGGER.info("Root is to {}", rootPath.toURI().toString());
+            var root = rootPath.toURI().toString();
+            if (this.useInputForWorkspace) {
+                root = rootPath.toPath().relativize(inputFile.toPath()).toUri().toString();
+            }
+
+            initParams.setRootUri(root);
+            LOGGER.info("Workspace root is {}", root);
         }
         WorkspaceClientCapabilities workspaceClientCapabilities = new WorkspaceClientCapabilities();
         workspaceClientCapabilities.setApplyEdit(true);
@@ -357,6 +424,16 @@ public class LanguageServerWrapper {
     }
 
     public String getServerPath() {
-        return serverPath;
+        return serverPath.get();
+    }
+
+    public LanguageServerWrapper useInputAsWorkspace() {
+        this.useInputForWorkspace = true;
+        return this;
+    }
+
+    public LanguageServerWrapper writeOnChange() {
+        this.writeOnChange = true;
+        return this;
     }
 }
