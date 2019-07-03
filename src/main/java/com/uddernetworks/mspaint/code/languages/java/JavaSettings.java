@@ -1,11 +1,11 @@
 package com.uddernetworks.mspaint.code.languages.java;
 
 import com.uddernetworks.mspaint.cmd.Commandline;
+import com.uddernetworks.mspaint.code.gui.BooleanLangGUIOption;
+import com.uddernetworks.mspaint.code.gui.DropdownLangGUIOption;
+import com.uddernetworks.mspaint.code.gui.FileLangGUIOption;
+import com.uddernetworks.mspaint.code.gui.StringLangGUIOption;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
-import com.uddernetworks.mspaint.code.languages.gui.BooleanLangGUIOption;
-import com.uddernetworks.mspaint.code.languages.gui.DropdownLangGUIOption;
-import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
-import com.uddernetworks.mspaint.code.languages.gui.StringLangGUIOption;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import org.slf4j.Logger;
@@ -59,14 +59,16 @@ public class JavaSettings extends LanguageSettings {
                         .setChooserTitle("Select or create the png file where compiler output text will be located")
                         .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setExtensionFilter(ProjectFileFilter.PNG)
-                        .setSave(true));
+                        .setSave(true),
+                () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "compiler.png"));
 
         addOption(JavaOptions.PROGRAM_OUTPUT,
                 new FileLangGUIOption("Program output")
                         .setChooserTitle("Select or create the png file where program output text will be located")
                         .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setExtensionFilter(ProjectFileFilter.PNG)
-                        .setSave(true));
+                        .setSave(true),
+                () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "program.png"));
 
         addOption(JavaOptions.JAVA_VERSION,
                 new DropdownLangGUIOption("Java Version", "Java 8", "Java 9", "Java 10", "Java 11", "Java 12", "Java 13"),

@@ -1,6 +1,7 @@
-package com.uddernetworks.mspaint.code.languages.gui;
+package com.uddernetworks.mspaint.code.gui;
 
 import com.jfoenix.controls.JFXCheckBox;
+import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
 import javafx.beans.property.BooleanProperty;
@@ -17,6 +18,7 @@ public class BooleanLangGUIOption implements LangGUIOption {
     String name;
     BooleanProperty value = new SimpleBooleanProperty();
     int index;
+    LangGUIOptionRequirement requirement;
 
     public BooleanLangGUIOption(String name) {
         this.name = name;
@@ -79,5 +81,15 @@ public class BooleanLangGUIOption implements LangGUIOption {
     @Override
     public int getIndex() {
         return this.index;
+    }
+
+    @Override
+    public void setRequirement(LangGUIOptionRequirement requirement) {
+        this.requirement = requirement;
+    }
+
+    @Override
+    public LangGUIOptionRequirement getRequirement() {
+        return this.requirement;
     }
 }

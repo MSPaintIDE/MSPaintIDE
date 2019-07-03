@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.code.languages.gui;
+package com.uddernetworks.mspaint.code.gui;
 
 import com.jfoenix.controls.JFXComboBox;
 import javafx.scene.control.Control;

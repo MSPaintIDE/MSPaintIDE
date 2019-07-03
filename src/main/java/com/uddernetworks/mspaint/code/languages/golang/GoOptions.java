@@ -1,38 +1,26 @@
-package com.uddernetworks.mspaint.code.languages.python;
+package com.uddernetworks.mspaint.code.languages.golang;
 
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
-import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
 
 import java.io.File;
 import java.util.Arrays;
 
-import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.BOTTOM_DISPLAY;
-import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.REQUIRED;
+import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.*;
 
-/**
- * All the Python language options. All options that are linked as {@link LangGUIOptionRequirement#OPTIONAL} must require
- * the {@link LanguageSettings#getSettingOptional} and other Optional-returning methods, as they may not be set.
- */
-public enum PythonOptions implements Option {
+public enum GoOptions implements Option {
     /**
      * The directory where code image files go
      * @see File
      * @see LangGUIOptionRequirement#REQUIRED
      */
-    INPUT_DIRECTORY("inputDirectory", File.class, REQUIRED),
+    INPUT_DIRECTORY("inputDirectory", File.class, UNMODIFIABLE),
     /**
      * The output directory where generated highlighted code files go
      * @see File
      * @see LangGUIOptionRequirement#REQUIRED
      */
     HIGHLIGHT_DIRECTORY("highlightDirectory", File.class, REQUIRED),
-    /**
-     * The image file that will be ran upon execution
-     * @see File
-     * @see LangGUIOptionRequirement#REQUIRED
-     */
-    RUNNING_FILE("runningFile", File.class, REQUIRED),
     /**
      * The image file to output compiler information
      * @see File
@@ -46,11 +34,23 @@ public enum PythonOptions implements Option {
      */
     PROGRAM_OUTPUT("programOutput", File.class, REQUIRED),
     /**
+     * The file to run
+     * @see File
+     * @see LangGUIOptionRequirement#REQUIRED
+     */
+    RUNNING_FILE("runningFile", File.class, OPTIONAL),
+    /**
      * A boolean to toggle the highlighting of code files
      * @see Boolean
      * @see LangGUIOptionRequirement#BOTTOM_DISPLAY
      */
     HIGHLIGHT("highlight", Boolean.class, BOTTOM_DISPLAY),
+    /**
+     * A boolean to toggle the compilation of files
+     * @see Boolean
+     * @see LangGUIOptionRequirement#BOTTOM_DISPLAY
+     */
+    COMPILE("compile", Boolean.class, BOTTOM_DISPLAY),
     /**
      * A boolean to toggle the execution of files
      * @see Boolean
@@ -62,7 +62,7 @@ public enum PythonOptions implements Option {
     private LangGUIOptionRequirement requirement;
     private Class type;
 
-    PythonOptions(String name, Class type, LangGUIOptionRequirement requirement) {
+    GoOptions(String name, Class type, LangGUIOptionRequirement requirement) {
         this.name = name;
         this.type = type;
         this.requirement = requirement;
@@ -88,7 +88,7 @@ public enum PythonOptions implements Option {
         return this.requirement;
     }
 
-    public static PythonOptions staticFromName(String name) {
-        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(PythonOptions.class, name));
+    public static GoOptions staticFromName(String name) {
+        return Arrays.stream(values()).filter(option -> option.name.equalsIgnoreCase(name)).findFirst().orElseThrow(() -> new EnumConstantNotPresentException(GoOptions.class, name));
     }
 }

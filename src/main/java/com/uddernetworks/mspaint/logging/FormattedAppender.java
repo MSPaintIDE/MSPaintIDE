@@ -8,9 +8,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
 import org.fxmisc.richtext.model.SegmentOps;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +31,6 @@ public class FormattedAppender extends ConsoleAppender {
     private static final Map<Level, String> STYLE_MAP = new HashMap<>();
 
     private static InlineCssTextArea output;
-    private StyleSpansBuilder<Collection<String>> spansBuilder
-            = new StyleSpansBuilder<>();
 
     public static void activate(InlineCssTextArea output) {
         FormattedAppender.output = output;
@@ -42,8 +38,6 @@ public class FormattedAppender extends ConsoleAppender {
 
         PRE_STYLES.forEach((level, style) -> STYLE_MAP.put(level, style + "-fx-font-family: Monospace;"));
     }
-
-    private int lastIndex = 0;
 
     @Override
     public void append(LoggingEvent event) {

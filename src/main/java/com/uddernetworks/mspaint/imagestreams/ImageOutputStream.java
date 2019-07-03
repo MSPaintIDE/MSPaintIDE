@@ -2,6 +2,8 @@ package com.uddernetworks.mspaint.imagestreams;
 
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.newocr.utils.ConversionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -14,6 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ImageOutputStream extends OutputStream {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(ImageOutputStream.class);
+
     private StringBuilder string = new StringBuilder();
     private StartupLogic startupLogic;
     private File location;

@@ -1,38 +1,31 @@
-package com.uddernetworks.mspaint.code.languages.python;
+package com.uddernetworks.mspaint.code.languages.golang;
 
 import com.uddernetworks.mspaint.cmd.Commandline;
-import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
 import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicReference;
 
-public class PythonCodeManager {
+public class GoCodeManager {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(PythonCodeManager.class);
-    private PythonLanguage language;
+    private static Logger LOGGER = LoggerFactory.getLogger(GoCodeManager.class);
+    private GoLanguage language;
 
 
-    public PythonCodeManager(PythonLanguage language) {
+    public GoCodeManager(GoLanguage language) {
         this.language = language;
     }
 
-    public DefaultCompilationResult executeCode(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
+    public DefaultCompilationResult executeCode(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) {
         mainGUI.setIndeterminate(true);
 
         compilerStream.changeColor(Color.RED);
@@ -41,25 +34,21 @@ public class PythonCodeManager {
 
         ConsoleManager.setAll(new PrintStream(compilerOut));
 
-        var runningFile = this.language.getLanguageSettings().getSetting(PythonOptions.RUNNING_FILE);
-        var runningSrc = new AtomicReference<File>();
+        var input = this.language.getLanguageSettings().<File>getSetting(GoOptions.INPUT_DIRECTORY);
+
+        if (this.language.getLanguageSettings().getSetting(GoOptions.COMPILE)) {
+            LOGGER.info("Compiling...");
+            mainGUI.setStatusText("Compiling...");
+            var start = System.currentTimeMillis();
+            Commandline.runLiveCommand(Arrays.asList("go", "install", "-v", "-x", "./..."), input, "Golang");
+            LOGGER.info("Compilation completed in {}ms", System.currentTimeMillis() - start);
+        }
+
+        if (this.language.getLanguageSettings().<Boolean>getSetting(GoOptions.EXECUTE)) new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
+
+        var runningFileOptional = this.language.getLanguageSettings().<File>getSettingOptional(GoOptions.RUNNING_FILE);
 
         // Puts .java files into this directory, which are then compiled from here
-        var generateJava = new File(System.getProperty("java.io.tmpdir"), "MSPaintIDE_" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
-        var genSrc = new File(generateJava, "src");
-
-        var input = this.language.getLanguageSettings().<File>getSetting(PythonOptions.INPUT_DIRECTORY);
-        imageClasses.forEach(imageClass -> {
-            var relative = input.toURI().relativize(imageClass.getInputImage().toURI());
-            var absoluteOutput = new File(genSrc, relative.getPath().replaceAll("\\.png$", ""));
-
-            if (imageClass.getInputImage().equals(runningFile)) runningSrc.set(absoluteOutput);
-            try {
-                FileUtils.write(absoluteOutput, imageClass.getText(), Charset.defaultCharset());
-            } catch (IOException e) {
-                LOGGER.error("An error occurred while writing to the temp file {}", absoluteOutput.getAbsolutePath());
-            }
-        });
 
         LOGGER.info("Executing...");
         mainGUI.setStatusText("Executing...");
@@ -68,7 +57,9 @@ public class PythonCodeManager {
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
             ConsoleManager.setAll(programOut);
-            return Commandline.runLiveCommand(Arrays.asList("python", runningSrc.get().getAbsolutePath()), genSrc);
+            var runningString = "./...";
+            if (runningFileOptional.isPresent()) runningString = input.toPath().relativize(runningFileOptional.get().toPath()).toString();
+            return Commandline.runLiveCommand(Arrays.asList("go", "run", runningString), input, "Golang");
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
                 LOGGER.info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");
@@ -83,4 +74,5 @@ public class PythonCodeManager {
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);
     }
+
 }

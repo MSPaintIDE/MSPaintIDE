@@ -26,6 +26,7 @@ public class BasicDocument implements Document {
 
     private LanguageServerWrapper lsWrapper;
     private RequestManager requestManager;
+    private File relParent;
 
     public BasicDocument(ImageClass imageClass, LanguageServerWrapper lsWrapper) {
         this.file = imageClass.getInputImage();
@@ -104,8 +105,19 @@ public class BasicDocument implements Document {
     }
 
     @Override
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @Override
     public boolean isOpened() {
         return opened;
+    }
+
+    @Override
+    public void setUseRelativeToDirectory(File relParent) {
+        this.relParent = relParent;
+        changesParams.getTextDocument().setUri(getURI());
     }
 
     /**
@@ -114,6 +126,9 @@ public class BasicDocument implements Document {
      * @return The .png-removed URI
      */
     private String getURI() {
-        return this.file.toURI().toString().replaceAll("\\.png?$", "");
+        var nonRelPath = this.file.toPath().toString();
+        if (this.relParent != null) nonRelPath = this.relParent.toPath().relativize(this.file.toPath()).toString();
+        LOGGER.info("URI is {}", nonRelPath);
+        return nonRelPath.replaceAll("\\.png?$", "");
     }
 }

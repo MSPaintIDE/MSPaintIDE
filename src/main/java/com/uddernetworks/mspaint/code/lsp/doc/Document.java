@@ -56,9 +56,18 @@ public interface Document {
     String getText();
 
     /**
+     * Sets the current text of the {@link Document}, without firing any other event.
+     *
+     * @param text The text to set
+     */
+    void setText(String text);
+
+    /**
      * If the {@link Document} is opened currently.
      *
      * @return If the {@link Document} is opened
      */
     boolean isOpened();
+
+    void setUseRelativeToDirectory(File relParent);
 }

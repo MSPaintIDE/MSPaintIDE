@@ -56,6 +56,8 @@ public class CreateProjectWindow extends Stage implements Initializable {
     private Label error;
 
     private MainGUI mainGUI;
+    private boolean isStatic;
+    private File staticFile;
 
     public CreateProjectWindow(MainGUI mainGUI) throws IOException {
         super();
@@ -88,34 +90,46 @@ public class CreateProjectWindow extends Stage implements Initializable {
         ));
     }
 
+    private void updateLocation() {
+        if (!this.isStatic) return;
+        this.projectLocation.setText(this.staticFile.getAbsolutePath() + "\\" + projectName.getText());
+    }
+
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         File startAt = MainGUI.APP_DATA;
         this.languageComboBox.setItems(mainGUI.getLanguages());
 
+        this.languageComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            var staticParentOptional = newValue.getStaticParent();
+            this.isStatic = staticParentOptional.isPresent();
+            this.projectLocation.setEditable(!isStatic);
+            this.projectLocation.setDisable(isStatic);
+            if (isStatic) this.staticFile = staticParentOptional.get();
+            updateLocation();
+        });
+
+        this.projectName.textProperty().addListener((observable, oldValue, newValue) -> updateLocation());
+
         finish.setOnAction(event -> {
-            try {
-                File fileLocation = new File(projectLocation.getText());
-                String name = projectName.getText();
-                Language language = languageComboBox.getValue();
-                if (!fileLocation.exists() && !fileLocation.createNewFile()) {
-                    error.setText("Couldn't find or create project directory!");
-                    return;
-                }
-
-                PPFProject ppfProject = new PPFProject(new File(fileLocation, name.replaceAll("[^\\w\\-. ]+", "") + ".ppf"));
-                ppfProject.setName(name);
-                ppfProject.setLanguage(language.getClass().getCanonicalName());
-
-                Platform.runLater(() -> {
-                    ProjectManager.switchProject(ppfProject);
-                    this.mainGUI.refreshProject();
-                    close();
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
+            File fileLocation = new File(projectLocation.getText());
+            String name = projectName.getText();
+            Language language = languageComboBox.getValue();
+            if (!fileLocation.exists() && !fileLocation.mkdirs()) {
+                error.setText("Couldn't find or create project directory!");
+                return;
             }
+
+            PPFProject ppfProject = new PPFProject(new File(fileLocation, name.replaceAll("[^\\w\\-. ]+", "") + ".ppf"));
+            ppfProject.setName(name);
+            ppfProject.setLanguage(language.getClass().getCanonicalName());
+
+            Platform.runLater(() -> {
+                ProjectManager.switchProject(ppfProject);
+                this.mainGUI.refreshProject();
+                close();
+            });
         });
 
         browse.setOnAction(event -> {

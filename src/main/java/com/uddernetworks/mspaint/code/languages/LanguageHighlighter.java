@@ -1,5 +1,7 @@
 package com.uddernetworks.mspaint.code.languages;
 
+import com.uddernetworks.code.lexer.golang.GolangLexer;
+import com.uddernetworks.code.lexer.golang.GolangParser;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.texteditor.LetterGenerator;
 import org.antlr.v4.runtime.*;
@@ -14,6 +16,22 @@ import static com.uddernetworks.mspaint.gui.window.search.ReplaceManager.trimIma
 public class LanguageHighlighter {
 
     private static Logger LOGGER = LoggerFactory.getLogger(LanguageHighlighter.class);
+
+    public static void main(String[] args) {
+        var input = CharStreams.fromString("def oof");
+        var lex = new GolangLexer(input);
+        // copy text out of sliding buffer and store in tokens
+        lex.setTokenFactory(new CommonTokenFactory(true));
+        var tokens = new UnbufferedTokenStream<CommonToken>(lex);
+        var parser = new GolangParser(tokens);
+        parser.setBuildParseTree(false);
+        var voc = parser.getVocabulary();
+
+        System.out.println("\n");
+        for (int i = 0; i < voc.getMaxTokenType(); i++) {
+            System.out.print("\"" + voc.getDisplayName(i) + "\", ");
+        }
+    }
 
     public void highlight(Language language, ImageClass imageClass) {
         try {

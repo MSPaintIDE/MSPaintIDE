@@ -1,11 +1,13 @@
 package com.uddernetworks.mspaint.project;
 
 import com.google.gson.*;
+import com.uddernetworks.mspaint.main.JFXWorkaround;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -135,12 +137,36 @@ public class ProjectManager {
         }
     }
 
+    private static PPFProject previous = null;
+
     public static void switchProject(PPFProject ppfProject) {
         System.out.println("Switching project");
         setCurrentProject(ppfProject);
         save();
         addRecent(ppfProject);
         writeRecent();
+
+        // TODO: Test this?
+        if (previous != null) {
+            try {
+                LOGGER.info("Restarting self...");
+                StringBuilder cmd = new StringBuilder();
+                cmd.append(System.getProperty("java.home")).append(File.separator).append("bin").append(File.separator).append("java ");
+                for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+                    cmd.append(jvmArg).append(" ");
+                }
+                cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+                cmd.append(JFXWorkaround.class.getName()).append(" ");
+                cmd.append(ppfProject.getFile().getAbsolutePath());
+                Runtime.getRuntime().exec(cmd.toString());
+                System.exit(0);
+                return;
+            } catch (IOException e) {
+                LOGGER.error("Error while trying to self-restart");
+            }
+        }
+
+        previous = ppfProject;
 
         projectConsumer.accept(ppfProject);
     }

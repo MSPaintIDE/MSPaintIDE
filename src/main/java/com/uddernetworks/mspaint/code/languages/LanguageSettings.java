@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.code.languages;
 
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
-import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
+import com.uddernetworks.mspaint.code.gui.LangGUIOption;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
 
@@ -40,6 +40,7 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     }
 
     protected void addOption(Option option, LangGUIOption langGUIOption, Supplier<Object> defaultGenerator) {
+        langGUIOption.setRequirement(option.getRequirement());
         this.optionMap.put(option, langGUIOption);
         this.defaultGenerators.put(option, defaultGenerator == null ? () -> null : defaultGenerator);
         langGUIOption.bindValue(option, this);

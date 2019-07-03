@@ -42,8 +42,8 @@ public class TextEditorManager {
         this.startupLogic = startupLogic;
     }
 
-    public TextEditorManager(String file) throws IOException, InterruptedException, ExecutionException {
-        this(new File(file), null);
+    public TextEditorManager(File file) throws IOException, InterruptedException, ExecutionException {
+        this(file, null);
     }
 
     public TextEditorManager(File file, MainGUI mainGUI) throws IOException, InterruptedException, ExecutionException {

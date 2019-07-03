@@ -75,9 +75,6 @@ public abstract class SettingsAccessor<G> {
     }
 
     public void setSetting(G setting, Object value, boolean override, boolean runOnChange) {
-//        if (value instanceof File) {
-//            LOGGER.error("FILE INSTANCE!", new RuntimeException("Type is file, exatc is " + value + " setting is "+ setting));
-//        }
         if (this.settings.containsKey(setting) && !override) return;
         settings.put(setting, value);
         if (runOnChange) Platform.runLater(() -> this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));

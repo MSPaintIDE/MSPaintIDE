@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.code.languages.python;
+package com.uddernetworks.mspaint.code.languages.golang;
 
 import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
@@ -23,20 +23,24 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-public class PythonLanguage extends Language {
+public class GoLanguage extends Language {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(PythonLanguage.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(GoLanguage.class);
 
-    private LanguageSettings settings = new PythonSettings();
-    private PythonCodeManager pythonCodeManager = new PythonCodeManager(this);
-    private HighlightData highlightData = new PythonHighlightData();
-    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.PYTHON,
-            Collections.singletonList("pyls"));
+    private LanguageSettings settings = new GoSettings();
+    private GoCodeManager goCodeManager = new GoCodeManager(this);
+    private HighlightData highlightData = new GoHighlightData();
+    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.GO,
+            Arrays.asList("gopls", "serve", "-logfile", "auto"))
+            .setServerDirectorySupplier(() -> getStaticParent().orElse(new File("")).getAbsolutePath())
+                .useInputAsWorkspace()
+                .writeOnChange();
 
-    public PythonLanguage(StartupLogic startupLogic) {
+    public GoLanguage(StartupLogic startupLogic) {
         super(startupLogic);
     }
 
@@ -47,37 +51,41 @@ public class PythonLanguage extends Language {
 
     @Override
     public String getName() {
-        return "Python";
+        return "Go";
     }
 
     @Override
     public String[] getFileExtensions() {
-        return new String[] {"py"};
+        return new String[] {"go"};
     }
 
     @Override
     public Option getInputOption() {
-        return PythonOptions.INPUT_DIRECTORY;
+        return GoOptions.INPUT_DIRECTORY;
     }
 
     @Override
     public Option getHighlightOption() {
-        return PythonOptions.HIGHLIGHT_DIRECTORY;
+        return GoOptions.HIGHLIGHT_DIRECTORY;
+    }
+
+    public static File getGoSrc() {
+        return new File(System.getenv("GOPATH"), "src");
     }
 
     @Override
     public File getAppOutput() {
-        return getLanguageSettings().getSetting(PythonOptions.PROGRAM_OUTPUT);
+        return getLanguageSettings().getSetting(GoOptions.PROGRAM_OUTPUT);
     }
 
     @Override
     public File getCompilerOutput() {
-        return getLanguageSettings().getSetting(PythonOptions.COMPILER_OUTPUT);
+        return getLanguageSettings().getSetting(GoOptions.COMPILER_OUTPUT);
     }
 
     @Override
     public boolean isInterpreted() {
-        return true;
+        return false;
     }
 
     @Override
@@ -86,9 +94,13 @@ public class PythonLanguage extends Language {
     }
 
     @Override
+    public Optional<File> getStaticParent() {
+        return Optional.of(getGoSrc());
+    }
+
+    @Override
     public boolean hasLSP() {
-        var output = Commandline.runSyncCommand("pip list");
-        return output.contains("python-language-server ");
+        return Commandline.runSyncCommand("gopls version").contains(", built in");
     }
 
     @Override
@@ -97,34 +109,29 @@ public class PythonLanguage extends Language {
 
         try {
             var res = JOptionPane.showOptionDialog(null,
-                    "Would you like to proceed with downloading the Python Language Server by palantir?",
+                    "Would you like to proceed with downloading the Go Language Server by Google?",
                     "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
                     new ImageIcon(ImageIO.read(new File("E:\\MSPaintIDE\\src\\main\\resources\\icons\\popup\\save.png"))),
                     new String[]{"Yes", "No", "Website"}, "Yes");
 
             if (res == 0) {
-                var output = Commandline.runSyncCommand("pip install python-language-server[all]");
+                var output = Commandline.runSyncCommand("go get golang.org/x/tools/gopls");
 
-                if (output.contains("'install_requires' must be")) {
-                    Commandline.runSyncCommand("pip install -U setuptools");
-                    output = Commandline.runSyncCommand("pip install python-language-server[all]");
-                }
-
-                if (output.contains("Successfully installed")) {
-                    LOGGER.info("Successfully installed the Python Language Server");
+                if (hasLSP()) {
+                    LOGGER.info("Successfully installed the Go Language Server");
                     return true;
                 } else if (output.contains("is not recognized as an internal or external command")) {
-                    LOGGER.error("You must have Python and pip installed on your system and in your PATH before installing");
+                    LOGGER.error("You must have Go installed on your system and in your PATH before installing");
                     return false;
                 } else {
                     LOGGER.error("An unknown error caused the LSP to not be installed. The log is below:\n{}", output);
                 }
             } else if (res == 1) {
             } else {
-                Desktop.getDesktop().browse(new URI("https://github.com/palantir/python-language-server"));
+                Desktop.getDesktop().browse(new URI("https://github.com/golang/go/wiki/gopls"));
             }
         } catch (IOException | URISyntaxException e) {
-            LOGGER.error("There was an error while trying to install the Python LSP server", e);
+            LOGGER.error("There was an error while trying to install the Go LSP server", e);
         }
 
         return false;
@@ -132,12 +139,12 @@ public class PythonLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        return Commandline.runSyncCommand("python --version").startsWith("Python ");
+        return Commandline.runSyncCommand("go version").startsWith("go version ");
     }
 
     @Override
     public String downloadRuntimeLink() {
-        return "https://www.python.org/downloads/";
+        return "https://golang.org/dl/";
     }
 
     @Override
@@ -152,12 +159,12 @@ public class PythonLanguage extends Language {
 
     @Override
     public void highlightAll(List<ImageClass> imageClasses) throws IOException {
-        if (!this.settings.<Boolean>getSetting(PythonOptions.HIGHLIGHT)) return;
-        highlightAll(PythonOptions.HIGHLIGHT_DIRECTORY, imageClasses);
+        if (!this.settings.<Boolean>getSetting(GoOptions.HIGHLIGHT)) return;
+        highlightAll(GoOptions.HIGHLIGHT_DIRECTORY, imageClasses);
     }
 
     @Override
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException {
-        return this.pythonCodeManager.executeCode(mainGUI, imageClasses, imageOutputStream, compilerStream);
+        return this.goCodeManager.executeCode(mainGUI, imageOutputStream, compilerStream);
     }
 }

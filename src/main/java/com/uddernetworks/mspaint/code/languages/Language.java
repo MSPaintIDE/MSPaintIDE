@@ -3,6 +3,7 @@ package com.uddernetworks.mspaint.code.languages;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -83,12 +84,16 @@ public abstract class Language {
      */
     public abstract Option getInputOption();
 
+    public abstract Option getHighlightOption();
+
     /**
      * Gets the source directory that files are coming from.
      *
      * @return The source directory
      */
-    public abstract File getInputLocation();
+    public File getInputLocation() {
+        return getLanguageSettings().getSetting(getInputOption());
+    }
 
     /**
      * Gets the image file where executed programs' console output will go.
@@ -117,6 +122,16 @@ public abstract class Language {
      * @return The instance of the used {@link LanguageServerWrapper}
      */
     public abstract LanguageServerWrapper getLSPWrapper();
+
+    /**
+     * Gets the parent that is requires for all projects of the current language. If not present, the user will be able
+     * to set the project to go anywhere.
+     *
+     * @return The parent directory of all projects of this language, if necessary
+     */
+    public Optional<File> getStaticParent() {
+        return Optional.empty();
+    }
 
     /**
      * Gets if the language has the correct software/libraries needed to compile/interpret and execute the language on
@@ -174,7 +189,9 @@ public abstract class Language {
      * Gets all the {@link ImageClass}s that will be used during execution/compilation of the program with the current
      * language.
      */
-    public abstract Optional<List<ImageClass>> indexFiles();
+    public Optional<List<ImageClass>> indexFiles() {
+        return indexFiles(getInputOption());
+    }
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
@@ -183,7 +200,15 @@ public abstract class Language {
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
      */
-    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException;
+    public CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
+        var imageClassesOptional = indexFiles();
+        if (imageClassesOptional.isEmpty()) {
+            getLogger().error("Error while finding ImageClasses, aborting...");
+            return new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
+        }
+
+        return compileAndExecute(mainGUI, imageClassesOptional.get(), imageOutputStream, compilerStream);
+    }
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.
@@ -193,7 +218,9 @@ public abstract class Language {
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
      */
-    public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException;
+    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
+        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, BuildSettings.DEFAULT);
+    }
 
     /**
      * Compiles and/or executes the given image. If the language does not compile, it will interpret the files.

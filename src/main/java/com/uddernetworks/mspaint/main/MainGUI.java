@@ -4,8 +4,8 @@ import com.jfoenix.controls.*;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
+import com.uddernetworks.mspaint.code.gui.LangGUIOption;
 import com.uddernetworks.mspaint.code.languages.Language;
-import com.uddernetworks.mspaint.code.languages.gui.LangGUIOption;
 import com.uddernetworks.mspaint.git.GitController;
 import com.uddernetworks.mspaint.gui.MaterialMenu;
 import com.uddernetworks.mspaint.gui.window.WelcomeWindow;
@@ -66,6 +66,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.BOTTOM_DISPLAY;
 
 public class MainGUI extends Application implements Initializable {
 
@@ -207,22 +209,26 @@ public class MainGUI extends Application implements Initializable {
         socketCommunicator = new DefaultInternalSocketCommunicator();
 
         if (args.length == 1) {
-            if (args[0].endsWith(".ppf")) {
+            var file = new File(args[0]);
+            if (file.getName().endsWith(".ppf")) {
                 if (socketCommunicator.serverAvailable()) {
                     LOGGER.error("Error: You can't have more than one instance of MS Paint IDE running at the same time!");
                     System.exit(1);
                 }
 
-                initialProject = new File(args[0]);
+                initialProject = file;
                 if (!initialProject.isFile()) initialProject = null;
+            } else if (file.getName().endsWith(".png")) {
+                Runtime.getRuntime().exec("mspaint.exe \"" + file.getAbsolutePath() + "\"");
+                System.exit(0);
             } else {
                 if (!socketCommunicator.serverAvailable()) {
                     HEADLESS = true;
                     startServer(null);
-                    new TextEditorManager(args[0]);
+                    new TextEditorManager(file);
                 } else {
                     LOGGER.info("Server is available, connecting...");
-                    startDocumentClient(args[0]);
+                    startDocumentClient(file.getAbsolutePath());
                 }
                 return;
             }
@@ -383,7 +389,8 @@ public class MainGUI extends Application implements Initializable {
                     var lspWrapper = language.getLSPWrapper();
 
                     var fileWatchManager = this.startupLogic.getFileWatchManager();
-                    if (previousInput != null) fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
+                    if (previousInput != null)
+                        fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
 
                     LOGGER.info("About to change setting listener!");
                     language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) inputFile -> {
@@ -814,7 +821,7 @@ public class MainGUI extends Application implements Initializable {
         var langSettings = getCurrentLanguage().getLanguageSettings();
 
         var i = new LongAdder();
-        var addingSettings = langSettings.getOptionsGUI(Predicate.not(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY)))
+        var addingSettings = langSettings.getOptionsGUI(requirement -> requirement != BOTTOM_DISPLAY)
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .collect(Collectors.toList());
@@ -828,12 +835,18 @@ public class MainGUI extends Application implements Initializable {
         GridPane.setRowIndex(generate, constraints.size() - 1);
 
         addingSettings.forEach(langGUIOption -> {
-                    var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), langGUIOption.getDisplay()));
-                    if (langGUIOption.hasChangeButton())
-                        childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
-                    langSettingsGrid.addRow(i.intValue(), childrenAdding.toArray(Control[]::new));
-                    i.increment();
-                });
+            var display = langGUIOption.getDisplay();
+            var childrenAdding = new ArrayList<>(Arrays.asList(langGUIOption.getTextControl(), display));
+
+            if (langGUIOption.getRequirement() == LangGUIOptionRequirement.UNMODIFIABLE) {
+                display.setDisable(true);
+            } else if (langGUIOption.hasChangeButton()) {
+                childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
+            }
+
+            langSettingsGrid.addRow(i.intValue(), childrenAdding.toArray(Control[]::new));
+            i.increment();
+        });
 
         Function<LangGUIOption, JFXCheckBox> checkBoxGen = option -> {
             var checkbox = new JFXCheckBox(option.getName());
@@ -842,12 +855,11 @@ public class MainGUI extends Application implements Initializable {
             checkbox.getStyleClass().add("theme-text");
             checkbox.setCursor(Cursor.HAND);
             checkbox.setPadding(new Insets(0, 10, 0, 0));
-            System.out.println(option.getName() + " = " + option.getSetting());
             checkbox.selectedProperty().bindBidirectional(option.getProperty());
             return checkbox;
         };
 
-        langSettings.getOptionsGUI(Predicate.isEqual(LangGUIOptionRequirement.BOTTOM_DISPLAY))
+        langSettings.getOptionsGUI(Predicate.isEqual(BOTTOM_DISPLAY))
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .forEach(guiOption ->

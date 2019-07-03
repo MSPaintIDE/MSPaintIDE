@@ -8,6 +8,7 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -98,5 +99,12 @@ public class LSPClient implements LanguageClient {
     public CompletableFuture<List<WorkspaceFolder>> workspaceFolders() {
         LOGGER.info("workspaceFolders");
         return CompletableFuture.completedFuture(Collections.emptyList());
+    }
+
+//    @JsonRequest("workspace/configuration")
+    @Override
+    public  CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
+        LOGGER.warn("Workspace configuration! " + configurationParams);
+        return CompletableFuture.supplyAsync(() -> Arrays.asList(new Object()));
     }
 }

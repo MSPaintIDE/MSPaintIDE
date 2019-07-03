@@ -1,18 +1,14 @@
-package com.uddernetworks.mspaint.code.languages.java;
-
-import com.uddernetworks.mspaint.code.execution.RunningCode;
-import com.uddernetworks.mspaint.code.execution.ThrowableRunnable;
-import com.uddernetworks.mspaint.code.execution.ThrowableSupplier;
+package com.uddernetworks.mspaint.code.execution;
 
 import java.util.Optional;
 
-public class JavaRunningCode extends RunningCode {
+public class DefaultRunningCode extends RunningCode {
 
-    public JavaRunningCode(ThrowableRunnable runnable) {
+    public DefaultRunningCode(ThrowableRunnable runnable) {
         super(runnable);
     }
 
-    public JavaRunningCode(ThrowableSupplier<Integer> runnable) {
+    public DefaultRunningCode(ThrowableSupplier<Integer> runnable) {
         super(runnable);
     }
 

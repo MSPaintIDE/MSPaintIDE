@@ -58,12 +58,18 @@ public class Commandline {
     }
 
     public static int runLiveCommand(List<String> command, File directory) {
+        return runLiveCommand(command, directory, "");
+    }
+
+    public static int runLiveCommand(List<String> command, File directory, String threadName) {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectError();
+            processBuilder.redirectOutput();
             if (directory != null) processBuilder.directory(directory);
             Process p = processBuilder.start();
             InputStreamConsumer streamConsumer = new InputStreamConsumer(p.getInputStream(), LOGGER);
+            streamConsumer.setName(threadName);
             streamConsumer.start();
             int exitCode = p.waitFor();
             streamConsumer.join();

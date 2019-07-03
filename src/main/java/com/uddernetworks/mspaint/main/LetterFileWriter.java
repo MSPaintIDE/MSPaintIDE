@@ -87,7 +87,7 @@ public class LetterFileWriter {
         for (int i = 0; i < doubleGrid.length; i++) {
             var row = new double[grid[0].length];
             for (int i1 = 0; i1 < grid[i].length; i1++) {
-                row[i1] = grid[i][i1] ? value : -1; // Isn't white
+                row[i1] = grid[i][i1] ? value : -1; // Isn't whitefailed to read
             }
             doubleGrid[i] = row;
         }

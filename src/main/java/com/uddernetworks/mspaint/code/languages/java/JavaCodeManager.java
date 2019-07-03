@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
 import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -46,7 +47,7 @@ public class JavaCodeManager {
 
         long start = System.currentTimeMillis();
 
-        info("Compiling...");
+        LOGGER.info("Compiling...");
         mainGUI.setStatusText("Compiling...");
 
         LOGGER.info("Compiling {} files", imageClasses.size());
@@ -123,7 +124,7 @@ public class JavaCodeManager {
         final var programStart = System.currentTimeMillis();
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
-        runningCodeManager.runCode(new JavaRunningCode(() -> {
+        runningCodeManager.runCode(new DefaultRunningCode(() -> {
             ConsoleManager.setAll(programOut);
             return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()));
         }).afterSuccess(exitCode -> {
@@ -133,17 +134,12 @@ public class JavaCodeManager {
                 LOGGER.info("Executed " + (exitCode > 0 ? "with errors " : "") + "in " + (System.currentTimeMillis() - programStart) + "ms");
             }
         }).afterError(message -> {
-            info("Program stopped for the reason: " + message);
+            LOGGER.info("Program stopped for the reason: " + message);
         }).afterAll((exitCode, ignored) -> {
             mainGUI.setStatusText("");
         }));
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);
-    }
-
-    private void info(String message) {
-        LOGGER.info(message);
-        System.out.println(message);
     }
 
     private static void copyFolder(File src, File dest) throws IOException {

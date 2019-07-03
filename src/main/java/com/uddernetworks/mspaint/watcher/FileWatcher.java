@@ -2,6 +2,7 @@ package com.uddernetworks.mspaint.watcher;
 
 import java.io.File;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public interface FileWatcher {
 
@@ -54,5 +55,16 @@ public interface FileWatcher {
      * @return If the watcher is watching
      */
     boolean isWatching();
+
+    // TODO: More docs, I'm lazy
+    void addFileFiler(Function<File, Boolean> filter);
+
+    /**
+     * If the file should be kept according to filters
+     *
+     * @param file
+     * @return
+     */
+    boolean keepFromFilters(File file);
 
 }

@@ -8,6 +8,7 @@ import com.uddernetworks.mspaint.code.execution.RunningCodeManager;
 import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
+import com.uddernetworks.mspaint.code.languages.golang.GoLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DefaultDiagnosticManager;
@@ -74,8 +75,8 @@ public class StartupLogic {
         Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
         languageManager.addLanguage(new JavaLanguage(this));
-//        languageManager.addLanguage(new BrainfuckLanguage(this));
         languageManager.addLanguage(new PythonLanguage(this));
+        languageManager.addLanguage(new GoLanguage(this));
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
@@ -182,18 +183,10 @@ public class StartupLogic {
     public void compile(List<ImageClass> imageClasses, BuildSettings buildSettings) throws IOException {
         long start = System.currentTimeMillis();
 
-        if (this.currentLanguage.isInterpreted()) {
-            LOGGER.info("Interpreting...");
-            mainGUI.setStatusText("Interpreting...");
-        } else {
-            LOGGER.info("Compiling...");
-            mainGUI.setStatusText("Compiling...");
-        }
-
         mainGUI.setIndeterminate(true);
 
-        var imageOutputStream = new ImageOutputStream(this, this.currentLanguage.getAppOutput(), 500);
-        var compilerOutputStream = new ImageOutputStream(this, this.currentLanguage.getCompilerOutput(), 500);
+        var imageOutputStream = new ImageOutputStream(this, this.currentLanguage.getAppOutput(), 1500);
+        var compilerOutputStream = new ImageOutputStream(this, this.currentLanguage.getCompilerOutput(), 1500);
 
         var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, buildSettings);
 

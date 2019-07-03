@@ -7,12 +7,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class DefaultFileWatcher implements FileWatcher {
 
@@ -26,6 +29,7 @@ public class DefaultFileWatcher implements FileWatcher {
     private Future<?> watchingFuture;
     private Map<Integer, BiConsumer<WatchType, File>> fileListeners = new HashMap<>();
     private int lastUsedID = 0;
+    private List<Function<File, Boolean>> fileFilters = new ArrayList<>();
 
     public DefaultFileWatcher(File file) {
         this.file = file;
@@ -41,6 +45,7 @@ public class DefaultFileWatcher implements FileWatcher {
                         ExtendedWatchEventModifier.FILE_TREE);
 
                 var cooldownMap = new HashMap<File, Long>();
+                var lastActionMap = new HashMap<File, WatchType>();
                 while (true) {
                     var watchKey = watchService.take();
                     Map<WatchType, File> found = null;
@@ -56,9 +61,14 @@ public class DefaultFileWatcher implements FileWatcher {
                     // TODO: Add back time?
                     if (found != null) {
                         found.forEach((type, file) -> {
+                            if (!keepFromFilters(file)) return;
+                            if (lastActionMap.get(file) == type) {
+                                if (System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
+                                    return;
+                            }
+                            lastActionMap.put(file, type);
+
                             LOGGER.info("Found {}", file.getAbsolutePath());
-                            if (System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
-                                return;
                             cooldownMap.put(file, System.currentTimeMillis());
                             this.fileListeners.values().forEach(listener -> listener.accept(type, file));
                         });
@@ -110,5 +120,15 @@ public class DefaultFileWatcher implements FileWatcher {
     @Override
     public boolean isWatching() {
         return this.watching;
+    }
+
+    @Override
+    public void addFileFiler(Function<File, Boolean> filter) {
+        this.fileFilters.add(filter);
+    }
+
+    @Override
+    public boolean keepFromFilters(File file) {
+        return this.fileFilters.stream().allMatch(filter -> filter.apply(file));
     }
 }

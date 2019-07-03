@@ -4,7 +4,6 @@ import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
-import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
@@ -162,8 +161,8 @@ public class JavaLanguage extends Language {
     }
 
     @Override
-    public File getInputLocation() {
-        return getLanguageSettings().getSetting(JavaOptions.INPUT_DIRECTORY);
+    public Option getHighlightOption() {
+        return JavaOptions.HIGHLIGHT_DIRECTORY;
     }
 
     @Override
@@ -259,27 +258,6 @@ public class JavaLanguage extends Language {
     public void highlightAll(List<ImageClass> imageClasses) throws IOException {
         if (!this.settings.<Boolean>getSetting(JavaOptions.HIGHLIGHT)) return;
         highlightAll(JavaOptions.HIGHLIGHT_DIRECTORY, imageClasses);
-    }
-
-    @Override
-    public Optional<List<ImageClass>> indexFiles() {
-        return indexFiles(JavaOptions.INPUT_DIRECTORY);
-    }
-
-    @Override
-    public CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
-        var imageClassesOptional = indexFiles();
-        if (imageClassesOptional.isEmpty()) {
-            LOGGER.error("Error while finding ImageClasses, aborting...");
-            return new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
-        }
-
-        return compileAndExecute(mainGUI, imageClassesOptional.get(), imageOutputStream, compilerStream);
-    }
-
-    @Override
-    public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
-        return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, BuildSettings.DEFAULT);
     }
 
     @Override

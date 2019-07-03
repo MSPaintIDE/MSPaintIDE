@@ -5,7 +5,7 @@ import java.io.PrintStream;
 public class ConsoleManager {
 
     private static ThreadPrintStream outStream = new ThreadPrintStream(System.out);
-    private static ThreadPrintStream errStream = new ThreadPrintStream(System.out);
+    private static ThreadPrintStream errStream = new ThreadPrintStream(System.err);
 
     static {
         System.setOut(outStream);

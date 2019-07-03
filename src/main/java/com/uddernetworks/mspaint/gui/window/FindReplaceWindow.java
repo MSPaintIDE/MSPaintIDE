@@ -1,7 +1,7 @@
 package com.uddernetworks.mspaint.gui.window;
 
 import com.jfoenix.controls.*;
-import com.uddernetworks.mspaint.code.languages.gui.FileLangGUIOption;
+import com.uddernetworks.mspaint.code.gui.FileLangGUIOption;
 import com.uddernetworks.mspaint.gui.window.search.ReplaceManager;
 import com.uddernetworks.mspaint.gui.window.search.SearchListCell;
 import com.uddernetworks.mspaint.gui.window.search.SearchManager;

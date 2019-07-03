@@ -1,5 +1,6 @@
-package com.uddernetworks.mspaint.code.languages.gui;
+package com.uddernetworks.mspaint.code.gui;
 
+import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
@@ -71,4 +72,8 @@ public interface LangGUIOption {
     void setIndex(int index);
 
     int getIndex();
+
+    public void setRequirement(LangGUIOptionRequirement requirement);
+
+    LangGUIOptionRequirement getRequirement();
 }
