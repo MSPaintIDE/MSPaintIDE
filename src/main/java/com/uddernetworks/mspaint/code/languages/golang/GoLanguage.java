@@ -95,7 +95,7 @@ public class GoLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        return Commandline.runSyncCommand("gopls version").contains(", built in");
+        return Commandline.runSyncCommand("cmd /c gopls version").contains(", built in");
     }
 
     @Override

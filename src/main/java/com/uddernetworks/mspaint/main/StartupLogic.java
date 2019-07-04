@@ -12,6 +12,8 @@ import com.uddernetworks.mspaint.code.languages.golang.GoLanguage;
 import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.code.languages.javascript.JSLanguage;
 import com.uddernetworks.mspaint.code.languages.python.PythonLanguage;
+import com.uddernetworks.mspaint.discord.DiscordRPCManager;
+import com.uddernetworks.mspaint.discord.RPCManager;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DefaultDiagnosticManager;
 import com.uddernetworks.mspaint.gui.window.diagnostic.DiagnosticManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -37,6 +39,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.*;
 
@@ -55,6 +58,7 @@ public class StartupLogic {
     private PaintAssist paintAssist;
     private FileWatchManager fileWatchManager;
     private DiagnosticManager diagnosticManager;
+    private List<RPCManager> rpcManagers = new ArrayList<>();
 
     private CenterPopulator centerPopulator;
 
@@ -62,6 +66,9 @@ public class StartupLogic {
     private List<String> added = new ArrayList<>();
 
     public void start(MainGUI mainGUI) throws IOException {
+        this.rpcManagers.add(new DiscordRPCManager());
+        runRPC(RPCManager::init);
+
         this.fileWatchManager = new DefaultFileWatchManager();
         headlessStart();
         this.mainGUI = mainGUI;
@@ -295,5 +302,13 @@ public class StartupLogic {
 
     public DiagnosticManager getDiagnosticManager() {
         return diagnosticManager;
+    }
+
+    public List<RPCManager> getRPCManagers() {
+        return this.rpcManagers;
+    }
+
+    public void runRPC(Consumer<RPCManager> rpcConsumer) {
+        this.rpcManagers.forEach(rpcConsumer);
     }
 }

@@ -191,8 +191,9 @@ public class LanguageServerWrapper {
                             }
                         });
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("An error has occurred while initially walking workspace files", e);
             }
+
             diagnosticManager.resumeDiagnostics();
 
             watcher.addListener((type, changedFile) -> {
@@ -237,6 +238,7 @@ public class LanguageServerWrapper {
 
                 if (document != null) {
                     var imageClass = document.getImageClass();
+                    this.startupLogic.runRPC(rpcManager -> rpcManager.setFileEditing(imageClass.getInputImage().getName()));
                     if (type == WatchType.CREATE && imageClass.getScannedImage().isPresent()) highlightFile(document);
                 }
             });

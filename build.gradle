@@ -31,9 +31,8 @@ tasks.withType(JavaCompile) {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://jitpack.io' }
 }
 
 sass {
@@ -90,6 +89,8 @@ dependencies {
     antlr 'org.antlr:antlr4:4.7.2'
 
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
+    compile 'com.github.Vatuu:discord-rpc:1.6.2'
 
     compile configurations.javafxCompile
 }

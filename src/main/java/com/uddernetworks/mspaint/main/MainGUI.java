@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.main;
 
 import com.jfoenix.controls.*;
+import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
@@ -251,8 +252,9 @@ public class MainGUI extends Application implements Initializable {
 
                         CompletableFuture.runAsync(() -> {
                             try {
-                                Runtime.getRuntime().exec("cmd /c mspaint.exe \"" + data + "\"");
-                            } catch (IOException e) {
+                                mainGUI.getStartupLogic().runRPC(rpcManager -> rpcManager.setFileEditing(new File(data).getName()));
+                                Commandline.runLiveCommand(Arrays.asList("mspaint.exe", data));
+                            } catch (Exception e) {
                                 LOGGER.error("Error while opening paint for " + data, e);
                             }
                         });
@@ -370,7 +372,6 @@ public class MainGUI extends Application implements Initializable {
         }
     }
 
-    private PPFProject previousProject = null;
     private File previousInput = null;
 
     public void refreshProject() {
@@ -403,15 +404,18 @@ public class MainGUI extends Application implements Initializable {
                     if (previousInput != null)
                         fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
 
+                    LOGGER.info("Updating RPC");
+                    this.startupLogic.runRPC(rpcManager -> {
+                        rpcManager.setLanguage(language);
+                        rpcManager.updateProject();
+                    });
+
                     LOGGER.info("About to change setting listener!");
                     language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) inputFile -> {
                         if (inputFile == null) return;
-                        LOGGER.info("Prev = {} Curr = {}", previousInput, inputFile.getAbsolutePath());
                         var file = inputFile.getParentFile();
                         if (file.equals(this.previousInput)) return;
-                        LOGGER.info("Changing input to: {}", inputFile.getAbsolutePath());
                         if (previousInput != null) {
-                            LOGGER.info("Previous input: {}", previousInput.getAbsolutePath());
                             fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
                             lspWrapper.closeWorkspace(previousInput);
                         }

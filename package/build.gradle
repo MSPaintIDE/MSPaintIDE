@@ -7,8 +7,6 @@ assert Runtime.version().major() == 12
 sourceCompatibility = 12
 targetCompatibility = 12
 
-mainClassName = 'com.uddernetworks.mspaint.main.JFXWorkaround'
-
 ext {
     publishedVersion = rootProject.version
 
@@ -26,14 +24,6 @@ ext {
 
     bundlePath.deleteDir()
     bundlePath.mkdirs()
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': mainClassName
-        )
-    }
 }
 
 // Happens during assembly

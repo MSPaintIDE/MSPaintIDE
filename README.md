@@ -58,7 +58,8 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 - Right-click context menu to open and edit ANY text file in an MS Paint instance <small>[(details)](#Context-Menu)</small>
 - Integrated buttons within MS Paint (No program modifications) to do basic IDE tasks* <small>[(details)](#MS-Paint-Integration)</small>
 - Native installer for easy usage
-- IDE theming via CSS files*
+- Full Discord RPC Support
+- IDE theming via CSS files
 
 \* Feature is still under development/unstable
 
@@ -71,7 +72,6 @@ MS Paint IDE has many features, however it will not stop there. Some of these pl
   - Live debugging with line highlights from MS Paint
   - Autocompletition
 - Auto updater/checker
-- Discord RCP
 - Acquire [JetBrains](https://www.jetbrains.com/)
 
 # How It Works
