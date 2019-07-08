@@ -40,31 +40,29 @@ public class LSPClient implements LanguageClient {
     }
 
     @JsonNotification("java/didChangeWorkspaceFolders")
-    public void test(Object object) {
-        LOGGER.info("Stuff java/didChangeWorkspaceFolders is {}", object);
+    public void didChangeWorkspaceFolders(Object object) {
+        LOGGER.info("[didChangeWorkspaceFolders] {}", object);
     }
 
     @Override
     public void telemetryEvent(Object object) {
-        LOGGER.info("telemetryEvent {}", object);
+        LOGGER.info("[telemetryEvent] {}", object);
     }
 
     @Override
     public final CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams requestParams) {
-        LOGGER.info("showMessageRequest {}", requestParams);
+        LOGGER.info("[showMessageRequest] {}", requestParams);
         return CompletableFuture.supplyAsync(MessageActionItem::new);
     }
 
     @Override
     public final void showMessage(MessageParams messageParams) {
-        LOGGER.info("showMessage {}", messageParams);
+        LOGGER.info("[showMessage] {}", messageParams);
     }
 
     @Override
     public final void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        if (diagnostics.getDiagnostics().isEmpty()) {
-            LOGGER.warn("Diagnostics empty for {}", diagnostics.getUri());
-        }
+        if (diagnostics.getDiagnostics().isEmpty()) LOGGER.info("Diagnostics empty for {}", diagnostics.getUri());
         diagnostics.getDiagnostics().forEach(diagnostic -> {
             LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage());
         });
@@ -79,32 +77,30 @@ public class LSPClient implements LanguageClient {
 
     @Override
     public final CompletableFuture<ApplyWorkspaceEditResponse> applyEdit(ApplyWorkspaceEditParams params) {
-        LOGGER.info("applyEdit {}", params);
+        LOGGER.info("[applyEdit] {}", params);
         return CompletableFuture.supplyAsync(() -> new ApplyWorkspaceEditResponse(true));
     }
 
     @Override
     public CompletableFuture<Void> registerCapability(RegistrationParams params) {
-        LOGGER.info("registerCapability {}", params);
+        LOGGER.info("[registerCapability] {}", params);
         return CompletableFuture.runAsync(() -> {});
     }
 
     @Override
     public CompletableFuture<Void> unregisterCapability(UnregistrationParams params) {
-        LOGGER.info("unregisterCapability {}", params);
+        LOGGER.info("[unregisterCapability] {}", params);
         return CompletableFuture.runAsync(() -> {});
     }
 
     @Override
     public CompletableFuture<List<WorkspaceFolder>> workspaceFolders() {
-        LOGGER.info("workspaceFolders");
         return CompletableFuture.completedFuture(Collections.emptyList());
     }
 
-//    @JsonRequest("workspace/configuration")
     @Override
     public  CompletableFuture<List<Object>> configuration(ConfigurationParams configurationParams) {
-        LOGGER.warn("Workspace configuration! " + configurationParams);
+        LOGGER.info("[configuration] {}", configurationParams);
         return CompletableFuture.supplyAsync(() -> Arrays.asList(new Object()));
     }
 }

@@ -8,6 +8,7 @@ import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
+import com.uddernetworks.mspaint.code.lsp.DefaultLanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.LSP;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -42,8 +43,8 @@ public class JavaLanguage extends Language {
     private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
     private HighlightData highlightData = new JavaHighlightData(this);
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
-    private File lspPath = new File(LanguageServerWrapper.getLSPDirectory(), "java");
-    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JAVA, new File(this.lspPath, "jdt-language-server-latest").getAbsolutePath(),
+    private File lspPath = new File(DefaultLanguageServerWrapper.getLSPDirectory(), "java");
+    private LanguageServerWrapper lspWrapper = new DefaultLanguageServerWrapper(this.startupLogic, LSP.JAVA, new File(this.lspPath, "jdt-language-server-latest").getAbsolutePath(),
             Arrays.asList(
                     "java",
                     "-Declipse.application=org.eclipse.jdt.ls.core.id1",

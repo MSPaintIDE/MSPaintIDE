@@ -12,6 +12,11 @@ public enum LSP {
         this.workspace = workspace;
     }
 
+    /**
+     * Gets if the LSP server uses workspaces.
+     *
+     * @return If the LSP server uses workspaces
+     */
     public boolean usesWorkspaces() {
         return workspace;
     }

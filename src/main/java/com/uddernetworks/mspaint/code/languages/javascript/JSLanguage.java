@@ -8,6 +8,7 @@ import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
+import com.uddernetworks.mspaint.code.lsp.DefaultLanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.LSP;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -29,7 +30,7 @@ public class JSLanguage extends Language {
     private LanguageSettings settings = new JSSettings();
     private JSCodeManager jsCodeManager = new JSCodeManager(this);
     private HighlightData highlightData = new JSHighlightData(this);
-    private LanguageServerWrapper lspWrapper = new LanguageServerWrapper(this.startupLogic, LSP.JS, System.getenv("APPDATA") + "\\npm\\node_modules\\javascript-typescript-langserver\\lib",
+    private LanguageServerWrapper lspWrapper = new DefaultLanguageServerWrapper(this.startupLogic, LSP.JS, System.getenv("APPDATA") + "\\npm\\node_modules\\javascript-typescript-langserver\\lib",
             Arrays.asList("node", "language-server-stdio"))
                 .writeOnChange();
 

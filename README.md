@@ -7,6 +7,7 @@
   <img src="https://img.shields.io/github/stars/MSPaintIDE/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
   <a href="https://github.com/RubbaBoy/MSPaintIDE/issues"><img src="https://img.shields.io/github/issues/MSPaintIDE/MSPaintIDE.svg" alt="GitHub issues"/></a>
   <a href="https://github.com/RubbaBoy/MSPaintIDE/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/MSPaintIDE/MSPaintIDE.svg" alt="GitHub issues"/></a>
+    <a href="https://opencollective.com/MSPaintIDE"><img alt="open collective backers and sponsors" src="https://img.shields.io/opencollective/all/MSPaintIDE.svg"></a>
 </h1>
 <h1 align="center">
     <img src="https://ms-paint-i.de/images/Logo-Header.png">
@@ -110,6 +111,8 @@ Thank you very much to the current donators:
 
 <h2 name="special-thanks">Special Thanks To:</h2>
 ![](https://www.yourkit.com/images/yklogo.png)
+
+
 
 YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>

@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.ThrowableSupplier;
+import com.uddernetworks.mspaint.code.lsp.DefaultLanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
@@ -110,9 +111,9 @@ public abstract class Language {
     public abstract boolean isInterpreted();
 
     /**
-     * Gets the instance of {@link LanguageServerWrapper} being used by the current {@link Language}.
+     * Gets the instance of {@link DefaultLanguageServerWrapper} being used by the current {@link Language}.
      *
-     * @return The instance of the used {@link LanguageServerWrapper}
+     * @return The instance of the used {@link DefaultLanguageServerWrapper}
      */
     public abstract LanguageServerWrapper getLSPWrapper();
 

@@ -1,1 +1,0 @@
-"%JAVAW_JDK%" -jar "%APPDATA_JAR%" %1
