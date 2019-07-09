@@ -40,7 +40,10 @@ public class LSPProvider {
             LOGGER.info("Server process started " + process);
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> this.requestManagerSupplier.get().shutdown()));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            var requestManager = this.requestManagerSupplier.get();
+            if (requestManager != null) requestManager.shutdown().thenRun(() -> this.process.destroyForcibly());
+        }));
     }
 
     private ProcessBuilder createProcessBuilder() {

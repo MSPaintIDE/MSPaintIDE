@@ -89,6 +89,8 @@ public class PythonLanguage extends Language {
     @Override
     public boolean installLSP() {
         return lspInstallHelper("Would you like to proceed with downloading the Python Language Server by palantir?", "https://github.com/palantir/python-language-server", () -> {
+            LOGGER.info("Installing Python LSP server...");
+
             var output = Commandline.runSyncCommand("pip install python-language-server[all]");
 
             if (output.contains("'install_requires' must be")) {

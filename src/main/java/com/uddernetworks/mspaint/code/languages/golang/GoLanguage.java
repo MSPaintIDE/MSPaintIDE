@@ -102,6 +102,8 @@ public class GoLanguage extends Language {
     @Override
     public boolean installLSP() {
         return lspInstallHelper("Would you like to proceed with downloading the Go Language Server by Google?", "https://github.com/golang/go/wiki/gopls", () -> {
+            LOGGER.info("Installing Go LSP server...");
+
             var output = Commandline.runSyncCommand("go get golang.org/x/tools/gopls");
 
             if (hasLSP()) {

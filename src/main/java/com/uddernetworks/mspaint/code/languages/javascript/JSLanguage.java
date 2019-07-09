@@ -92,6 +92,8 @@ public class JSLanguage extends Language {
     @Override
     public boolean installLSP() {
         return lspInstallHelper("Would you like to proceed with downloading the JavaScript Language Server by sourcegraph?", "https://www.npmjs.com/package/javascript-typescript-langserver", () -> {
+            LOGGER.info("Installing JavaScript LSP server...");
+
             var output = Commandline.runSyncCommand("cmd /c npm install -g javascript-typescript-langserver");
 
             if (output.contains(" packages from ")) {

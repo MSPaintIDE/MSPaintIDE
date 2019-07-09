@@ -371,7 +371,6 @@ public class MainGUI extends Application implements Initializable {
 
         ProjectManager.getRecent();
 
-        System.out.println("Reading 111 " + initialProject);
         if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this);
@@ -528,7 +527,7 @@ public class MainGUI extends Application implements Initializable {
     public void changeImage(String path) {
         List<Image> icons = this.primaryStage.getIcons();
         icons.clear();
-        icons.add(this.cachedTaksbarIcons.computeIfAbsent(path, path2 -> new Image(getClass().getClassLoader().getResourceAsStream("icons/taskbar/" + path))));
+        icons.add(this.cachedTaksbarIcons.computeIfAbsent(path, path2 -> new Image(MainGUI.class.getResourceAsStream("/icons/taskbar/" + path))));
 
         JFXDecorator root = (JFXDecorator) this.primaryStage.getScene().getRoot();
         root.setGraphic(this.cachedImageViews.computeIfAbsent(path, path2 -> {

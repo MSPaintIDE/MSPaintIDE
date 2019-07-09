@@ -158,7 +158,7 @@ public abstract class Language {
             var res = JOptionPane.showOptionDialog(null,
                     promptText,
                     "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
-                    new ImageIcon(ImageIO.read(getClass().getClassLoader().getResourceAsStream("icons\\popup\\save.png"))),
+                    new ImageIcon(ImageIO.read(Language.class.getResourceAsStream("/icons/popup/save.png"))),
                     new String[]{"Yes", "No", "Website"}, "Yes");
             if (res == 0) {
                 return install.get();

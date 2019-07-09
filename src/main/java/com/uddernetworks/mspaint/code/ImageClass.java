@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.code.languages.LanguageHighlighter;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.ocr.FontData;
 import com.uddernetworks.mspaint.ocr.ImageCompare;
 import com.uddernetworks.newocr.recognition.ScannedImage;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class ImageClass {
 
     public ImageClass(File inputImage, MainGUI mainGUI) {
         this(inputImage, mainGUI, null);
+        this.startupLogic = this.mainGUI.getStartupLogic();
     }
 
     public ImageClass(File inputImage, MainGUI mainGUI, StartupLogic startupLogic) {
@@ -44,16 +46,14 @@ public class ImageClass {
     }
 
     public void scan() {
+        if (!verifyScannable()) return;
+
         LOGGER.info("Scanning image " + this.inputImage.getName() + "...");
         final String prefix = "[" + this.inputImage.getName() + "] ";
 
         long start = System.currentTimeMillis();
 
         ImageCompare imageCompare = new ImageCompare();
-
-        if (this.startupLogic == null) {
-            this.startupLogic = this.mainGUI.getStartupLogic();
-        }
 
         this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.startupLogic);
 
@@ -88,6 +88,17 @@ public class ImageClass {
         letterFileWriter.writeToFile();
 
         LOGGER.info(prefix + "Finished writing to file in " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    private boolean verifyScannable() {
+        FontData fontData;
+        var ocrManager = this.startupLogic.getOCRManager();
+        if (ocrManager == null || (fontData = ocrManager.getActiveFont()) == null || !fontData.getDatabaseManager().isTrainedSync()) {
+            LOGGER.warn("Cancelling the scanning of {} as the current font is either non existent or untrained", this.getInputImage().getName());
+            return false;
+        }
+
+        return true;
     }
 
     public BufferedImage getImage() {

@@ -68,7 +68,6 @@ public class ProjectManager {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
-            System.out.println("recentProjects = " + recentProjects);
             if (open.get() && !recentProjects.isEmpty()) {
                 ppfProject = recentProjects.get(0);
                 projectConsumer.accept(ppfProject);

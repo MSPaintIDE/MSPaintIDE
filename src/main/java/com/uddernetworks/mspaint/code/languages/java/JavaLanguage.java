@@ -44,6 +44,7 @@ public class JavaLanguage extends Language {
     private HighlightData highlightData = new JavaHighlightData(this);
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
     private File lspPath = new File(DefaultLanguageServerWrapper.getLSPDirectory(), "java");
+    private File templateDir = MainGUI.DEV_MODE ? new File("src\\main\\resources\\lsp\\java\\project-template") : new File(StartupLogic.getJarParent().orElse(new File("")), "lsp\\java\\project-template");
     private LanguageServerWrapper lspWrapper = new DefaultLanguageServerWrapper(this.startupLogic, LSP.JAVA, new File(this.lspPath, "jdt-language-server-latest").getAbsolutePath(),
             Arrays.asList(
                     "java",
@@ -60,8 +61,6 @@ public class JavaLanguage extends Language {
                     "-data"
             ), (wrapper, workspaceDir) -> {
         LOGGER.info("Setting up the Java project...");
-
-        var templateDir = new File(this.lspPath, "project-template");
 
         if (!new File(workspaceDir.getAbsolutePath(), ".classpath").exists()) {
             LOGGER.info("Copying template files...");
@@ -179,16 +178,19 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
+        LOGGER.info("Get LSP dir {}", DefaultLanguageServerWrapper.getLSPDirectory());
+        LOGGER.info("Base lsp path {}", this.lspPath);
+        LOGGER.info("Exists: {}", new File(this.lspPath, "jdt-language-server-latest"));
         return new File(this.lspPath, "jdt-language-server-latest").exists();
     }
 
     @Override
     public boolean installLSP() {
         return lspInstallHelper("Would you like to proceed with downloading the Java Language Server by the Eclipse Foundation? This will take up about 94MB.", "https://github.com/eclipse/eclipse.jdt.ls", () -> {
+            LOGGER.info("Installing Java LSP server...");
             this.lspPath.mkdirs();
 
             var tarGz = new File(this.lspPath, "jdt-language-server-latest.tar.gz");
-            System.out.println("tarGz = " + tarGz.getAbsolutePath());
             FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), tarGz);
 
             var destDir = new File(this.lspPath, "jdt-language-server-latest");

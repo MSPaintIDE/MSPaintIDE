@@ -90,22 +90,32 @@ public class StartupLogic {
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
 
         if (languageManager.getEnabledLanguages().isEmpty()) {
-            var res = JOptionPane.showOptionDialog(null,
-                    "There are no languages enabled in the IDE, meaning you need to install at least one language's LSP and/or runtime to continue.\nPlease select a language to download the LSP for. This will also open the runtime download page if it's not found,\nas in some cases the runtime is required.",
-                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
-                    new ImageIcon(ImageIO.read(getClass().getClassLoader().getResourceAsStream("icons\\popup\\save.png"))),
-                    languageManager.getAllLanguages().stream().map(Language::getName).toArray(String[]::new), null);
+            LOGGER.info("No enabled languages found");
+            try {
+                var res = JOptionPane.showOptionDialog(null,
+                        "There are no languages enabled in the IDE, meaning you need to install at least one language's LSP and/or runtime to continue.\nPlease select a language to download the LSP for. This will also open the runtime download page if it's not found,\nas in some cases the runtime is required.",
+                        "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
+                        new ImageIcon(ImageIO.read(StartupLogic.class.getResourceAsStream("/icons/popup/save.png"))),
+                        languageManager.getAllLanguages().stream().map(Language::getName).toArray(String[]::new), null);
 
-            var language = languageManager.getAllLanguages().get(res);
-            if (!language.hasRuntime()) {
-                Browse.browse(language.downloadRuntimeLink());
-            }
+                var allLangs = languageManager.getAllLanguages();
+                if (res >= allLangs.size()) {
+                    LOGGER.info("Closed prompt, exiting...");
+                    System.exit(1);
+                }
+                var language = allLangs.get(res);
+                if (!language.hasRuntime()) {
+                    Browse.browse(language.downloadRuntimeLink());
+                }
 
-            if (language.installLSP()) {
-                LOGGER.info("Successfully installed LSP. Continuing...");
-            } else {
-                LOGGER.error("Could not install LSP. Exiting...");
-                System.exit(1);
+                if (language.installLSP()) {
+                    LOGGER.info("Successfully installed LSP. Continuing...");
+                } else {
+                    LOGGER.error("Could not install LSP. Exiting...");
+                    System.exit(1);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error!", e);
             }
         }
 

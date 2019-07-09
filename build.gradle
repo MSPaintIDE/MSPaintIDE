@@ -11,7 +11,7 @@ plugins {
 
 ext {
     DEV_MODE = true
-    STATIC_LSP_DIRECTORY = 'C:\\Program Files (x86)\\MS Paint IDE\\lsp' // Only used if in Dev Mode
+    STATIC_LSP_DIRECTORY = '' // Only used if in Dev Mode, defaults to %LocalAppData%\MSPaintIDE
 }
 
 group = 'com.uddernetworks.mspaint'

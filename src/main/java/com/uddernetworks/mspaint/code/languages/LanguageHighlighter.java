@@ -37,6 +37,7 @@ public class LanguageHighlighter {
         try {
             var highlightData = language.getHighlightData();
             String text = imageClass.getText();
+            if (text == null) return; // Silently fail
 
             var input = CharStreams.fromString(text);
             var lex = highlightData.getLexer(input);

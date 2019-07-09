@@ -30,6 +30,7 @@ public class LetterFileWriter {
     }
 
     public void writeToFile() throws IOException {
+        if (scannedImage == null) return; // Silently fail
         AtomicInteger width = new AtomicInteger(this.image.getWidth());
         AtomicInteger height = new AtomicInteger(this.image.getHeight());
         scannedImage.getGrid().values()

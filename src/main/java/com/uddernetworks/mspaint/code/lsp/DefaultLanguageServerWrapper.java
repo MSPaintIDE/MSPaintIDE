@@ -178,7 +178,6 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
                         .forEach(path -> {
                             try {
                                 if (!watcher.keepFromFilters(path)) return;
-                                LOGGER.info("Walked to file {} vs {}\tfile is {}", path.toPath(), path.getAbsoluteFile().toPath(), file.toPath());
                                 var document = this.documentManager.getDocument(path);
                                 if (this.useInputForWorkspace) document.setUseRelativeToDirectory(file);
                                 writeIfApplicable(document);
@@ -452,10 +451,11 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
     }
 
     public static File getLSPDirectory() {
-        var file = new File(StartupLogic.getJarParent().orElse(new File("")), "lsp");
+        LOGGER.info("Dev mode: {}", MainGUI.DEV_MODE);
+        var file = new File(MainGUI.APP_DATA, "lsp");
         if (MainGUI.DEV_MODE) {
             var envLsp = System.getenv("STATIC_LSP_DIRECTORY");
-            file = new File(envLsp == null ? "C:\\Program Files (x86)\\MS Paint IDE\\lsp" : envLsp);
+            file = envLsp == null || envLsp.isBlank() ? new File(MainGUI.APP_DATA, "lsp") : new File(envLsp);
             if (!file.exists() && !file.mkdirs()) {
                 LOGGER.error("The IDE is in development mode and the hard-coded LSP directory could not be created. " +
                         "Either create \"{}\" manually, or set the directory required to the environment variable 'STATIC_LSP_DIRECTORY' " +
@@ -463,6 +463,8 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
                 System.exit(0);
             }
         }
+
+        LOGGER.info("Returning oof {}", file);
 
         return file;
     }
