@@ -79,10 +79,13 @@ public class FormattedAppender extends ConsoleAppender {
 
             return;
         }
+
         Platform.runLater(() -> {
             processEvent(event);
             if (virtualScrollPane != null) virtualScrollPane.scrollYBy(1000000);
         });
+
+        ThreadedLogger.pipeEvent(event);
     }
 
     private void processEvent(LoggingEvent event) {

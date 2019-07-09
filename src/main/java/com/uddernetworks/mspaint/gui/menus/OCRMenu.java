@@ -47,7 +47,6 @@ public class OCRMenu extends MenuBind {
 
         final long start = System.currentTimeMillis();
         var fontData = this.mainGUI.getStartupLogic().getOCRManager().getActiveFont();
-        System.out.println("fontData = " + fontData);
         CompletableFuture.runAsync(() -> {
             fontData.getTrain().trainImage(file);
         }).thenRun(() -> {

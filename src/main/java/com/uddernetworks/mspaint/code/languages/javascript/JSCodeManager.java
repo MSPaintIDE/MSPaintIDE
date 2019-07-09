@@ -6,8 +6,8 @@ import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
 import com.uddernetworks.mspaint.code.languages.golang.GoCodeManager;
-import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.logging.ThreadedLogger;
 import com.uddernetworks.mspaint.main.MainGUI;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class JSCodeManager {
         PrintStream compilerOut = new PrintStream(compilerStream);
         PrintStream programOut = new PrintStream(imageOutputStream);
 
-        ConsoleManager.setAll(new PrintStream(compilerOut));
+        ThreadedLogger.addPipe(compilerOut, "JSCompiler", JSCodeManager.class, Commandline.class);
 
         var runningFile = this.language.getLanguageSettings().<File>getSetting(JSOptions.RUNNING_FILE);
         var runningSrc = new AtomicReference<File>();
@@ -73,7 +73,9 @@ public class JSCodeManager {
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
-            ConsoleManager.setAll(programOut);
+            ThreadedLogger.removePipe("JSCompiler");
+            ThreadedLogger.addPipe(programOut, "JSProgram", JSCodeManager.class, Commandline.class);
+
             return Commandline.runLiveCommand(Arrays.asList("node", runningSrc.get().getAbsolutePath()), genSrc, "Node");
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
@@ -85,6 +87,7 @@ public class JSCodeManager {
             LOGGER.info("Program stopped for the reason: " + message);
         }).afterAll((exitCode, ignored) -> {
             mainGUI.setStatusText("");
+            ThreadedLogger.removePipe("JSProgram");
         }));
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);

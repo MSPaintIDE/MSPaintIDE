@@ -117,6 +117,7 @@ public class PPFProject {
     }
 
     public void addFont(String name, String path) {
+        if (this.fonts == null) this.fonts = new HashMap<>();
         this.fonts.put(name, path);
     }
 

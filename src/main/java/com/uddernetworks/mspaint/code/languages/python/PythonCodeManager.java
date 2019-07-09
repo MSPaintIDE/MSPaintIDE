@@ -5,8 +5,8 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
-import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.logging.ThreadedLogger;
 import com.uddernetworks.mspaint.main.MainGUI;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class PythonCodeManager {
         PrintStream compilerOut = new PrintStream(compilerStream);
         PrintStream programOut = new PrintStream(imageOutputStream);
 
-        ConsoleManager.setAll(new PrintStream(compilerOut));
+        ThreadedLogger.addPipe(compilerOut, "PythonCompiler", PythonCodeManager.class, Commandline.class);
 
         var runningFile = this.language.getLanguageSettings().<File>getSetting(PythonOptions.RUNNING_FILE);
         var runningSrc = new AtomicReference<File>();
@@ -72,7 +72,9 @@ public class PythonCodeManager {
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
-            ConsoleManager.setAll(programOut);
+            ThreadedLogger.removePipe("PythonCompiler");
+            ThreadedLogger.addPipe(programOut, "PythonProgram", PythonCodeManager.class, Commandline.class);
+
             return Commandline.runLiveCommand(Arrays.asList("python", runningSrc.get().getAbsolutePath()), genSrc, "Python");
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
@@ -84,6 +86,7 @@ public class PythonCodeManager {
             LOGGER.info("Program stopped for the reason: " + message);
         }).afterAll((exitCode, ignored) -> {
             mainGUI.setStatusText("");
+            ThreadedLogger.removePipe("PythonProgram");
         }));
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);

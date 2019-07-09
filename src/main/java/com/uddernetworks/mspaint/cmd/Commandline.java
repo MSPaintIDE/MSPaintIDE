@@ -3,11 +3,9 @@ package com.uddernetworks.mspaint.cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -62,21 +60,19 @@ public class Commandline {
     }
 
     public static int runLiveCommand(List<String> command, File directory, String threadName) {
+        LOGGER.info("Running command {}", String.join(" ", command));
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.redirectError();
-            processBuilder.redirectOutput();
             if (directory != null) processBuilder.directory(directory);
             Process process = processBuilder.start();
-            InputStreamConsumer streamConsumer = new InputStreamConsumer(process.getInputStream(), LOGGER);
-            streamConsumer.setName(threadName);
-            streamConsumer.start();
+            inheritIO(process.getInputStream(), threadName);
+            inheritIO(process.getErrorStream(), threadName);
+
             var exitCode = 1;
             Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
 
             try {
                 exitCode = process.waitFor();
-                streamConsumer.join();
             } catch (InterruptedException ignored) { // This is probably from manually stopping the process; nothing bad to report
                 process.destroyForcibly();
             }
@@ -89,4 +85,13 @@ public class Commandline {
         }
     }
 
+    private static void inheritIO(InputStream inputStream, String threadName) {
+        CompletableFuture.runAsync(() -> {
+            Thread.currentThread().setName(threadName);
+            Scanner sc = new Scanner(inputStream);
+            while (sc.hasNextLine()) {
+                LOGGER.info(sc.nextLine());
+            }
+        });
+    }
 }

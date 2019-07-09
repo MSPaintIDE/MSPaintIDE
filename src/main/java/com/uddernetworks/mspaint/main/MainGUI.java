@@ -562,6 +562,7 @@ public class MainGUI extends Application implements Initializable {
 
             long start = System.currentTimeMillis();
 
+            CompletableFuture future = null;
             var imageClassesOptional = language.indexFiles();
             if (imageClassesOptional.isPresent()) {
                 var imageClasses = imageClassesOptional.get();
@@ -570,15 +571,29 @@ public class MainGUI extends Application implements Initializable {
 
                 language.highlightAll(imageClasses);
 
-                startupLogic.compile(imageClasses, executeOverride);
+                future = CompletableFuture.runAsync(() -> {
+                    try {
+                        startupLogic.compile(imageClasses, executeOverride);
+                    } catch (IOException e) {
+                        LOGGER.error("Error while compiling", e);
+                    }
+                });
             } else {
                 LOGGER.error("Error while finding ImageClasses, aborting...");
             }
 
-            setStatusText("");
-            updateLoading(0, 1);
+            Runnable run = () -> {
+                setStatusText("");
+                updateLoading(0, 1);
 
-            LOGGER.info("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
+                LOGGER.info("Finished everything in " + (System.currentTimeMillis() - start) + "ms");
+            };
+
+            if (future != null) {
+                future.thenRun(run);
+            } else {
+                run.run();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -767,15 +782,7 @@ public class MainGUI extends Application implements Initializable {
 
             this.startupLogic.getCurrentLanguage().getLanguageSettings().generateDefaults();
 
-            if (project.getActiveFont() == null) {
-                project.addFont("Comic Sans MS", "fonts/ComicSans");
-                project.addFont("Monospaced.plain", "fonts/Monospaced.plain");
-                project.addFont("Verdana", "fonts/Verdana");
-                project.addFont("Courier New", "fonts/CourierNew");
-                project.addFont("Consolas", "fonts/Consolas");
-                project.addFont("Calibri", "fonts/Calibri");
-                project.setActiveFont("Comic Sans MS");
-            }
+            // Moved font generation to StartupLogic
 
             if (settingsManager.getSettingMap(Setting.THEMES).isEmpty()) {
                 settingsManager.setSetting(Setting.THEMES, Map.of(

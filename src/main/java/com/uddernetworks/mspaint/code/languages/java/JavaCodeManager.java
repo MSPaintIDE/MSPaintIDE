@@ -5,8 +5,8 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
-import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.logging.ThreadedLogger;
 import com.uddernetworks.mspaint.main.MainGUI;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class JavaCodeManager {
         PrintStream compilerOut = new PrintStream(compilerStream);
         PrintStream programOut = new PrintStream(imageOutputStream);
 
-        ConsoleManager.setAll(new PrintStream(compilerOut));
+        ThreadedLogger.addPipe(compilerOut, "JavaCompiler", JavaCodeManager.class, Commandline.class);
 
         long start = System.currentTimeMillis();
 
@@ -124,7 +124,9 @@ public class JavaCodeManager {
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
-            ConsoleManager.setAll(programOut);
+            ThreadedLogger.removePipe("JavaCompiler");
+            ThreadedLogger.addPipe(programOut, "JavaProgram", JavaCodeManager.class, Commandline.class);
+
             return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()), null, "Java");
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
@@ -136,6 +138,7 @@ public class JavaCodeManager {
             LOGGER.info("Program stopped for the reason: " + message);
         }).afterAll((exitCode, ignored) -> {
             mainGUI.setStatusText("");
+            ThreadedLogger.removePipe("JavaProgram");
         }));
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);

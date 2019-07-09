@@ -198,8 +198,13 @@ public class StartupLogic {
         } else {
             ProjectManager.switchProjectConsumer(project -> {
                 if (project.getActiveFont() == null) {
-                    project.addFont(settingsManager.getSetting(Setting.HEADLESS_FONT), settingsManager.getSetting(Setting.HEADLESS_FONT_CONFIG));
-                    project.setActiveFont(settingsManager.getSetting(Setting.HEADLESS_FONT));
+                    project.addFont("Comic Sans MS", "fonts/ComicSans");
+                    project.addFont("Monospaced.plain", "fonts/Monospaced.plain");
+                    project.addFont("Verdana", "fonts/Verdana");
+                    project.addFont("Courier New", "fonts/CourierNew");
+                    project.addFont("Consolas", "fonts/Consolas");
+                    project.addFont("Calibri", "fonts/Calibri");
+                    project.setActiveFont("Comic Sans MS");
                 }
 
                 project.onFontUpdate((name, path) -> this.ocrManager.setActiveFont(name, path), true);

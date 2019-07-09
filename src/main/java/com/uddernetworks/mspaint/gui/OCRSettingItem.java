@@ -77,6 +77,7 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
                 project.setActiveFont(name);
             }
 
+            if (name == null) name = "";
             project.modifyFontName(name, newValue);
         }));
 

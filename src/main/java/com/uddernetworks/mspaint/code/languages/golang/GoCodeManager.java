@@ -4,8 +4,8 @@ import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
-import com.uddernetworks.mspaint.imagestreams.ConsoleManager;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
+import com.uddernetworks.mspaint.logging.ThreadedLogger;
 import com.uddernetworks.mspaint.main.MainGUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class GoCodeManager {
         PrintStream compilerOut = new PrintStream(compilerStream);
         PrintStream programOut = new PrintStream(imageOutputStream);
 
-        ConsoleManager.setAll(new PrintStream(compilerOut));
+        ThreadedLogger.addPipe(compilerOut, "GoCompiler", GoCodeManager.class, Commandline.class);
 
         var input = this.language.getLanguageSettings().<File>getSetting(GoOptions.INPUT_DIRECTORY);
 
@@ -56,7 +56,9 @@ public class GoCodeManager {
 
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
-            ConsoleManager.setAll(programOut);
+            ThreadedLogger.removePipe("GoCompiler");
+            ThreadedLogger.addPipe(programOut, "GoProgram", GoCodeManager.class, Commandline.class);
+
             var runningString = "./...";
             if (runningFileOptional.isPresent()) runningString = input.toPath().relativize(runningFileOptional.get().toPath()).toString();
             return Commandline.runLiveCommand(Arrays.asList("go", "run", runningString), input, "Golang");
@@ -70,6 +72,7 @@ public class GoCodeManager {
             LOGGER.info("Program stopped for the reason: " + message);
         }).afterAll((exitCode, ignored) -> {
             mainGUI.setStatusText("");
+            ThreadedLogger.removePipe("GoProgram");
         }));
 
         return new DefaultCompilationResult(CompilationResult.Status.RUNNING);
