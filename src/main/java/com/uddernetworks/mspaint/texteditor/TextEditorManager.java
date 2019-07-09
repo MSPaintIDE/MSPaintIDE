@@ -6,7 +6,6 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.newocr.character.ImageLetter;
 import com.uddernetworks.newocr.recognition.DefaultScannedImage;
 import com.uddernetworks.newocr.recognition.ScannedImage;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -196,8 +194,6 @@ public class TextEditorManager {
 
     private void initialProcess() throws IOException, InterruptedException {
         LOGGER.info("Processing");
-
-        CompletableFuture.runAsync(Splash::end);
 
         Runtime runtime = Runtime.getRuntime();
         Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");

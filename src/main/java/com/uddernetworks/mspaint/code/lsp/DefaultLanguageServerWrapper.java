@@ -347,10 +347,6 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
     @Override
     public InitializeParams getInitParams() {
         InitializeParams initParams = new InitializeParams();
-//        initParams.setClientName("MS Paint IDE");
-//        initParams.setWorkspaceFolders(List.of(new WorkspaceFolder(new File("E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\clone\\shit\\other").toURI().toString())));
-//        initParams.setWorkspaceFolders(Arrays.asList(new WorkspaceFolder(new File(TEMP_ROOT).toURI().toString())));
-//        initParams.setRootUri(new File(TEMP_ROOT).getParentFile().toURI().toString());
         if (this.rootPath != null) {
             var root = rootPath.toURI().toString();
             if (this.useInputForWorkspace) {

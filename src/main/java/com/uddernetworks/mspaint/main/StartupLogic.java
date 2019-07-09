@@ -22,8 +22,6 @@ import com.uddernetworks.mspaint.painthook.InjectionManager;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
-import com.uddernetworks.mspaint.splash.Splash;
-import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
 import com.uddernetworks.mspaint.util.Browse;
 import com.uddernetworks.mspaint.watcher.DefaultFileWatchManager;
@@ -82,8 +80,6 @@ public class StartupLogic {
 
         this.mainGUI.setDarkTheme(SettingsManager.getInstance().getSetting(Setting.DARK_THEME));
         this.mainGUI.updateTheme();
-
-        Splash.setStatus(SplashMessage.ADDING_LANGUAGES);
 
         languageManager.addLanguage(new JavaLanguage(this));
         languageManager.addLanguage(new PythonLanguage(this));
@@ -167,14 +163,12 @@ public class StartupLogic {
 
     public void headlessStart() throws IOException {
         LOGGER.info("Loading settings");
-        Splash.setStatus(SplashMessage.SETTINGS);
         var optionsFile = new File(MainGUI.APP_DATA, "options.ini");
         var initializeSettings = !optionsFile.exists();
         var settingsManager = SettingsManager.getInstance();
         settingsManager.initialize(optionsFile);
         this.centerPopulator = new CenterPopulator(this);
 
-        Splash.setStatus(SplashMessage.DATABASE);
         this.ocrManager = new OCRManager(this);
 
         if (initializeSettings) {
@@ -258,16 +252,6 @@ public class StartupLogic {
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Optional<File> getCurrentJar() {
-        if (currentJar != null) return Optional.of(currentJar);
-        try {
-            return Optional.of((currentJar = new File(StartupLogic.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())));
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
     }
 
     public static Optional<File> getJarParent() {

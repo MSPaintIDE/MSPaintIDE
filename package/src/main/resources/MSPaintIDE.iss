@@ -62,6 +62,7 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{localappdata}\MSPaintIDE"
+Type: filesandordirs; Name: "{app}"
 
 [Registry]
 Root: HKCR; Subkey: ".ppf"; ValueType: string; ValueName: ""; ValueData: "MSPaintIDE"; Flags: uninsdeletevalue; Components: ppf_file

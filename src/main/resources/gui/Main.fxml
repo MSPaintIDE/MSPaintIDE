@@ -43,7 +43,6 @@
                             </MaterialMenu>
                           <MaterialMenuItem clickLabel="settings" text="Settings" />
                           <MaterialMenuItem clickLabel="show-diagnostics" text="Show Diagnostics" />
-                          <MaterialMenuItem clickLabel="print" text="Print" />
                           <MaterialMenuItem clickLabel="close-project" text="Close Project" />
                           <MaterialMenuItem clickLabel="exit" text="Exit" />
                         </items>

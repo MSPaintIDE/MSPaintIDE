@@ -15,7 +15,7 @@ ext {
 }
 
 group = 'com.uddernetworks.mspaint'
-version = '2.2.0-SNAPSHOT'
+version = '3.0.0-BETA'
 
 description = "Programming in MS Paint"
 
@@ -102,13 +102,12 @@ run {
             "DEV_MODE": DEV_MODE,
             "STATIC_LSP_DIRECTORY": STATIC_LSP_DIRECTORY
     ])
-//    jvmArgs("-splash:${file('src/main/resources/splash/splash-full.png').toPath()}".toString())
     jvmArgs("--illegal-access=deny")
     jvmArgs("--add-opens", "java.base/jdk.internal.loader=ALL-UNNAMED")
     jvmArgs("--add-opens", "java.base/java.io=ALL-UNNAMED")
     jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     jvmArgs("--enable-preview")
-//    args = ['E:\\MS Paint IDE Demos\\MS Paint IDE Demo\\Test.txt']
+//    args = ['Test.txt']
 }
 
 task preLaunch << {

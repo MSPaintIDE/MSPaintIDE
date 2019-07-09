@@ -18,8 +18,6 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.socket.DefaultInternalSocketCommunicator;
 import com.uddernetworks.mspaint.socket.InternalConnection;
 import com.uddernetworks.mspaint.socket.InternalSocketCommunicator;
-import com.uddernetworks.mspaint.splash.Splash;
-import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -167,7 +165,12 @@ public class MainGUI extends Application implements Initializable {
     private Map<String, ImageView> cachedImageViews = new HashMap<>();
 
     public static File APP_DATA = new File(System.getenv("LocalAppData"), "MSPaintIDE");
-    public static final boolean DEV_MODE = System.getenv("DEV_MODE").equalsIgnoreCase("true");
+    public static final boolean DEV_MODE;
+
+    static {
+        var devModeEnv = System.getenv("DEV_MODE");
+        DEV_MODE = devModeEnv != null && devModeEnv.equalsIgnoreCase("true");
+    }
 
     private ObservableList<Language> languages = FXCollections.observableArrayList();
 
@@ -372,7 +375,6 @@ public class MainGUI extends Application implements Initializable {
         if (initialProject != null) ProjectManager.switchProject(ProjectManager.readProject(initialProject));
         if (ProjectManager.getPPFProject() == null) {
             new WelcomeWindow(this);
-            Splash.end();
         } else {
             refreshProject();
         }
@@ -467,16 +469,11 @@ public class MainGUI extends Application implements Initializable {
     private boolean registeredBefore = false;
 
     public void registerThings() throws IOException {
-        System.out.println("MainGUI.registerThings");
-
         if (this.registeredBefore) {
-            System.out.println("Already registered, so just showing...");
             this.primaryStage.show();
         } else {
-            System.out.println("Else!");
             this.registeredBefore = true;
             if (!this.primaryStage.isShowing()) {
-                System.out.println("Not showing now");
 
                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("gui/Main.fxml"));
                 loader.setController(this);
@@ -523,11 +520,7 @@ public class MainGUI extends Application implements Initializable {
 
         this.primaryStage.setTitle("MS Paint IDE | " + ProjectManager.getPPFProject().getName());
 
-        Splash.setStatus(SplashMessage.STARTING);
-        this.primaryStage.setOnShown(event -> Splash.end());
-        System.out.println("Here!");
         if (!this.primaryStage.isShowing()) {
-            System.out.println("#show!");
             this.primaryStage.show();
         }
     }
@@ -684,7 +677,6 @@ public class MainGUI extends Application implements Initializable {
         FormattedAppender.activate(output, virtualScrollPane);
 
         var settingsManager = SettingsManager.getInstance();
-        Splash.setStatus(SplashMessage.GUI);
 
         setGitFeaturesDisabled(true);
         this.initialized.set(true);

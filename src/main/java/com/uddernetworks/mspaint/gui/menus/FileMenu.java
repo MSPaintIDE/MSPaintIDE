@@ -82,11 +82,6 @@ public class FileMenu extends MenuBind {
         this.mainGUI.getStartupLogic().getDiagnosticManager().openGUI();
     }
 
-    @BindItem(label = "print")
-    private void onClickPrint() {
-        // TODO: Print
-    }
-
     @BindItem(label = "close-project")
     private void onClickCloseProject() throws IOException {
         this.mainGUI.showWelcomeScreen();
