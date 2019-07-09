@@ -45,6 +45,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +133,9 @@ public class MainGUI extends Application implements Initializable {
     private InlineCssTextArea output;
 
     @FXML
+    private VirtualizedScrollPane virtualScrollPane;
+
+    @FXML
     private AnchorPane rootAnchor;
 
     @FXML
@@ -171,6 +175,8 @@ public class MainGUI extends Application implements Initializable {
     private static InternalSocketCommunicator socketCommunicator;
 
     public MainGUI() throws IOException, ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        var currThread = Thread.currentThread();
+        if (currThread.getName().equals("JavaFX Application Thread")) currThread.setName("JavaFX");
         System.setProperty("jna.debug_load", "true");
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -675,7 +681,7 @@ public class MainGUI extends Application implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        FormattedAppender.activate(output);
+        FormattedAppender.activate(output, virtualScrollPane);
 
         var settingsManager = SettingsManager.getInstance();
         Splash.setStatus(SplashMessage.GUI);

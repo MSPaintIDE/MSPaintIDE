@@ -25,6 +25,7 @@ import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.splash.Splash;
 import com.uddernetworks.mspaint.splash.SplashMessage;
 import com.uddernetworks.mspaint.texteditor.CenterPopulator;
+import com.uddernetworks.mspaint.util.Browse;
 import com.uddernetworks.mspaint.watcher.DefaultFileWatchManager;
 import com.uddernetworks.mspaint.watcher.FileWatchManager;
 import com.uddernetworks.paintassist.DefaultPaintAssist;
@@ -33,6 +34,8 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -89,6 +92,26 @@ public class StartupLogic {
 
         languageManager.initializeLanguages();
         mainGUI.addLanguages(languageManager.getEnabledLanguages());
+
+        if (languageManager.getEnabledLanguages().isEmpty()) {
+            var res = JOptionPane.showOptionDialog(null,
+                    "There are no languages enabled in the IDE, meaning you need to install at least one language's LSP and/or runtime to continue.\nPlease select a language to download the LSP for. This will also open the runtime download page if it's not found,\nas in some cases the runtime is required.",
+                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
+                    new ImageIcon(ImageIO.read(getClass().getClassLoader().getResourceAsStream("icons\\popup\\save.png"))),
+                    languageManager.getAllLanguages().stream().map(Language::getName).toArray(String[]::new), null);
+
+            var language = languageManager.getAllLanguages().get(res);
+            if (!language.hasRuntime()) {
+                Browse.browse(language.downloadRuntimeLink());
+            }
+
+            if (language.installLSP()) {
+                LOGGER.info("Successfully installed LSP. Continuing...");
+            } else {
+                LOGGER.error("Could not install LSP. Exiting...");
+                System.exit(1);
+            }
+        }
 
         this.runningCodeManager = new GeneralRunningCodeManager(this);
 

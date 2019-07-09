@@ -123,7 +123,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="855.0" vgrow="ALWAYS" />
                   </rowConstraints>
                   <children>
-                      <VirtualizedScrollPane maxWidth="999999.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
+                      <VirtualizedScrollPane fx:id="virtualScrollPane" maxWidth="999999.0" styleClass="output-text" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.columnSpan="1">
                           <GridPane.margin>
                               <Insets left="15.0" />
                           </GridPane.margin>

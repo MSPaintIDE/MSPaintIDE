@@ -8,6 +8,9 @@ import org.eclipse.lsp4j.services.LanguageServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -62,12 +65,17 @@ public class LSPClient implements LanguageClient {
 
     @Override
     public final void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-        if (diagnostics.getDiagnostics().isEmpty()) LOGGER.info("Diagnostics empty for {}", diagnostics.getUri());
-        diagnostics.getDiagnostics().forEach(diagnostic -> {
-            LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage());
-        });
+        try {
+            var diagnosticsAbsPath = Path.of(new URI(diagnostics.getUri())).toAbsolutePath().toString();
+            if (diagnostics.getDiagnostics().isEmpty()) LOGGER.info("Diagnostics empty for {}", diagnosticsAbsPath);
+            diagnostics.getDiagnostics().forEach(diagnostic -> {
+                LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage());
+            });
 
-        this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics(), diagnostics.getUri());
+            this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics(), diagnosticsAbsPath);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Error parsing a URI from the LSP: " + diagnostics.getUri(), e);
+        }
     }
 
     @Override
