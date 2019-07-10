@@ -18,6 +18,10 @@
 
         <SettingCheckBox text="When creating a new file from the IDE" setting="INJECT_AUTO_NEW"
                          realPadding="10px 0 0 0"/>
+
+        <SettingCheckBox text="When opening a file from the context menu, if an IDE instance is already opened"
+                         setting="INJECT_AUTO_CONTEXT"
+                         realPadding="10px 0 0 0"/>
     </children>
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>

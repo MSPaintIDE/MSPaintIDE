@@ -133,7 +133,7 @@ public class StartupLogic {
             var thisAdded = new ArrayList<ImageClass>();
             sortedDiagnostics.forEach((uri, diagnostics) -> {
                 try {
-                    var document = documentManager.getDocument(new File(URI.create(uri + ".png")));
+                    var document = documentManager.getDocument(createFile(uri + ".png"));
                     var imageClass = document.getImageClass();
                     thisAdded.add(imageClass);
                     imageClass.getScannedImage().ifPresentOrElse(img -> {}, () -> LOGGER.error("Error! Image has not been scanned yet! {}", uri));
@@ -170,6 +170,14 @@ public class StartupLogic {
             hasErrors.clear();
             hasErrors.addAll(thisAdded);
         });
+    }
+
+    private File createFile(String possibleURI) {
+        try {
+            return new File(new URI(possibleURI));
+        } catch (URISyntaxException ignored) {
+            return new File(possibleURI);
+        }
     }
 
     public void headlessStart() throws IOException {
@@ -251,6 +259,7 @@ public class StartupLogic {
         mainGUI.setStatusText("Saving compiler output images...");
 
         compilerOutputStream.saveImage();
+        mainGUI.setIndeterminate(false);
 
         mainGUI.setStatusText(null);
     }

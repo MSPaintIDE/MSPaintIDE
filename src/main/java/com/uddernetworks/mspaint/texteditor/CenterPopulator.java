@@ -46,8 +46,6 @@ public class CenterPopulator {
         var input = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         var graphics = input.createGraphics();
 
-//        clearImage(input);
-
         graphics.setRenderingHints(new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON));
 
         var font = new Font(activeFont.getFontName(), Font.PLAIN, fontSize);
@@ -70,8 +68,6 @@ public class CenterPopulator {
 
         ImageIO.write(input, "png", centerCalcFile);
 
-//        System.exit(0);
-
         // Goes through coordinates of image and adds any connecting pixels to `coordinates`
         var scanImage = activeFont.getScan().scanImage(centerCalcFile).stripLeadingSpaces();
 
@@ -79,26 +75,14 @@ public class CenterPopulator {
 
         var lineBound = getLineBounds(input, activeFont.getActions());
 
-        System.out.println("lineBound = " + lineBound);
-
-        System.out.println(scanImage.getPrettyString());
-
         scanImage.getGridLineAtIndex(0).get().forEach(imageLetter -> {
             if (currentLetter.get() == OCRScan.RAW_STRING.indexOf("W W")) return;
             var letter = OCRScan.RAW_STRING.charAt(currentLetter.getAndIncrement());
-//            System.out.println(imageLetter.getLetter());
-//            var halfOfLineHeight = ((double) lineBound.getValue() - (double) lineBound.getKey()) / 2;
-//            var middleToTopChar = (double) imageLetter.getY() - (double) lineBound.getKey();
-//            var topOfLetterToCenter = halfOfLineHeight - middleToTopChar;
             var topOfLetterToCenter = imageLetter.getY() - lineBound.getKey();
 
             // Extra space above character to Y
-            currentCenters.put(letter, (int) topOfLetterToCenter);
+            currentCenters.put(letter, topOfLetterToCenter);
         });
-
-//        Files.deleteIfExists(centerCalcFile.toPath());
-
-        System.out.println("centers = " + centers);
     }
 
     private IntPair getLineBounds(BufferedImage input, Actions actions) {

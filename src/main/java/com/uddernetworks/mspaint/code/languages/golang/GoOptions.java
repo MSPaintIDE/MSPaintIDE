@@ -22,6 +22,12 @@ public enum GoOptions implements Option {
      */
     HIGHLIGHT_DIRECTORY("highlightDirectory", File.class, REQUIRED),
     /**
+     * The file to run
+     * @see File
+     * @see LangGUIOptionRequirement#REQUIRED
+     */
+    RUNNING_FILE("runningFile", File.class, OPTIONAL),
+    /**
      * The image file to output compiler information
      * @see File
      * @see LangGUIOptionRequirement#REQUIRED
@@ -33,12 +39,6 @@ public enum GoOptions implements Option {
      * @see LangGUIOptionRequirement#REQUIRED
      */
     PROGRAM_OUTPUT("programOutput", File.class, REQUIRED),
-    /**
-     * The file to run
-     * @see File
-     * @see LangGUIOptionRequirement#REQUIRED
-     */
-    RUNNING_FILE("runningFile", File.class, OPTIONAL),
     /**
      * A boolean to toggle the highlighting of code files
      * @see Boolean

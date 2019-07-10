@@ -14,6 +14,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Cell;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
@@ -123,6 +124,7 @@ public class SettingKV extends VBox {
     }
 
     private ThemeManager.ThemeChanger themeChanger;
+    private ToggleGroup toggleGroup = new ToggleGroup();
 
     public void initLogic(MainGUI mainGUI) {
         var list = new ArrayList<KVCell>();
@@ -136,6 +138,8 @@ public class SettingKV extends VBox {
             }
 
             var cell = new KVCell(mainGUI, themeChanger, getKeyPlaceholder(), getValuePlaceholder(), currCell -> {
+                currCell.getRadio().setToggleGroup(toggleGroup);
+
                 currCell.getName().textProperty().addListener(((observable, oldValue, newValue) -> {
                     this.keyChange.onChange(currCell, oldValue, newValue);
                     currCell.getItem().setName(newValue);
@@ -153,7 +157,6 @@ public class SettingKV extends VBox {
                         if (itemSelect.getItems().size() == 1) return;
                         list.stream()
                                 .map(Cell::getItem)
-                                .limit(1)
                                 .findFirst()
                                 .ifPresent(newActive -> {
                                     this.kvActiveConsumer.accept(newActive);

@@ -112,6 +112,8 @@ public class SettingsWindow extends Stage implements Initializable {
                 if (item.toString().equalsIgnoreCase(startPath)) selectionModel.select(genericItem);
             });
         }
+
+        tree.getSelectionModel().select(0);
     }
 
     @FXML
@@ -125,16 +127,12 @@ public class SettingsWindow extends Stage implements Initializable {
         children.addAll(settingItems.stream().map(TreeItem::new).collect(Collectors.toList()));
 
         tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//            List<Node> contentChildren = this.content.getChildren();
-//            contentChildren.clear();
-
             try {
                 this.content.setContent(newValue.getValue().getPane());
-                toggleStuff.accept(SettingsManager.getInstance().getSetting(Setting.DARK_THEME));
+                this.toggleStuff.accept(SettingsManager.getInstance().getSetting(Setting.DARK_THEME));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-
     }
 }

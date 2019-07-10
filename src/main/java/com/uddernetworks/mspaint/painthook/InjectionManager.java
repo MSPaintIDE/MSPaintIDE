@@ -112,6 +112,6 @@ public class InjectionManager {
     }
 
     private void clickPull() {
-        LOGGER.error("How did you even do this?");
+        LOGGER.error("Pull feature not yet implemented");
     }
 }

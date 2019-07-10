@@ -85,7 +85,7 @@ public class AppearanceSettingItem extends Stage implements SettingItem, Initial
         this.themeSetting.onKVActive(kvData -> {
             if (!kvData.getName().equals(themeManager.getActiveTheme())) {
                 SettingsManager.getInstance().setSetting(Setting.ACTIVE_THEME_NAME, kvData.getName());
-                themeManager.selectThemeName(kvData.getPath());
+                themeManager.selectThemeName(kvData.getName());
             }
         });
     }

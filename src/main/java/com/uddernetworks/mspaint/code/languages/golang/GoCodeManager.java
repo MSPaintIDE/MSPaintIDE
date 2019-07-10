@@ -44,7 +44,8 @@ public class GoCodeManager {
             LOGGER.info("Compilation completed in {}ms", System.currentTimeMillis() - start);
         }
 
-        if (this.language.getLanguageSettings().<Boolean>getSetting(GoOptions.EXECUTE)) new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
+        // This wasn't inverted but still worked... what the fuck?
+        if (!this.language.getLanguageSettings().<Boolean>getSetting(GoOptions.EXECUTE)) new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
 
         var runningFileOptional = this.language.getLanguageSettings().<File>getSettingOptional(GoOptions.RUNNING_FILE);
 

@@ -272,13 +272,7 @@ public class MainGUI extends Application implements Initializable {
 
                         return "Opening,success";
                     }
-                    CompletableFuture.runAsync(() -> {
-                        try {
-                            new TextEditorManager(new File(data), mainGUI);
-                        } catch (IOException | InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    TextEditorManager.openAsync(new File(data), mainGUI, Setting.INJECT_AUTO_CONTEXT);
                     return "Opening,success";
                 }
                 return "";
@@ -318,22 +312,9 @@ public class MainGUI extends Application implements Initializable {
         Thread.sleep(100000);
     }
 
-    public void createAndOpenTextFile(File file) {
-        try {
-            setIndeterminate(true);
-            file.createNewFile();
-            new TextEditorManager(file, this);
-        } catch (IOException | InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        progress.setProgress(0);
-    }
-
     public void createAndOpenImageFile(File file) {
         try {
             if (!file.getName().endsWith(".png")) file = new File(file.getAbsolutePath() + ".png");
-            setIndeterminate(true);
 
             BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_ARGB);
             clearImage(image);
@@ -790,8 +771,8 @@ public class MainGUI extends Application implements Initializable {
                 ));
             }
 
-            var trainImage = settingsManager.getSetting(Setting.TRAIN_IMAGE);
-            if (trainImage == null || ((String) trainImage).trim().equals("")) {
+            var trainImage = settingsManager.<String>getSetting(Setting.TRAIN_IMAGE);
+            if (trainImage == null || trainImage.isBlank() || trainImage.equals("\\train.png")) {
                 settingsManager.setSetting(Setting.TRAIN_IMAGE, project.getFile().getParentFile().getAbsolutePath() + "\\train.png");
             }
 

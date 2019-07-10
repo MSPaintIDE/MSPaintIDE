@@ -31,6 +31,12 @@ public class GoSettings extends LanguageSettings {
                         .setSelectDirectories(true),
                 () -> createSubOfProject("highlight"));
 
+        addOption(GoOptions.RUNNING_FILE,
+                new FileLangGUIOption("Running file")
+                        .setChooserTitle("Select or create the png file that will be executed")
+                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
+                        .setExtensionFilter(ProjectFileFilter.PNG));
+
         addOption(GoOptions.COMPILER_OUTPUT,
                 new FileLangGUIOption("Compiler output")
                         .setChooserTitle("Select or create the png file where compiler output text will be located")
@@ -46,12 +52,6 @@ public class GoSettings extends LanguageSettings {
                         .setExtensionFilter(ProjectFileFilter.PNG)
                         .setSave(true),
                 () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "program.png"));
-
-        addOption(GoOptions.RUNNING_FILE,
-                new FileLangGUIOption("Running file")
-                        .setChooserTitle("Select or create the png file that will be executed")
-                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
-                        .setExtensionFilter(ProjectFileFilter.PNG));
 
         addOption(GoOptions.HIGHLIGHT, new BooleanLangGUIOption("Syntax highlight"), () -> true);
 

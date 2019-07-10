@@ -8,12 +8,12 @@ import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 public class FileMenu extends MenuBind {
 
@@ -34,7 +34,7 @@ public class FileMenu extends MenuBind {
 
     @BindItem(label = "new.image-file")
     private void onClickNewImageFile() {
-        FileDirectoryChooser.openFileSelector(chooser -> {
+        FileDirectoryChooser.openFileSaver(chooser -> {
             chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile());
             chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
         }, file -> this.mainGUI.createAndOpenImageFile(file));
@@ -43,8 +43,14 @@ public class FileMenu extends MenuBind {
     @BindItem(label = "new.text-file")
     private void onClickNewTextFile() {
         FileDirectoryChooser.openFileSaver(chooser ->
-                chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile()), file ->
-                this.mainGUI.createAndOpenTextFile(file));
+                chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile()), file -> {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                LOGGER.error("An error occurred while creating a new text file", e);
+            }
+            TextEditorManager.openAsync(file, mainGUI, Setting.INJECT_AUTO_NEW);
+        });
     }
 
     @BindItem(label = "open.project")
@@ -63,13 +69,7 @@ public class FileMenu extends MenuBind {
         FileDirectoryChooser.openFileSelector(chooser -> {
             chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile());
             chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
-        }, file -> {
-            try {
-                new TextEditorManager(file, this.mainGUI);
-            } catch (IOException | InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        }, file -> TextEditorManager.openAsync(file, mainGUI, Setting.INJECT_AUTO_OPEN));
     }
 
     @BindItem(label = "settings")

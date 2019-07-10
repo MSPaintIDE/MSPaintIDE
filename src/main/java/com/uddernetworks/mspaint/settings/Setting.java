@@ -28,6 +28,7 @@ public enum Setting {
     THEMES("themes", Map.of("Default", "themes/default.css", "Extra Dark", "themes/extra-dark.css"), STRING_STRING_MAP),
     INJECT_AUTO_NEW("injectAutoNew", true, BOOLEAN),
     INJECT_AUTO_OPEN("injectAutoOpen", true, BOOLEAN),
+    INJECT_AUTO_CONTEXT("injectAutoContext", true, BOOLEAN),
     INCOMPATIBLE_LANGUAGE_ERRORS("incompatibleLanguageErrors", true, BOOLEAN);
 
     private final String name;

@@ -149,7 +149,7 @@ public abstract class Language {
      * @param website The website to direct the user to if they click the "Website" option
      * @param install The code to actually install the LSP. No further checking is required if the LSP should be
      *                installed, as {@link Language#hasLSP()} has been checked before the prompt.
-     * @return If the install was successful.
+     * @return If the install was successful
      */
     protected boolean lspInstallHelper(String promptText, String website, ThrowableSupplier<Boolean> install) {
         if (hasLSP()) return false;

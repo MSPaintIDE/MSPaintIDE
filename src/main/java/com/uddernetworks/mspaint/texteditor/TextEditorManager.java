@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.main.LetterFileWriter;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
+import com.uddernetworks.mspaint.painthook.PaintInjector;
 import com.uddernetworks.mspaint.settings.Setting;
 import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.newocr.character.ImageLetter;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,10 +43,10 @@ public class TextEditorManager {
     }
 
     public TextEditorManager(File file) throws IOException, InterruptedException, ExecutionException {
-        this(file, null);
+        this(file, null, false);
     }
 
-    public TextEditorManager(File file, MainGUI mainGUI) throws IOException, InterruptedException, ExecutionException {
+    public TextEditorManager(File file, MainGUI mainGUI, boolean bindButtons) throws IOException, InterruptedException, ExecutionException {
         this.originalFile = file.getAbsoluteFile();
 
         if (MainGUI.HEADLESS) {
@@ -99,8 +101,22 @@ public class TextEditorManager {
             } catch (IOException | InterruptedException ignored) {}
         })).start();
 
-        initialProcess();
+        initialProcess(bindButtons);
         if (!MainGUI.HEADLESS) mainGUI.setIndeterminate(false);
+    }
+
+    public static void openAsync(File file, MainGUI mainGUI, Setting bindButtons) {
+        openAsync(file, mainGUI, SettingsManager.getInstance().<Boolean>getSetting(bindButtons));
+    }
+
+    public static void openAsync(File file, MainGUI mainGUI, boolean bindButtons) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                new TextEditorManager(file, mainGUI, bindButtons);
+            } catch (IOException | InterruptedException | ExecutionException e) {
+                LOGGER.error("An error occurred while editing a text file", e);
+            }
+        });
     }
 
     public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
@@ -192,13 +208,19 @@ public class TextEditorManager {
         return tempImage;
     }
 
-    private void initialProcess() throws IOException, InterruptedException {
+    private void initialProcess(boolean bindButtons) throws IOException, InterruptedException {
         LOGGER.info("Processing");
 
         Runtime runtime = Runtime.getRuntime();
         Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");
+        this.startupLogic.getMainGUI().setIndeterminate(false);
 
         Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
+
+        Thread.sleep(3000);
+
+        var paintInjector = PaintInjector.INSTANCE;
+        if (bindButtons && paintInjector != null) paintInjector.initializeButtonsByID((int) process.pid());
 
         LOGGER.info("Opened MS Paint");
         process.waitFor();

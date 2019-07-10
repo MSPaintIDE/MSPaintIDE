@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ public class ThemeManager {
     private Map<String, String> themes = new HashMap<>();
     private List<Scene> scenes = new ArrayList<>();
     private String activeName;
+    private String activePath;
 
     public void loadTheme(String name, String path) {
         LOGGER.info("Loading theme \"" + name + "\"");
@@ -52,11 +54,19 @@ public class ThemeManager {
 
     public void selectThemeName(String name) {
         if (!this.themes.containsKey(name)) return;
+
+        var themePath = this.themes.get(name);
+        if (!themePath.startsWith("themes")) themePath = new File(themePath).toURI().toString();
+        var removingTheme = this.activePath;
+        this.activePath = themePath;
+
         this.scenes.stream().map(Scene::getStylesheets).forEach(sheets -> {
-            if (this.activeName != null) sheets.remove(activeName);
-            sheets.add(this.themes.get(name));
+            if (removingTheme != null) sheets.remove(removingTheme);
+            sheets.add(activePath);
             saveSettings();
         });
+
+        this.activeName = name;
     }
 
     public void removeThemeName(String name) {

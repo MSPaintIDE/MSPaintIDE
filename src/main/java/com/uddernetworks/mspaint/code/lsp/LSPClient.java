@@ -72,7 +72,7 @@ public class LSPClient implements LanguageClient {
                 LOGGER.warn("[Diagnostic] [{}] {}", diagnostic.getSeverity(), diagnostic.getMessage());
             });
 
-            this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics(), diagnosticsAbsPath);
+            this.startupLogic.getDiagnosticManager().setDiagnostics(diagnostics.getDiagnostics(), diagnostics.getUri());
         } catch (URISyntaxException e) {
             LOGGER.error("Error parsing a URI from the LSP: " + diagnostics.getUri(), e);
         }
