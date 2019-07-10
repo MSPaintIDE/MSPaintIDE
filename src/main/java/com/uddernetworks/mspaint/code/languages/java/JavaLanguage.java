@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
+import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
@@ -211,7 +212,7 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        return Commandline.runSyncCommand("java --version").contains("Runtime Environment");
+        return Commandline.runCommand("java", "--version").contains("Runtime Environment");
     }
 
     @Override
@@ -237,6 +238,7 @@ public class JavaLanguage extends Language {
 
     @Override
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException {
+        if (!getLanguageSettings().<Boolean>getSetting(JavaOptions.COMPILE)) new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
         var jarFile = this.settings.<File>getSetting(JavaOptions.JAR);
         var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaOptions.LIBRARY_LOCATION);
         var otherFilesOptional = this.settings.<File>getSettingOptional(JavaOptions.OTHER_LOCATION);

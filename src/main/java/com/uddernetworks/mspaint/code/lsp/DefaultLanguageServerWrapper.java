@@ -110,7 +110,7 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
             var streamConnectionProvider = new LSPProvider(
                     () -> requestManager,
                     processedArgs,
-                    serverPath.get()); // new File(TEMP_ROOT).getParent()
+                    serverPath.get());
             streamConnectionProvider.start();
 
             Launcher<LanguageServer> launcher =
@@ -253,6 +253,8 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
                     imageClass.scan();
                     document.setText(imageClass.getText());
                 }
+
+                if (document.getText() == null) return;
 
                 if (writingFile.createNewFile()) setHidden(writingFile);
                 Files.write(writingFile.toPath(), document.getText().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);

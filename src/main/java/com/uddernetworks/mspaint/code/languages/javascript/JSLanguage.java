@@ -85,7 +85,7 @@ public class JSLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        var output = Commandline.runSyncCommand("cmd /c node \"%USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\javascript-typescript-langserver\\lib\\language-server-stdio\" --version");
+        var output = Commandline.runCommand(true, "node", "%USERPROFILE%\\AppData\\Roaming\\npm\\node_modules\\javascript-typescript-langserver\\lib\\language-server-stdio", "--version");
         return !output.contains("Cannot find module") && Arrays.stream(output.split("\\.")).allMatch(StringUtils::isNumeric);
     }
 
@@ -94,7 +94,7 @@ public class JSLanguage extends Language {
         return lspInstallHelper("Would you like to proceed with downloading the JavaScript Language Server by sourcegraph?", "https://www.npmjs.com/package/javascript-typescript-langserver", () -> {
             LOGGER.info("Installing JavaScript LSP server...");
 
-            var output = Commandline.runSyncCommand("cmd /c npm install -g javascript-typescript-langserver");
+            var output = Commandline.runCommand(true, "npm", "install", "-g", "javascript-typescript-langserver");
 
             if (output.contains(" packages from ")) {
                 LOGGER.info("Successfully installed the JavaScript Language Server");
@@ -111,7 +111,7 @@ public class JSLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        return Commandline.runSyncCommand("node --version").startsWith("v");
+        return Commandline.runCommand("node", "--version").startsWith("v");
     }
 
     @Override

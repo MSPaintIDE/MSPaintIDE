@@ -6,6 +6,7 @@ import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.GeneralRunningCodeManager;
 import com.uddernetworks.mspaint.code.execution.RunningCodeManager;
 import com.uddernetworks.mspaint.code.highlighter.AngrySquiggleHighlighter;
+import com.uddernetworks.mspaint.code.languages.DefaultLanguageManager;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageManager;
 import com.uddernetworks.mspaint.code.languages.golang.GoLanguage;
@@ -52,7 +53,7 @@ public class StartupLogic {
 
     private MainGUI mainGUI;
 
-    private LanguageManager languageManager = new LanguageManager();
+    private LanguageManager languageManager = new DefaultLanguageManager();
     private Language currentLanguage;
     private RunningCodeManager runningCodeManager;
     private OCRManager ocrManager;

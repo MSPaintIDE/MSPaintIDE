@@ -83,7 +83,7 @@ public class PythonLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        return Commandline.runSyncCommand("pip list").contains("python-language-server ");
+        return Commandline.runCommand("pip", "list").contains("python-language-server ");
     }
 
     @Override
@@ -91,11 +91,11 @@ public class PythonLanguage extends Language {
         return lspInstallHelper("Would you like to proceed with downloading the Python Language Server by palantir?", "https://github.com/palantir/python-language-server", () -> {
             LOGGER.info("Installing Python LSP server...");
 
-            var output = Commandline.runSyncCommand("pip install python-language-server[all]");
+            var output = Commandline.runCommand("pip", "install", "python-language-server[all]");
 
             if (output.contains("'install_requires' must be")) {
-                Commandline.runSyncCommand("pip install -U setuptools");
-                output = Commandline.runSyncCommand("pip install python-language-server[all]");
+                Commandline.runCommand("pip", "install", "-U", "setuptools");
+                output = Commandline.runCommand("pip", "install", "python-language-server[all]");
             }
 
             if (output.contains("Successfully installed")) {
@@ -113,7 +113,7 @@ public class PythonLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        return Commandline.runSyncCommand("python --version").startsWith("Python ");
+        return Commandline.runCommand("python", "--version").startsWith("Python ");
     }
 
     @Override

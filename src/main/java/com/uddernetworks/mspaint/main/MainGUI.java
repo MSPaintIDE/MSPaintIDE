@@ -219,7 +219,9 @@ public class MainGUI extends Application implements Initializable {
             var file = new File(args[0]);
             if (file.getName().endsWith(".ppf")) {
                 if (socketCommunicator.serverAvailable()) {
-                    LOGGER.error("Error: You can't have more than one instance of MS Paint IDE running at the same time!");
+                    var message = "Error: You can't have more than one instance of MS Paint IDE running at the same time!";
+                    LOGGER.error(message);
+                    JOptionPane.showMessageDialog(null, message, "Fatal Error", JOptionPane.WARNING_MESSAGE);
                     System.exit(1);
                 }
 
@@ -389,10 +391,7 @@ public class MainGUI extends Application implements Initializable {
                 var langClass = Class.forName(languageClassString);
                 var languageManager = this.startupLogic.getLanguageManager();
 
-                LOGGER.info(langClass.getCanonicalName());
-
                 languageManager.getLanguageByClass(langClass).ifPresentOrElse(language -> {
-
                     if (!language.hasLSP()) {
                         LOGGER.warn("LSP server not found for {}. Requesting install.", language.getName());
                         if (!language.installLSP()) {
@@ -429,7 +428,7 @@ public class MainGUI extends Application implements Initializable {
 
                         lspWrapper.openWorkspace(previousInput = file, inputFile);
                     }, true);
-                }, () -> LOGGER.error("No language found with a class of \"{}\"", languageClassString));
+                }, () -> LOGGER.error("No enabled language found with a class of \"{}\"", languageClassString));
                 languageManager.reloadAllLanguages();
 
                 registerThings();

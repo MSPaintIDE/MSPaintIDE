@@ -96,7 +96,7 @@ public class GoLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        return Commandline.runSyncCommand("cmd /c gopls version").contains(", built in");
+        return Commandline.runCommand(true, "gopls", "version").contains(", built in");
     }
 
     @Override
@@ -104,7 +104,7 @@ public class GoLanguage extends Language {
         return lspInstallHelper("Would you like to proceed with downloading the Go Language Server by Google?", "https://github.com/golang/go/wiki/gopls", () -> {
             LOGGER.info("Installing Go LSP server...");
 
-            var output = Commandline.runSyncCommand("go get golang.org/x/tools/gopls");
+            var output = Commandline.runCommand(true, "go", "get", "golang.org/x/tools/gopls");
 
             if (hasLSP()) {
                 LOGGER.info("Successfully installed the Go Language Server");
@@ -120,7 +120,7 @@ public class GoLanguage extends Language {
 
     @Override
     public boolean hasRuntime() {
-        return Commandline.runSyncCommand("go version").startsWith("go version ");
+        return Commandline.runCommand("go", "version").startsWith("go version ");
     }
 
     @Override
