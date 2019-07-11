@@ -26,6 +26,8 @@ ext {
 
     bundlePath.deleteDir()
     bundlePath.mkdirs()
+
+    useJpackage = project.properties['jpackage.home'] != ''
 }
 
 // Happens during assembly
@@ -117,14 +119,15 @@ task innoCompile(type: Exec) {
     }
 }
 
-assemble.dependsOn jpackage
+if (useJpackage) assemble.dependsOn jpackage
 
 
 
 def buildAliases = [
-        'compileJar' : [':package:build', ':package:completeInnoSetup', ':package:processResources'],
-        'createInstaller' : [':package:build', ':package:completeInnoSetup', ':package:processResources', ':package:innoCompile']
+        'compileJar' : [':package:build', ':package:completeInnoSetup', ':package:processResources']
 ]
+if (useJpackage) buildAliases.put('createInstaller', [':package:build', ':package:completeInnoSetup', ':package:processResources', ':package:innoCompile'])
+
 def expandedTaskList = []
 
 gradle.startParameter.taskNames.each {
