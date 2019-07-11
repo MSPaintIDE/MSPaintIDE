@@ -43,16 +43,16 @@ public abstract class JavaScriptBaseParser extends Parser {
     }
 
     protected boolean notLineTerminator() {
-        return !here(JavaScriptParser.LineTerminator);
+        return !here(com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.LineTerminator);
     }
 
     protected boolean notOpenBraceAndNotFunction() {
         int nextTokenType = _input.LT(1).getType();
-        return nextTokenType != JavaScriptParser.OpenBrace && nextTokenType != JavaScriptParser.Function;
+        return nextTokenType != com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.OpenBrace && nextTokenType != com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.Function;
     }
 
     protected boolean closeBrace() {
-        return _input.LT(1).getType() == JavaScriptParser.CloseBrace;
+        return _input.LT(1).getType() == com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.CloseBrace;
     }
 
     /**
@@ -99,12 +99,12 @@ public abstract class JavaScriptBaseParser extends Parser {
             return false;
         }
 
-        if (ahead.getType() == JavaScriptParser.LineTerminator) {
+        if (ahead.getType() == com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.LineTerminator) {
             // There is definitely a line terminator ahead.
             return true;
         }
 
-        if (ahead.getType() == JavaScriptParser.WhiteSpaces) {
+        if (ahead.getType() == com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.WhiteSpaces) {
             // Get the token ahead of the current whitespaces.
             possibleIndexEosToken = this.getCurrentToken().getTokenIndex() - 2;
             ahead = _input.get(possibleIndexEosToken);
@@ -115,7 +115,7 @@ public abstract class JavaScriptBaseParser extends Parser {
         int type = ahead.getType();
 
         // Check if the token is, or contains a line terminator.
-        return (type == JavaScriptParser.MultiLineComment && (text.contains("\r") || text.contains("\n"))) ||
-                (type == JavaScriptParser.LineTerminator);
+        return (type == com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.MultiLineComment && (text.contains("\r") || text.contains("\n"))) ||
+                (type == com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptParser.LineTerminator);
     }
 }

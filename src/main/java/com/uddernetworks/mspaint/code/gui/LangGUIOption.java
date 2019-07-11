@@ -53,6 +53,7 @@ public interface LangGUIOption {
     /**
      * Binds the setting's value with the given {@link LanguageSettings}.
      *
+     * @param option The {@link Option} to bind
      * @param languageSettings The {@link LanguageSettings} to bind with
      */
     void bindValue(Option option, LanguageSettings languageSettings);

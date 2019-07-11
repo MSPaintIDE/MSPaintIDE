@@ -2,16 +2,14 @@
 
 ## Supported Versions
 
-Currently, there is **no released and supported IDE version**. The alpha is under way which will be 3.0.0-ALPHA, but it has been under heavy development for over a year and will take a few more months to be released as alpha. This being said, any 
+The current IDE version is in beta, with no other versions supported. This is due to the extreme amounts of changes to the IDE internally.
 
 | Version     | Supported |
 | ----------- | --------- |
-| 3.0.0-ALPHA | :clock3:  |
+| 3.0.0-BETA |  :white_check_mark:  |
 | 2.1.x       | :x:       |
 | 2.0.x       | :x:       |
 | 1.x         | :x:       |
-
-<small>:clock3: = In Development</small>
 
 ## Reporting a Vulnerability
 

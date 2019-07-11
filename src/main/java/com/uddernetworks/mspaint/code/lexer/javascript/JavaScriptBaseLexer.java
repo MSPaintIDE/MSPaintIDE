@@ -81,7 +81,7 @@ public abstract class JavaScriptBaseLexer extends Lexer
 
     protected void ProcessStringLiteral()
     {
-        if (lastToken == null || lastToken.getType() == JavaScriptLexer.OpenBrace)
+        if (lastToken == null || lastToken.getType() == com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.OpenBrace)
         {
             String text = getText();
             if (text.equals("\"use strict\"") || text.equals("'use strict'"))
@@ -106,18 +106,18 @@ public abstract class JavaScriptBaseLexer extends Lexer
         }
 
         switch (this.lastToken.getType()) {
-            case JavaScriptLexer.Identifier:
-            case JavaScriptLexer.NullLiteral:
-            case JavaScriptLexer.BooleanLiteral:
-            case JavaScriptLexer.This:
-            case JavaScriptLexer.CloseBracket:
-            case JavaScriptLexer.CloseParen:
-            case JavaScriptLexer.OctalIntegerLiteral:
-            case JavaScriptLexer.DecimalLiteral:
-            case JavaScriptLexer.HexIntegerLiteral:
-            case JavaScriptLexer.StringLiteral:
-            case JavaScriptLexer.PlusPlus:
-            case JavaScriptLexer.MinusMinus:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.Identifier:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.NullLiteral:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.BooleanLiteral:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.This:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.CloseBracket:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.CloseParen:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.OctalIntegerLiteral:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.DecimalLiteral:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.HexIntegerLiteral:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.StringLiteral:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.PlusPlus:
+            case com.uddernetworks.mspaint.code.lexer.javascript.JavaScriptLexer.MinusMinus:
                 // After any of the tokens above, no regex literal can follow.
                 return false;
             default:

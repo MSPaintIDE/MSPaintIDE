@@ -215,6 +215,7 @@ public abstract class Language {
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
+     * @return The result of the compilation/execution
      */
     public CompilationResult compileAndExecute(MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
         var imageClassesOptional = indexFiles();
@@ -233,6 +234,7 @@ public abstract class Language {
      * @param imageOutputStream The ImageOutputStream that is used for all executed program output
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @throws IOException If an IO Exception occurs
+     * @return The result of the compilation/execution
      */
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream) throws IOException {
         return compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerStream, BuildSettings.DEFAULT);
@@ -246,6 +248,7 @@ public abstract class Language {
      * @param compilerStream The ImageOutputStream that is used for all compilation-related output
      * @param executeOverride The policy for executing or not
      * @throws IOException If an IO Exception occurs
+     * @return The result of the compilation/execution
      */
     public abstract CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException;
 
