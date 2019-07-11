@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 cls
 title MS Paint IDE Codebase Setup
-type ascii-colored.txt
+type setup\\ascii-colored.txt
 echo.
 echo.
 echo.
@@ -46,11 +46,11 @@ if not defined jdk13 (
 )
 
 echo [90mReplacing data in gradle.properties...[0m
-powershell -Command "(gc ..\\gradle.properties) -replace 'jdk12', '%jdk12%' | Out-File -encoding ASCII ..\\gradle.properties"
-powershell -Command "(gc ..\\gradle.properties) -replace 'jdk13', '!jdk13!' | Out-File -encoding ASCII ..\\gradle.properties"
+powershell -Command "(gc gradle.properties) -replace 'jdk12', '%jdk12%' | Out-File -encoding ASCII gradle.properties"
+powershell -Command "(gc gradle.properties) -replace 'jdk13', '!jdk13!' | Out-File -encoding ASCII gradle.properties"
 
 REM This makes it so you don't commit your changes to gradle.properties
-start git update-index --assume-unchanged gradle.properties
+git update-index --assume-unchanged gradle.properties
 
 echo.
 echo Complete^^! This script may do more in the future, I mainly wanted to show off the sick colored ASCII art at the top.[0m

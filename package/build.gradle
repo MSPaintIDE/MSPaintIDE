@@ -1,13 +1,17 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
+tasks.whenTaskAdded {task ->
+    if(task.name.contains("startScripts")) {
+        task.enabled = false
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'application'
 
 assert Runtime.version().major() == 12
 sourceCompatibility = 12
 targetCompatibility = 12
-
-mainClassName = 'com.uddernetworks.mspaint.main.JFXWorkaround'
 
 ext {
     publishedVersion = rootProject.version
@@ -56,7 +60,7 @@ task jpackage(type: Exec, dependsOn: ':copyDependencies') {
             '--input', libraryPath,
             '--output', bundlePath,
             '--main-jar', mainJar,
-            '--main-class', mainClassName,
+            '--main-class', 'com.uddernetworks.mspaint.main.JFXWorkaround',
             '--java-options', '--add-opens javafx.base/com.sun.javafx.reflect=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-opens javafx.base/com.sun.javafx.collections=ALL-UNNAMED --illegal-access=deny'
     environment << [JPACKAGE_DEBUG: true]
 }
@@ -104,17 +108,12 @@ task innoCompile(type: Exec) {
     executable 'C:\\Program Files (x86)\\Inno Setup 5\\compil32.exe'
     args "/cc", "\"${generatedInnoSetupFile}\""
     doLast {
-        task copyOutput(dependsOn: processResources) {
-            doLast {
-                copy {
-                    from "${buildDir}\\resources\\main\\Output"
-                    into "${buildDir}"
-                    include "MSPaintIDE-${publishedVersion}.exe"
-                }
-            }
+        copy {
+            from "${buildDir}\\resources\\main\\Output"
+            into "${buildDir}"
+            include "MSPaintIDE-${publishedVersion}.exe"
         }
 
-        copyOutput.execute()
         println "Installation file: ${buildDir}\\MSPaintIDE-${publishedVersion}.exe"
     }
 }

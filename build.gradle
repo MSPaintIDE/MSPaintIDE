@@ -110,18 +110,23 @@ run {
 //    args = ['Test.txt']
 }
 
-task preLaunch << {
-    println 'COMPILE'
-    sassCompile.execute()
-}
-
-task replaceStuff << {
-    println 'REPLACE'
-    ant.replaceregexp(match: '@charset "UTF-8";', replace: '') {
-        fileset(dir: 'src/main/resources', includes: 'style.css')
+task preLaunch {
+    doLast {
+        println 'SCSS Compile'
+        sassCompile.execute()
     }
 }
 
+task replaceStuff {
+    doLast {
+        println 'SCSS Replace'
+        ant.replaceregexp(match: '@charset "UTF-8";', replace: '') {
+            fileset(dir: 'src/main/resources', includes: 'style.css')
+        }
+    }
+}
+
+run.dependsOn preLaunch
 preLaunch.finalizedBy replaceStuff
 
 task copyDependencies(type: Copy) {
