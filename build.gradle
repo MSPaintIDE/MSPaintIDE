@@ -6,7 +6,7 @@ plugins {
     id 'antlr'
     id "it.tellnet.sass" version "1.2"
     id "com.github.johnrengelman.shadow" version "4.0.2"
-    id 'org.openjfx.javafxplugin' version '0.0.6'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 
 ext {
@@ -29,7 +29,6 @@ tasks.withType(JavaCompile) {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
@@ -57,9 +56,9 @@ dependencies {
     // TODO: Clean this monstrosity of shit
     compile group: 'com.intellij', name: 'forms_rt', version:'7.0.3'
 
-    compile group: 'com.jfoenix', name: 'jfoenix', version: '9.0.8-J12'
+    compile 'com.github.MSPaintIDE:JFoenix:9.0.8-J12-jitpack'
     compile group: 'com.google.code.gson', name: 'gson', version:'2.8.5'
-    compile 'com.uddernetworks.newocr:NewOCR:2.0.0-SNAPSHOT'
+    compile 'com.uddernetworks.newocr:NewOCR:2.0.0'
     compile group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version: '1.10'
     compile 'org.ocpsoft.prettytime:prettytime:4.0.2.Final'
     compile group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
@@ -74,9 +73,7 @@ dependencies {
     javafxCompile "org.openjfx:javafx-graphics:12.0.1:win"
     javafxCompile "org.openjfx:javafx-controls:12.0.1:win"
     javafxCompile "org.openjfx:javafx-fxml:12.0.1:win"
-
-    // Local dependency from https://github.com/MSPaintIDE/PaintAssistant
-    compile ('com.uddernetworks.paintassist:PaintAssistant:1.0-SNAPSHOT') {
+    compile ('com.github.MSPaintIDE:PaintAssistant:1.0.1')  {
         exclude group: 'com.google.auto.value'
     }
 

@@ -1,7 +1,7 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 tasks.whenTaskAdded {task ->
-    if(task.name.contains("startScripts")) {
+    if(task.name.contains("startScripts") || task.name.contains("run")) {
         task.enabled = false
     }
 }

@@ -79,7 +79,7 @@ public class Commandline {
             if (printStatus) LOGGER.info("Process terminated with {}", exitCode);
             return exitCode;
         } catch (IOException e) {
-            LOGGER.error("An error occurred while running command with arguments " + command, e);
+            if (!e.getLocalizedMessage().contains("The system cannot find the file specified")) LOGGER.error("An error occurred while running command with arguments " + command, e);
             return -1;
         }
     }

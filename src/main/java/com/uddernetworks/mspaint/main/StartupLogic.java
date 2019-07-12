@@ -100,7 +100,7 @@ public class StartupLogic {
                         languageManager.getAllLanguages().stream().map(Language::getName).toArray(String[]::new), null);
 
                 var allLangs = languageManager.getAllLanguages();
-                if (res >= allLangs.size()) {
+                if (res == -1 || res >= allLangs.size()) {
                     LOGGER.info("Closed prompt, exiting...");
                     System.exit(1);
                 }
