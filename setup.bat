@@ -25,7 +25,7 @@ echo [0m
 if "%jdk13%" == "link" (
     echo [90mOpening URL...[0m
     echo.
-    start "" https://jdk.java.net/jpackage/
+    start "" https://download.java.net/java/early_access/jpackage/49/openjdk-13-jpackage+49_windows-x64_bin.zip
     goto :jdk13_prompt
 )
 

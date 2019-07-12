@@ -70,9 +70,8 @@ Thank you very much to the current donators:
 [@AL1L](https://al1l.com/)
 
 <h2 name="special-thanks">Special Thanks To:</h2>
+
 ![](https://www.yourkit.com/images/yklogo.png)
-
-
 
 YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
