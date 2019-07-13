@@ -105,7 +105,7 @@ processResources {
 
 // Actually compiles the installer
 task innoCompile(type: Exec) {
-    executable 'C:\\Program Files (x86)\\Inno Setup 5\\compil32.exe'
+    executable 'C:\\Program Files (x86)\\Inno Setup 6\\compil32.exe'
     args "/cc", "\"${generatedInnoSetupFile}\""
     doLast {
         copy {
