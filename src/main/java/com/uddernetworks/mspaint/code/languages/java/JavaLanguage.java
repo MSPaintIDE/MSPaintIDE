@@ -179,9 +179,6 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        LOGGER.info("Get LSP dir {}", DefaultLanguageServerWrapper.getLSPDirectory());
-        LOGGER.info("Base lsp path {}", this.lspPath);
-        LOGGER.info("Exists: {}", new File(this.lspPath, "jdt-language-server-latest"));
         return new File(this.lspPath, "jdt-language-server-latest").exists();
     }
 

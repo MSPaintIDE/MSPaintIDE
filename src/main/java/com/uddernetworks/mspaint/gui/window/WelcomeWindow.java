@@ -75,7 +75,6 @@ public class WelcomeWindow extends Stage implements Initializable {
     @FXML
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Init");
         try {
             recentProjects.setItems(FXCollections.observableList(ProjectManager.getRecent()));
 

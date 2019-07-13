@@ -45,12 +45,18 @@ if not defined jdk13 (
     exit /b
 )
 
-echo [90mReplacing data in gradle.properties...[0m
-powershell -Command "(gc gradle.properties) -replace 'jdk12', '%jdk12%' | Out-File -encoding ASCII gradle.properties"
-powershell -Command "(gc gradle.properties) -replace 'jdk13', '!jdk13!' | Out-File -encoding ASCII gradle.properties"
-
 REM This makes it so you don't commit your changes to gradle.properties
 git update-index --assume-unchanged gradle.properties
 
+set word=\\
+set jdk12=%jdk12:\=!word!%
+set jdk13=%jdk13:\=!word!%
+
+echo [90mReplacing data in gradle.properties...[0m
+powershell -Command "(gc gradle.properties) -replace 'jdk12', '!jdk12!' | Out-File -encoding ASCII gradle.properties"
+powershell -Command "(gc gradle.properties) -replace 'jdk13', '!jdk13!' | Out-File -encoding ASCII gradle.properties"
+
 echo.
 echo Complete^^! This script may do more in the future, I mainly wanted to show off the sick colored ASCII art at the top.[0m
+echo Press any key to exit...
+PAUSE >nul

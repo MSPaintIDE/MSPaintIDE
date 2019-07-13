@@ -453,7 +453,6 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
     }
 
     public static File getLSPDirectory() {
-        LOGGER.info("Dev mode: {}", MainGUI.DEV_MODE);
         var file = new File(MainGUI.APP_DATA, "lsp");
         if (MainGUI.DEV_MODE) {
             var envLsp = System.getenv("STATIC_LSP_DIRECTORY");
@@ -465,8 +464,6 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
                 System.exit(0);
             }
         }
-
-        LOGGER.info("Returning oof {}", file);
 
         return file;
     }
