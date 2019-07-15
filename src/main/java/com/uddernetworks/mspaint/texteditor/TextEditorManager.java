@@ -64,8 +64,6 @@ public class TextEditorManager {
         backupFile.createNewFile();
         Files.copy(this.originalFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        System.out.println("StartupLogic: " + Thread.currentThread());
-
         this.imageFile = createImageFile();
 
         this.imageClass = new ImageClass(this.imageFile, mainGUI, this.startupLogic);
@@ -211,9 +209,26 @@ public class TextEditorManager {
     private void initialProcess(boolean bindButtons) throws IOException, InterruptedException {
         LOGGER.info("Processing");
 
-        Runtime runtime = Runtime.getRuntime();
-        Process process = runtime.exec("mspaint.exe \"" + this.imageFile.getAbsolutePath() + "\"");
         this.startupLogic.getMainGUI().setIndeterminate(false);
+        openPaint(this.imageFile, bindButtons);
+
+        stopping.set(true);
+        savingThread.interrupt();
+        savingThread.join();
+
+        if (!this.imageFile.delete()) {
+            Thread.sleep(3000);
+            this.imageFile.delete();
+        }
+
+        LOGGER.info("Is headless? {}", MainGUI.HEADLESS);
+
+        if (MainGUI.HEADLESS) System.exit(0);
+    }
+
+    public static void openPaint(File file, boolean bindButtons) throws IOException, InterruptedException {
+        Runtime runtime = Runtime.getRuntime();
+        Process process = runtime.exec("mspaint.exe \"" + file + "\"");
 
         Runtime.getRuntime().addShutdownHook(new Thread(process::destroyForcibly));
 
@@ -226,17 +241,6 @@ public class TextEditorManager {
         process.waitFor();
 
         LOGGER.info("Closed MS Paint!");
-
-        stopping.set(true);
-        savingThread.interrupt();
-        savingThread.join();
-
-        if (!this.imageFile.delete()) {
-            Thread.sleep(3000);
-            this.imageFile.delete();
-        }
-
-        if (MainGUI.HEADLESS) System.exit(0);
     }
 
     // Utility methods

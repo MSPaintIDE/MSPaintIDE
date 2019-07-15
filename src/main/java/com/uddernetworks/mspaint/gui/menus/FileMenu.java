@@ -9,11 +9,16 @@ import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.Setting;
+import com.uddernetworks.mspaint.settings.SettingsManager;
 import com.uddernetworks.mspaint.texteditor.TextEditorManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public class FileMenu extends MenuBind {
 
@@ -37,7 +42,23 @@ public class FileMenu extends MenuBind {
         FileDirectoryChooser.openFileSaver(chooser -> {
             chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile());
             chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
-        }, file -> this.mainGUI.createAndOpenImageFile(file));
+        }, file -> {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    var usingFile = file;
+                    if (!usingFile.getName().endsWith(".png"))
+                        usingFile = new File(usingFile.getAbsolutePath() + ".png");
+
+                    BufferedImage image = new BufferedImage(600, 500, BufferedImage.TYPE_INT_ARGB);
+                    MainGUI.clearImage(image);
+                    ImageIO.write(image, "png", usingFile);
+
+                    TextEditorManager.openPaint(file, SettingsManager.getInstance().getSetting(Setting.INJECT_AUTO_NEW));
+                } catch (IOException | InterruptedException e) {
+                    LOGGER.error("Error creating image and opening MS Paint.");
+                }
+            });
+        });
     }
 
     @BindItem(label = "new.text-file")
@@ -69,7 +90,19 @@ public class FileMenu extends MenuBind {
         FileDirectoryChooser.openFileSelector(chooser -> {
             chooser.setInitialDirectory(ProjectManager.getPPFProject().getFile().getParentFile());
             chooser.setSelectedExtensionFilter(ProjectFileFilter.PNG);
-        }, file -> TextEditorManager.openAsync(file, mainGUI, Setting.INJECT_AUTO_OPEN));
+        }, file -> {
+            if (!file.getName().endsWith(".png")) {
+                TextEditorManager.openAsync(file, mainGUI, Setting.INJECT_AUTO_OPEN);
+            } else {
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        TextEditorManager.openPaint(file, SettingsManager.getInstance().getSetting(Setting.INJECT_AUTO_OPEN));
+                    } catch (IOException | InterruptedException e) {
+                        LOGGER.error("Error opening MS Paint", e);
+                    }
+                });
+            }
+        });
     }
 
     @BindItem(label = "settings")

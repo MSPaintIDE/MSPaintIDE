@@ -329,7 +329,7 @@ public class MainGUI extends Application implements Initializable {
         updateLoading(0, 1);
     }
 
-    private void clearImage(BufferedImage image) {
+    public static void clearImage(BufferedImage image) {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 image.setRGB(x, y, Color.WHITE.getRGB());

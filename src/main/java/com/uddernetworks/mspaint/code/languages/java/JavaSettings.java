@@ -45,7 +45,8 @@ public class JavaSettings extends LanguageSettings {
                         .setChooserTitle("Select or create the file the compiled jar will be")
                         .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
                         .setExtensionFilter(ProjectFileFilter.JAR)
-                        .setSave(true));
+                        .setSave(true),
+                () ->  new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
 
         addOption(JavaOptions.CLASS_OUTPUT,
                 new FileLangGUIOption("Class output")

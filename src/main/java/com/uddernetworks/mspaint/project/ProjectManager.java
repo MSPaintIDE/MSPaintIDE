@@ -2,6 +2,8 @@ package com.uddernetworks.mspaint.project;
 
 import com.google.gson.*;
 import com.uddernetworks.mspaint.main.JFXWorkaround;
+import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,27 +135,36 @@ public class ProjectManager {
         save();
         addRecent(ppfProject);
         writeRecent();
-        previous = ppfProject;
 
         if (previous != null) {
             try {
                 LOGGER.info("Restarting self, this may take a few seconds...");
                 StringBuilder cmd = new StringBuilder();
-                cmd.append(System.getProperty("java.home")).append(File.separator).append("bin").append(File.separator).append("java ");
+                var javaHome = "\"" + (MainGUI.DEV_MODE
+                        ? System.getProperty("java.home") :
+                        StartupLogic.getJarParent()
+                                .map(File::getAbsolutePath)
+                                .map(path -> path + "\\runtime")
+                                .orElse(System.getProperty("java.home")));
+
+                cmd.append(javaHome).append("\\bin\\java\" ");
                 for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
                     cmd.append(jvmArg).append(" ");
                 }
+
                 cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
                 cmd.append(JFXWorkaround.class.getName()).append(" ");
                 cmd.append(ppfProject.getFile().getAbsolutePath());
+                LOGGER.info(cmd.toString());
                 Runtime.getRuntime().exec(cmd.toString());
                 System.exit(0);
                 return;
             } catch (IOException e) {
-                LOGGER.error("Error while trying to self-restart");
+                LOGGER.error("Error while trying to self-restart", e);
             }
         }
 
+        previous = ppfProject;
         projectConsumer.accept(ppfProject);
     }
 
