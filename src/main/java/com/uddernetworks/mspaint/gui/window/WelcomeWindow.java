@@ -97,10 +97,8 @@ public class WelcomeWindow extends Stage implements Initializable {
             });
 
             openProject.setOnAction(event -> {
-                System.out.println("Open project click!");
                 File openAt = ProjectManager.getPPFProject() != null ? ProjectManager.getPPFProject().getFile().getParentFile() : new File(System.getProperty("user.home", "C:\\"));
 
-                System.out.println(openAt.getAbsolutePath());
                 FileDirectoryChooser.openFileSelector(chooser -> {
                     chooser.setInitialDirectory(openAt);
                     chooser.setSelectedExtensionFilter(ProjectFileFilter.PPF);

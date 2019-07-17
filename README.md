@@ -40,6 +40,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 - Native installer for easy usage
 - Full Discord RPC Support
 - IDE theming via CSS files
+- Program and compiler outputs as image logs
 
 ## How It Works
 
@@ -57,9 +58,9 @@ Contributors are always welcome, and for setting up the repository locally, ther
 
 ## Donations
 
-I've been doing mainly this project for over a year now, and even though I'm not making money off of it, I would be extremely appreciative for any contributions to help pay for the domain and the website's VPS. If you donate and want to be mentioned here, just put it in the donation message. Feel free to donate via  [PayPal](https://paypal.me/RubbaBoy).
+I've been doing mainly this project for over a year now, and even though I'm not making money off of it, I would be extremely appreciative for any contributions to help pay for the domain and the website's VPS. If you donate and want to be mentioned here, just put it in the donation message. Feel free to donate via  [PayPal](https://paypal.me/RubbaBoy) or [Open Collective](https://opencollective.com/mspaintide).
 
-Thank you very much to the current donators:
+Thank you very much to the current donors:
 
 [@Mr. Midnight](https://www.spigotmc.org/members/11614/)
 

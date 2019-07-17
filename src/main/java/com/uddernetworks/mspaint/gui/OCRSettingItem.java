@@ -92,7 +92,6 @@ public class OCRSettingItem extends Stage implements SettingItem, Initializable 
 
         this.fontKV.onKVActive(kvData -> getAndSaveProject(project -> {
             if (!kvData.getName().equals(project.getActiveFont())) {
-                System.out.println("Following is from active");
                 project.setActiveFont(kvData.getName());
             }
         }));

@@ -126,7 +126,6 @@ public class AngrySquiggleHighlighter {
         } else {
             var startIndex = Math.min(columnNumber, line.size() - 1); // Need to get BEFORE
             ImageLetter firstLetter = line.get(startIndex);
-            System.out.println("Column letter info: " + firstLetter.getLetter()  +" width: " + firstLetter.getWidth());
             calcXY = firstLetter;
 
             var lastLetter = line.get(length == Integer.MAX_VALUE ?

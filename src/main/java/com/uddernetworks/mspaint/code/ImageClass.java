@@ -58,6 +58,12 @@ public class ImageClass {
         this.scannedImage = imageCompare.getText(this.inputImage, this.mainGUI, this.startupLogic);
 
         var leadingStripped = this.scannedImage.stripLeadingSpaces();
+        if (leadingStripped.getLineCount() == 0) {
+            this.text = "";
+            this.leadingStripped = 0;
+            return;
+        }
+
         this.text = this.trimmedText = leadingStripped.getPrettyString();
         if (!AUTO_TRIM_TEXT) {
             this.text = this.scannedImage.getPrettyString();

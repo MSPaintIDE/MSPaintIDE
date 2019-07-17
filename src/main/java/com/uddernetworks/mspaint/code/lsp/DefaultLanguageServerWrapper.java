@@ -26,6 +26,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -194,49 +195,59 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
             diagnosticManager.resumeDiagnostics();
 
             watcher.addListener((type, changedFile) -> {
-                changedFile = changedFile.getAbsoluteFile();
-                LOGGER.info("Changed: {}", changedFile.getAbsolutePath());
+                try {
+                    changedFile = changedFile.getAbsoluteFile();
+                    LOGGER.info("Changed: {}", changedFile.getAbsolutePath());
 
-                if (lsp.usesWorkspaces()) {
-                    // Not sure if this should happen before or after the following switch? It has seemed to work fine with
-                    // Java, Python, Go and JS so far, so I'm leaving this the same.
-                    this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
-                            new FileEvent(changedFile.toURI().toString(), type.toFCT())
-                    )));
-                }
+                    if (lsp.usesWorkspaces()) {
+                        // Not sure if this should happen before or after the following switch? It has seemed to work fine with
+                        // Java, Python, Go and JS so far, so I'm leaving this the same.
+                        this.languageServer.getWorkspaceService().didChangeWatchedFiles(new DidChangeWatchedFilesParams(Arrays.asList(
+                                new FileEvent(changedFile.toURI().toString(), type.toFCT())
+                        )));
+                    }
 
-                Document document = null;
-                switch (type) {
-                    case CREATE:
-                        LOGGER.info("Create document event {}", changedFile.getAbsolutePath());
-                        writeIfApplicable(document = this.documentManager.getDocument(changedFile));
-                        if (this.useInputForWorkspace) document.setUseRelativeToDirectory(file);
-                        document.open();
-                        break;
-                    case MODIFY:
-                        LOGGER.info("Modify document event {}", changedFile.getAbsolutePath());
-                        document = this.documentManager.getDocument(changedFile);
+                    File finalChangedFile = changedFile;
+                    CompletableFuture.delayedExecutor(type == WatchType.CREATE ? 500 : 0, TimeUnit.MILLISECONDS).execute(() -> {
+                        Document document = null;
+                        switch (type) {
+                            case CREATE:
+                                LOGGER.info("Create document event {}", finalChangedFile.getAbsolutePath());
+                                writeIfApplicable(document = this.documentManager.getDocument(finalChangedFile));
+                                if (this.useInputForWorkspace) document.setUseRelativeToDirectory(file);
+                                document.open();
+                                break;
+                            case MODIFY:
+                                LOGGER.info("Modify document event {}", finalChangedFile.getAbsolutePath());
+                                document = this.documentManager.getDocument(finalChangedFile);
 
-                        var imageClass = document.getImageClass();
-                        imageClass.scan();
-                        document.setText(imageClass.getText());
+                                var imageClass = document.getImageClass();
+                                imageClass.scan();
+                                document.setText(imageClass.getText());
 
-                        writeIfApplicable(document);
+                                writeIfApplicable(document);
 
-                        if (!document.isOpened()) document.open();
+                                if (!document.isOpened()) document.open();
 
-                        document.modifyText(document.getText());
-                        break;
-                    case DELETE:
-                        LOGGER.info("Delete document event {}", changedFile.getAbsolutePath());
-                        this.documentManager.getDocument(changedFile, false).ifPresent(this.documentManager::deleteDocument);
-                        break;
-                }
+                                document.modifyText(document.getText());
+                                break;
+                            case DELETE:
+                                LOGGER.info("Delete document event {}", finalChangedFile.getAbsolutePath());
+                                this.documentManager.getDocument(finalChangedFile, false).ifPresent(this.documentManager::deleteDocument);
+                                break;
+                        }
 
-                if (document != null) {
-                    var imageClass = document.getImageClass();
-                    this.startupLogic.runRPC(rpcManager -> rpcManager.setFileEditing(imageClass.getInputImage().getName()));
-                    if (type == WatchType.CREATE && imageClass.getScannedImage().isPresent()) highlightFile(document);
+                        if (document != null) {
+                            var imageClass = document.getImageClass();
+                            this.startupLogic.runRPC(rpcManager -> rpcManager.setFileEditing(imageClass.getInputImage().getName()));
+                            if (type == WatchType.CREATE && imageClass.getScannedImage().isPresent())
+                                highlightFile(document);
+                        }
+                    });
+
+
+                } catch (Exception e) {
+                    LOGGER.error("An error occurred", e);
                 }
             });
         });

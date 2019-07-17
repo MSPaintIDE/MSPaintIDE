@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXListView;
 import com.uddernetworks.mspaint.gui.kvselection.EmptySelection;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.main.ThemeManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,11 +23,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public class DiagnosticWindow extends Stage implements Initializable {
 
     private static Logger LOGGER = LoggerFactory.getLogger(DiagnosticWindow.class);
+    private ThemeManager.ThemeChanger themeManager;
 
     @FXML
     private JFXListView<Map.Entry<String, Diagnostic>> diagnosticList;
@@ -63,7 +66,7 @@ public class DiagnosticWindow extends Stage implements Initializable {
         setTitle("IDE Diagnostics");
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
 
-        this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of(
+        this.themeManager = this.mainGUI.getThemeManager().onDarkThemeChange(root, Map.of(
                 "#diagnosticWindow", "dark"
         ));
     }
@@ -75,7 +78,10 @@ public class DiagnosticWindow extends Stage implements Initializable {
         this.diagnosticList.setFocusTraversable(false);
         this.diagnosticList.setSelectionModel(new EmptySelection<>());
 
-        this.diagnosticList.setCellFactory(t -> new DiagnosticCell(this.mainGUI));
+        this.diagnosticList.setCellFactory(t -> {
+            themeManager.update(500, TimeUnit.MILLISECONDS);
+            return new DiagnosticCell(this.mainGUI);
+        });
 
         this.diagnosticManager.onDiagnosticChange(diagnostics -> {
             Platform.runLater(() -> {

@@ -59,8 +59,6 @@ public class SettingsManager extends SettingsAccessor<Setting> {
                 settings.put(setting, setting.getDefault());
             });
 
-            System.out.println("settings = " + settings);
-
             properties.store(new FileOutputStream(file), "MS Paint IDE Global Settings");
             return;
         }

@@ -62,8 +62,8 @@ public class DefaultFileWatcher implements FileWatcher {
                         found.forEach((type, file) -> {
                             if (!keepFromFilters(file)) return;
 
-                            if (lastActionMap.get(file) == type && System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS)
-                                return;
+                            if (compareTypes(lastActionMap.get(file), type) && System.currentTimeMillis() - cooldownMap.getOrDefault(file, 0L) < MIN_TIME_IN_MILLS) return;
+
                             lastActionMap.put(file, type);
 
                             cooldownMap.put(file, System.currentTimeMillis());
@@ -81,6 +81,12 @@ public class DefaultFileWatcher implements FileWatcher {
         });
 
         return this;
+    }
+
+    private boolean compareTypes(WatchType gotten, WatchType type) {
+        if (type == gotten) return true;
+        if (type == WatchType.CREATE && gotten == WatchType.MODIFY) return true;
+        return type == WatchType.MODIFY && gotten == WatchType.CREATE;
     }
 
     @Override

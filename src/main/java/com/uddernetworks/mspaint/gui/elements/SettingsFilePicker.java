@@ -58,9 +58,6 @@ public class SettingsFilePicker extends HBox {
 
             File finalOpenAt = FileDirectoryChooser.givenOrParentDir(openAt);
 
-            System.out.println("finalOpenAt = " + finalOpenAt.getAbsolutePath());
-            System.out.println(getOptions());
-
             if (getOptions() == ChooseOptions.FILES_ONLY) {
                 FileDirectoryChooser.openFileSelector(chooser ->
                         chooser.setInitialDirectory(finalOpenAt), file ->
