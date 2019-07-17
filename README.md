@@ -42,6 +42,10 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 - IDE theming via CSS files
 - Program and compiler outputs as image logs
 
+The following is a video of the IDE being installed and used (For just usage, skip to [2:18](https://www.youtube.com/watch?v=fhSaLx6l9Xk&t=138s))
+
+[![](https://rubbaboy.me/images/qr73jd0)](https://www.youtube.com/watch?v=fhSaLx6l9Xk)
+
 ## How It Works
 
 MS Paint IDE is an application that runs alongside MS Paint that reads its images you make from MS Paint. It then uses a custom [OCR](https://github.com/MSPaintIDE/NewOCR/) to read, parse, highlight, and execute the text. All output files and logs are created as images, to show you the program output, and compilation/interpretation output.
@@ -55,6 +59,24 @@ The wiki also includes screenshots of nearly everything, with videos coming soon
 ## Contributing
 
 Contributors are always welcome, and for setting up the repository locally, there's a wiki page walking through the whole process: [https://wiki.ms-paint-i.de/developing](https://wiki.ms-paint-i.de/developing)
+
+A video of getting the codebase locally is available below.
+
+[![](https://rubbaboy.me/images/k9m6lri)](https://www.youtube.com/watch?v=HF1e9tk5GT4)
+
+## Screenshots
+
+Many screenshots are available through [the wiki](https://wiki.ms-paint-i.de), but some showing off the IDE are below so you don't need to dig through it.
+
+[![](https://wiki.ms-paint-i.de/assets/images/misc/replace.png)](https://wiki.ms-paint-i.de/misc/editing)
+
+[![](https://wiki.ms-paint-i.de/assets/images/setup/ocr-settings-first.png)](https://wiki.ms-paint-i.de/setup/ocr)
+
+[![](https://wiki.ms-paint-i.de/assets/images/misc/context-edit.png)](https://wiki.ms-paint-i.de/misc/editing)
+
+[![](https://wiki.ms-paint-i.de/assets/images/misc/injected-buttons.png)](https://wiki.ms-paint-i.de/misc/editing)
+
+[![](https://wiki.ms-paint-i.de/assets/images/codebase-setup.png)](https://wiki.ms-paint-i.de/developing)
 
 ## Donations
 
@@ -71,7 +93,6 @@ Thank you very much to the current donors:
 [@AL1L](https://al1l.com/)
 
 <h2 name="special-thanks">Special Thanks To:</h2>
-
 ![](https://www.yourkit.com/images/yklogo.png)
 
 YourKit supports open source projects with its full-featured Java Profiler.
