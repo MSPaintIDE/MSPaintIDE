@@ -1,13 +1,13 @@
 <h1 align="center">
   <a href="http://hits.dwyl.io/RubbaBoy/MSPaintIDE"><img src="http://hits.dwyl.io/RubbaBoy/MSPaintIDE.svg" alt="HitCount"/></a>
   <a href="https://discord.gg/RXmPkPJ" style="color: transparent">
-        <a href="https://opencollective.com/MSPaintIDE" alt="Financial Contributors on Open Collective"><img src="https://opencollective.com/MSPaintIDE/all/badge.svg?label=financial+contributors" /></a> <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
+        <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
             alt="MS Paint IDE's Discord server">
   </a>
   <img src="https://img.shields.io/github/stars/MSPaintIDE/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
   <a href="https://github.com/RubbaBoy/MSPaintIDE/issues"><img src="https://img.shields.io/github/issues/MSPaintIDE/MSPaintIDE.svg" alt="GitHub issues"/></a>
   <a href="https://github.com/RubbaBoy/MSPaintIDE/blob/master/LICENSE.txt"><img src="https://img.shields.io/github/license/MSPaintIDE/MSPaintIDE.svg" alt="GitHub issues"/></a>
-    <a href="https://opencollective.com/MSPaintIDE"><img alt="open collective backers and sponsors" src="https://img.shields.io/opencollective/all/MSPaintIDE.svg"></a>
+    <a href="https://opencollective.com/MSPaintIDE" alt="Financial Contributors on Open Collective"><img src="https://opencollective.com/MSPaintIDE/all/badge.svg?label=financial+contributors" /></a> 
 </h1>
 <h1 align="center">
     <img src="https://ms-paint-i.de/images/Logo-Header.png">
