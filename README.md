@@ -1,7 +1,7 @@
 <h1 align="center">
   <a href="http://hits.dwyl.io/RubbaBoy/MSPaintIDE"><img src="http://hits.dwyl.io/RubbaBoy/MSPaintIDE.svg" alt="HitCount"/></a>
   <a href="https://discord.gg/RXmPkPJ" style="color: transparent">
-        <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
+        <a href="https://opencollective.com/MSPaintIDE" alt="Financial Contributors on Open Collective"><img src="https://opencollective.com/MSPaintIDE/all/badge.svg?label=financial+contributors" /></a> <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
             alt="MS Paint IDE's Discord server">
   </a>
   <img src="https://img.shields.io/github/stars/MSPaintIDE/MSPaintIDE.svg?label=Stars&style=flat" alt="Stars"/>
@@ -99,3 +99,32 @@ YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
 and <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>,
 innovative and intelligent tools for profiling Java and .NET applications.
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/MSPaintIDE/MSPaintIDE/graphs/contributors"><img src="https://opencollective.com/MSPaintIDE/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/MSPaintIDE/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/MSPaintIDE"><img src="https://opencollective.com/MSPaintIDE/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/MSPaintIDE/contribute)]
+
+<a href="https://opencollective.com/MSPaintIDE/organization/0/website"><img src="https://opencollective.com/MSPaintIDE/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/1/website"><img src="https://opencollective.com/MSPaintIDE/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/2/website"><img src="https://opencollective.com/MSPaintIDE/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/3/website"><img src="https://opencollective.com/MSPaintIDE/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/4/website"><img src="https://opencollective.com/MSPaintIDE/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/5/website"><img src="https://opencollective.com/MSPaintIDE/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/6/website"><img src="https://opencollective.com/MSPaintIDE/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/7/website"><img src="https://opencollective.com/MSPaintIDE/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/8/website"><img src="https://opencollective.com/MSPaintIDE/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/MSPaintIDE/organization/9/website"><img src="https://opencollective.com/MSPaintIDE/organization/9/avatar.svg"></a>
