@@ -58,7 +58,7 @@ The wiki also includes screenshots of nearly everything, with videos coming soon
 
 ## Contributing
 
-Contributors are always welcome, and for setting up the repository locally, there's a wiki page walking through the whole process: [https://wiki.ms-paint-i.de/developing](https://wiki.ms-paint-i.de/developing)
+Contributors are always welcome, and for setting up the repository locally, there's a wiki page walking through the whole process: [https://wiki.ms-paint-i.de/developing](https://wiki.ms-paint-i.de/developing). If you simply have a bug or feature request, please make a issue on GitHub using the corresponding template.
 
 A video of getting the codebase locally is available below.
 
