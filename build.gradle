@@ -32,6 +32,7 @@ repositories {
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.gradle.org/gradle/libs-releases' }
 }
 
 sass {
@@ -40,6 +41,7 @@ sass {
 }
 
 mainClassName = 'com.uddernetworks.mspaint.main.JFXWorkaround'
+//mainClassName = 'com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle.GradleConnector'
 
 jar {
     manifest {
@@ -54,20 +56,22 @@ configurations {
 
 dependencies {
     // TODO: Clean this monstrosity of shit
-    compile group: 'com.intellij', name: 'forms_rt', version:'7.0.3'
+    implementation 'com.intellij:forms_rt:7.0.3'
 
-    compile 'com.github.MSPaintIDE:JFoenix:9.0.8-J12-jitpack'
-    compile group: 'com.google.code.gson', name: 'gson', version:'2.8.5'
-    compile 'com.uddernetworks.newocr:NewOCR:2.0.0'
-    compile group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version: '1.10'
-    compile 'org.ocpsoft.prettytime:prettytime:4.0.2.Final'
-    compile group: 'net.java.dev.jna', name: 'jna', version: '5.2.0'
-    compile 'commons-codec:commons-codec:1.11'
-    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
-    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.18'
+    implementation 'com.github.MSPaintIDE:JFoenix:9.0.8-J12-jitpack'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.uddernetworks.newocr:NewOCR:2.0.0'
+    implementation 'org.apache.xmlgraphics:batik-rasterizer:1.10'
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.2.Final'
+    implementation 'net.java.dev.jna:jna:5.2.0'
+    implementation 'commons-codec:commons-codec:1.11'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'org.apache.commons:commons-compress:1.18'
 
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+    implementation 'org.gradle:gradle-tooling-api:4.10.2'
+
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'org.slf4j:slf4j-log4j12:1.7.25'
 
     javafxCompile "org.openjfx:javafx-base:12.0.1:win"
     javafxCompile "org.openjfx:javafx-graphics:12.0.1:win"
@@ -77,19 +81,19 @@ dependencies {
         exclude group: 'com.google.auto.value'
     }
 
-    compile             "com.google.auto.value:auto-value-annotations:1.6.2"
+    implementation      "com.google.auto.value:auto-value-annotations:1.6.2"
     annotationProcessor "com.google.auto.value:auto-value:1.6.2"
 
-    compile 'org.eclipse.lsp4j:org.eclipse.lsp4j:0.7.2'
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.1'
-    compile group: 'org.antlr', name: 'antlr4-runtime', version: '4.7.2'
+    implementation 'org.eclipse.lsp4j:org.eclipse.lsp4j:0.7.2'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.1'
+    implementation 'org.antlr:antlr4-runtime:4.7.2'
     antlr 'org.antlr:antlr4:4.7.2'
 
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 
-    compile 'com.github.Vatuu:discord-rpc:1.6.2'
+    implementation 'com.github.Vatuu:discord-rpc:1.6.2'
 
-    compile configurations.javafxCompile
+    implementation configurations.javafxCompile
 }
 
 run {

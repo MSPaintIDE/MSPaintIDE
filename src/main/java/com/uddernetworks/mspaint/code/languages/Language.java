@@ -17,7 +17,8 @@ import com.uddernetworks.mspaint.util.Browse;
 import org.slf4j.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +29,7 @@ public abstract class Language {
 
     // Public as to be used in subclasses
     public StartupLogic startupLogic;
-    private PPFProject lastInitted = null;
+    protected PPFProject lastInitted = null;
 
     public Language(StartupLogic startupLogic) {
         this.startupLogic = startupLogic;
@@ -65,6 +66,10 @@ public abstract class Language {
      * @return the file extensions used
      */
     public abstract String[] getFileExtensions();
+
+    public Optional<ExtraCreationOptions> getExtraCreationOptions() {
+        return Optional.empty();
+    }
 
     /**
      * Gets the input {@link Option} for the language.
@@ -157,7 +162,7 @@ public abstract class Language {
         try {
             var res = JOptionPane.showOptionDialog(null,
                     promptText,
-                    "Download Confirm", 0, JOptionPane.INFORMATION_MESSAGE,
+                    "Download Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                     new ImageIcon(ImageIO.read(Language.class.getResourceAsStream("/icons/popup/save.png"))),
                     new String[]{"Yes", "No", "Website"}, "Yes");
             if (res == 0) {

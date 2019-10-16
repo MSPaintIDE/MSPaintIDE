@@ -1,11 +1,12 @@
-package com.uddernetworks.mspaint.code.languages.java;
+package com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle;
 
 import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.gui.BooleanLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.DropdownLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.FileLangGUIOption;
-import com.uddernetworks.mspaint.code.gui.StringLangGUIOption;
-import com.uddernetworks.mspaint.code.languages.LanguageSettings;
+import com.uddernetworks.mspaint.code.languages.java.JavaLangOptions;
+import com.uddernetworks.mspaint.code.languages.java.JavaOptions;
+import com.uddernetworks.mspaint.code.languages.java.JavaSettings;
 import com.uddernetworks.mspaint.main.ProjectFileFilter;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import org.slf4j.Logger;
@@ -13,14 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class JavaSettings extends LanguageSettings {
+public class GradleSettings extends JavaSettings {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(JavaSettings.class);
-
-    protected JavaSettings() {
-        super("Java");
-        LOGGER.info("Creating settings!");
-    }
+    private static Logger LOGGER = LoggerFactory.getLogger(GradleSettings.class);
 
     @Override
     public void initOptions() {
@@ -38,23 +34,23 @@ public class JavaSettings extends LanguageSettings {
                         .setSelectDirectories(true),
                 () -> createSubOfProject("highlight"));
 
-        addOption(JavaLangOptions.MAIN, new StringLangGUIOption("Main class", "com.example.Main"), // TODO: Class selection
-                () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
+//        addOption(JavaLangOptions.MAIN, new StringLangGUIOption("Main class", "com.example.Main"), // TODO: Class selection
+//                () -> new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
 
-        addOption(JavaLangOptions.JAR,
-                new FileLangGUIOption("Jar output")
-                        .setChooserTitle("Select or create the file the compiled jar will be")
-                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
-                        .setExtensionFilter(ProjectFileFilter.JAR)
-                        .setSave(true),
-                () ->  new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
+//        addOption(JavaLangOptions.JAR,
+//                new FileLangGUIOption("Jar output")
+//                        .setChooserTitle("Select or create the file the compiled jar will be")
+//                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
+//                        .setExtensionFilter(ProjectFileFilter.JAR)
+//                        .setSave(true),
+//                () ->  new File(ProjectManager.getPPFProject().getFile().getParentFile(), "Output.jar"));
 
-        addOption(JavaLangOptions.CLASS_OUTPUT,
-                new FileLangGUIOption("Class output")
-                        .setChooserTitle("Select the directory the classes will compile to")
-                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
-                        .setSelectDirectories(true),
-                () -> create(new File(ProjectManager.getPPFProject().getFile().getParentFile(), "build")));
+//        addOption(JavaLangOptions.CLASS_OUTPUT,
+//                new FileLangGUIOption("Class output")
+//                        .setChooserTitle("Select the directory the classes will compile to")
+//                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
+//                        .setSelectDirectories(true),
+//                () -> create(new File(ProjectManager.getPPFProject().getFile().getParentFile(), "build")));
 
         addOption(JavaLangOptions.COMPILER_OUTPUT,
                 new FileLangGUIOption("Compiler output")
@@ -103,6 +99,6 @@ public class JavaSettings extends LanguageSettings {
 
     @Override
     protected JavaOptions nameToEnum(String name) {
-        return JavaLangOptions.staticFromName(name);
+        return JavaLangOptions.staticOptionalFromName(name).orElseGet(() -> GradleOptions.staticFromName(name));
     }
 }

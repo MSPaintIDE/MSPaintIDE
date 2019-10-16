@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -17,7 +19,7 @@
            </cursor>
        </JFXComboBox>
       <Label layoutX="10.0" layoutY="122.0" prefWidth="100.0" text="Project language:" styleClass="theme-text" />
-      <JFXButton fx:id="finish" buttonType="FLAT" layoutX="344.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="primary-button" text="Finish" />
+      <JFXButton fx:id="finish" buttonType="RAISED" layoutX="344.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="primary-button" text="Finish" />
       <JFXButton fx:id="cancel" buttonType="FLAT" layoutX="429.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Cancel" styleClass="theme-text" />
       <JFXButton fx:id="help" buttonType="FLAT" layoutX="514.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" text="Help" styleClass="theme-text" />
       <Label fx:id="error" layoutX="10.0" layoutY="165.0" prefWidth="580.0" style="-fx-text-fill: RED;" />

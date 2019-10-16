@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
+import com.uddernetworks.mspaint.code.languages.ExtraCreationOptions;
 import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
@@ -32,7 +33,12 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -41,6 +47,7 @@ public class JavaLanguage extends Language {
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
     private LanguageSettings settings = new JavaSettings();
+    private ExtraCreationOptions extraCreationOptions;
     private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
     private HighlightData highlightData = new JavaHighlightData(this);
     private Map<String, Map<String, String>> replaceData = new HashMap<>();
@@ -80,19 +87,19 @@ public class JavaLanguage extends Language {
             var corePrefsTemplate = new File(templateDir, ".settings\\org.eclipse.jdt.core.prefs").toPath();
 
             var sourceListener = bindFileVariable(corePrefsTemplate, corePrefs, "replace.versionnumber");
-            getLanguageSettings().onChangeSetting(JavaOptions.JAVA_VERSION, (Consumer<String>) value -> sourceListener.accept(value.substring(5)), true);
+            getLanguageSettings().onChangeSetting(JavaLangOptions.JAVA_VERSION, (Consumer<String>) value -> sourceListener.accept(value.substring(5)), true);
 
             var classpath = new File(workspaceDir, ".classpath").toPath();
             var classpathTemplate = new File(templateDir, ".classpath").toPath();
 
             var versionListener = bindFileVariable(classpathTemplate, classpath, "replace.version");
-            getLanguageSettings().onChangeSetting(JavaOptions.JAVA_VERSION, (Consumer<String>) value -> versionListener.accept("JavaSE-" + value.substring(5)), true);
+            getLanguageSettings().onChangeSetting(JavaLangOptions.JAVA_VERSION, (Consumer<String>) value -> versionListener.accept("JavaSE-" + value.substring(5)), true);
 
             var srcListener = bindFileVariable(classpathTemplate, classpath, "replace.src");
-            getLanguageSettings().onChangeSetting(JavaOptions.INPUT_DIRECTORY, (Consumer<File>) file -> srcListener.accept(relativizeFromBase(file)), true);
+            getLanguageSettings().onChangeSetting(JavaLangOptions.INPUT_DIRECTORY, (Consumer<File>) file -> srcListener.accept(relativizeFromBase(file)), true);
 
             var binListener = bindFileVariable(classpathTemplate, classpath, "replace.bin");
-            getLanguageSettings().onChangeSetting(JavaOptions.CLASS_OUTPUT, (Consumer<File>) file -> binListener.accept(relativizeFromBase(file)), true);
+            getLanguageSettings().onChangeSetting(JavaLangOptions.CLASS_OUTPUT, (Consumer<File>) file -> binListener.accept(relativizeFromBase(file)), true);
 
             var project = new File(workspaceDir, ".project").toPath();
             var projectTemplate = new File(templateDir, ".project").toPath();
@@ -112,6 +119,12 @@ public class JavaLanguage extends Language {
 
     public JavaLanguage(StartupLogic startupLogic) {
         super(startupLogic);
+
+        try {
+            extraCreationOptions = new JavaCreationExtraOptions(startupLogic.getMainGUI());
+        } catch (IOException e) {
+            LOGGER.error("Error creating JavaCreationExtraOptions", e);
+        }
     }
 
     private String relativizeFromBase(File file) {
@@ -138,6 +151,15 @@ public class JavaLanguage extends Language {
     }
 
     @Override
+    public void loadForCurrent() {
+        var current = ProjectManager.getPPFProject();
+        if (current.equals(this.lastInitted)) return;
+        this.lastInitted = current;
+        LOGGER.info("Build system setting: {}", (Object) settings.getSetting(JavaLangOptions.BUILDSYSTEM));
+        getLanguageSettings().initOptions();
+    }
+
+    @Override
     public String getName() {
         return "Java";
     }
@@ -148,23 +170,28 @@ public class JavaLanguage extends Language {
     }
 
     @Override
+    public Optional<ExtraCreationOptions> getExtraCreationOptions() {
+        return Optional.of(extraCreationOptions);
+    }
+
+    @Override
     public Option getInputOption() {
-        return JavaOptions.INPUT_DIRECTORY;
+        return JavaLangOptions.INPUT_DIRECTORY;
     }
 
     @Override
     public Option getHighlightOption() {
-        return JavaOptions.HIGHLIGHT_DIRECTORY;
+        return JavaLangOptions.HIGHLIGHT_DIRECTORY;
     }
 
     @Override
     public File getAppOutput() {
-        return getLanguageSettings().getSetting(JavaOptions.PROGRAM_OUTPUT);
+        return getLanguageSettings().getSetting(JavaLangOptions.PROGRAM_OUTPUT);
     }
 
     @Override
     public File getCompilerOutput() {
-        return getLanguageSettings().getSetting(JavaOptions.COMPILER_OUTPUT);
+        return getLanguageSettings().getSetting(JavaLangOptions.COMPILER_OUTPUT);
     }
 
     @Override
@@ -229,22 +256,22 @@ public class JavaLanguage extends Language {
 
     @Override
     public void highlightAll(List<ImageClass> imageClasses) throws IOException {
-        if (!this.settings.<Boolean>getSetting(JavaOptions.HIGHLIGHT)) return;
-        highlightAll(JavaOptions.HIGHLIGHT_DIRECTORY, imageClasses);
+        if (!this.settings.<Boolean>getSetting(JavaLangOptions.HIGHLIGHT)) return;
+        highlightAll(JavaLangOptions.HIGHLIGHT_DIRECTORY, imageClasses);
     }
 
     @Override
     public CompilationResult compileAndExecute(MainGUI mainGUI, List<ImageClass> imageClasses, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, BuildSettings executeOverride) throws IOException {
-        if (!getLanguageSettings().<Boolean>getSetting(JavaOptions.COMPILE)) new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
-        var jarFile = this.settings.<File>getSetting(JavaOptions.JAR);
-        var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaOptions.LIBRARY_LOCATION);
-        var otherFilesOptional = this.settings.<File>getSettingOptional(JavaOptions.OTHER_LOCATION);
-        var classOutput = this.settings.<File>getSetting(JavaOptions.CLASS_OUTPUT);
+        if (!getLanguageSettings().<Boolean>getSetting(JavaLangOptions.COMPILE)) new DefaultCompilationResult(CompilationResult.Status.COMPILE_COMPLETE);
+        var jarFile = this.settings.<File>getSetting(JavaLangOptions.JAR);
+        var libDirectoryOptional = this.settings.<File>getSettingOptional(JavaLangOptions.LIBRARY_LOCATION);
+        var otherFilesOptional = this.settings.<File>getSettingOptional(JavaLangOptions.OTHER_LOCATION);
+        var classOutput = this.settings.<File>getSetting(JavaLangOptions.CLASS_OUTPUT);
         var execute = false;
         if (executeOverride == BuildSettings.EXECUTE) {
             execute = true;
         } else if (executeOverride != BuildSettings.DONT_EXECUTE) {
-            execute = this.settings.<Boolean>getSetting(JavaOptions.EXECUTE);
+            execute = this.settings.<Boolean>getSetting(JavaLangOptions.EXECUTE);
         }
 
         var libFiles = new ArrayList<File>();

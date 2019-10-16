@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="gridpane-theme" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXComboBox fx:id="buildSystemSelection" layoutX="130.0" layoutY="28.0" prefHeight="30.0" prefWidth="150.0" styleClass="language-selection-dark">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXComboBox>
+      <JFXTextField fx:id="groupId" layoutX="130.0" layoutY="68.0" prefHeight="25.0" prefWidth="460.0" styleClass="theme-text" text="com.example" />
+      <Label layoutX="14.0" layoutY="72.0" prefWidth="100.0" styleClass="theme-text" text="Group ID:" />
+      <Label layoutX="14.0" layoutY="112.0" prefWidth="100.0" styleClass="theme-text" text="Artifact ID:" />
+      <JFXButton fx:id="finish" buttonType="RAISED" layoutX="344.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" styleClass="primary-button" text="Finish" />
+      <JFXButton fx:id="cancel" buttonType="FLAT" layoutX="429.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" styleClass="theme-text" text="Cancel" />
+      <JFXButton fx:id="help" buttonType="FLAT" layoutX="514.0" layoutY="356.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" style="-fx-text-fill:BLACK;-fx-font-size:14px;" styleClass="theme-text" text="Help" />
+      <JFXTextField fx:id="artifactId" layoutX="130.0" layoutY="108.0" prefHeight="25.0" prefWidth="460.0" promptText="Example" styleClass="theme-text" />
+      <JFXTextField fx:id="version" layoutX="130.0" layoutY="148.0" prefHeight="25.0" prefWidth="230.0" styleClass="theme-text" text="1.0.0-SNAPSHOT" />
+      <Label layoutX="14.0" layoutY="32.0" prefWidth="100.0" styleClass="theme-text" text="Buildsystem" />
+      <Label layoutX="14.0" layoutY="152.0" prefWidth="100.0" styleClass="theme-text" text="Version" />
+   </children>
+</AnchorPane>

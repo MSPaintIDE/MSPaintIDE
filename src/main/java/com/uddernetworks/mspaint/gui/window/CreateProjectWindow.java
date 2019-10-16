@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDecorator;
 import com.jfoenix.controls.JFXTextField;
+import com.uddernetworks.mspaint.code.languages.ExtraCreationOptions;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.main.FileDirectoryChooser;
 import com.uddernetworks.mspaint.main.MainGUI;
@@ -56,6 +57,8 @@ public class CreateProjectWindow extends Stage implements Initializable {
     private MainGUI mainGUI;
     private boolean isStatic;
     private File staticFile;
+
+    private ExtraCreationOptions defaultCreationOptions = new ExtraCreationOptions.NoExtraOptions();
 
     public CreateProjectWindow(MainGUI mainGUI) throws IOException {
         super();
@@ -123,11 +126,11 @@ public class CreateProjectWindow extends Stage implements Initializable {
             ppfProject.setName(name);
             ppfProject.setLanguage(language.getClass().getCanonicalName());
 
-            Platform.runLater(() -> {
-                ProjectManager.switchProject(ppfProject);
+            ProjectManager.switchProject(ppfProject);
+            close();
+            Platform.runLater(() -> language.getExtraCreationOptions().orElse(defaultCreationOptions).onComplete(this, ppfProject, language, () -> {
                 this.mainGUI.refreshProject();
-                close();
-            });
+            }));
         });
 
         browse.setOnAction(event -> {
@@ -138,6 +141,6 @@ public class CreateProjectWindow extends Stage implements Initializable {
 
         cancel.setOnAction(event -> close());
 
-        help.setOnAction(event -> Browse.browse("https://github.com/RubbaBoy/MSPaintIDE/blob/master/README.md"));
+        help.setOnAction(event -> Browse.browse("https://github.com/MSPaintIDE/MSPaintIDE/blob/master/README.md"));
     }
 }

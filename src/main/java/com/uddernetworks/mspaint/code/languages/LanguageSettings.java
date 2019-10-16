@@ -100,7 +100,13 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
         ProjectManager.getPPFProject().getLanguageSetting(langName)
                 .forEach((name, value) -> {
                     var enumName = nameToEnum(name);
-                    if (enumName.getType().equals(File.class) && value instanceof String) value = new File((String) value);
+                    var type = enumName.getType();
+                    if (type.equals(File.class) && value instanceof String) {
+                        value = new File((String) value);
+                    } else if (type.equals(Enum.class) && value instanceof Integer) {
+                        value = type.getEnumConstants()[(int) value];
+                    }
+
                     setSetting(enumName, value);
                 });
     }

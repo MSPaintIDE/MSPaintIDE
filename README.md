@@ -22,8 +22,11 @@
   </b>
 </p>
 
-
 People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
+
+## dev branch
+
+This branch is the dev branch, therefore things are not guaranteed to work. The current changes are being made to allow for Gradle (With a modular buildsystem framework) support, and possibly some other small things. It is targeted to the v3.1.0 release.
 
 ## Features
 
@@ -93,7 +96,6 @@ Thank you very much to the current donors:
 [@AL1L](https://al1l.com/)
 
 <h2 name="special-thanks">Special Thanks To:</h2>
-
 ![](https://www.yourkit.com/images/yklogo.png)
 
 YourKit supports open source projects with its full-featured Java Profiler.

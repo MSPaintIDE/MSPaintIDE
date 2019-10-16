@@ -14,11 +14,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -117,14 +124,14 @@ public class TextEditorManager {
         });
     }
 
-    public ScannedImage generateLetterGrid(String text) throws ExecutionException, InterruptedException {
-        var ocrManager = this.startupLogic.getOCRManager();
-        ScannedImage scannedImage = new DefaultScannedImage(this.originalFile, null, null);
+    public static ScannedImage generateLetterGrid(StartupLogic startupLogic, File originalFile, String text) throws ExecutionException, InterruptedException {
+        var ocrManager = startupLogic.getOCRManager();
+        ScannedImage scannedImage = new DefaultScannedImage(originalFile, null, null);
         LetterGenerator letterGenerator = new LetterGenerator();
 
         int size = SettingsManager.getInstance().getSetting(Setting.EDIT_FILE_SIZE);
 
-        var data = this.startupLogic.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
+        var data = startupLogic.getOCRManager().getActiveFont().getDatabaseManager().getAllCharacterSegments().get();
 
         // Gets the space DatabaseCharacter used for the current font size from the database
         var spaceOptional = data.stream().filter(databaseCharacter -> databaseCharacter.getLetter() == ' ').findFirst();
@@ -139,7 +146,7 @@ public class TextEditorManager {
         double spaceRatio = space.getAvgWidth() / space.getAvgHeight();
         int characterBetweenSpace = (int) ((spaceRatio * size) / 3D);
 
-        var centerPopulator = this.startupLogic.getCenterPopulator();
+        var centerPopulator = startupLogic.getCenterPopulator();
         try {
             centerPopulator.generateCenters(size);
         } catch (IOException e) {
@@ -194,7 +201,7 @@ public class TextEditorManager {
 
         ImageIO.write(image, "png", tempImage);
 
-        ScannedImage letterGrid = generateLetterGrid(text);
+        ScannedImage letterGrid = generateLetterGrid(startupLogic, originalFile, text);
         int[] coords = getBiggestCoordinates(letterGrid);
         applyPadding(letterGrid, padding, padding);
 

@@ -12,8 +12,14 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -56,7 +62,7 @@ public class JavaCodeManager {
         var genSrc = new File(generateJava, "src");
 
         var javaFiles = new ArrayList<File>();
-        var input = this.language.getLanguageSettings().<File>getSetting(JavaOptions.INPUT_DIRECTORY);
+        var input = this.language.getLanguageSettings().<File>getSetting(JavaLangOptions.INPUT_DIRECTORY);
         imageClasses.forEach(imageClass -> {
             var relative = input.toURI().relativize(imageClass.getInputImage().toURI());
             var absoluteOutput = new File(genSrc, relative.getPath().replaceAll("\\.png$", ""));
@@ -108,7 +114,7 @@ public class JavaCodeManager {
         jarCreate.add("-f");
         jarCreate.add(jarFile.getAbsolutePath());
         jarCreate.add("-e");
-        jarCreate.add(this.language.getLanguageSettings().getSetting(JavaOptions.MAIN));
+        jarCreate.add(this.language.getLanguageSettings().getSetting(JavaLangOptions.MAIN));
         jarCreate.add("*");
         Commandline.runLiveCommand(jarCreate, classOutputFolder, "Jar");
 
