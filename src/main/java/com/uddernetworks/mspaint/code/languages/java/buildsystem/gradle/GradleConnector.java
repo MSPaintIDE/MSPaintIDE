@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class GradleConnector {
 
     public static void main(String[] args) {
-        var connector = new GradleConnector("E:\\MSPaintIDE", "E:\\MSPaintIDE");
+        var connector = new GradleConnector("E:\\MSPaintIDE");
         System.out.println("Using Gradle version: " + connector.getGradleVersion());
         System.out.println("Tasks:");
         connector.getGradleTasks().forEach(task -> {
@@ -24,8 +24,7 @@ public class GradleConnector {
 
     private org.gradle.tooling.GradleConnector connector;
 
-    public GradleConnector(String gradleInstallationDir, String projectDir) {
-        var gradleInstallationDir1 = new File(gradleInstallationDir);
+    public GradleConnector(String projectDir) {
         connector = org.gradle.tooling.GradleConnector.newConnector();
 //        connector.useInstallation(gradleInstallationDir1);
         connector.forProjectDirectory(new File(projectDir));
@@ -48,5 +47,11 @@ public class GradleConnector {
             tasks = new ArrayList<>(project.getTasks());
         }
         return tasks;
+    }
+
+    public void runTask(String... tasks) {
+        try (ProjectConnection connection = connector.connect()) {
+            connection.newBuild().forTasks(tasks).run();
+        }
     }
 }

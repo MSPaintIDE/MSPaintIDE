@@ -126,8 +126,8 @@ public class TextEditorManager {
 
     public static ScannedImage generateLetterGrid(StartupLogic startupLogic, File originalFile, String text) throws ExecutionException, InterruptedException {
         var ocrManager = startupLogic.getOCRManager();
-        ScannedImage scannedImage = new DefaultScannedImage(originalFile, null, null);
-        LetterGenerator letterGenerator = new LetterGenerator();
+        var scannedImage = new DefaultScannedImage(originalFile, null, null);
+        var letterGenerator = new LetterGenerator();
 
         int size = SettingsManager.getInstance().getSetting(Setting.EDIT_FILE_SIZE);
 

@@ -10,6 +10,8 @@ import com.uddernetworks.mspaint.code.languages.HighlightData;
 import com.uddernetworks.mspaint.code.languages.Language;
 import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.Option;
+import com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle.GradleCodeManager;
+import com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle.GradleSettings;
 import com.uddernetworks.mspaint.code.lsp.DefaultLanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.LSP;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
@@ -46,6 +48,7 @@ public class JavaLanguage extends Language {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaLanguage.class);
 
+    private JavaBuildSystem currentBuildSystem;
     private LanguageSettings settings = new JavaSettings();
     private ExtraCreationOptions extraCreationOptions;
     private JavaCodeManager javaCodeManager = new JavaCodeManager(this);
@@ -155,8 +158,25 @@ public class JavaLanguage extends Language {
         var current = ProjectManager.getPPFProject();
         if (current.equals(this.lastInitted)) return;
         this.lastInitted = current;
-        LOGGER.info("Build system setting: {}", (Object) settings.getSetting(JavaLangOptions.BUILDSYSTEM));
+        var buildSystem = (JavaBuildSystem) settings.getSetting(JavaLangOptions.BUILDSYSTEM);
+        if (buildSystem != currentBuildSystem) {
+            currentBuildSystem = buildSystem;
+            switch (buildSystem) {
+                case GRADLE:
+                    settings = new GradleSettings();
+                    javaCodeManager = new GradleCodeManager(this);
+                    break;
+                case DEFAULT:
+                    settings = new JavaSettings();
+                    javaCodeManager = new JavaCodeManager(this);
+                    break;
+            }
+        }
         getLanguageSettings().initOptions();
+
+        if (buildSystem == JavaBuildSystem.GRADLE) {
+            settings.setSetting(JavaLangOptions.INPUT_DIRECTORY, current.getFile().getParentFile());
+        }
     }
 
     @Override
@@ -206,19 +226,19 @@ public class JavaLanguage extends Language {
 
     @Override
     public boolean hasLSP() {
-        return new File(this.lspPath, "jdt-language-server-latest").exists();
+        return new File(lspPath, "jdt-language-server-latest").exists();
     }
 
     @Override
     public boolean installLSP() {
         return lspInstallHelper("Would you like to proceed with downloading the Java Language Server by the Eclipse Foundation? This will take up about 94MB.", "https://github.com/eclipse/eclipse.jdt.ls", () -> {
             LOGGER.info("Installing Java LSP server...");
-            this.lspPath.mkdirs();
+            lspPath.mkdirs();
 
-            var tarGz = new File(this.lspPath, "jdt-language-server-latest.tar.gz");
+            var tarGz = new File(lspPath, "jdt-language-server-latest.tar.gz");
             FileUtils.copyURLToFile(new URL("http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz"), tarGz);
 
-            var destDir = new File(this.lspPath, "jdt-language-server-latest");
+            var destDir = new File(lspPath, "jdt-language-server-latest");
 
             try (var in = new TarArchiveInputStream(
                     new GzipCompressorInputStream(

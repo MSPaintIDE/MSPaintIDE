@@ -1,4 +1,4 @@
-package com.uddernetworks.mspaint.code.languages.java;
+package com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle;
 
 import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.ImageClass;
@@ -6,9 +6,13 @@ import com.uddernetworks.mspaint.code.execution.CompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultCompilationResult;
 import com.uddernetworks.mspaint.code.execution.DefaultRunningCode;
 import com.uddernetworks.mspaint.code.languages.SourceMover;
+import com.uddernetworks.mspaint.code.languages.java.JavaCodeManager;
+import com.uddernetworks.mspaint.code.languages.java.JavaLangOptions;
+import com.uddernetworks.mspaint.code.languages.java.JavaLanguage;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.logging.ThreadedLogger;
 import com.uddernetworks.mspaint.main.MainGUI;
+import com.uddernetworks.mspaint.project.ProjectManager;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,25 +25,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+public class GradleCodeManager extends JavaCodeManager {
 
-public class JavaCodeManager {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(JavaCodeManager.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(GradleCodeManager.class);
 
     private JavaLanguage language;
 
-    public JavaCodeManager(JavaLanguage language) {
-        this.language = language;
+    private GradleConnector gradleConnector;
+
+    public GradleCodeManager(JavaLanguage language) {
+        super(language);
     }
 
+    @Override
     public CompilationResult compileAndExecute(List<ImageClass> imageClasses, File jarFile, File otherFiles, File classOutputFolder, MainGUI mainGUI, ImageOutputStream imageOutputStream, ImageOutputStream compilerStream, List<File> libs, boolean execute) throws IOException {
+        gradleConnector = new GradleConnector(ProjectManager.getPPFProject().getFile().getParent());
+
         mainGUI.setIndeterminate(true);
         classOutputFolder.mkdirs();
 
@@ -47,11 +52,10 @@ public class JavaCodeManager {
         var compilerOut = new PrintStream(compilerStream);
         var programOut = new PrintStream(imageOutputStream);
 
-        ThreadedLogger.addPipe(compilerOut, "JavaCompiler", JavaCodeManager.class, Commandline.class);
+        ThreadedLogger.addPipe(compilerOut, "JavaCompiler", GradleCodeManager.class, Commandline.class);
 
         long start = System.currentTimeMillis();
 
-        LOGGER.info("Compiling...");
         mainGUI.setStatusText("Compiling...");
 
         LOGGER.info("Compiling {} files", imageClasses.size());
@@ -63,34 +67,13 @@ public class JavaCodeManager {
         FileUtils.deleteDirectory(classOutputFolder);
         classOutputFolder.mkdirs();
 
-        var javac = new ArrayList<String>();
-        javac.add("javac");
-        javac.add("-g");
-        javac.add("-verbose");
-        if (!libs.isEmpty()) javac.add("-cp");
-        libs.forEach(file -> {
-            javac.add(file.getAbsolutePath());
-        });
-        javac.add("-d");
-        javac.add(classOutputFolder.getAbsolutePath());
-        sourceMover.getAddedFiles().stream().map(File::getAbsolutePath).forEach(javac::add);
-        Commandline.runLiveCommand(javac, null, "Javac");
+        gradleConnector.runTask("build");
 
         LOGGER.info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
         start = System.currentTimeMillis();
         LOGGER.info("Packaging jar...");
         mainGUI.setStatusText("Packaging jar...");
-
-        if (otherFiles != null) {
-            if (otherFiles.isDirectory()) {
-                copyFolder(otherFiles, classOutputFolder);
-            } else {
-                File newLoc = new File(classOutputFolder, otherFiles.getName());
-                newLoc.createNewFile();
-                Files.copy(Paths.get(otherFiles.getAbsolutePath()), Paths.get(newLoc.getAbsolutePath()), REPLACE_EXISTING);
-            }
-        }
 
         var jarCreate = new ArrayList<String>();
         jarCreate.add("jar");
@@ -115,7 +98,7 @@ public class JavaCodeManager {
         var runningCodeManager = mainGUI.getStartupLogic().getRunningCodeManager();
         runningCodeManager.runCode(new DefaultRunningCode(() -> {
             ThreadedLogger.removePipe("JavaCompiler");
-            ThreadedLogger.addPipe(programOut, "JavaProgram", JavaCodeManager.class, Commandline.class);
+            ThreadedLogger.addPipe(programOut, "JavaProgram", GradleCodeManager.class, Commandline.class);
 
             return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()), null, "Java");
         }).afterSuccess(exitCode -> {
