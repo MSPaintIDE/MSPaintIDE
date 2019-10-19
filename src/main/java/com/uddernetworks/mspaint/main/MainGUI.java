@@ -1,6 +1,12 @@
 package com.uddernetworks.mspaint.main;
 
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDecorator;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXProgressBar;
+import com.jfoenix.controls.JFXTextField;
 import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.BuildSettings;
 import com.uddernetworks.mspaint.code.ImageClass;
@@ -49,14 +55,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
+import java.awt.Color;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -68,6 +86,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.BOTTOM_DISPLAY;
+import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.HIDDEN;
 
 public class MainGUI extends Application implements Initializable {
 
@@ -225,8 +244,7 @@ public class MainGUI extends Application implements Initializable {
                     System.exit(1);
                 }
 
-                initialProject = file;
-                if (!initialProject.isFile()) initialProject = null;
+                initialProject = initialProject.isFile() ? file : null;
             } else if (file.getName().endsWith(".png")) {
                 Runtime.getRuntime().exec("mspaint.exe \"" + file.getAbsolutePath() + "\"");
                 System.exit(0);
@@ -365,6 +383,10 @@ public class MainGUI extends Application implements Initializable {
     private File previousInput = null;
 
     public void refreshProject() {
+        refreshProject(false);
+    }
+
+    public void refreshProject(boolean firstRefresh) {
         var currentProject = ProjectManager.getPPFProject();
         String languageClassString = currentProject.getLanguage();
         Platform.runLater(() -> {
@@ -388,14 +410,20 @@ public class MainGUI extends Application implements Initializable {
                     var lspWrapper = language.getLSPWrapper();
 
                     var fileWatchManager = this.startupLogic.getFileWatchManager();
-                    if (previousInput != null)
+                    if (previousInput != null) {
                         fileWatchManager.getWatcher(previousInput).ifPresent(fileWatchManager::removeWatcher);
+                    }
 
                     LOGGER.info("Updating RPC");
                     this.startupLogic.runRPC(rpcManager -> {
                         rpcManager.setLanguage(language);
                         rpcManager.updateProject();
                     });
+
+                    if (firstRefresh) {
+                        language.getLanguageSettings().generateDefaults();
+                        ProjectManager.save();
+                    }
 
                     LOGGER.info("About to change setting listener!");
                     language.getLanguageSettings().onChangeSetting(language.getInputOption(), (Consumer<File>) inputFile -> {
@@ -819,7 +847,7 @@ public class MainGUI extends Application implements Initializable {
         var langSettings = getCurrentLanguage().getLanguageSettings();
 
         var i = new LongAdder();
-        var addingSettings = langSettings.getOptionsGUI(requirement -> requirement != BOTTOM_DISPLAY)
+        var addingSettings = langSettings.getOptionsGUI(requirement -> requirement != BOTTOM_DISPLAY && requirement != HIDDEN)
                 .stream()
                 .sorted(Comparator.comparingInt(LangGUIOption::getIndex))
                 .collect(Collectors.toList());
@@ -838,7 +866,7 @@ public class MainGUI extends Application implements Initializable {
 
             if (langGUIOption.getRequirement() == LangGUIOptionRequirement.UNMODIFIABLE) {
                 display.setDisable(true);
-            } else if (langGUIOption.hasChangeButton()) {
+            } else if (langGUIOption.getRequirement() != LangGUIOptionRequirement.HIDDEN && langGUIOption.hasChangeButton()) {
                 childrenAdding.add(buttonGen.apply(langGUIOption::activateChangeButtonAction));
             }
 

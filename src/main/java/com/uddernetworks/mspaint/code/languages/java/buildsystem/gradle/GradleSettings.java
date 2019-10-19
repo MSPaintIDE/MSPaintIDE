@@ -4,6 +4,7 @@ import com.uddernetworks.mspaint.cmd.Commandline;
 import com.uddernetworks.mspaint.code.gui.BooleanLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.DropdownLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.FileLangGUIOption;
+import com.uddernetworks.mspaint.code.gui.HiddenGUIOption;
 import com.uddernetworks.mspaint.code.languages.java.JavaLangOptions;
 import com.uddernetworks.mspaint.code.languages.java.JavaOptions;
 import com.uddernetworks.mspaint.code.languages.java.JavaSettings;
@@ -51,6 +52,9 @@ public class GradleSettings extends JavaSettings {
 //                        .setInitialDirectory(FileLangGUIOption.PPF_PARENT_DIR)
 //                        .setSelectDirectories(true),
 //                () -> create(new File(ProjectManager.getPPFProject().getFile().getParentFile(), "build")));
+
+        addOption(JavaLangOptions.CLASS_OUTPUT, new HiddenGUIOption(),
+                () -> create(new File(ProjectManager.getPPFProject().getFile().getParentFile(), "build")));
 
         addOption(JavaLangOptions.COMPILER_OUTPUT,
                 new FileLangGUIOption("Compiler output")

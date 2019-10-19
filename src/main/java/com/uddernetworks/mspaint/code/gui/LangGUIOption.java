@@ -77,4 +77,8 @@ public interface LangGUIOption {
     public void setRequirement(LangGUIOptionRequirement requirement);
 
     LangGUIOptionRequirement getRequirement();
+
+    default boolean isHidden() {
+        return false;
+    }
 }

@@ -80,7 +80,6 @@ public class JavaCreationExtraOptions extends ExtraCreationOptions {
 
         setScene(scene);
         this.mainGUI.getThemeManager().addStage(this);
-        show();
 
         setTitle("Gradle options");
         getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("ms-paint-logo-taskbar.png")));
@@ -122,6 +121,9 @@ public class JavaCreationExtraOptions extends ExtraCreationOptions {
 
                 Commandline.runLiveCommand(Arrays.asList("gradle", "wrapper", "--gradle-version", "5.6.2", "--distribution-type", "all"), parent, "Gradle");
 
+                // TODO: This will fail if the OCR has not been trained yet. This should be resolved somehow, probably by
+                //       training the database on CMS if no font has been trained yet.
+
                 try {
                     ImageIO.write(createImage("plugins {\n" +
                             "    id 'java'\n" +
@@ -155,7 +157,7 @@ public class JavaCreationExtraOptions extends ExtraCreationOptions {
 
         cancel.setOnAction(event -> {
             close();
-//            createProjectWindow.close();
+            createProjectWindow.close();
         });
 
         help.setOnAction(event -> Browse.browse("https://github.com/MSPaintIDE/MSPaintIDE/blob/master/README.md"));

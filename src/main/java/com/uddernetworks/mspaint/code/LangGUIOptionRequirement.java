@@ -22,5 +22,10 @@ public enum LangGUIOptionRequirement {
      * The option is displayed but can not be changed by the user; only programmatically. Used for things like go's
      * src folder.
      */
-    UNMODIFIABLE
+    UNMODIFIABLE,
+
+    /**
+     * The option is hidden from any GUI.
+     */
+    HIDDEN
 }

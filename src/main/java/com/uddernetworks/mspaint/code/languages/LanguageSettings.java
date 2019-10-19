@@ -4,6 +4,8 @@ import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.gui.LangGUIOption;
 import com.uddernetworks.mspaint.project.ProjectManager;
 import com.uddernetworks.mspaint.settings.SettingsAccessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class LanguageSettings extends SettingsAccessor<Option> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LanguageSettings.class);
 
     private String langName;
     private Map<Option, Supplier<Object>> defaultGenerators = new HashMap<>();
@@ -31,7 +35,6 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     public void generateDefaults() {
         this.defaultGenerators.entrySet()
                 .stream()
-                .filter(entry -> !isSet(entry.getKey()))
                 .forEach(entry -> setSetting(entry.getKey(), entry.getValue().get(), false));
     }
 
@@ -46,6 +49,14 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
         langGUIOption.bindValue(option, this);
         langGUIOption.setIndex(option.ordinal());
         onChangeSetting(option, langGUIOption::setSetting);
+    }
+
+    /**
+     * Same as {@link #addOption(Option, LangGUIOption, Supplier)} except with just the default generator, and no
+     * displaying of actual settings.
+     */
+    protected void addDefault(Option option, Supplier<Object> defaultGenerator) {
+        this.defaultGenerators.put(option, defaultGenerator == null ? () -> null : defaultGenerator);
     }
 
     protected File create(File file) {
@@ -64,7 +75,7 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     }
 
     public List<Map.Entry<Option, LangGUIOption>> getOptions(Predicate<LangGUIOptionRequirement> predicate) {
-        return this.optionMap.entrySet().stream().filter(entry -> predicate.test(entry.getKey().getRequirement())).collect(Collectors.toList());
+        return this.optionMap.entrySet().stream().filter(entry -> !entry.getValue().isHidden() && predicate.test(entry.getKey().getRequirement())).collect(Collectors.toList());
     }
 
     public List<Option> getOptionsTyped(Predicate<LangGUIOptionRequirement> predicate) {

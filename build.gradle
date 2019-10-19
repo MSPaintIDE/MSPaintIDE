@@ -41,7 +41,7 @@ sass {
 }
 
 mainClassName = 'com.uddernetworks.mspaint.main.JFXWorkaround'
-//mainClassName = 'com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle.GradleConnector'
+// mainClassName = 'com.uddernetworks.mspaint.discord.DiscordRPCManager'
 
 jar {
     manifest {

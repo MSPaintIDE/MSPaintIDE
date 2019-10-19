@@ -23,6 +23,11 @@ public abstract class ExtraCreationOptions extends Stage implements Initializabl
         this.onComplete = onComplete;
     }
 
+    public ExtraCreationOptions showWindow() {
+        show();
+        return this;
+    }
+
     public static class NoExtraOptions extends ExtraCreationOptions {
         @Override
         public void onComplete(CreateProjectWindow createProjectWindow, PPFProject ppfProject, Language language, Runnable onComplete) {
@@ -32,6 +37,11 @@ public abstract class ExtraCreationOptions extends Stage implements Initializabl
         @Override
         public void initialize(URL location, ResourceBundle resources) {
 
+        }
+
+        @Override
+        public ExtraCreationOptions showWindow() {
+            return this;
         }
     }
 

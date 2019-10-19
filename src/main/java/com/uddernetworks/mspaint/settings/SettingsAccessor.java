@@ -6,7 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class SettingsAccessor<G> {
@@ -75,10 +80,14 @@ public abstract class SettingsAccessor<G> {
     }
 
     public void setSetting(G setting, Object value, boolean override, boolean runOnChange) {
-        if (this.settings.containsKey(setting) && !override) return;
-        settings.put(setting, value);
-        if (runOnChange) Platform.runLater(() -> this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
-        save();
+        if (override || this.settings.get(setting) == null) {
+            settings.put(setting, value);
+            if (runOnChange) {
+                Platform.runLater(() -> this.onChangeSettings.getOrDefault(setting, Collections.emptyList()).forEach(consumer -> consumer.accept(value)));
+            }
+
+            save();
+        }
     }
 
     public <T> void onChangeSetting(G setting, Consumer<T> consumer) {

@@ -127,10 +127,13 @@ public class CreateProjectWindow extends Stage implements Initializable {
             ppfProject.setLanguage(language.getClass().getCanonicalName());
 
             ProjectManager.switchProject(ppfProject);
-            close();
-            Platform.runLater(() -> language.getExtraCreationOptions().orElse(defaultCreationOptions).onComplete(this, ppfProject, language, () -> {
-                this.mainGUI.refreshProject();
-            }));
+            Platform.runLater(() -> {
+                close();
+                language.getExtraCreationOptions()
+                        .map(ExtraCreationOptions::showWindow)
+                        .orElse(defaultCreationOptions)
+                        .onComplete(this, ppfProject, language, () -> this.mainGUI.refreshProject(true));
+            });
         });
 
         browse.setOnAction(event -> {

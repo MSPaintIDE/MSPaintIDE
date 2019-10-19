@@ -164,19 +164,21 @@ public class JavaLanguage extends Language {
             switch (buildSystem) {
                 case GRADLE:
                     settings = new GradleSettings();
+                    settings.setSetting(JavaLangOptions.BUILDSYSTEM, JavaBuildSystem.GRADLE);
                     javaCodeManager = new GradleCodeManager(this);
                     break;
                 case DEFAULT:
                     settings = new JavaSettings();
+                    settings.setSetting(JavaLangOptions.BUILDSYSTEM, JavaBuildSystem.DEFAULT);
                     javaCodeManager = new JavaCodeManager(this);
                     break;
             }
         }
         getLanguageSettings().initOptions();
 
-        if (buildSystem == JavaBuildSystem.GRADLE) {
-            settings.setSetting(JavaLangOptions.INPUT_DIRECTORY, current.getFile().getParentFile());
-        }
+//        if (buildSystem == JavaBuildSystem.GRADLE) {
+//            settings.setSetting(JavaLangOptions.INPUT_DIRECTORY, current.getFile().getParentFile());
+//        }
     }
 
     @Override
