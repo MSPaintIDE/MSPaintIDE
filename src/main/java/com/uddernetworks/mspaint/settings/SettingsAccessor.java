@@ -115,8 +115,8 @@ public abstract class SettingsAccessor<G> {
         return false;
     }
 
-    protected abstract void save();
+    public abstract void save();
 
-    protected abstract void reload() throws IOException;
+    public abstract void reload() throws IOException;
 
 }

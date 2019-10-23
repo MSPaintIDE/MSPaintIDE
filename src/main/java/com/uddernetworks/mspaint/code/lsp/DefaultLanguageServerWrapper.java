@@ -14,7 +14,29 @@ import com.uddernetworks.mspaint.watcher.WatchType;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.ClientCapabilities;
+import org.eclipse.lsp4j.CodeActionCapabilities;
+import org.eclipse.lsp4j.CompletionCapabilities;
+import org.eclipse.lsp4j.CompletionItemCapabilities;
+import org.eclipse.lsp4j.DefinitionCapabilities;
+import org.eclipse.lsp4j.DidChangeWatchedFilesCapabilities;
+import org.eclipse.lsp4j.DidChangeWatchedFilesParams;
+import org.eclipse.lsp4j.DidChangeWorkspaceFoldersParams;
+import org.eclipse.lsp4j.ExecuteCommandCapabilities;
+import org.eclipse.lsp4j.FileEvent;
+import org.eclipse.lsp4j.FormattingCapabilities;
+import org.eclipse.lsp4j.InitializeParams;
+import org.eclipse.lsp4j.InitializedParams;
+import org.eclipse.lsp4j.ReferencesCapabilities;
+import org.eclipse.lsp4j.RenameCapabilities;
+import org.eclipse.lsp4j.SemanticHighlightingCapabilities;
+import org.eclipse.lsp4j.SignatureHelpCapabilities;
+import org.eclipse.lsp4j.SynchronizationCapabilities;
+import org.eclipse.lsp4j.TextDocumentClientCapabilities;
+import org.eclipse.lsp4j.WorkspaceClientCapabilities;
+import org.eclipse.lsp4j.WorkspaceEditCapabilities;
+import org.eclipse.lsp4j.WorkspaceFolder;
+import org.eclipse.lsp4j.WorkspaceFoldersChangeEvent;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageServer;
 import org.slf4j.Logger;
@@ -22,8 +44,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +61,10 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import static com.uddernetworks.mspaint.code.lsp.LSStatus.*;
+import static com.uddernetworks.mspaint.code.lsp.LSStatus.INITIALIZED;
+import static com.uddernetworks.mspaint.code.lsp.LSStatus.STARTED;
+import static com.uddernetworks.mspaint.code.lsp.LSStatus.STARTING;
+import static com.uddernetworks.mspaint.code.lsp.LSStatus.STOPPED;
 
 public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
 
@@ -267,7 +300,7 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
 
                 if (document.getText() == null) return;
 
-                if (writingFile.createNewFile()) setHidden(writingFile);
+//                if (writingFile.createNewFile()) setHidden(writingFile);
                 Files.write(writingFile.toPath(), document.getText().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
             } catch (IOException e) {
                 LOGGER.error("Error while writing to file after creation/modification", e);

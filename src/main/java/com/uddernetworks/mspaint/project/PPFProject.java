@@ -1,5 +1,8 @@
 package com.uddernetworks.mspaint.project;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -8,6 +11,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class PPFProject {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PPFProject.class);
 
     private transient File file;
 
@@ -134,7 +139,10 @@ public class PPFProject {
     }
 
     public void setLanguageSetting(String language, Map<String, Object> map, boolean override) {
-        if (!this.languageSettings.containsKey(language) || override) this.languageSettings.put(language, map);
+        if (!this.languageSettings.containsKey(language) || override) {
+            LOGGER.info("Setting for {} with: {}", language, map);
+            this.languageSettings.put(language, map);
+        }
     }
 
     @Override

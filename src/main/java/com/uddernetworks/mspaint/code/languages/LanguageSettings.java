@@ -33,9 +33,7 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     protected abstract Option nameToEnum(String name);
 
     public void generateDefaults() {
-        this.defaultGenerators.entrySet()
-                .stream()
-                .forEach(entry -> setSetting(entry.getKey(), entry.getValue().get(), false));
+        this.defaultGenerators.forEach((key, value) -> setSetting(key, value.get(), false));
     }
 
     protected void addOption(Option option, LangGUIOption langGUIOption) {
@@ -97,7 +95,7 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
 
     @Override
     public void save() {
-        ProjectManager.getPPFProject().setLanguageSetting(this.langName, this.optionMap.keySet()
+        ProjectManager.getPPFProject().setLanguageSetting(this.langName, settings.keySet()
                 .stream()
                 .filter(this::isSet)
                 .filter(option -> getSettingOptional(option).isPresent())
@@ -106,7 +104,7 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
     }
 
     @Override
-    protected void reload() {
+    public void reload() {
         this.settings.clear();
         ProjectManager.getPPFProject().getLanguageSetting(langName)
                 .forEach((name, value) -> {
@@ -114,8 +112,8 @@ public abstract class LanguageSettings extends SettingsAccessor<Option> {
                     var type = enumName.getType();
                     if (type.equals(File.class) && value instanceof String) {
                         value = new File((String) value);
-                    } else if (type.equals(Enum.class) && value instanceof Integer) {
-                        value = type.getEnumConstants()[(int) value];
+                    } else if (type.getSuperclass().equals(Enum.class) && value instanceof String) {
+                        value = Enum.valueOf((Class<? extends Enum>) type, (String) value);
                     }
 
                     setSetting(enumName, value);

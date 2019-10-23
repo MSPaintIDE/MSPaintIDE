@@ -3,19 +3,10 @@ package com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle;
 import com.uddernetworks.mspaint.code.LangGUIOptionRequirement;
 import com.uddernetworks.mspaint.code.languages.java.JavaOptions;
 
-import java.io.File;
 import java.util.Arrays;
 
-import static com.uddernetworks.mspaint.code.LangGUIOptionRequirement.REQUIRED;
-
 public enum GradleOptions implements JavaOptions {
-    /**
-     * The directory where code image files go
-     *
-     * @see File
-     * @see LangGUIOptionRequirement#REQUIRED
-     */
-    INPUT_DIRECTORY("inputDirectory", File.class, REQUIRED);
+    ;
 
     private String name;
     private LangGUIOptionRequirement requirement;

@@ -37,33 +37,45 @@ public class SourceMover {
      *                     will be moved as-is.
      */
     public void moveToHardTemp(List<ImageClass> imageClasses) {
-        addedFiles.clear();
-        destination = new File(System.getProperty("java.io.tmpdir"), "MSPaintIDE_" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
-        var genSrc = new File(destination, "src");
+        try {
+            System.out.println(111);
+            addedFiles.clear();
+            System.out.println(222);
+            destination = new File(System.getProperty("java.io.tmpdir"), "MSPaintIDE_" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+            System.out.println("destination = " + destination);
+            destination.mkdirs();
+            System.out.println(333);
+            var genSrc = new File(destination, "src");
+            System.out.println(444);
+            genSrc.mkdirs();
+            System.out.println(555);
 
-        var imageClassMap = imageClasses.stream().collect(Collectors.toMap(ImageClass::getInputImage, imageClass -> imageClass));
-        IDEFileUtils.getFilesFromDirectory(input, (String[]) null).forEach(file -> {
+            var imageClassMap = imageClasses.stream().collect(Collectors.toMap(ImageClass::getInputImage, imageClass -> imageClass));
+            IDEFileUtils.getFilesFromDirectory(input, (String[]) null).forEach(file -> {
 
-            var relative = input.toURI().relativize(file.toURI());
+                var relative = input.toURI().relativize(file.toURI());
 
-            Optional.ofNullable(imageClassMap.get(file)).ifPresentOrElse(imageClass -> {
-                var absoluteOutput = new File(genSrc, relative.getPath().replaceAll("\\.png$", ""));
-                try {
-                    FileUtils.write(absoluteOutput, imageClass.getText(), Charset.defaultCharset());
-                    addedFiles.add(absoluteOutput);
-                } catch (IOException e) {
-                    LOGGER.error("An error occurred while writing to the temp file {}", absoluteOutput.getAbsolutePath());
-                }
-            }, () -> {
-                var to = new File(genSrc, relative.getPath());
-                try {
-                    Files.copy(file.toPath(), to.toPath());
-                    addedFiles.add(to);
-                } catch (IOException e) {
-                    LOGGER.error("An error occured while writing to the temp file {}", to.getAbsolutePath());
-                }
+                Optional.ofNullable(imageClassMap.get(file)).ifPresentOrElse(imageClass -> {
+                    var absoluteOutput = new File(genSrc, relative.getPath().replaceAll("\\.png$", ""));
+                    try {
+                        FileUtils.write(absoluteOutput, imageClass.getText(), Charset.defaultCharset());
+                        addedFiles.add(absoluteOutput);
+                    } catch (IOException e) {
+                        LOGGER.error("An error occurred while writing to the temp file {}", absoluteOutput.getAbsolutePath());
+                    }
+                }, () -> {
+                    var to = new File(genSrc, relative.getPath());
+                    try {
+                        Files.copy(file.toPath(), to.toPath());
+                        addedFiles.add(to);
+                    } catch (IOException e) {
+                        LOGGER.error("An error occured while writing to the temp file {}", to.getAbsolutePath());
+                    }
+                });
             });
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public File getInput() {

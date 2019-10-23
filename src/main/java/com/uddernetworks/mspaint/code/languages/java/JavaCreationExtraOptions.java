@@ -132,6 +132,7 @@ public class JavaCreationExtraOptions extends ExtraCreationOptions {
                             "\n" +
                             "group '" + groupIdString + "'\n" +
                             "version '" + versionString + "'\n" +
+                            "mainClassName = '" + groupIdString + ".Main'\n" +
                             "\n" +
                             "sourceCompatibility = 11\n" +
                             "\n" +

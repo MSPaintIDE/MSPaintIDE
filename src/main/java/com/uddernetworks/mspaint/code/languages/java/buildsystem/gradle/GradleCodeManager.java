@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GradleCodeManager extends JavaCodeManager {
@@ -67,7 +65,7 @@ public class GradleCodeManager extends JavaCodeManager {
         FileUtils.deleteDirectory(classOutputFolder);
         classOutputFolder.mkdirs();
 
-        gradleConnector.runTask("build");
+        gradleConnector.runTask("clean", "build");
 
         LOGGER.info("Compiled in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -75,15 +73,7 @@ public class GradleCodeManager extends JavaCodeManager {
         LOGGER.info("Packaging jar...");
         mainGUI.setStatusText("Packaging jar...");
 
-        var jarCreate = new ArrayList<String>();
-        jarCreate.add("jar");
-        jarCreate.add("-c");
-        jarCreate.add("-f");
-        jarCreate.add(jarFile.getAbsolutePath());
-        jarCreate.add("-e");
-        jarCreate.add(this.language.getLanguageSettings().getSetting(JavaLangOptions.MAIN));
-        jarCreate.add("*");
-        Commandline.runLiveCommand(jarCreate, classOutputFolder, "Jar");
+        gradleConnector.runTask("java");
 
         LOGGER.info("Packaged jar in " + (System.currentTimeMillis() - start) + "ms");
 
@@ -100,7 +90,8 @@ public class GradleCodeManager extends JavaCodeManager {
             ThreadedLogger.removePipe("JavaCompiler");
             ThreadedLogger.addPipe(programOut, "JavaProgram", GradleCodeManager.class, Commandline.class);
 
-            return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()), null, "Java");
+//            return Commandline.runLiveCommand(Arrays.asList("java", "-jar", jarFile.getAbsolutePath()), null, "Java");
+            gradleConnector.runTask("run");
         }).afterSuccess(exitCode -> {
             if (exitCode < 0) {
                 LOGGER.info("Forcibly terminated after " + (System.currentTimeMillis() - programStart) + "ms");

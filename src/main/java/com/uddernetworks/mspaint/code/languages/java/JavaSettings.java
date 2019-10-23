@@ -17,9 +17,13 @@ public class JavaSettings extends LanguageSettings {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaSettings.class);
 
-    protected JavaSettings() {
+    public JavaSettings() {
         super("Java");
-        LOGGER.info("Creating settings!");
+    }
+
+    public JavaSettings(LanguageSettings settings) {
+        super("Java");
+        this.settings = settings.settings;
     }
 
     @Override

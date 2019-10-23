@@ -108,7 +108,7 @@ public enum JavaLangOptions implements JavaOptions {
      *
      * @see JavaBuildSystem
      */
-    BUILDSYSTEM("buildSystem", Enum.class, REQUIRED);
+    BUILDSYSTEM("buildSystem", JavaBuildSystem.class, REQUIRED);
 
     private String name;
     private LangGUIOptionRequirement requirement;

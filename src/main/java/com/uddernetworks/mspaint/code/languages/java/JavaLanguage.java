@@ -158,27 +158,24 @@ public class JavaLanguage extends Language {
         var current = ProjectManager.getPPFProject();
         if (current.equals(this.lastInitted)) return;
         this.lastInitted = current;
-        var buildSystem = (JavaBuildSystem) settings.getSetting(JavaLangOptions.BUILDSYSTEM);
+        settings.reload();
+        var buildSystem = (JavaBuildSystem) current.getLanguageSetting(getName()).get(JavaLangOptions.BUILDSYSTEM.getName()); // Doing some sketchy shit due to settings not being properly loaded yet
         if (buildSystem != currentBuildSystem) {
             currentBuildSystem = buildSystem;
             switch (buildSystem) {
                 case GRADLE:
-                    settings = new GradleSettings();
+                    settings = new GradleSettings(settings);
                     settings.setSetting(JavaLangOptions.BUILDSYSTEM, JavaBuildSystem.GRADLE);
                     javaCodeManager = new GradleCodeManager(this);
                     break;
                 case DEFAULT:
-                    settings = new JavaSettings();
+                    settings = new JavaSettings(settings);
                     settings.setSetting(JavaLangOptions.BUILDSYSTEM, JavaBuildSystem.DEFAULT);
                     javaCodeManager = new JavaCodeManager(this);
                     break;
             }
         }
         getLanguageSettings().initOptions();
-
-//        if (buildSystem == JavaBuildSystem.GRADLE) {
-//            settings.setSetting(JavaLangOptions.INPUT_DIRECTORY, current.getFile().getParentFile());
-//        }
     }
 
     @Override

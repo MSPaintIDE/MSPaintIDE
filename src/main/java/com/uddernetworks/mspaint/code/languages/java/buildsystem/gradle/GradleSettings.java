@@ -5,6 +5,7 @@ import com.uddernetworks.mspaint.code.gui.BooleanLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.DropdownLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.FileLangGUIOption;
 import com.uddernetworks.mspaint.code.gui.HiddenGUIOption;
+import com.uddernetworks.mspaint.code.languages.LanguageSettings;
 import com.uddernetworks.mspaint.code.languages.java.JavaLangOptions;
 import com.uddernetworks.mspaint.code.languages.java.JavaOptions;
 import com.uddernetworks.mspaint.code.languages.java.JavaSettings;
@@ -18,6 +19,14 @@ import java.io.File;
 public class GradleSettings extends JavaSettings {
 
     private static Logger LOGGER = LoggerFactory.getLogger(GradleSettings.class);
+
+    public GradleSettings() {
+        super();
+    }
+
+    public GradleSettings(LanguageSettings settings) {
+        super(settings);
+    }
 
     @Override
     public void initOptions() {
