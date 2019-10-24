@@ -33,7 +33,7 @@ public class JavaCodeManager {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JavaCodeManager.class);
 
-    private JavaLanguage language;
+    protected JavaLanguage language;
 
     public JavaCodeManager(JavaLanguage language) {
         this.language = language;

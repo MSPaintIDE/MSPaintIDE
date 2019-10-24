@@ -140,7 +140,6 @@ public class PPFProject {
 
     public void setLanguageSetting(String language, Map<String, Object> map, boolean override) {
         if (!this.languageSettings.containsKey(language) || override) {
-            LOGGER.info("Setting for {} with: {}", language, map);
             this.languageSettings.put(language, map);
         }
     }

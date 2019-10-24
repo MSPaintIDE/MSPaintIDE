@@ -15,6 +15,7 @@ import com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle.GradleSe
 import com.uddernetworks.mspaint.code.lsp.DefaultLanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.LSP;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
+import com.uddernetworks.mspaint.code.lsp.doc.Document;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JavaLanguage extends Language {
 
@@ -303,5 +305,27 @@ public class JavaLanguage extends Language {
         });
 
         return this.javaCodeManager.compileAndExecute(imageClasses, jarFile, otherFilesOptional.orElse(null), classOutput, mainGUI, imageOutputStream, compilerStream, libFiles, execute);
+    }
+
+    @Override
+    public Optional<List<ImageClass>> indexFiles() {
+        return super.indexFiles().map(files -> {
+            if (currentBuildSystem == JavaBuildSystem.GRADLE) {
+                LOGGER.info("Adding Gradle specific documents...");
+
+                var lspWrapper = getLSPWrapper();
+                var documentManager = lspWrapper.getDocumentManager();
+                var parent = ProjectManager.getPPFProject().getFile().getParentFile();
+
+                Stream.of("build.gradle.png", "settings.gradle.png")
+                        .map(name -> new File(parent, name))
+                        .filter(File::exists)
+                        .map(documentManager::getDocument)
+                        .map(Document::getImageClass)
+                        .forEach(files::add);
+            }
+
+            return files;
+        });
     }
 }

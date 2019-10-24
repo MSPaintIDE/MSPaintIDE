@@ -67,6 +67,12 @@ public abstract class Language {
      */
     public abstract String[] getFileExtensions();
 
+    /**
+     * Gets the {@link ExtraCreationOptions}, if present, to display a new window upon project creation displaying
+     * alternate settings specific to the language.
+     *
+     * @return The {@link ExtraCreationOptions} if present
+     */
     public Optional<ExtraCreationOptions> getExtraCreationOptions() {
         return Optional.empty();
     }
@@ -264,7 +270,7 @@ public abstract class Language {
      */
     public Optional<List<ImageClass>> indexFiles() {
         var LOGGER = getLogger();
-        var mainGUI = this.startupLogic.getMainGUI();
+        var mainGUI = startupLogic.getMainGUI();
         if (optionsNotFilled()) {
             LOGGER.error("Please select files for all options");
             mainGUI.setHaveError();

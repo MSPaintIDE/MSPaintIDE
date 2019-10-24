@@ -12,12 +12,14 @@ public class ThreadedLogger {
 
     private static List<LogPipe> pipes = new ArrayList<>();
 
-    public static void addPipe(OutputStream allOut, String name, Class<?>... classes) {
-        addPipe(allOut, allOut, name, classes);
+    public static LogPipe addPipe(OutputStream allOut, String name, Class<?>... classes) {
+        return addPipe(allOut, allOut, name, classes);
     }
 
-    public static void addPipe(OutputStream standardOut, OutputStream errorOut, String name, Class<?>... classes) {
-        pipes.add(new LogPipe(name, standardOut, errorOut, Arrays.asList(classes)));
+    public static LogPipe addPipe(OutputStream standardOut, OutputStream errorOut, String name, Class<?>... classes) {
+        var pipe = new LogPipe(name, standardOut, errorOut, Arrays.asList(classes));
+        pipes.add(pipe);
+        return pipe;
     }
 
     public static void removePipe(String name) {

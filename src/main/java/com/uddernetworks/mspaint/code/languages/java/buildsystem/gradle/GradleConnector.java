@@ -1,33 +1,35 @@
 package com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle;
 
+import com.uddernetworks.mspaint.logging.LogPipe;
+import org.gradle.tooling.GradleConnectionException;
 import org.gradle.tooling.ProjectConnection;
+import org.gradle.tooling.ResultHandler;
+import org.gradle.tooling.internal.consumer.DefaultGradleConnector;
 import org.gradle.tooling.model.GradleProject;
 import org.gradle.tooling.model.GradleTask;
 import org.gradle.tooling.model.Task;
 import org.gradle.util.GradleVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GradleConnector {
 
-    public static void main(String[] args) {
-        var connector = new GradleConnector("E:\\MSPaintIDE");
-        System.out.println("Using Gradle version: " + connector.getGradleVersion());
-        System.out.println("Tasks:");
-        connector.getGradleTasks().forEach(task -> {
-            System.out.println(task.getName());
-        });
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(GradleConnector.class);
 
     private org.gradle.tooling.GradleConnector connector;
 
-    public GradleConnector(String projectDir) {
+    public GradleConnector(File projectDir) {
+        LOGGER.info("Connector connected at {}", projectDir.getAbsolutePath());
         connector = org.gradle.tooling.GradleConnector.newConnector();
-//        connector.useInstallation(gradleInstallationDir1);
-        connector.forProjectDirectory(new File(projectDir));
+        connector.forProjectDirectory(projectDir);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(DefaultGradleConnector::close));
     }
 
     public String getGradleVersion() {
@@ -50,8 +52,36 @@ public class GradleConnector {
     }
 
     public void runTask(String... tasks) {
+        runTask(System.out, tasks);
+    }
+
+    public void runTask(LogPipe logPipe, String... tasks) {
+        if (logPipe == null) {
+            runTask(tasks);
+        } else {
+            runTask(logPipe.getStandardOut(), logPipe.getErrorOut(), tasks);
+        }
+    }
+
+    public void runTask(OutputStream out, String... tasks) {
+        runTask(out, System.err, tasks);
+    }
+
+    public void runTask(OutputStream out, OutputStream err, String... tasks) {
+        LOGGER.info("Running task(s) {}", String.join(" ", tasks));
         try (ProjectConnection connection = connector.connect()) {
-            connection.newBuild().forTasks(tasks).run();
+
+            connection.newBuild().setStandardOutput(out).setStandardError(err).forTasks(tasks).run(new ResultHandler<>() {
+                @Override
+                public void onComplete(Void result) {
+                    LOGGER.info("Finished {}", String.join(" ", tasks));
+                }
+
+                @Override
+                public void onFailure(GradleConnectionException failure) {
+                    LOGGER.error("Failed to execute " + String.join(" ", tasks), failure.fillInStackTrace());
+                }
+            });
         }
     }
 }

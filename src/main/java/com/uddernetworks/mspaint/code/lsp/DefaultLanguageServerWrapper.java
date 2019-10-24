@@ -300,7 +300,7 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
 
                 if (document.getText() == null) return;
 
-//                if (writingFile.createNewFile()) setHidden(writingFile);
+                if (writingFile.createNewFile()) setHidden(writingFile);
                 Files.write(writingFile.toPath(), document.getText().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
             } catch (IOException e) {
                 LOGGER.error("Error while writing to file after creation/modification", e);
