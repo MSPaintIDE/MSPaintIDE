@@ -15,7 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.log4j.Level.*;
+import static org.apache.log4j.Level.ALL;
+import static org.apache.log4j.Level.DEBUG;
+import static org.apache.log4j.Level.ERROR;
+import static org.apache.log4j.Level.FATAL;
+import static org.apache.log4j.Level.INFO;
+import static org.apache.log4j.Level.OFF;
+import static org.apache.log4j.Level.TRACE;
+import static org.apache.log4j.Level.WARN;
 
 public class FormattedAppender extends ConsoleAppender {
 
@@ -104,6 +111,10 @@ public class FormattedAppender extends ConsoleAppender {
 
     private void printOut(String text, String style) {
         output.append(ReadOnlyStyledDocument.fromString(text, style, style, SegmentOps.styledTextOps()));
+    }
+
+    public static void appendText(String text) {
+        Platform.runLater(() -> instance.printOut(text, STYLE_MAP.get(INFO)));
     }
 
     public static FormattedAppender getInstance() {

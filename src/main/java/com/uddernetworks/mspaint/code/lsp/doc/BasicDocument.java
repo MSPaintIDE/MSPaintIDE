@@ -3,11 +3,20 @@ package com.uddernetworks.mspaint.code.lsp.doc;
 import com.uddernetworks.mspaint.code.ImageClass;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.RequestManager;
-import org.eclipse.lsp4j.*;
+import com.uddernetworks.mspaint.util.IDEFileUtils;
+import org.eclipse.lsp4j.DidChangeTextDocumentParams;
+import org.eclipse.lsp4j.DidCloseTextDocumentParams;
+import org.eclipse.lsp4j.DidOpenTextDocumentParams;
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent;
+import org.eclipse.lsp4j.TextDocumentIdentifier;
+import org.eclipse.lsp4j.TextDocumentItem;
+import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 
 public class BasicDocument implements Document {
@@ -15,6 +24,8 @@ public class BasicDocument implements Document {
     private static Logger LOGGER = LoggerFactory.getLogger(BasicDocument.class);
 
     private File file;
+    private File hiddenClone;
+    private boolean enableHiddenClone;
     private ImageClass imageClass;
     private String text;
 
@@ -33,6 +44,7 @@ public class BasicDocument implements Document {
         this.imageClass = imageClass;
         this.lsWrapper = lsWrapper;
         this.requestManager = lsWrapper.getRequestManager();
+        this.hiddenClone = new File(file.getAbsolutePath().replaceAll("\\.png$", ""));
 
         this.text = imageClass.getText();
 
@@ -44,6 +56,10 @@ public class BasicDocument implements Document {
 
     @Override
     public void open() {
+        open(true);
+    }
+
+    public void open(boolean updateLSP) {
         this.opened = true;
 
         if (this.text == null) {
@@ -51,6 +67,7 @@ public class BasicDocument implements Document {
             if ((this.text = this.imageClass.getText()) == null) return;
         }
 
+        if (!updateLSP) return;
         this.requestManager.didOpen(new DidOpenTextDocumentParams(new TextDocumentItem(getURI(), "java", version++, this.text)));
     }
 
@@ -76,11 +93,23 @@ public class BasicDocument implements Document {
         // Sync settings *should* be incremental, but will be full since I'm lazy
         changesParams.getContentChanges().get(0).setText(getText());
         requestManager.didChange(changesParams);
+
+        rewriteFile();
+    }
+
+    private void rewriteFile() {
+        if (enableHiddenClone && hiddenClone != null) {
+            try {
+                if (hiddenClone.createNewFile()) IDEFileUtils.setHidden(hiddenClone);
+                Files.write(hiddenClone.toPath(), text.getBytes());
+            } catch (IOException e) {
+                LOGGER.error("Error updating hidden clone!", e);
+            }
+        }
     }
 
     @Override
     public void notifyOfTextChange() {
-        LOGGER.info("Notifying of text change");
         this.imageClass.scan();
         modifyText(this.imageClass.getText());
     }
@@ -108,6 +137,27 @@ public class BasicDocument implements Document {
     @Override
     public boolean isOpened() {
         return opened;
+    }
+
+    @Override
+    public void enableHiddenClone(boolean enabled) {
+        var pref = enableHiddenClone;
+        if (pref != (enableHiddenClone = enabled) && text != null) rewriteFile();
+    }
+
+    @Override
+    public boolean isHiddenCloneEnabled() {
+        return enableHiddenClone;
+    }
+
+    @Override
+    public void setHiddenClone(File file) {
+        hiddenClone = file;
+    }
+
+    @Override
+    public File getHiddenClone() {
+        return hiddenClone;
     }
 
     @Override

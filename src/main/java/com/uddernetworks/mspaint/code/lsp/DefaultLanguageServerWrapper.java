@@ -8,6 +8,7 @@ import com.uddernetworks.mspaint.code.lsp.doc.DocumentManager;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.mspaint.project.ProjectManager;
+import com.uddernetworks.mspaint.util.IDEFileUtils;
 import com.uddernetworks.mspaint.watcher.FileWatchManager;
 import com.uddernetworks.mspaint.watcher.FileWatcher;
 import com.uddernetworks.mspaint.watcher.WatchType;
@@ -46,7 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -300,7 +300,7 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
 
                 if (document.getText() == null) return;
 
-                if (writingFile.createNewFile()) setHidden(writingFile);
+                if (writingFile.createNewFile()) IDEFileUtils.setHidden(writingFile);
                 Files.write(writingFile.toPath(), document.getText().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
             } catch (IOException e) {
                 LOGGER.error("Error while writing to file after creation/modification", e);
@@ -374,12 +374,6 @@ public class DefaultLanguageServerWrapper implements LanguageServerWrapper {
     public LanguageServerWrapper setServerDirectorySupplier(Supplier<String> supplier) {
         this.serverPath = supplier;
         return this;
-    }
-
-    private void setHidden(File file) {
-        try {
-            Files.setAttribute(file.toPath(), "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS); //< set hidden attribute
-        } catch (IOException e) {}
     }
 
     private String getURI(String file) {

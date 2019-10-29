@@ -24,10 +24,6 @@
 
 People joke about what IDE they use often, things like Word, MS Notepad, sometimes even _Eclipse_, and then often times MS Paint. People joke about MS Paint because it's not even a text editor, people joke about it because it doesn't have one feature in common with IDEs. Well, this application gives MS Paint a boost, and lets MS Paint highlight, compile, and execute code, with just a few clicks of a button, and only text coming from MS Paint. It is now much more practical than things like Word, Notepad, and obviously _Eclipse_.
 
-## dev branch
-
-This branch is the dev branch, therefore things are not guaranteed to work. The current changes are being made to allow for Gradle (With a modular buildsystem framework) support, and possibly some other small things. It is targeted to the v3.1.0 release.
-
 ## Features
 
 MS Paint IDE has grown an insane amount over the past year, and I plan for it to grow even more in the following year. Currently, these are some of the features present in MS Paint IDE:
@@ -36,6 +32,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 - Finding and replacing of text from image files
 - Supports Java, Python, JavaScript, and Go, with many more planned
   - Includes [LSP](https://microsoft.github.io/language-server-protocol/) support alongside a very simple language API to add custom languages
+  - Expandable build system support, with Gradle included
 - Git tools, to create and manage your project in Git from within the IDE
 - Google Assistant support
 - Right-click context menu to open and edit ANY text file in an MS Paint instance

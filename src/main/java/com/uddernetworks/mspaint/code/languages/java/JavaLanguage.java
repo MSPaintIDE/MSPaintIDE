@@ -15,7 +15,7 @@ import com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle.GradleSe
 import com.uddernetworks.mspaint.code.lsp.DefaultLanguageServerWrapper;
 import com.uddernetworks.mspaint.code.lsp.LSP;
 import com.uddernetworks.mspaint.code.lsp.LanguageServerWrapper;
-import com.uddernetworks.mspaint.code.lsp.doc.Document;
+import com.uddernetworks.mspaint.code.lsp.doc.BasicDocument;
 import com.uddernetworks.mspaint.imagestreams.ImageOutputStream;
 import com.uddernetworks.mspaint.main.MainGUI;
 import com.uddernetworks.mspaint.main.StartupLogic;
@@ -178,6 +178,21 @@ public class JavaLanguage extends Language {
             }
         }
         getLanguageSettings().initOptions();
+
+        if (currentBuildSystem == JavaBuildSystem.GRADLE) {
+            LOGGER.info("Adding Gradle specific documents...");
+
+            var lspWrapper = getLSPWrapper();
+            var documentManager = lspWrapper.getDocumentManager();
+            var parent = ProjectManager.getPPFProject().getFile().getParentFile();
+
+            Stream.of("build.gradle.png", "settings.gradle.png")
+                    .map(name -> new File(parent, name))
+                    .filter(File::exists)
+                    .map(documentManager::getDocument)
+                    .peek(document -> ((BasicDocument) document).open(false))
+                    .forEach(document -> document.enableHiddenClone(true));
+        }
     }
 
     @Override
@@ -310,20 +325,21 @@ public class JavaLanguage extends Language {
     @Override
     public Optional<List<ImageClass>> indexFiles() {
         return super.indexFiles().map(files -> {
-            if (currentBuildSystem == JavaBuildSystem.GRADLE) {
-                LOGGER.info("Adding Gradle specific documents...");
-
-                var lspWrapper = getLSPWrapper();
-                var documentManager = lspWrapper.getDocumentManager();
-                var parent = ProjectManager.getPPFProject().getFile().getParentFile();
-
-                Stream.of("build.gradle.png", "settings.gradle.png")
-                        .map(name -> new File(parent, name))
-                        .filter(File::exists)
-                        .map(documentManager::getDocument)
-                        .map(Document::getImageClass)
-                        .forEach(files::add);
-            }
+//            if (currentBuildSystem == JavaBuildSystem.GRADLE) {
+//                LOGGER.info("Adding Gradle specific documents...");
+//
+//                var lspWrapper = getLSPWrapper();
+//                var documentManager = lspWrapper.getDocumentManager();
+//                var parent = ProjectManager.getPPFProject().getFile().getParentFile();
+//
+//                Stream.of("build.gradle.png", "settings.gradle.png")
+//                        .map(name -> new File(parent, name))
+//                        .filter(File::exists)
+//                        .map(documentManager::getDocument)
+//                        .peek(document -> document.enableHiddenClone(true))
+//                        .map(Document::getImageClass)
+//                        .forEach(files::add);
+//            }
 
             return files;
         });

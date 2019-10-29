@@ -1,12 +1,17 @@
 package com.uddernetworks.mspaint.imagestreams;
 
+import com.uddernetworks.mspaint.logging.FormattedAppender;
 import com.uddernetworks.mspaint.main.StartupLogic;
 import com.uddernetworks.newocr.utils.ConversionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -24,15 +29,18 @@ public class ImageOutputStream extends OutputStream {
     private File location;
     private Graphics2D graphics;
     private int width;
+    private final boolean log;
     private int minHeight;
     private Color color;
     private Color background;
+    private StringBuilder buffer = new StringBuilder();
 
-    public ImageOutputStream(StartupLogic startupLogic, File location, int width) {
+    public ImageOutputStream(StartupLogic startupLogic, File location, int width, boolean log) {
         this.startupLogic = startupLogic;
         this.location = location;
 
         this.width = width;
+        this.log = log;
         this.minHeight = 200;
 
         this.color = Color.BLACK;
@@ -41,7 +49,15 @@ public class ImageOutputStream extends OutputStream {
 
     @Override
     public void write(int b) {
-        string.append((char) b);
+        var c = (char) b;
+        string.append(c);
+        if (!log) return;
+        if (c == '\n') {
+            FormattedAppender.appendText(buffer.append('\n').toString());
+            buffer.setLength(0);
+        } else {
+            buffer.append(c);
+        }
     }
 
     public void saveImage() {

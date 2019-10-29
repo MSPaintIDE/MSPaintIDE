@@ -1,6 +1,7 @@
 package com.uddernetworks.mspaint.code.languages.java.buildsystem.gradle;
 
 import com.uddernetworks.mspaint.logging.LogPipe;
+import com.uddernetworks.mspaint.main.StartupLogic;
 import org.gradle.tooling.GradleConnectionException;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.ResultHandler;
@@ -21,10 +22,14 @@ import java.util.stream.Collectors;
 public class GradleConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GradleConnector.class);
+    private final StartupLogic startupLogic;
+    private final File projectDir;
 
     private org.gradle.tooling.GradleConnector connector;
 
-    public GradleConnector(File projectDir) {
+    public GradleConnector(StartupLogic startupLogic, File projectDir) {
+        this.startupLogic = startupLogic;
+        this.projectDir = projectDir;
         LOGGER.info("Connector connected at {}", projectDir.getAbsolutePath());
         connector = org.gradle.tooling.GradleConnector.newConnector();
         connector.forProjectDirectory(projectDir);
@@ -70,7 +75,6 @@ public class GradleConnector {
     public void runTask(OutputStream out, OutputStream err, String... tasks) {
         LOGGER.info("Running task(s) {}", String.join(" ", tasks));
         try (ProjectConnection connection = connector.connect()) {
-
             connection.newBuild().setStandardOutput(out).setStandardError(err).forTasks(tasks).run(new ResultHandler<>() {
                 @Override
                 public void onComplete(Void result) {

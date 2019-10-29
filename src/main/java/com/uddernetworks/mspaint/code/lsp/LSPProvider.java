@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 public class LSPProvider {
@@ -42,12 +43,12 @@ public class LSPProvider {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             var requestManager = this.requestManagerSupplier.get();
-            if (requestManager != null) requestManager.shutdown().thenRun(() -> this.process.destroyForcibly());
+            if (requestManager != null) requestManager.shutdown().orTimeout(10, TimeUnit.SECONDS).thenRun(() -> this.process.destroyForcibly());
         }));
     }
 
     private ProcessBuilder createProcessBuilder() {
-        commands.forEach(c -> c = c.replace("\'", ""));
+        commands.forEach(c -> c = c.replace("'", ""));
         ProcessBuilder builder = new ProcessBuilder(commands);
         if (this.workingDir != null) builder.directory(new File(workingDir));
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);

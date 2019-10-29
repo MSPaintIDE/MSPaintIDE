@@ -34,16 +34,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 public class StartupLogic {
 
@@ -235,8 +242,8 @@ public class StartupLogic {
 
         mainGUI.setIndeterminate(true);
 
-        var imageOutputStream = new ImageOutputStream(this, this.currentLanguage.getAppOutput(), 1500);
-        var compilerOutputStream = new ImageOutputStream(this, this.currentLanguage.getCompilerOutput(), 1500);
+        var imageOutputStream = new ImageOutputStream(this, this.currentLanguage.getAppOutput(), 1750, true);
+        var compilerOutputStream = new ImageOutputStream(this, this.currentLanguage.getCompilerOutput(), 1750, true);
 
         var result = this.currentLanguage.compileAndExecute(mainGUI, imageClasses, imageOutputStream, compilerOutputStream, buildSettings);
 

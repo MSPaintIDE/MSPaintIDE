@@ -60,7 +60,7 @@ public class GradleCodeManager extends JavaCodeManager {
             FileUtils.deleteDirectory(classOutputFolder);
             classOutputFolder.mkdirs();
 
-            gradleConnector = new GradleConnector(sourceMover.getDestination());
+            gradleConnector = new GradleConnector(mainGUI.getStartupLogic(), sourceMover.getDestination());
 
             gradleConnector.runTask(javaCompilerPipe, "build"); // clean
 

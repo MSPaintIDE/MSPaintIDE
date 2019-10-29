@@ -69,5 +69,13 @@ public interface Document {
      */
     boolean isOpened();
 
+    void enableHiddenClone(boolean enabled);
+
+    boolean isHiddenCloneEnabled();
+
+    void setHiddenClone(File file);
+
+    File getHiddenClone();
+
     void setUseRelativeToDirectory(File relParent);
 }
