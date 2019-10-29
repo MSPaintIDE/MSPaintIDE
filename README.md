@@ -54,8 +54,6 @@ MS Paint IDE is an application that runs alongside MS Paint that reads its image
 
 Every feature, button, usage instructions, and whatever you want is on the wiki, which is the best place to start if you're interested in trying out the IDE. [https://wiki.ms-paint-i.de/](https://wiki.ms-paint-i.de/)
 
-The wiki also includes screenshots of nearly everything, with videos coming soon upon the final 3.0.0 release.
-
 ## Contributing
 
 Contributors are always welcome, and for setting up the repository locally, there's a wiki page walking through the whole process: [https://wiki.ms-paint-i.de/developing](https://wiki.ms-paint-i.de/developing). If you simply have a bug or feature request, please make a issue on GitHub using the corresponding template.

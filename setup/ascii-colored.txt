@@ -41,5 +41,5 @@
 [0m
 [0m
 [0m                           [32mWelcome to the MS Paint IDE Codebase
-[0m                                        [31mv3.0.0-BETA
+[0m                                        [31mv3.1.0
 [0m

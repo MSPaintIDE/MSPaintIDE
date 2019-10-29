@@ -6,6 +6,7 @@ The current IDE version is in beta, with no other versions supported. This is du
 
 | Version     | Supported |
 | ----------- | --------- |
+| 3.1.0       |  :white_check_mark:  |
 | 3.0.0       |  :white_check_mark:  |
 | 2.1.x       | :x:       |
 | 2.0.x       | :x:       |
