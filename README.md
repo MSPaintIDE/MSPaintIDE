@@ -10,7 +10,7 @@
     <a href="https://opencollective.com/MSPaintIDE" alt="Financial Contributors on Open Collective"><img src="https://opencollective.com/MSPaintIDE/all/badge.svg?label=financial+contributors" /></a> 
 </h1>
 <h1 align="center">
-    <img src="https://ms-paint-i.de/images/Logo-Header.png">
+    <img src="https://ms-paint-i.de/images/Logo-Header.png" alt="MS Paint IDE Logo header">
 </h1>
 <p align="center">
   <b>
@@ -44,7 +44,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 
 The following is a video of the IDE being installed and used (For just usage, skip to [2:18](https://www.youtube.com/watch?v=fhSaLx6l9Xk&t=138s))
 
-[![](https://rubbaboy.me/images/qr73jd0)](https://www.youtube.com/watch?v=fhSaLx6l9Xk)
+[![video preview](https://rubbaboy.me/images/qr73jd0)](https://www.youtube.com/watch?v=fhSaLx6l9Xk)
 
 ## How It Works
 
@@ -60,21 +60,21 @@ Contributors are always welcome, and for setting up the repository locally, ther
 
 A video of getting the codebase locally is available below.
 
-[![](https://rubbaboy.me/images/k9m6lri)](https://www.youtube.com/watch?v=HF1e9tk5GT4)
+[![video preview](https://rubbaboy.me/images/k9m6lri)](https://www.youtube.com/watch?v=HF1e9tk5GT4)
 
 ## Screenshots
 
 Many screenshots are available through [the wiki](https://wiki.ms-paint-i.de), but some showing off the IDE are below so you don't need to dig through it.
 
-[![](https://wiki.ms-paint-i.de/assets/images/misc/replace.png)](https://wiki.ms-paint-i.de/misc/editing)
+[![screenshot](https://wiki.ms-paint-i.de/assets/images/misc/replace.png)](https://wiki.ms-paint-i.de/misc/editing)
 
-[![](https://wiki.ms-paint-i.de/assets/images/setup/ocr-settings-first.png)](https://wiki.ms-paint-i.de/setup/ocr)
+[![screenshot](https://wiki.ms-paint-i.de/assets/images/setup/ocr-settings-first.png)](https://wiki.ms-paint-i.de/setup/ocr)
 
-[![](https://wiki.ms-paint-i.de/assets/images/misc/context-edit.png)](https://wiki.ms-paint-i.de/misc/editing)
+[![screenshot](https://wiki.ms-paint-i.de/assets/images/misc/context-edit.png)](https://wiki.ms-paint-i.de/misc/editing)
 
-[![](https://wiki.ms-paint-i.de/assets/images/misc/injected-buttons.png)](https://wiki.ms-paint-i.de/misc/editing)
+[![screenshot](https://wiki.ms-paint-i.de/assets/images/misc/injected-buttons.png)](https://wiki.ms-paint-i.de/misc/editing)
 
-[![](https://wiki.ms-paint-i.de/assets/images/codebase-setup.png)](https://wiki.ms-paint-i.de/developing)
+[![screenshot](https://wiki.ms-paint-i.de/assets/images/codebase-setup.png)](https://wiki.ms-paint-i.de/developing)
 
 ## Donations
 
@@ -91,7 +91,7 @@ Thank you very much to the current donors:
 [@AL1L](https://al1l.com/)
 
 <h2 name="special-thanks">Special Thanks To:</h2>
-![](https://www.yourkit.com/images/yklogo.png)
+![YourKit Logo](https://www.yourkit.com/images/yklogo.png)
 
 YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>
