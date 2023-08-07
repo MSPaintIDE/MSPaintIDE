@@ -1,5 +1,4 @@
 <h1 align="center">
-  <a href="http://hits.dwyl.io/RubbaBoy/MSPaintIDE"><img src="http://hits.dwyl.io/RubbaBoy/MSPaintIDE.svg" alt="HitCount"/></a>
   <a href="https://discord.gg/RXmPkPJ" style="color: transparent">
         <img src="https://img.shields.io/discord/528423806453415972.svg?logo=discord"
             alt="MS Paint IDE's Discord server">
@@ -44,7 +43,7 @@ MS Paint IDE has grown an insane amount over the past year, and I plan for it to
 
 The following is a video of the IDE being installed and used (For just usage, skip to [2:18](https://www.youtube.com/watch?v=fhSaLx6l9Xk&t=138s))
 
-[![video preview](https://rubbaboy.me/images/qr73jd0)](https://www.youtube.com/watch?v=fhSaLx6l9Xk)
+[![video preview](https://i.yarr.is/qr73jd0)](https://www.youtube.com/watch?v=fhSaLx6l9Xk)
 
 ## How It Works
 
@@ -60,7 +59,7 @@ Contributors are always welcome, and for setting up the repository locally, ther
 
 A video of getting the codebase locally is available below.
 
-[![video preview](https://rubbaboy.me/images/k9m6lri)](https://www.youtube.com/watch?v=HF1e9tk5GT4)
+[![video preview](https://i.yarr.is/k9m6lri)](https://www.youtube.com/watch?v=HF1e9tk5GT4)
 
 ## Screenshots
 
